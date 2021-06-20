@@ -1,0 +1,41 @@
+---
+require:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rubycw
+  - rubocop-thread_safety
+
+AllCops:
+  CacheRootDirectory: 'tmp/'
+  DefaultFormatter: fuubar
+  DisabledByDefault: false
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+  MaxFilesInCache: 65536
+  NewCops: enable
+  TargetRubyVersion: 3.0
+  UseCache: true
+
+  # RuboCop has a bunch of cops enabled by default. This setting tells RuboCop
+  # to ignore them, so only the ones explicitly set in this file are enabled.
+  Exclude:
+    - '**/node_modules/**/*'
+    - '**/templates/**/*'
+    - '**/tmp/**/*'
+    - '**/vendor/**/*'
+    - 'bin/bundle'
+    - 'bin/puma'
+    - 'bin/pumactl'
+    - 'bin/rails'
+    - 'bin/rake'
+    - 'bin/setup'
+    - 'bin/sidekiq'
+    - 'bin/sidekiqctl'
+    - 'bin/spring'
+    - 'bin/yarn'
+
+Style/Documentation:
+  Enabled: false
