@@ -8,8 +8,7 @@ set :repo_url, 'git@github.com:just3ws/outlier_jobs'
 
 set :asdf_tools, %w[ruby nodejs yarn]
 
-# Default branch is :master
-# ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
+set :branch, 'main'
 
 # Default deploy_to directory is /var/www/my_app_name
 # set :deploy_to, "/var/www/my_app_name"
