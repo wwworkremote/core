@@ -1,12 +1,13 @@
 # frozen_string_literal: true
+
 # server-based syntax
 # ======================
 # Defines a single server with a list of roles and multiple properties.
 # You can define all roles on a single server, or split them:
 
-# server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
-# server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
-# server "db.example.com", user: "deploy", roles: %w{db}
+server 'malina101', user: 'deploy', roles: %w[web]
+server 'malina102', user: 'deploy', roles: %w[app]
+server 'malina103', user: 'deploy', roles: %w[db]
 
 # role-based syntax
 # ==================
