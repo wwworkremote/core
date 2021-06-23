@@ -84,4 +84,4 @@ production:
   database: outlier_jobs_production
   username: outlier_jobs
   host: malina103 
-  # password: <%= ENV['OUTLIER_JOBS_DATABASE_PASSWORD'] %>
+  password: <%= ENV['OUTLIER_JOBS_DATABASE_PASSWORD'] %>
