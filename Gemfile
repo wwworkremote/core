@@ -17,11 +17,13 @@ gem 'sass-rails', '>= 6'
 # gem 'bcrypt', '~> 3.1.7'
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'byebug'
 end
 
 group :development do
+  gem 'capistrano', '~> 3.10', require: false
+  gem 'capistrano-asdf', require: false
+  gem 'capistrano-rails', '~> 1.6', require: false
   gem 'listen', '~> 3.3'
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
