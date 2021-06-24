@@ -11,7 +11,7 @@ set :asdf_tools, %w[ruby nodejs yarn]
 set :branch, 'main'
 
 # Default deploy_to directory is /var/www/my_app_name
-# set :deploy_to, "/var/www/my_app_name"
+set :deploy_to, "/home/ubuntu/outlier_jobs"
 
 # Default value for :format is :airbrussh.
 # set :format, :airbrussh
