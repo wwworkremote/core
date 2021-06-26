@@ -35,6 +35,10 @@ Metrics/MethodLength:
   Exclude:
     - 'bin/bundle'
 
+Metrics/BlockLength:
+  Exclude:
+    - 'Guardfile'
+
 Metrics/CyclomaticComplexity:
   Exclude:
     - 'bin/bundle'
