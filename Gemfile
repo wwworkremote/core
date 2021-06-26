@@ -6,6 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.0.1'
 
 gem 'bcrypt', '~> 3.1.7'
+gem 'faraday'
 gem 'hiredis'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
