@@ -15,6 +15,10 @@ gem 'sass-rails', '>= 6'
 
 group :development, :test do
   gem 'byebug'
+  gem 'fuubar', require: false
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'rspec-rails'
 end
 
 group :development do

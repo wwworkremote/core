@@ -19,23 +19,26 @@ AllCops:
   TargetRubyVersion: 3.0
   UseCache: true
 
-  # RuboCop has a bunch of cops enabled by default. This setting tells RuboCop
-  # to ignore them, so only the ones explicitly set in this file are enabled.
   Exclude:
     - '**/node_modules/**/*'
     - '**/templates/**/*'
     - '**/tmp/**/*'
     - '**/vendor/**/*'
-    - 'bin/bundle'
-    - 'bin/puma'
-    - 'bin/pumactl'
-    - 'bin/rails'
-    - 'bin/rake'
-    - 'bin/setup'
-    - 'bin/sidekiq'
-    - 'bin/sidekiqctl'
-    - 'bin/spring'
-    - 'bin/yarn'
 
 Style/Documentation:
   Enabled: false
+
+Layout/LineLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Exclude:
+    - 'bin/bundle'
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'bin/bundle'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'bin/bundle'
