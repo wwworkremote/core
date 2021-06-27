@@ -10,19 +10,16 @@ require_relative '../../../lib/spikes/github'
 
 module Spikes
   RSpec.describe Github do
-    it do
+    it 'example request', :vcr  do
       actual = 1
       expected = 1
       expect(actual).to eq(expected)
 
       conn = Faraday::Connection.new(url: 'https://httpbingo.org/') do |faraday|
-        faraday.use VCR::Middleware::Faraday do |cassette|
-          cassette.name    'faraday_example'
-          cassette.options record: :new_episodes
-        end
-
         faraday.adapter :typhoeus
       end
+
+      ap conn.get
     end
   end
 end

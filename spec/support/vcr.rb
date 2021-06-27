@@ -2,7 +2,12 @@
 
 require 'vcr'
 
-VCR.config do |c|
+VCR.configure do |c|
+  c.allow_http_connections_when_no_cassette = false
   c.cassette_library_dir = 'cassettes'
-  c.stub_with :faraday
+  c.configure_rspec_metadata!
+  c.default_cassette_options = { record: :new_episodes }
+  c.default_cassette_options = { serialize_with: :json }
+  c.hook_into :faraday
+  c.ignore_localhost = false
 end

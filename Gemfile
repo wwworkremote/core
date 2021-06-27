@@ -5,6 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.0.1'
 
+gem 'awesome_print'
 gem 'bcrypt', '~> 3.1.7'
 gem 'faraday'
 gem 'faraday_middleware'
