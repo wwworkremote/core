@@ -97,6 +97,8 @@ GEM
       ruby2_keywords (>= 0.0.4)
     faraday-em_http (1.0.0)
     faraday-em_synchrony (1.0.0)
+    faraday-encoding (0.0.5)
+      faraday
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
@@ -153,6 +155,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.11.7-x86_64-darwin)
       racc (~> 1.4)
+    nori (2.6.0)
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -231,6 +234,8 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
+    rss (0.2.9)
+      rexml
     rubocop (1.17.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
@@ -309,12 +314,15 @@ DEPENDENCIES
   capistrano-asdf
   capistrano-rails (~> 1.6)
   faraday
+  faraday-encoding
   faraday_middleware
   fuubar
   guard-rspec
   hiredis
   listen (~> 3.3)
   multi_xml
+  nokogiri
+  nori
   pg (~> 1.1)
   pry-byebug
   pry-rails
@@ -323,6 +331,7 @@ DEPENDENCIES
   rash_alt
   redis
   rspec-rails
+  rss
   rubocop
   rubocop-performance
   rubocop-rails
