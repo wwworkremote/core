@@ -7,12 +7,17 @@ ruby '3.0.1'
 
 gem 'bcrypt', '~> 3.1.7'
 gem 'faraday'
+gem 'faraday_middleware'
 gem 'hiredis'
+gem 'multi_xml'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
 gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
+gem 'rash_alt', require: 'rash'
 gem 'redis', require: %w[redis redis/connection/hiredis]
+gem 'safe_yaml'
 gem 'sass-rails', '>= 6'
+gem 'typhoeus'
 
 group :development, :test do
   gem 'byebug'
@@ -36,4 +41,5 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
+  gem 'vcr'
 end

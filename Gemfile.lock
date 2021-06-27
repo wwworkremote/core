@@ -84,6 +84,8 @@ GEM
     crass (1.0.6)
     diff-lcs (1.4.4)
     erubi (1.10.0)
+    ethon (0.14.0)
+      ffi (>= 1.15.0)
     faraday (1.4.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -97,6 +99,8 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
+    faraday_middleware (1.0.0)
+      faraday (~> 1.0)
     ffi (1.15.3)
     formatador (0.3.0)
     fuubar (2.5.1)
@@ -118,6 +122,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
+    hashie (4.1.0)
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
@@ -135,6 +140,7 @@ GEM
     mini_mime (1.1.0)
     mini_portile2 (2.5.3)
     minitest (5.14.4)
+    multi_xml (0.6.0)
     multipart-post (2.1.1)
     nenv (0.3.0)
     net-scp (3.0.0)
@@ -195,6 +201,8 @@ GEM
       thor (~> 1.0)
     rainbow (3.0.0)
     rake (13.0.3)
+    rash_alt (0.4.9)
+      hashie (~> 4.1)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -253,6 +261,7 @@ GEM
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.4)
+    safe_yaml (1.0.5)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
@@ -276,9 +285,12 @@ GEM
       net-ssh (>= 2.8.0)
     thor (1.1.0)
     tilt (2.0.10)
+    typhoeus (1.4.0)
+      ethon (>= 0.9.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.0.0)
+    vcr (6.0.0)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -295,15 +307,18 @@ DEPENDENCIES
   capistrano-asdf
   capistrano-rails (~> 1.6)
   faraday
+  faraday_middleware
   fuubar
   guard-rspec
   hiredis
   listen (~> 3.3)
+  multi_xml
   pg (~> 1.1)
   pry-byebug
   pry-rails
   puma (~> 5.0)
   rails (~> 6.1.3, >= 6.1.3.2)
+  rash_alt
   redis
   rspec-rails
   rubocop
@@ -314,7 +329,10 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-rubycw
   rubocop-thread_safety
+  safe_yaml
   sass-rails (>= 6)
+  typhoeus
+  vcr
 
 RUBY VERSION
    ruby 3.0.1p64
