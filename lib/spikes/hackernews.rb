@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Spikes
-  class Hackernews 
+  class Hackernews
   end
 end

@@ -1,3 +1,4 @@
-example_id                                | status | run_time        |
------------------------------------------ | ------ | --------------- |
-./spec/lib/spikes/hackernews_spec.rb[1:1] | passed | 0.00492 seconds |
+example_id                                            | status | run_time        |
+----------------------------------------------------- | ------ | --------------- |
+./spec/lib/spikes/hackernews_spec.rb[1:1]             | passed | 0.04711 seconds |
+./spec/services/hackernews/v0/jobstories_spec.rb[1:1] | passed | 0.00833 seconds |
