@@ -8,6 +8,9 @@ set :asdf_tools, %w[ruby nodejs yarn]
 set :branch, 'main'
 set :deploy_to, '/home/ubuntu/outlier_jobs'
 
+set :conditionally_migrate, true
+set :migration_role, :app
+
 # Default value for :format is :airbrussh.
 # set :format, :airbrussh
 

@@ -22,7 +22,6 @@ gem 'redis', require: %w[redis redis/connection/hiredis]
 # gem 'rss'
 # gem 'safe_yaml'
 gem 'rack-cors'
-gem 'sass-rails', '>= 6'
 gem 'typhoeus'
 
 group :development, :test do
