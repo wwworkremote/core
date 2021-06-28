@@ -12,16 +12,11 @@ gem 'faraday-encoding'
 gem 'faraday_middleware'
 gem 'hiredis'
 gem 'multi_xml'
-# gem 'nokogiri'
-# gem 'nori'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
-gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
-# gem 'rash_alt', require: 'rash'
-gem 'redis', require: %w[redis redis/connection/hiredis]
-# gem 'rss'
-# gem 'safe_yaml'
 gem 'rack-cors'
+gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
+gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'typhoeus'
 
 group :development, :test do
@@ -46,5 +41,14 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
+end
+
+group :test do
   gem 'vcr'
 end
+
+# gem 'nokogiri'
+# gem 'nori'
+# gem 'rash_alt', require: 'rash'
+# gem 'rss'
+# gem 'safe_yaml'
