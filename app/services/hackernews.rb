@@ -2,5 +2,5 @@
 
 # frozen_string_literal
 
-module Hackernews
+module HackerNews
 end

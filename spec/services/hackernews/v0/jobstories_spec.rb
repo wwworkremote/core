@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-module Hackernews
+module HackerNews
   module V0
     RSpec.describe Jobstories do
       it 'cool', :vcr do

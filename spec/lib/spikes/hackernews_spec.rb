@@ -20,7 +20,7 @@
 # # end
 #
 # module Spikes
-#   RSpec.describe Hackernews do
+#   RSpec.describe HackerNews do
 #     it 'example request', :vcr do
 #       faraday = Faraday.new do |f|
 #         f.headers[:user_agent] = 'OutlierJobs::HackerNews/1.0'

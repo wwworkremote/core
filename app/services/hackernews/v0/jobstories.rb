@@ -8,7 +8,7 @@ require 'faraday_middleware'
 
 require 'typhoeus/adapters/faraday'
 
-module Hackernews
+module HackerNews
   module V0
     class Jobstories
       def call
