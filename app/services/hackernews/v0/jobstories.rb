@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-# frozen_string_literal
-
 require 'faraday'
 require 'faraday_middleware'
-# require 'faraday/encoding'
 
 require 'typhoeus/adapters/faraday'
 
@@ -21,7 +18,7 @@ module HackerNews
 
       def faraday
         Faraday.new do |f|
-          f.headers[:user_agent] = 'OutlierJobs::HackerNews/1.0'
+          f.headers[:user_agent] = "OutlierJobs::HackerNews/1.0 (#{self.class.name};#{Rails.env})"
 
           f.url_prefix = 'https://hacker-news.firebaseio.com'
           f.path_prefix = 'v0'
@@ -29,12 +26,7 @@ module HackerNews
           f.headers[:accept] = 'application/json; charset=utf-8'
 
           f.response :json, content_type: /\bjson$/
-          # f.response :encoding
           f.response :follow_redirects
-
-          # f.response :logger, nil, { headers: true, bodies: true }
-
-          # f.use :instrumentation
 
           f.adapter :typhoeus
         end
