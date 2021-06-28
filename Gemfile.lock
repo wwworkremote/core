@@ -125,7 +125,6 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hashie (4.1.0)
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
@@ -155,7 +154,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.11.7-x86_64-darwin)
       racc (~> 1.4)
-    nori (2.6.0)
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -175,6 +173,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
+    rack-cors (1.1.1)
+      rack (>= 2.0.0)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (6.1.4)
@@ -205,8 +205,6 @@ GEM
       thor (~> 1.0)
     rainbow (3.0.0)
     rake (13.0.3)
-    rash_alt (0.4.9)
-      hashie (~> 4.1)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -234,8 +232,6 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
-    rss (0.2.9)
-      rexml
     rubocop (1.17.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
@@ -267,7 +263,6 @@ GEM
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.4)
-    safe_yaml (1.0.5)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
@@ -321,17 +316,14 @@ DEPENDENCIES
   hiredis
   listen (~> 3.3)
   multi_xml
-  nokogiri
-  nori
   pg (~> 1.1)
   pry-byebug
   pry-rails
   puma (~> 5.0)
+  rack-cors
   rails (~> 6.1.3, >= 6.1.3.2)
-  rash_alt
   redis
   rspec-rails
-  rss
   rubocop
   rubocop-performance
   rubocop-rails
@@ -340,7 +332,6 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-rubycw
   rubocop-thread_safety
-  safe_yaml
   sass-rails (>= 6)
   typhoeus
   vcr
