@@ -24,7 +24,7 @@ module HackerNews
         end
 
         def faraday
-          Faraday.new do |f|
+          @faraday ||= Faraday.new do |f|
             f.headers[:user_agent] = "OutlierJobs::HackerNews/1.0 (#{self.class.name};#{Rails.env})"
 
             f.url_prefix = 'https://hacker-news.firebaseio.com'

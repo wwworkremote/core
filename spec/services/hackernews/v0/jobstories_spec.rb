@@ -5,7 +5,7 @@ require 'rails_helper'
 module HackerNews
   module V0
     RSpec.describe Jobstories do
-      it 'cool', :vcr do
+      it 'requests a list of jobstories', :vcr do
         ap described_class.new.call
       end
     end
