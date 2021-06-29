@@ -34,6 +34,7 @@ Layout/LineLength:
 Metrics/MethodLength:
   Exclude:
     - 'bin/bundle'
+    - 'app/services/hackernews.rb'
 
 Metrics/BlockLength:
   Exclude:
@@ -46,3 +47,6 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Exclude:
     - 'bin/bundle'
+
+Naming/InclusiveLanguage:
+  Enabled: false

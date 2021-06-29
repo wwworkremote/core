@@ -1,44 +1,29 @@
 # frozen_string_literal: true
 
-require 'faraday'
-require 'faraday_middleware'
-
-require 'typhoeus/adapters/faraday'
-
 module HackerNews
   module V0
     module Item
       class Jobs
-        attr_reader :job_ids
+        attr_reader :job_ids, :client
 
-        def initialize(job_ids)
+        def initialize(job_ids, client = nil)
           @job_ids = job_ids
+          @client = client || HackerNews.client
         end
 
         def call
-          jobs
+          request
+          self
         end
 
-        def jobs
-          @jobs ||= job_ids.map do |job_id|
-            faraday.get("#{job_id}.json")
+        def request
+          @request ||= job_ids.map do |job_id|
+            Job.new(job_id, client).call.data
           end
         end
 
-        def faraday
-          @faraday ||= Faraday.new do |f|
-            f.headers[:user_agent] = "OutlierJobs::HackerNews/1.0 (#{self.class.name};#{Rails.env})"
-
-            f.url_prefix = 'https://hacker-news.firebaseio.com'
-            f.path_prefix = 'v0'
-
-            f.headers[:accept] = 'application/json; charset=utf-8'
-
-            f.response :json, content_type: /\bjson$/
-            f.response :follow_redirects
-
-            f.adapter :typhoeus
-          end
+        def data
+          @data ||= request
         end
       end
     end
