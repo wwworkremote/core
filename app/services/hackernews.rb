@@ -5,6 +5,7 @@ module HackerNews
 
   def jobs
     jobstories = HackerNews::V0::Jobstories.new.call
+
     HackerNews::V0::Item::Jobs.new(jobstories.data, jobstories.client).call.data
   end
 
