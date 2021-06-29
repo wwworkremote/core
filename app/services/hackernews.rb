@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# frozen_string_literal
-
 module HackerNews
   module_function
 
@@ -13,6 +11,7 @@ module HackerNews
   def client
     Faraday.new do |f|
       f.request :retry, max: 3
+
       f.headers[:user_agent] = 'OutlierJobs::HackerNews/1.0'
 
       f.url_prefix = 'https://hacker-news.firebaseio.com'
