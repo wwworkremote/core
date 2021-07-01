@@ -1,0 +1,19 @@
+#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+# frozen_string_literal: true
+
+require 'uri'
+require 'net/http'
+require 'openssl'
+
+url = URI('https://stackoverflow.com/jobs/feed?sort=p&r=true&q=ruby%20on%20rails')
+
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+request = Net::HTTP::Get.new(url)
+request['cookie'] = 'prov=a372420b-be3c-005a-06fa-360e82c9573f'
+request['Accept'] = 'application/rss+xml; charset=utf-8'
+
+response = http.request(request)
+puts response.read_body

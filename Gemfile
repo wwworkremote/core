@@ -52,8 +52,8 @@ group :test do
   gem 'vcr'
 end
 
-# gem 'nokogiri'
-# gem 'nori'
+gem 'nokogiri'
+gem 'nori'
 # gem 'rash_alt', require: 'rash'
-# gem 'rss'
+gem 'rss'
 # gem 'safe_yaml'
