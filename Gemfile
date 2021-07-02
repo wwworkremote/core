@@ -15,13 +15,9 @@ gem 'hiredis'
 gem 'multi_xml'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
-# gem 'rack-cache'
 gem 'rack-cors'
 gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
 gem 'redis', require: %w[redis redis/connection/hiredis]
-# gem 'redis-actionpack'
-# gem 'redis-rack-cache'
-# gem 'redis-rails'
 gem 'typhoeus'
 
 group :development, :test do
@@ -33,6 +29,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'brakeman'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', require: false
@@ -52,8 +49,6 @@ group :test do
   gem 'vcr'
 end
 
-# gem 'nokogiri'
-# gem 'nori'
-# gem 'rash_alt', require: 'rash'
-# gem 'rss'
-# gem 'safe_yaml'
+group :development, :production do
+  gem 'rails_performance'
+end
