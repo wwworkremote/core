@@ -6,7 +6,7 @@ module HackerNews
       class Job
         attr_reader :job_id, :client
 
-        def initialize(job_id, client = nil)
+        def initialize(job_id:, client: nil)
           @job_id = job_id
           @client = client || HackerNews.client
         end

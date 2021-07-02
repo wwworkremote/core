@@ -3,10 +3,12 @@
 module StackOverflow
   module_function
 
-  def jobs(_params = {})
-    feed = StackOverflow::Jobs::Feed.new(nil, nil).call
+  def jobs
+    service = StackOverflow::Jobs::Feed.new(nil, nil)
 
-    feed.data.dig('rss', 'channel', 'item')
+    service.call
+
+    service.data.dig('rss', 'channel', 'item')
   end
 
   def client

@@ -6,7 +6,7 @@ module HackerNews
       class Jobs
         attr_reader :job_ids, :client
 
-        def initialize(job_ids, client = nil)
+        def initialize(job_ids:, client: nil)
           @job_ids = job_ids
           @client = client || HackerNews.client
         end
@@ -18,7 +18,7 @@ module HackerNews
 
         def request
           @request ||= job_ids.map do |job_id|
-            Job.new(job_id, client).call.data
+            Job.new(job_id: job_id, client: client).call.data
           end
         end
 

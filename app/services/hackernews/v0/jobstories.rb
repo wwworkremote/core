@@ -5,7 +5,7 @@ module HackerNews
     class Jobstories
       attr_reader :client
 
-      def initialize(client = nil)
+      def initialize(client: nil)
         @client = client || HackerNews.client
       end
 

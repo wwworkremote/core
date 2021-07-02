@@ -5,7 +5,7 @@ module StackOverflow
     class Feed
       attr_reader :client, :params
 
-      def initialize(client = nil, params = nil)
+      def initialize(client: nil, params: nil)
         @client = client || StackOverflow.client
         @params = params || { q: 'ruby on rails', sort: 'p', r: true }
       end
