@@ -30,6 +30,7 @@ end
 
 group :development do
   gem 'brakeman'
+  gem 'bullet'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', require: false
@@ -47,8 +48,4 @@ end
 
 group :test do
   gem 'vcr'
-end
-
-group :development, :production do
-  gem 'rails_performance'
 end
