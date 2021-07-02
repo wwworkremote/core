@@ -11,6 +11,8 @@ set :deploy_to, '/home/ubuntu/outlier_jobs'
 set :conditionally_migrate, true
 set :migration_role, :app
 
+set :whenever_roles, %i[app]
+
 # Default value for :format is :airbrussh.
 # set :format, :airbrussh
 

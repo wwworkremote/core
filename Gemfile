@@ -18,6 +18,7 @@ gem 'puma', '~> 5.0', require: false
 gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
 gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'typhoeus'
+gem 'whenever', require: false
 
 group :development, :test do
   gem 'byebug'
