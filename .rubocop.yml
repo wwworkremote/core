@@ -35,6 +35,7 @@ Metrics/MethodLength:
   Exclude:
     - 'bin/bundle'
     - 'app/services/hackernews.rb'
+    - 'app/services/stackoverflow.rb'
 
 Metrics/BlockLength:
   Exclude:

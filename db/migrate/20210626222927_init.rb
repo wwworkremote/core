@@ -7,6 +7,7 @@ class Init < ActiveRecord::Migration[6.1]
     enable_extension 'ltree'
     enable_extension 'pg_stat_statements'
     enable_extension 'pg_trgm'
+    enable_extension 'pgcrypto'
     enable_extension 'plpgsql'
     enable_extension 'sslinfo'
   end

@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20_210_626_222_927) do
   enable_extension 'ltree'
   enable_extension 'pg_stat_statements'
   enable_extension 'pg_trgm'
+  enable_extension 'pgcrypto'
   enable_extension 'plpgsql'
   enable_extension 'sslinfo'
 end
