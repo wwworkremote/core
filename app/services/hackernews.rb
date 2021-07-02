@@ -28,6 +28,9 @@ module HackerNews
       f.response :encoding
       f.response :follow_redirects
 
+      f.response :logger, nil, { headers: true, bodies: true }
+      f.use :instrumentation
+
       f.adapter :typhoeus
     end
   end
