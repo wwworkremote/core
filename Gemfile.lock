@@ -156,7 +156,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.11.7-x86_64-darwin)
       racc (~> 1.4)
-    nori (2.6.0)
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -235,8 +234,6 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
-    rss (0.2.9)
-      rexml
     rubocop (1.18.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
@@ -311,8 +308,6 @@ DEPENDENCIES
   hiredis
   listen (~> 3.3)
   multi_xml
-  nokogiri
-  nori
   pg (~> 1.1)
   pry-byebug
   pry-rails
@@ -321,7 +316,6 @@ DEPENDENCIES
   rails (~> 6.1.3, >= 6.1.3.2)
   redis
   rspec-rails
-  rss
   rubocop
   rubocop-performance
   rubocop-rails
