@@ -14,6 +14,7 @@ gem 'faraday_middleware'
 gem 'hiredis'
 gem 'multi_xml'
 gem 'pg', '~> 1.1'
+gem 'pg_query'
 gem 'puma', '~> 5.0', require: false
 gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
 gem 'redis', require: %w[redis redis/connection/hiredis]
