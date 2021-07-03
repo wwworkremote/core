@@ -5,4 +5,4 @@ require 'faraday_middleware'
 
 require 'typhoeus/adapters/faraday'
 
-Typhoeus::Config.cache = Typhoeus::Cache::Redis.new(Rails.cache.redis, default_ttl: 600)
+Typhoeus::Config.cache = Typhoeus::Cache::Redis.new(Rails.cache.redis, default_ttl: 3600)

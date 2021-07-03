@@ -3,6 +3,7 @@
 
 jobs = HackerNews.jobs
 
-binding.pry
-puts
+
+# binding.pry
+# puts
 

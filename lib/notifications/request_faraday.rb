@@ -1,9 +1,16 @@
 # frozen_string_literal: true
 
-ActiveSupport::Notifications.subscribe('request.faraday') do |name, starts, ends, _, env|
-  # ap [name, starts, ends, env]
-  # url = env[:url]
-  # http_method = env[:method].to_s.upcase
-  # duration = ends - starts
-  # warn format('[%s] %s %s (%.3f s)', url.host, http_method, url.request_uri, duration)
+ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event| # |name, start, finish, id, env|
+  puts '------------ notify >>>>>>>>>>>>'
+
+  puts "#{Rainbow('Payload:').bold.blue} #{event.payload.body}"
+  puts "#{Rainbow('Started:').bold.blue} #{event.time}"
+  puts "#{Rainbow('Finished:').bold.blue} #{event.end}"
+  puts "#{Rainbow('Duration (ms):').bold.blue} #{event.duration}"
+  puts "#{Rainbow('CPU time (ms):').bold.blue} #{event.cpu_time}"
+  puts "#{Rainbow('Idle time (ms):').bold.blue} #{event.idle_time}"
+  puts "#{Rainbow('Allocations:').bold.blue} #{event.allocations}"
+  puts "#{Rainbow('Event:').bold.blue} #{event.inspect}"
+
+  puts '<<<<<<<<<<<< notify ------------'
 end
