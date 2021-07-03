@@ -18,6 +18,7 @@ job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment ':task' :outp
 every(36.minutes) { runner 'exe/hackernews' }
 every(37.minutes) { runner 'exe/stackoverflow' }
 every(38.minutes) { runner 'exe/monster' }
+every(39.minutes) { runner 'exe/weworkremotely' }
 
 # every('0 01 * * 0') { rails 'pghero:clean_query_stats' }
 # every('0 0-23 * * *') { rails 'pghero:capture_space_stats' }
