@@ -1,7 +1,4 @@
 #!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
 # frozen_string_literal: true
 
-jobs = StackOverflow.jobs
-
-binding.pry
-puts
+StackOverflow.jobs

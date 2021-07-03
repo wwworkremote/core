@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_210_626_222_927) do
+ActiveRecord::Schema.define(version: 20_210_703_173_154) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'citext'
   enable_extension 'hstore'
@@ -22,4 +22,13 @@ ActiveRecord::Schema.define(version: 20_210_626_222_927) do
   enable_extension 'pgcrypto'
   enable_extension 'plpgsql'
   enable_extension 'sslinfo'
+
+  create_table 'notifications_request_faradays', force: :cascade do |t|
+    t.string 'signature', null: false
+    t.jsonb 'event', default: {}, null: false
+    t.jsonb 'payload', default: {}, null: false
+    t.datetime 'created_at', precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
+    t.datetime 'updated_at', precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
+    t.index ['signature'], name: 'index_notifications_request_faradays_on_signature', unique: true
+  end
 end

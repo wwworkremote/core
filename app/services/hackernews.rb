@@ -24,12 +24,10 @@ module HackerNews
 
       f.headers[:accept] = 'application/json; charset=utf-8'
 
+      f.use :instrumentation
       f.response :json, content_type: /\bjson$/
       f.response :encoding
       f.response :follow_redirects
-
-      # f.response :logger, nil, { headers: true, bodies: true }
-      f.use :instrumentation
 
       f.adapter :typhoeus
     end

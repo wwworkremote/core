@@ -22,12 +22,10 @@ module StackOverflow
 
       f.headers[:accept] = 'application/rss+xml; charset=utf-8'
 
+      f.use :instrumentation
       f.response :xml, content_type: /\bxml$/
       f.response :encoding
       f.response :follow_redirects
-
-      f.response :logger, nil, { headers: true, bodies: true }
-      f.use :instrumentation
 
       f.adapter :typhoeus
     end
