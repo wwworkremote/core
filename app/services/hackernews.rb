@@ -15,7 +15,7 @@ module HackerNews
 
   def client
     Faraday.new do |f|
-      f.request :retry, max: 3
+      f.request :retry, max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 3, max_interval: 900
 
       f.headers[:user_agent] = 'OutlierJobs::HackerNews/1.0'
 

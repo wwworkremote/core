@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event| # |name, start, finish, id, env|
+  puts '------------ notify >>>>>>>>>>>>'
+
+  puts "#{Rainbow('Payload:').bold.blue} #{event.payload.body}"
+  puts "#{Rainbow('Started:').bold.blue} #{event.time}"
+  puts "#{Rainbow('Finished:').bold.blue} #{event.end}"
+  puts "#{Rainbow('Duration (ms):').bold.blue} #{event.duration}"
+  puts "#{Rainbow('CPU time (ms):').bold.blue} #{event.cpu_time}"
+  puts "#{Rainbow('Idle time (ms):').bold.blue} #{event.idle_time}"
+  puts "#{Rainbow('Allocations:').bold.blue} #{event.allocations}"
+  puts "#{Rainbow('Event:').bold.blue} #{event.inspect}"
+
+  puts '<<<<<<<<<<<< notify ------------'
+end
