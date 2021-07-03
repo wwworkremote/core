@@ -15,6 +15,9 @@ job_type :rails,  " #{JOB_PREFIX} bundle exec rails :task --silent :output "
 job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
 job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment ':task' :output "
 
+every(36.minutes) { runner 'exe/hackernews' }
+every(37.minutes) { runner 'exe/stackoverflow' }
+
 # every('0 01 * * 0') { rails 'pghero:clean_query_stats' }
 # every('0 0-23 * * *') { rails 'pghero:capture_space_stats' }
 # every('*/15 * * * *') { rails 'pghero:capture_query_stats' }
