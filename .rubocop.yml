@@ -35,8 +35,10 @@ Metrics/MethodLength:
   Exclude:
     - 'bin/bundle'
     - 'app/services/hackernews.rb'
-    - 'app/services/stackoverflow.rb'
     - 'app/services/monster.rb'
+    - 'app/services/remoteok.rb'
+    - 'app/services/stackoverflow.rb'
+    - 'app/services/weworkremotely.rb'
 
 Metrics/AbcSize:
   Exclude:
