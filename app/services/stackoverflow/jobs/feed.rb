@@ -7,7 +7,7 @@ module StackOverflow
 
       def initialize(client: nil, params: nil)
         @client = client || StackOverflow.client
-        @params = params || { q: 'ruby on rails', sort: 'p', r: true }
+        @params = params || { q: 'ruby', sort: 'p', r: true }
       end
 
       def call
