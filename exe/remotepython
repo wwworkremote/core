@@ -1,0 +1,5 @@
+#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+# frozen_string_literal: true
+
+RemotePython.jobs
+

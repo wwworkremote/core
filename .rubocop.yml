@@ -39,6 +39,7 @@ Metrics/MethodLength:
     - 'app/services/monster.rb'
     - 'app/services/nexxt.rb'
     - 'app/services/remoteok.rb'
+    - 'app/services/remotepython.rb'
     - 'app/services/stackoverflow.rb'
     - 'app/services/weworkremotely.rb'
 
