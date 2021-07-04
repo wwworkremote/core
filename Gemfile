@@ -31,6 +31,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'annotate'
   gem 'brakeman'
   gem 'bullet'
   gem 'capistrano', '~> 3.10', require: false
