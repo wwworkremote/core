@@ -26,7 +26,7 @@ every(39.minutes) { runner 'exe/weworkremotely' }
 every(1.hour) { runner 'exe/stackoverflow' }
 
 every :day, at: '1:20am', roles: [:cron] do
-  shell 'exe/dice'
+  shell '. ./exe/dice'
 end
 
 # every('0 01 * * 0') { rails 'pghero:clean_query_stats' }
