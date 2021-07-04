@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
-module Monster
+module Indeed
   class Feed
     attr_reader :client, :params, :path
 
-    def initialize(client: nil, params: { q: 'Ruby' }, path: '')
-      @client = client || Monster.client
+    DEFAULT_PARAMS = {
+      remotejob: '032b3046-06a3-4876-8dfd-474eb5e7ed11',
+      jlid: 'aaa2b906602aa8f5',
+      rbl: 'Remote',
+      l: 'Remote',
+      q: 'Ruby'
+    }.freeze
+
+    def initialize(client: nil, params: DEFAULT_PARAMS, path: '')
+      @client = client || Indeed.client
       @params = params
       @path = path
     end

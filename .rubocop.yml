@@ -39,6 +39,7 @@ Metrics/MethodLength:
     - 'app/services/remoteok.rb'
     - 'app/services/stackoverflow.rb'
     - 'app/services/weworkremotely.rb'
+    - 'app/services/indeed.rb'
 
 Metrics/AbcSize:
   Exclude:
