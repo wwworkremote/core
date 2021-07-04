@@ -6,6 +6,7 @@ env 'MAILTO', 'mike@just3ws.com'
 
 set :job_template, "/usr/bin/env bash -l -c ':job'"
 set :output, '/home/ubuntu/outlier_jobs/shared/log/cron_production.log'
+set :env_path, '$PATH'
 
 JOB_PREFIX = ' cd :path && PATH=:env_path:"$PATH" :environment_variable=:environment nice -n 20 '
 
