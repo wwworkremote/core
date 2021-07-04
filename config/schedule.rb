@@ -15,6 +15,7 @@ job_type :rails,  " #{JOB_PREFIX} bundle exec rails :task --silent :output "
 job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
 job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment ':task' :output "
 
+every(34.minutes) { runner 'exe/nexxt' }
 every(35.minutes) { runner 'exe/indeed' }
 every(36.minutes) { runner 'exe/hackernews' }
 every(37.minutes) { runner 'exe/remoteok' }
