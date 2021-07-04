@@ -24,6 +24,10 @@ every(39.minutes) { runner 'exe/weworkremotely' }
 
 every(1.hour) { runner 'exe/stackoverflow' }
 
+every :day, at: '1:20am', roles: [:cron] do
+  command 'exe/dice'
+end
+
 # every('0 01 * * 0') { rails 'pghero:clean_query_stats' }
 # every('0 0-23 * * *') { rails 'pghero:capture_space_stats' }
 # every('*/15 * * * *') { rails 'pghero:capture_query_stats' }
