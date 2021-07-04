@@ -14,6 +14,7 @@ job_type :exclusive_rails, " cd :path && flock -n 'tmp/pids/cron_:task.lock' -c 
 job_type :rails,  " #{JOB_PREFIX} bundle exec rails :task --silent :output "
 job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
 job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment ':task' :output "
+job_type :shell,  " #{JOB_PREFIX} :task "
 
 every(34.minutes) { runner 'exe/nexxt' }
 every(35.minutes) { runner 'exe/indeed' }
@@ -25,7 +26,7 @@ every(39.minutes) { runner 'exe/weworkremotely' }
 every(1.hour) { runner 'exe/stackoverflow' }
 
 every :day, at: '1:20am', roles: [:cron] do
-  command 'exe/dice'
+  shell 'exe/dice'
 end
 
 # every('0 01 * * 0') { rails 'pghero:clean_query_stats' }
