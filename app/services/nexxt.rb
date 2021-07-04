@@ -4,7 +4,7 @@ module Nexxt
   module_function
 
   def jobs
-    service = Nexxt::Feed.new(client: nil, params: nil)
+    service = Nexxt::Feed.new
 
     service.call
 

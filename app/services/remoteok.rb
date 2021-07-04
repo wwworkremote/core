@@ -4,7 +4,7 @@ module RemoteOK
   module_function
 
   def jobs
-    service = RemoteOK::Feed.new(client: nil, params: nil)
+    service = RemoteOK::Feed.new
 
     service.call
 

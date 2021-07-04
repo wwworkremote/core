@@ -12,10 +12,10 @@ module Indeed
       q: 'Ruby'
     }.freeze
 
-    def initialize(client: nil, params: DEFAULT_PARAMS, path: '')
+    def initialize(client: nil, params: nil, path: nil)
       @client = client || Indeed.client
-      @params = params
-      @path = path
+      @params = params || DEFAULT_PARAMS
+      @path = path.to_s.strip
     end
 
     def call

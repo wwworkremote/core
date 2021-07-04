@@ -4,10 +4,10 @@ module Nexxt
   class Feed
     attr_reader :client, :params, :path
 
-    def initialize(client: nil, params: { k: 'Ruby' }, path: '')
+    def initialize(client: nil, params: nil, path: nil)
       @client = client || Nexxt.client
-      @params = params
-      @path = path
+      @params = params || { k: 'Ruby' }
+      @path = path.to_s.strip
     end
 
     def call

@@ -4,7 +4,7 @@ module Monster
   module_function
 
   def jobs
-    service = Monster::Feed.new(client: nil, params: nil)
+    service = Monster::Feed.new
 
     service.call
 

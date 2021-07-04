@@ -4,10 +4,10 @@ module RemotePython
   class Feed
     attr_reader :client, :params, :path
 
-    def initialize(client: nil, params: {}, path: '')
+    def initialize(client: nil, params: nil, path: nil)
       @client = client || RemotePython.client
-      @params = params
-      @path = path
+      @params = params || {}
+      @path = path.to_s.strip
     end
 
     def call

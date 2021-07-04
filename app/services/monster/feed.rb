@@ -4,10 +4,10 @@ module Monster
   class Feed
     attr_reader :client, :params, :path
 
-    def initialize(client: nil, params: { q: 'Ruby' }, path: '')
+    def initialize(client: nil, params: nil, path: nil)
       @client = client || Monster.client
-      @params = params
-      @path = path
+      @params = params || { q: 'Ruby' }
+      @path = path.to_s.strip
     end
 
     def call

@@ -4,10 +4,10 @@ module RemoteOK
   class Feed
     attr_reader :client, :params, :path
 
-    def initialize(client: nil, params: {}, path: 'remote-dev-jobs.rss')
+    def initialize(client: nil, params: nil, path: nil)
       @client = client || RemoteOK.client
-      @params = params
-      @path = path
+      @params = params || {}
+      @path = path || 'remote-dev-jobs.rss'
     end
 
     def call

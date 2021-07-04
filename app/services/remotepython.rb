@@ -4,7 +4,7 @@ module RemotePython
   module_function
 
   def jobs
-    service = RemotePython::Feed.new(client: nil, params: nil)
+    service = RemotePython::Feed.new
 
     service.call
 

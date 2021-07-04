@@ -4,7 +4,7 @@ module Indeed
   module_function
 
   def jobs
-    service = Indeed::Feed.new(client: nil, params: nil)
+    service = Indeed::Feed.new
 
     service.call
 

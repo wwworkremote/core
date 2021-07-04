@@ -4,7 +4,7 @@ module StackOverflow
   module_function
 
   def jobs
-    service = StackOverflow::Jobs::Feed.new(client: nil, params: nil)
+    service = StackOverflow::Jobs::Feed.new
 
     service.call
 

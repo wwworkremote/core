@@ -3,11 +3,12 @@
 module StackOverflow
   module Jobs
     class Feed
-      attr_reader :client, :params
+      attr_reader :client, :params, :path
 
-      def initialize(client: nil, params: nil)
+      def initialize(client: nil, params: nil, path: nil)
         @client = client || StackOverflow.client
         @params = params || { q: 'ruby', sort: 'p', r: true }
+        @path = path || 'feed'
       end
 
       def call
@@ -16,7 +17,7 @@ module StackOverflow
       end
 
       def request
-        @request ||= client.get('feed', params)
+        @request ||= client.get(path, params)
       end
 
       def data
