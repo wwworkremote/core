@@ -92,12 +92,14 @@ GEM
     erubi (1.10.0)
     ethon (0.14.0)
       ffi (>= 1.15.0)
-    faraday (1.4.3)
+    faraday (1.5.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
+      faraday-httpclient (~> 1.0.1)
       faraday-net_http (~> 1.0)
       faraday-net_http_persistent (~> 1.1)
+      faraday-patron (~> 1.0)
       multipart-post (>= 1.2, < 3)
       ruby2_keywords (>= 0.0.4)
     faraday-em_http (1.0.0)
@@ -107,8 +109,10 @@ GEM
     faraday-excon (1.1.0)
     faraday-http-cache (2.2.0)
       faraday (>= 0.8)
+    faraday-httpclient (1.0.1)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
+    faraday-patron (1.0.0)
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
     ffi (1.15.3)
@@ -137,6 +141,10 @@ GEM
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    jsonb_accessor (1.3.2)
+      activerecord (>= 5.0)
+      activesupport (>= 5.0)
+      pg (>= 0.18.1)
     listen (3.5.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -318,6 +326,7 @@ DEPENDENCIES
   fuubar
   guard-rspec
   hiredis
+  jsonb_accessor
   listen (~> 3.3)
   multi_xml
   pg (~> 1.1)

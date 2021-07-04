@@ -51,3 +51,5 @@ end
 group :test do
   gem 'vcr'
 end
+
+gem 'jsonb_accessor'
