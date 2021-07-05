@@ -1,0 +1,50 @@
+#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+# frozen_string_literal: true
+
+notification = Notifications::RequestFaraday.last
+payload = notification.payload.deep_symbolize_keys
+
+
+def extract(payload)
+  case payload
+    in response_body: { rss: { channel: { item: [*items] } } }
+    items.map do |item|
+      case item
+        in {
+          guid: { __content__: String => guid },
+          pubDate: String => pub_date,
+          link: String => link,
+          title: String => title,
+          description: String => description
+        }
+
+        { external_id: guid, published_at: pub_date, target_url: link, title: title, body: description.strip }
+      else
+      end
+    end
+  end
+end
+
+feed = extract(payload)
+
+binding.pry
+puts
+
+  # item = feed.first
+  # 
+  # ap item.keys
+  # 
+  # case item
+  #   in {
+  #     guid: { __content__: String => external_guid },
+  #     pubDate: String => remote_published_at,
+  #     link: String => target_link,
+  #     title: String => subject,
+  #     description: String => body
+  #   }
+  #   ap [external_guid, target_link, remote_published_at, subject, body]
+  # else
+  # end
+  # 
+  # binding.pry
+  # puts
