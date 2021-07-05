@@ -32,7 +32,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
-  config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_CACHE_URL'), driver: :hiredis, namespace: 'out' }
+  config.cache_store = :redis_cache_store, { url: ENV.fetch('OUTLIER_JOBS_REDIS_CACHE_URL'), driver: :hiredis, namespace: 'out' }
 
   config.i18n.fallbacks = true
 
