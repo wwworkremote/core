@@ -1,7 +1,8 @@
 #!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
 # frozen_string_literal: true
 
-feed = Notifications::RequestFaraday.find_each.map do |notification|
+
+feed = Notifications::RequestFaraday.find_each.flat_map do |notification|
   payload = notification.payload.deep_symbolize_keys
 
   case payload
@@ -40,7 +41,7 @@ feed = Notifications::RequestFaraday.find_each.map do |notification|
 
   # Filter for RSS job postings
   in response_body: { rss: { channel: { item: [*items] } } }
-    items.map do |item|
+    items.flat_map do |item|
       case item
       in { guid: { __content__: String => guid }, pubDate: String => pub_date, link: String => link, title: String => title, description: String => description }
 
@@ -66,6 +67,5 @@ feed = Notifications::RequestFaraday.find_each.map do |notification|
 end
 
 ap feed
-
-binding.pry
-puts
+ap Notifications::RequestFaraday.count
+ap feed.size
