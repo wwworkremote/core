@@ -1,63 +1,71 @@
 #!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
 # frozen_string_literal: true
 
-Notifications::RequestFaraday.find_each do |notification|
+feed = Notifications::RequestFaraday.find_each.map do |notification|
   payload = notification.payload.deep_symbolize_keys
-  ap payload.keys
 
-  begin
-    case payload
-    in response_body: Array
-      puts 'Array'
-    # Filter for RSS job postings
-    in response_body: { rss: { channel: { item: [*items] } } }
-      items.map do |item|
-        case item
-        in {
-            guid: { __content__: String => guid },
-            pubDate: String => pub_date,
-            link: String => link,
-            title: String => title,
-            description: String => description
-          }
+  case payload
+  in response_body: String | Array
+    nil
 
-          {
-            external_id: guid,
-            published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
-            target_url: link,
-            title: title,
-            body: description.strip
-          }
-        in {
-            guid: String => guid,
-            pubDate: String => pub_date,
-            link: String => link,
-            title: String => title,
-            description: String => description
-          }
+  in response_body: { by: String => by, id: Integer => id, text: String => text, title: String => title, type: String => type, time: Integer => time, score: Integer } if type == 'job'
 
-          {
-            external_id: guid,
-            published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
-            target_url: link,
-            title: title,
-            body: description.strip
-          }
-        end
-      rescue NoMatchingPatternError => e
-        ap e
-        binding.pry
-        puts
-        raise
+    {
+      external_id: id,
+      published_at: Time.at(time, in: 'UTC').utc,
+      title: title.strip,
+      body: text.strip,
+      external_author_id: by
+    }
+  in response_body: { by: String => by, id: Integer => id, url: String => url, time: Integer => time, type: String => type, score: Integer, title: String => title } if type == 'job'
+
+    {
+      external_id: id,
+      published_at: Time.at(time, in: 'UTC').utc,
+      target_url: url,
+      title: title.strip,
+      external_author_id: by
+    }
+
+  in response_body: { by: String => by, id: Integer => id, url: String => url, time: Integer => time, type: String => type, score: Integer, title: String => title, text: String => text } if type == 'job'
+
+    {
+      external_id: id,
+      published_at: Time.at(time, in: 'UTC').utc,
+      target_url: url,
+      title: title.strip,
+      body: text.strip,
+      external_author_id: by
+    }
+
+  # Filter for RSS job postings
+  in response_body: { rss: { channel: { item: [*items] } } }
+    items.map do |item|
+      case item
+      in { guid: { __content__: String => guid }, pubDate: String => pub_date, link: String => link, title: String => title, description: String => description }
+
+        {
+          external_id: guid,
+          published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+          target_url: link,
+          title: title.strip,
+          body: description.strip
+        }
+      in { guid: String => guid, pubDate: String => pub_date, link: String => link, title: String => title, description: String => description }
+
+        {
+          external_id: guid,
+          published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+          target_url: link,
+          title: title,
+          body: description.strip
+        }
       end
     end
-  rescue NoMatchingPatternError => e
-    ap e
-    binding.pry
-    puts
-    raise
   end
 end
+
+ap feed
 
 binding.pry
 puts

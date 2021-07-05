@@ -55,3 +55,4 @@ end
 
 gem 'jsonb_accessor'
 gem 'scenic'
+gem 'sorted_set'
