@@ -27,11 +27,27 @@ Notifications::RequestFaraday.find_each do |notification|
           title: title,
           body: description.strip
         }
+      in {
+        guid: String => guid,
+        pubDate: String => pub_date,
+        link: String => link,
+        title: String => title,
+        description: String => description
+      }
+
+        {
+          external_id: guid,
+          published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+          target_url: link,
+          title: title,
+          body: description.strip
+        }
       end
     rescue NoMatchingPatternError => e
       ap e
       binding.pry
       puts
+      raise
     end
   end
 end
