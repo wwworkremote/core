@@ -18,7 +18,13 @@ def extract(payload)
           description: String => description
         }
 
-        { external_id: guid, published_at: pub_date, target_url: link, title: title, body: description.strip }
+        { 
+          external_id: guid, 
+          published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), 
+          target_url: link, 
+          title: title, 
+          body: description.strip 
+        }
       else
       end
     end
