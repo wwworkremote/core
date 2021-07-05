@@ -14,12 +14,12 @@ feed = Notifications::RequestFaraday.find_each.flat_map do |notification|
     nil
 
   in by: String => by,
-      id: Integer => id,
-      score: Integer,
-      text: String => text,
-      time: Integer => time,
-      title: String => title,
-      type: String => type if type == 'job'
+     id: Integer => id,
+     score: Integer,
+     text: String => text,
+     time: Integer => time,
+     title: String => title,
+     type: String => type if type == 'job'
 
     {
       body: text.strip,
@@ -28,13 +28,14 @@ feed = Notifications::RequestFaraday.find_each.flat_map do |notification|
       published_at: Time.at(time, in: 'UTC').utc,
       title: title.strip
     }
+
   in by: String => by,
-      id: Integer => id,
-      score: Integer,
-      time: Integer => time,
-      title: String => title,
-      type: String => type,
-      url: String => url if type == 'job'
+     id: Integer => id,
+     score: Integer,
+     time: Integer => time,
+     title: String => title,
+     type: String => type,
+     url: String => url if type == 'job'
 
     {
       external_author_id: by,
@@ -45,13 +46,13 @@ feed = Notifications::RequestFaraday.find_each.flat_map do |notification|
     }
 
   in by: String => by,
-      id: Integer => id,
-      score: Integer,
-      text: String => text,
-      time: Integer => time,
-      title: String => title,
-      type: String => type,
-      url: String => url if type == 'job'
+     id: Integer => id,
+     score: Integer,
+     text: String => text,
+     time: Integer => time,
+     title: String => title,
+     type: String => type,
+     url: String => url if type == 'job'
 
     {
       body: text.strip,
@@ -66,10 +67,10 @@ feed = Notifications::RequestFaraday.find_each.flat_map do |notification|
     items.flat_map do |item|
       case item
       in description: String => description,
-          guid: { __content__: String => guid },
-          link: String => link,
-          pubDate: String => pub_date,
-          title: String => title
+         guid: { __content__: String => guid },
+         link: String => link,
+         pubDate: String => pub_date,
+         title: String => title
 
         {
           body: description.strip,
@@ -78,11 +79,12 @@ feed = Notifications::RequestFaraday.find_each.flat_map do |notification|
           target_url: link,
           title: title.strip
         }
+
       in description: String => description,
-          guid: String => guid,
-          link: String => link,
-          pubDate: String => pub_date,
-          title: String => title
+         guid: String => guid,
+         link: String => link,
+         pubDate: String => pub_date,
+         title: String => title
 
         {
           body: description.strip,
