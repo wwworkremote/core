@@ -54,3 +54,4 @@ group :test do
 end
 
 gem 'jsonb_accessor'
+gem 'scenic'
