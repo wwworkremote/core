@@ -5,50 +5,57 @@ Notifications::RequestFaraday.find_each do |notification|
   payload = notification.payload.deep_symbolize_keys
   ap payload.keys
 
-  case payload
-  in response_body: Array
-    puts 'Array'
-  # Filter for RSS job postings
-  in response_body: { rss: { channel: { item: [*items] } } }
-    items.map do |item|
-      case item
-      in {
-        guid: { __content__: String => guid },
-        pubDate: String => pub_date,
-        link: String => link,
-        title: String => title,
-        description: String => description
-      }
+  begin
+    case payload
+    in response_body: Array
+      puts 'Array'
+    # Filter for RSS job postings
+    in response_body: { rss: { channel: { item: [*items] } } }
+      items.map do |item|
+        case item
+        in {
+            guid: { __content__: String => guid },
+            pubDate: String => pub_date,
+            link: String => link,
+            title: String => title,
+            description: String => description
+          }
 
-        {
-          external_id: guid,
-          published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
-          target_url: link,
-          title: title,
-          body: description.strip
-        }
-      in {
-        guid: String => guid,
-        pubDate: String => pub_date,
-        link: String => link,
-        title: String => title,
-        description: String => description
-      }
+          {
+            external_id: guid,
+            published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+            target_url: link,
+            title: title,
+            body: description.strip
+          }
+        in {
+            guid: String => guid,
+            pubDate: String => pub_date,
+            link: String => link,
+            title: String => title,
+            description: String => description
+          }
 
-        {
-          external_id: guid,
-          published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
-          target_url: link,
-          title: title,
-          body: description.strip
-        }
+          {
+            external_id: guid,
+            published_at: DateTime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+            target_url: link,
+            title: title,
+            body: description.strip
+          }
+        end
+      rescue NoMatchingPatternError => e
+        ap e
+        binding.pry
+        puts
+        raise
       end
-    rescue NoMatchingPatternError => e
-      ap e
-      binding.pry
-      puts
-      raise
     end
+  rescue NoMatchingPatternError => e
+    ap e
+    binding.pry
+    puts
+    raise
   end
 end
 
