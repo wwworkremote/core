@@ -2,6 +2,8 @@
 
 require 'active_support/core_ext/integer/time'
 
+require 'r7_insight'
+
 Rails.application.configure do
   config.cache_classes = true
   config.eager_load = true
@@ -47,12 +49,14 @@ Rails.application.configure do
   # Use a different logger for distributed setups.
   # require "syslog/logger"
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
+  #
+  config.logger = R7Insight.new('5b0a2e11-6c3a-4c8d-a19f-29577d06c28d', 'us2')
 
-  if ENV['RAILS_LOG_TO_STDOUT'].present?
-    logger = ActiveSupport::Logger.new($stdout)
-    logger.formatter = config.log_formatter
-    config.logger = ActiveSupport::TaggedLogging.new(logger)
-  end
+  # if ENV['RAILS_LOG_TO_STDOUT'].present?
+  #   logger = ActiveSupport::Logger.new($stdout)
+  #   logger.formatter = config.log_formatter
+  #   config.logger = ActiveSupport::TaggedLogging.new(logger)
+  # end
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
