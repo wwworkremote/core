@@ -3,8 +3,8 @@
 module StackOverflow
   module_function
 
-  def jobs
-    service = StackOverflow::Jobs::Feed.new
+  def jobs(term = 'ruby')
+    service = StackOverflow::Jobs::Feed.new(term: term)
 
     service.call
 

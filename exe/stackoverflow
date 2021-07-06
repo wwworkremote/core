@@ -1,4 +1,6 @@
 #!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
 # frozen_string_literal: true
 
-StackOverflow.jobs
+term = ARGV.first
+
+StackOverflow.jobs(term: term)
