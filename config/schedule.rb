@@ -17,23 +17,35 @@ job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment :task :output
 job_type :command,  " #{JOB_PREFIX} :task :output "
 
 every('0 0-7 * * *') { runner 'exe/stackoverflow' }
+every('2 0-7 * * *') { runner 'exe/stackoverflow javascript' }
+every('4 0-7 * * *') { runner 'exe/stackoverflow golang' }
+every('6 0-7 * * *') { runner 'exe/stackoverflow rails' }
 every('8 0-7 * * *') { runner 'exe/remotepython' }
 every('16 0-7 * * *') { runner 'exe/nexxt' }
 every('24 0-7 * * *') { runner 'exe/indeed' }
 every('32 0-7 * * *') { runner 'exe/hackernews' }
 every('40 0-7 * * *') { runner 'exe/remoteok' }
 every('48 0-7 * * *') { runner 'exe/monster' }
-every('56 0-7 * * *') { runner 'exe/weworkremotely' }
+every('50 0-7 * * *') { runner 'exe/monster javascript' }
+every('52 0-7 * * *') { runner 'exe/monster golang' }
+every('54 0-7 * * *') { runner 'exe/monster rails' }
+every('56 0-7 * * *') { runner 'exe/weworkremotely ' }
 
 every :day, at: '8:08am', roles: [:cron] do # UTC
   command 'exe/dice'
 end
 
 every('0 9-23 * * *') { runner 'exe/stackoverflow' }
+every('2 9-23 * * *') { runner 'exe/stackoverflow javascript' }
+every('4 9-23 * * *') { runner 'exe/stackoverflow golang' }
+every('6 9-23 * * *') { runner 'exe/stackoverflow rails' }
 every('8 9-23 * * *') { runner 'exe/remotepython' }
 every('16 9-23 * * *') { runner 'exe/nexxt' }
 every('24 9-23 * * *') { runner 'exe/indeed' }
 every('32 9-23 * * *') { runner 'exe/hackernews' }
 every('40 9-23 * * *') { runner 'exe/remoteok' }
 every('48 9-23 * * *') { runner 'exe/monster' }
+every('50 9-23 * * *') { runner 'exe/monster javascript' }
+every('52 9-23 * * *') { runner 'exe/monster golang' }
+every('54 9-23 * * *') { runner 'exe/monster rails' }
 every('56 9-23 * * *') { runner 'exe/weworkremotely' }
