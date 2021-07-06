@@ -16,7 +16,7 @@ job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
 job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment :task :output "
 job_type :command,  " #{JOB_PREFIX} :task :output "
 
-every('0 0-7 * * *') { runner 'exe/stackoverflow' }
+every('0 0-7 * * *') { runner 'exe/stackoverflow ruby' }
 every('2 0-7 * * *') { runner 'exe/stackoverflow javascript' }
 every('4 0-7 * * *') { runner 'exe/stackoverflow golang' }
 every('6 0-7 * * *') { runner 'exe/stackoverflow rails' }
@@ -25,7 +25,7 @@ every('16 0-7 * * *') { runner 'exe/nexxt' }
 every('24 0-7 * * *') { runner 'exe/indeed' }
 every('32 0-7 * * *') { runner 'exe/hackernews' }
 every('40 0-7 * * *') { runner 'exe/remoteok' }
-every('48 0-7 * * *') { runner 'exe/monster' }
+every('48 0-7 * * *') { runner 'exe/monster ruby' }
 every('50 0-7 * * *') { runner 'exe/monster javascript' }
 every('52 0-7 * * *') { runner 'exe/monster golang' }
 every('54 0-7 * * *') { runner 'exe/monster rails' }
@@ -35,17 +35,23 @@ every :day, at: '8:08am', roles: [:cron] do # UTC
   command 'exe/dice'
 end
 
-every('0 9-23 * * *') { runner 'exe/stackoverflow' }
+every('0 9-23 * * *') { runner 'exe/stackoverflow bash' }
+every('1 9-23 * * *') { runner 'exe/stackoverflow postgresql' }
 every('2 9-23 * * *') { runner 'exe/stackoverflow javascript' }
+every('3 9-23 * * *') { runner 'exe/stackoverflow python' }
 every('4 9-23 * * *') { runner 'exe/stackoverflow golang' }
+every('5 9-23 * * *') { runner 'exe/stackoverflow sql' }
 every('6 9-23 * * *') { runner 'exe/stackoverflow rails' }
+every('7 9-23 * * *') { runner 'exe/stackoverflow zsh' }
 every('8 9-23 * * *') { runner 'exe/remotepython' }
 every('16 9-23 * * *') { runner 'exe/nexxt' }
 every('24 9-23 * * *') { runner 'exe/indeed' }
 every('32 9-23 * * *') { runner 'exe/hackernews' }
 every('40 9-23 * * *') { runner 'exe/remoteok' }
-every('48 9-23 * * *') { runner 'exe/monster' }
+every('48 9-23 * * *') { runner 'exe/monster postgresql' }
 every('50 9-23 * * *') { runner 'exe/monster javascript' }
+every('51 9-23 * * *') { runner 'exe/monster python' }
 every('52 9-23 * * *') { runner 'exe/monster golang' }
+every('53 9-23 * * *') { runner 'exe/monster ruby' }
 every('54 9-23 * * *') { runner 'exe/monster rails' }
 every('56 9-23 * * *') { runner 'exe/weworkremotely' }
