@@ -4,7 +4,7 @@ module StackOverflow
   module_function
 
   def jobs(term = 'ruby')
-    service = StackOverflow::Jobs::Feed.new(term: term)
+    service = StackOverflow::Jobs::Feed.new(term: term.presence)
 
     service.call
 

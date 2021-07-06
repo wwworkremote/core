@@ -7,7 +7,7 @@ module StackOverflow
 
       def initialize(client: nil, params: nil, path: nil, term: nil)
         @client = client || StackOverflow.client
-        @params = params || { q: term || 'ruby', sort: 'p', r: true }
+        @params = params || { q: term.presence || 'ruby', sort: 'p', r: true }
         @path = path || 'feed'
       end
 

@@ -3,8 +3,8 @@
 module Monster
   module_function
 
-  def jobs
-    service = Monster::Feed.new
+  def jobs(term: nil)
+    service = Monster::Feed.new(term: term.presence)
 
     service.call
 
