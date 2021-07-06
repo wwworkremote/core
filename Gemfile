@@ -55,3 +55,6 @@ end
 
 gem 'jsonb_accessor'
 gem 'scenic'
+
+gem 'sentry-rails'
+gem 'sentry-ruby'
