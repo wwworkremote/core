@@ -224,11 +224,10 @@ GEM
       rake (>= 0.13)
       thor (~> 1.0)
     rainbow (3.0.0)
-    rake (13.0.3)
+    rake (13.0.4)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rbtree (0.4.4)
     redis (4.3.1)
     regexp_parser (2.1.1)
     rexml (3.2.5)
@@ -253,7 +252,7 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
-    rubocop (1.18.2)
+    rubocop (1.18.3)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -287,11 +286,7 @@ GEM
     scenic (1.5.4)
       activerecord (>= 4.0.0)
       railties (>= 4.0.0)
-    set (1.0.1)
     shellany (0.0.1)
-    sorted_set (1.0.3)
-      rbtree
-      set (~> 1.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -359,7 +354,6 @@ DEPENDENCIES
   rubocop-rubycw
   rubocop-thread_safety
   scenic
-  sorted_set
   typhoeus
   vcr
   whenever

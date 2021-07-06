@@ -22,13 +22,13 @@ gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'typhoeus'
 gem 'whenever', require: false
 
-group :development, :test do
-  gem 'byebug'
-  gem 'fuubar', require: false
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'rspec-rails'
-end
+# group :development, :test do
+gem 'byebug'
+gem 'fuubar', require: false
+gem 'pry-byebug'
+gem 'pry-rails'
+gem 'rspec-rails'
+# end
 
 group :development do
   gem 'annotate'
@@ -55,4 +55,3 @@ end
 
 gem 'jsonb_accessor'
 gem 'scenic'
-gem 'sorted_set'
