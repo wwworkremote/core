@@ -58,7 +58,3 @@ gem 'scenic'
 
 gem 'sentry-rails'
 gem 'sentry-ruby'
-
-group :production do
-  gem 'r7insight'
-end
