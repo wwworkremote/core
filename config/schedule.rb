@@ -33,25 +33,9 @@ def scheduler(start_at:, slots:)
     task = slot.last
 
     every(cron) { runner "exe/#{task}" }
-
-    # {
-    #   cron: "#{time.min} #{time.hour} * * *",
-    #   task: slot.last
-    # }
   end
 end
 
-# # start_at: Date.today.to_datetime.to_time.utc,
-# Cronner.scheduler(
-#   start_at: Date.today.to_datetime.to_time.utc,
-#   slots: Cronner.planner(slots: FETCHERS, duration: 7.hours)
-# ).each do |slot|
-#   every(slot[:cron]) do
-#     runner task
-#   end
-# end
-
-# start_at: Date.today.to_datetime.to_time.utc,
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
   slots: planner(slots: FETCHERS, duration: 7.hours)
