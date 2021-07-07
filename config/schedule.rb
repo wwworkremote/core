@@ -26,13 +26,17 @@ def planner(slots:, duration:)
 end
 
 def scheduler(start_at:, slots:)
-  slots.each do |slot|
+  hosts = %i[cron1 cron2].freeze
+
+  slots.each_with_index do |slot, i|
     time = start_at + slot.first
 
     cron = "#{time.min} #{time.hour} * * *"
     task = slot.last
 
-    every(cron) { runner "exe/#{task}" }
+    host = hosts[i.even? ? 0 : 1]
+
+    every(cron, roles: [host]) { runner "exe/#{task}" }
   end
 end
 

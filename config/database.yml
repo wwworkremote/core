@@ -14,7 +14,7 @@ test:
 
 production:
   <<: *default
-  url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL') %>
+  url: <%= ENV['OUTLIER_JOBS_DATABASE_URL'] %>
 
 # For details on connection pooling, see Rails configuration guide
 # https://guides.rubyonrails.org/configuring.html#database-pooling
