@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FETCHERS = %w[
+TASKS = %w[
   hackernews
   indeed
   monster\ api
@@ -12,6 +12,7 @@ FETCHERS = %w[
   monster\ golang
   monster\ javascript
   monster\ jquery
+  monster\ json
   monster\ nodejs
   monster\ postgres
   monster\ postgresql
@@ -37,6 +38,7 @@ FETCHERS = %w[
   stackoverflow\ golang
   stackoverflow\ javascript
   stackoverflow\ jquery
+  stackoverflow\ json
   stackoverflow\ nodejs
   stackoverflow\ postgres
   stackoverflow\ postgresql
@@ -93,7 +95,7 @@ end
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
-  slots: planner(slots: FETCHERS, duration: 7.hours)
+  slots: planner(slots: TASKS.shuffle, duration: 7.hours)
 )
 
 every :day, at: '8:08am', roles: [:cron] do # UTC
@@ -102,5 +104,5 @@ end
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc + 8.hours,
-  slots: planner(slots: FETCHERS, duration: 16.hours)
+  slots: planner(slots: TASKS.shuffle, duration: 16.hours)
 )
