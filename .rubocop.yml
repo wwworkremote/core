@@ -62,3 +62,7 @@ Metrics/PerceivedComplexity:
 
 Naming/InclusiveLanguage:
   Enabled: false
+
+Rails/Date:
+  Exclude:
+    - 'config/schedule.rb'

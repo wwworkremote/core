@@ -41,7 +41,7 @@ module Cronner
 end
 # start_at: Date.today.to_datetime.to_time.utc,
 Cronner.scheduler(
-  start_at: Time.zone.today.to_datetime.to_time.utc,
+  start_at: Date.today.to_datetime.to_time.utc,
   slots: Cronner.planner(slots: FETCHERS, duration: 7.hours)
 )
 
@@ -50,6 +50,6 @@ every :day, at: '8:08am', roles: [:cron] do # UTC
 end
 
 Cronner.scheduler(
-  start_at: Time.zone.today.to_datetime.to_time.utc + 8.hours,
+  start_at: Date.today.to_datetime.to_time.utc + 8.hours,
   slots: Cronner.planner(slots: FETCHERS, duration: 16.hours)
 )
