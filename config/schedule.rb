@@ -1,5 +1,58 @@
 # frozen_string_literal: true
 
+FETCHERS = %w[
+  hackernews
+  indeed
+  monster\ api
+  monster\ bash
+  monster\ css
+  monster\ git
+  monster\ github
+  monster\ gitlab
+  monster\ golang
+  monster\ javascript
+  monster\ jquery
+  monster\ nodejs
+  monster\ postgres
+  monster\ postgresql
+  monster\ python
+  monster\ rails
+  monster\ redis
+  monster\ rspec
+  monster\ ruby
+  monster\ sass
+  monster\ sidekiq
+  monster\ sql
+  monster\ vim
+  monster\ zsh
+  nexxt
+  remoteok
+  remotepython
+  stackoverflow\ api
+  stackoverflow\ bash
+  stackoverflow\ css
+  stackoverflow\ git
+  stackoverflow\ github
+  stackoverflow\ gitlab
+  stackoverflow\ golang
+  stackoverflow\ javascript
+  stackoverflow\ jquery
+  stackoverflow\ nodejs
+  stackoverflow\ postgres
+  stackoverflow\ postgresql
+  stackoverflow\ python
+  stackoverflow\ rails
+  stackoverflow\ redis
+  stackoverflow\ rspec
+  stackoverflow\ ruby
+  stackoverflow\ sass
+  stackoverflow\ sidekiq
+  stackoverflow\ sql
+  stackoverflow\ vim
+  stackoverflow\ zsh
+  weworkremotely
+].freeze
+
 require 'whenever'
 
 env 'MAILTO', 'mike@just3ws.com'
@@ -15,8 +68,6 @@ job_type :rails,  " #{JOB_PREFIX} bundle exec rails :task --silent :output "
 job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
 job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment :task :output "
 job_type :command,  " #{JOB_PREFIX} :task :output "
-
-FETCHERS = %w[hackernews indeed monster\ api monster\ bash monster\ css monster\ git monster\ github monster\ gitlab monster\ golang monster\ javascript monster\ jquery monster\ nodejs monster\ postgres monster\ postgresql monster\ python monster\ rails monster\ redis monster\ rspec monster\ ruby monster\ sass monster\ sidekiq monster\ sql monster\ vim monster\ zsh nexxt remoteok remotepython stackoverflow\ api stackoverflow\ bash stackoverflow\ css stackoverflow\ git stackoverflow\ github stackoverflow\ gitlab stackoverflow\ golang stackoverflow\ javascript stackoverflow\ jquery stackoverflow\ nodejs stackoverflow\ postgres stackoverflow\ postgresql stackoverflow\ python stackoverflow\ rails stackoverflow\ redis stackoverflow\ rspec stackoverflow\ ruby stackoverflow\ sass stackoverflow\ sidekiq stackoverflow\ sql stackoverflow\ vim stackoverflow\ zsh weworkremotely].freeze
 
 def planner(slots:, duration:)
   count_from = ((duration.to_f / slots.count) / 2).to_i
