@@ -16,42 +16,40 @@ job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
 job_type :runner, " #{JOB_PREFIX} bin/rails runner -e :environment :task :output "
 job_type :command,  " #{JOB_PREFIX} :task :output "
 
-every('0 0-7 * * *') { runner 'exe/stackoverflow ruby' }
-every('2 0-7 * * *') { runner 'exe/stackoverflow javascript' }
-every('4 0-7 * * *') { runner 'exe/stackoverflow golang' }
-every('6 0-7 * * *') { runner 'exe/stackoverflow rails' }
-every('8 0-7 * * *') { runner 'exe/remotepython' }
-every('16 0-7 * * *') { runner 'exe/nexxt' }
-every('24 0-7 * * *') { runner 'exe/indeed' }
-every('32 0-7 * * *') { runner 'exe/hackernews' }
-every('40 0-7 * * *') { runner 'exe/remoteok' }
-every('48 0-7 * * *') { runner 'exe/monster ruby' }
-every('50 0-7 * * *') { runner 'exe/monster javascript' }
-every('52 0-7 * * *') { runner 'exe/monster golang' }
-every('54 0-7 * * *') { runner 'exe/monster rails' }
-every('56 0-7 * * *') { runner 'exe/weworkremotely ' }
+FETCHERS = %w[hackernews indeed monster\ api monster\ bash monster\ css monster\ git monster\ github monster\ gitlab monster\ golang monster\ javascript monster\ jquery monster\ nodejs monster\ postgres monster\ postgresql monster\ python monster\ rails monster\ redis monster\ rspec monster\ ruby monster\ sass monster\ sidekiq monster\ sql monster\ vim monster\ zsh nexxt remoteok remotepython stackoverflow\ api stackoverflow\ bash stackoverflow\ css stackoverflow\ git stackoverflow\ github stackoverflow\ gitlab stackoverflow\ golang stackoverflow\ javascript stackoverflow\ jquery stackoverflow\ nodejs stackoverflow\ postgres stackoverflow\ postgresql stackoverflow\ python stackoverflow\ rails stackoverflow\ redis stackoverflow\ rspec stackoverflow\ ruby stackoverflow\ sass stackoverflow\ sidekiq stackoverflow\ sql stackoverflow\ vim stackoverflow\ zsh weworkremotely].freeze
+
+module Cronner
+  module_function
+
+  def planner(slots:, duration:)
+    count_from = ((duration.to_f / slots.count) / 2).to_i
+    count_by = duration.to_f / (slots.count + 1)
+
+    count_from.step(duration, count_by).map(&:to_i).zip(slots)
+  end
+
+  def scheduler(start_at:, slots:)
+    slots.each do |slot|
+      time = start_at + slot.first
+
+      cron = "#{time.min} #{time.hour} * * *"
+      task = slot.last
+
+      every(cron) { "exe/#{task}" }
+    end
+  end
+end
+# start_at: Date.today.to_datetime.to_time.utc,
+Cronner.scheduler(
+  start_at: Time.zone.today.to_datetime.to_time.utc,
+  slots: Cronner.planner(slots: FETCHERS, duration: 7.hours)
+)
 
 every :day, at: '8:08am', roles: [:cron] do # UTC
   command 'exe/dice'
 end
 
-every('0 9-23 * * *') { runner 'exe/stackoverflow bash' }
-every('1 9-23 * * *') { runner 'exe/stackoverflow postgresql' }
-every('2 9-23 * * *') { runner 'exe/stackoverflow javascript' }
-every('3 9-23 * * *') { runner 'exe/stackoverflow python' }
-every('4 9-23 * * *') { runner 'exe/stackoverflow golang' }
-every('5 9-23 * * *') { runner 'exe/stackoverflow sql' }
-every('6 9-23 * * *') { runner 'exe/stackoverflow rails' }
-every('7 9-23 * * *') { runner 'exe/stackoverflow zsh' }
-every('8 9-23 * * *') { runner 'exe/remotepython' }
-every('16 9-23 * * *') { runner 'exe/nexxt' }
-every('24 9-23 * * *') { runner 'exe/indeed' }
-every('32 9-23 * * *') { runner 'exe/hackernews' }
-every('40 9-23 * * *') { runner 'exe/remoteok' }
-every('48 9-23 * * *') { runner 'exe/monster postgresql' }
-every('50 9-23 * * *') { runner 'exe/monster javascript' }
-every('51 9-23 * * *') { runner 'exe/monster python' }
-every('52 9-23 * * *') { runner 'exe/monster golang' }
-every('53 9-23 * * *') { runner 'exe/monster ruby' }
-every('54 9-23 * * *') { runner 'exe/monster rails' }
-every('56 9-23 * * *') { runner 'exe/weworkremotely' }
+Cronner.scheduler(
+  start_at: Time.zone.today.to_datetime.to_time.utc + 8.hours,
+  slots: Cronner.planner(slots: FETCHERS, duration: 16.hours)
+)
