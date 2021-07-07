@@ -58,3 +58,14 @@ gem 'scenic'
 
 gem 'sentry-rails'
 gem 'sentry-ruby'
+
+gem 'active_median'
+gem 'blingfire' # https://github.com/ankane/blingfire
+gem 'eps' # https://github.com/ankane/eps
+gem 'groupdate'
+gem 'hightop'
+gem 'mitie' # https://github.com/ankane/mitie
+gem 'notable' # https://github.com/ankane/notable
+gem 'rollups' # https://github.com/ankane/rollup
+gem 'safely_block' # https://github.com/ankane/safely
+gem 'youtokentome' # https://github.com/ankane/youtokentome
