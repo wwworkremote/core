@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_210_703_173_154) do
+ActiveRecord::Schema.define(version: 20_210_707_203_641) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'citext'
   enable_extension 'hstore'
@@ -22,6 +22,13 @@ ActiveRecord::Schema.define(version: 20_210_703_173_154) do
   enable_extension 'pgcrypto'
   enable_extension 'plpgsql'
   enable_extension 'sslinfo'
+
+  create_table 'messages', force: :cascade do |t|
+    t.jsonb 'data', default: {}, null: false
+    t.integer 'status', default: 0
+    t.datetime 'created_at', precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
+    t.datetime 'updated_at', precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
+  end
 
   create_table 'notifications_request_faradays', force: :cascade do |t|
     t.string 'signature', null: false
