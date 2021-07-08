@@ -1,7 +1,7 @@
 #!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
 # frozen_string_literal: true
 
-query = Notifications::RequestFaraday.where('created_at >= ?', 1.day.ago)
+query = Notifications::RequestFaraday.where('created_at >= ?', 8.hours.ago)
 feed = query.find_each.flat_map do |notification|
   payload = notification.payload
   response_body = payload['response_body']
@@ -97,7 +97,7 @@ feed = query.find_each.flat_map do |notification|
       end
     end
   else
-    ap [:PAYLOAD_MISMATCH, payload.class, payload]
+    ap [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body']]
   end
 end
 
