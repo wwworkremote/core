@@ -49,7 +49,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Exclude:
-    - 'exe/patterns.rb'
+    - 'exe/messages'
     - 'Guardfile'
 
 Metrics/CyclomaticComplexity:
