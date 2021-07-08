@@ -69,3 +69,5 @@ gem 'notable' # https://github.com/ankane/notable
 gem 'rollups' # https://github.com/ankane/rollup
 gem 'safely_block' # https://github.com/ankane/safely
 gem 'youtokentome' # https://github.com/ankane/youtokentome
+
+gem 'memo_wise'

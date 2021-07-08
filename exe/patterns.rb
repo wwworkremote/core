@@ -103,4 +103,4 @@ feed = query.find_each.flat_map do |notification|
   end
 end
 
-puts feed.select(&:present?).to_json
+puts feed.count(&:present?)
