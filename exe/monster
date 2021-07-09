@@ -5,6 +5,7 @@
 term = ARGV.first
 
 begin
+  Sentry.capture_message(__FILE__)
   Monster.jobs(term: term)
 rescue StandardError => e
   Sentry.capture_exception(e)

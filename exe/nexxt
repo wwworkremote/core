@@ -3,6 +3,7 @@
 # frozen_string_literal: true
 
 begin
+  Sentry.capture_message(__FILE__)
   Nexxt.jobs
 rescue StandardError => e
   Sentry.capture_exception(e)
