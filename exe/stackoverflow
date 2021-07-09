@@ -4,4 +4,8 @@
 
 term = ARGV.first
 
-StackOverflow.jobs(term: term)
+begin
+  StackOverflow.jobs(term: term)
+rescue StandardError => e
+  Sentry.capture_exception(e)
+end

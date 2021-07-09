@@ -4,4 +4,8 @@
 
 term = ARGV.first
 
-Monster.jobs(term: term)
+begin
+  Monster.jobs(term: term)
+rescue StandardError => e
+  Sentry.capture_exception(e)
+end
