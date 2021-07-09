@@ -58,8 +58,11 @@ feed = query.find_each.flat_map do |notification|
     case item
     in link: String, title: String => title if title.include?('No job postings found')
       nil
+
+    in { guid: { __content__: String => guid }, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
+      { notification_id: notification.id, body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link, title: title.strip }
     else
-      ap [:PAYLOAD_ITEM_MISMATCH, payload.class, payload.keys, payload['response_body']]
+      ap [:PAYLOAD_ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)]
     end
 
   in rss: { channel: { item: [*items] } }
@@ -111,7 +114,7 @@ feed = query.find_each.flat_map do |notification|
 
           { notification_id: notification.id, body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link, title: title }
         else
-          ap [:ITEM_MISMATCH, item.class, item]
+          ap [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)]
         end
       end
     rescue SignalException => e
@@ -119,7 +122,7 @@ feed = query.find_each.flat_map do |notification|
       exit
     end
   else
-    ap [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body']]
+    ap [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class)]
   end
 rescue SignalException => e
   puts "Received Signal during payload #{e}"
