@@ -2,21 +2,18 @@
 
 module Notifications
   class RequestFaraday < ApplicationRecord
-    # jsonb_accessor :event, end: :float, name: :string, time: :float, cpu_time_start: :float, transaction_id: :string, cpu_time_finish: :float, allocation_count_start: :integer, allocation_count_finish: :integer
-
-    def rss?
-      return false if payload.dig('response', 'body').blank?
-      return false if payload.dig('response', 'body').is_a?(Array)
-
-      payload.dig('response', 'body', 'rss', 'channel', 'item').present?
-    end
+    enum status: {
+      pending: 0,
+      active: 1,
+      archive: 2
+    }, _prefix: true
   end
 end
 
 # Notifications::RequestFaraday.last.payload.dig('response', 'body', 'rss', 'channel', 'item')
 
 # == Schema Information
-# Schema version: 20210703173154
+# Schema version: 20210709233739
 #
 # Table name: notifications_request_faradays
 #
@@ -24,6 +21,7 @@ end
 #  event      :jsonb            not null
 #  payload    :jsonb            not null
 #  signature  :string           not null, indexed
+#  status     :integer          default(0)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

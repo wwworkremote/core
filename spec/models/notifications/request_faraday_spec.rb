@@ -7,7 +7,7 @@ RSpec.describe Notifications::RequestFaraday, type: :model do
 end
 
 # == Schema Information
-# Schema version: 20210703173154
+# Schema version: 20210709233739
 #
 # Table name: notifications_request_faradays
 #
@@ -15,6 +15,7 @@ end
 #  event      :jsonb            not null
 #  payload    :jsonb            not null
 #  signature  :string           not null, indexed
+#  status     :integer          default(0)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
