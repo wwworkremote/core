@@ -5,7 +5,7 @@
 puts "App PID: #{Process.pid}"
 
 query = begin
-  Notifications::RequestFaraday.where('created_at >= ?', 8.hours.ago)
+  Notifications::RequestFaraday.where('created_at >= ?', 30.days.ago)
 rescue SignalException => e
   puts "Received Signal during query #{e}"
   exit

@@ -18,8 +18,10 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 3.0
   UseCache: true
-
+  Include:
+    - 'exe/**/*'
   Exclude:
+    - 'exe/dice'
     - '**/node_modules/**/*'
     - '**/templates/**/*'
     - '**/tmp/**/*'
