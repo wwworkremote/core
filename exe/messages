@@ -53,6 +53,14 @@ feed = query.find_each.flat_map do |notification|
 
     { notification_id: notification.id, body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip }
 
+  in rss: { channel: { item: Hash => item } }
+    case item
+    in link: String, title: String => title if title.include?('No job postings found')
+      nil
+    else
+      ap [:PAYLOAD_ITEM_MISMATCH, payload.class, payload.keys, payload['response_body']]
+    end
+
   in rss: { channel: { item: [*items] } }
     begin
       items.flat_map do |item|
