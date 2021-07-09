@@ -7,3 +7,15 @@ class Message < ApplicationRecord
     archive: 2
   }, _prefix: true
 end
+
+# == Schema Information
+# Schema version: 20210707203641
+#
+# Table name: messages
+#
+#  id         :bigint           not null, primary key
+#  data       :jsonb            not null
+#  status     :integer          default("pending")
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
