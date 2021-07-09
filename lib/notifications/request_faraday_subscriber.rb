@@ -3,7 +3,7 @@
 ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
   event_json = event.as_json
   payload = event_json.delete('payload')
-  signature = Digest::SHA2.hexdigest(payload.to_json)
+  signature = Digest::SHA2.hexdigest(payload.deepsort.to_json)
 
   begin
     ::Notifications::RequestFaraday.create(
