@@ -25,7 +25,7 @@ begin
         title: String => title,
         type: String => type if type == 'job'
 
-      notification.messages.create(data:  { body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, title: title.strip })
+      notification.messages.create(data:  { body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, title: title.strip }.deep_sort)
 
     in by: String => by,
         id: Integer => id,
@@ -35,7 +35,7 @@ begin
         type: String => type,
         url: String => url if type == 'job'
 
-      notification.messages.create(data:  { external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip })
+      notification.messages.create(data:  { external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip }.deep_sort)
 
     in by: String => by,
         id: Integer => id,
@@ -46,7 +46,7 @@ begin
         type: String => type,
         url: String => url if type == 'job'
 
-      notification.messages.create(data:  { body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip })
+      notification.messages.create(data:  { body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip }.deep_sort)
 
     in rss: { channel: { item: Hash => item } }
       case item
@@ -54,7 +54,7 @@ begin
         nil
 
       in { guid: { __content__: String => guid }, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
-        notification.messages.create(data: { body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link, title: title.strip })
+        notification.messages.create(data: { body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip }.deep_sort)
 
       else
         Rails.logger.warn { [:PAYLOAD_ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)].inspect }
@@ -77,7 +77,7 @@ begin
               tags: String => tags,
               title: String => title
 
-            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link, title: title.strip, location: location, company: company, tags: tags.split(',').map(&:strip) })
+            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip, location: location.strip, company: company, tags: tags.split(',').map(&:strip) }.deep_sort)
 
           in company: String => company,
               description: String => description,
@@ -89,7 +89,7 @@ begin
               tags: String => tags,
               title: String => title
 
-            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link, title: title.strip, company: company, tags: tags.split(',').map(&:strip) })
+            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip, company: company, tags: tags.split(',').map(&:strip) }.deep_sort)
 
           in description: String => description,
               guid: { __content__: String => guid },
@@ -97,7 +97,7 @@ begin
               pubDate: String => pub_date,
               title: String => title
 
-            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link, title: title.strip })
+            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip }.deep_sort)
 
           in description: String => description,
               guid: String => guid,
@@ -105,7 +105,7 @@ begin
               pubDate: String => pub_date,
               title: String => title
 
-            notification.messages.create(data:  { body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link, title: title })
+            notification.messages.create(data: { body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip }.deep_sort)
 
           else
             Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
@@ -123,5 +123,3 @@ rescue SignalException => e
   puts "Received Signal during payload #{e}"
   exit
 end
-
-puts feed.count(&:present?)
