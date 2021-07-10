@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TagAlias < ApplicationRecord
-  belongs_to :tag
+  belongs_to :tag, optional: true
 end
 
 # == Schema Information

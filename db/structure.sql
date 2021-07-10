@@ -238,8 +238,8 @@ ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
 
 CREATE TABLE public.tag_aliases (
     id bigint NOT NULL,
-    tag_id bigint NOT NULL,
-    name character varying,
+    tag_id bigint,
+    name public.citext NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -271,7 +271,7 @@ ALTER SEQUENCE public.tag_aliases_id_seq OWNED BY public.tag_aliases.id;
 CREATE TABLE public.tags (
     id bigint NOT NULL,
     slug character varying,
-    name character varying,
+    name public.citext,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
