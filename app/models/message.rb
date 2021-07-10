@@ -6,7 +6,7 @@ class Message < ApplicationRecord
     processed: 1
   }, _prefix: true
 
-  belongs_to :requests, optional: true, class_name: 'Notifications::RequestFaraday'
+  belongs_to :requests, optional: true, class_name: 'Notifications::RequestFaraday', foreign_key: :id
 end
 
 # == Schema Information

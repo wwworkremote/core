@@ -5,9 +5,7 @@
 begin
   puts "App PID: #{Process.pid}"
 
-  query = Notifications::RequestFaraday.where('created_at >= ?', 30.days.ago)
-
-  feed = query.find_each.flat_map do |notification|
+  Notifications::RequestFaraday.find_each do |notification|
     payload = notification.payload
     response_body = payload['response_body']
 
