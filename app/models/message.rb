@@ -13,6 +13,17 @@ class Message < ApplicationRecord
   def update_source
     source.status_processed! unless source.status_processed?
   end
+
+  jsonb_accessor :data,
+                 body: :string,
+                 company: :string,
+                 external_author_id: :string,
+                 external_id: :string,
+                 location: :string,
+                 published_at: :datetime,
+                 tags: [:string, { array: true, default: [] }],
+                 target_url: :string,
+                 title: :string
 end
 
 # == Schema Information
