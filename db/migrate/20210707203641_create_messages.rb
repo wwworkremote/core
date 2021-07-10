@@ -5,7 +5,7 @@ class CreateMessages < ActiveRecord::Migration[6.1]
     create_table :messages do |t|
       t.jsonb :data, default: {}, null: false
       t.integer :status, default: 0
-      t.references :sources
+      t.references :source
 
       t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
       t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false

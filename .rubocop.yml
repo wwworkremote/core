@@ -20,7 +20,7 @@ AllCops:
   UseCache: true
   Include:
     - 'exe/**/*'
-    - 'db/**/*'
+    - 'db/**/*.rb'
   Exclude:
     - 'exe/dice'
     - '**/node_modules/**/*'

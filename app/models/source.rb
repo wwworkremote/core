@@ -6,7 +6,7 @@ class Source < ApplicationRecord
     processed: 1
   }, _prefix: true
 
-  has_many :messages, inverse_of: :sources, dependent: :nullify
+  has_many :messages, dependent: :nullify
 end
 
 # == Schema Information

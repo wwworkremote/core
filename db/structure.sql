@@ -131,9 +131,9 @@ CREATE TABLE public.messages (
     id bigint NOT NULL,
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
     status integer DEFAULT 0,
+    source_id bigint,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    source_id bigint
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -268,7 +268,6 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210626222927'),
 ('20210703173154'),
-('20210707203641'),
-('20210710001701');
+('20210707203641');
 
 
