@@ -3,9 +3,9 @@
 # frozen_string_literal: true
 
 begin
-  puts "App PID: #{Process.pid}"
+  puts "exe/messages: #{Process.pid}"
 
-  Source.where(status: 0).find_each do |notification|
+  Source.where(status: 0).find_each(order: :asc, batch_size: 100) do |notification|
     payload = notification.payload
     response_body = payload['response_body']
 
