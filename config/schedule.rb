@@ -105,8 +105,9 @@ def scheduler(start_at:, slots:)
   end
 end
 
-# every 30 minutes on the quarter hour
-every('15,45 * * * *') { runner 'exe/messages' }
+# every 30 minutes on the quarter hour alternate hosts
+every('15 * * * *', roles: [:malina101]) { runner 'exe/messages' }
+every('45 * * * *', roles: [:malina102]) { runner 'exe/messages' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
