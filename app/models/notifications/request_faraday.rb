@@ -4,8 +4,7 @@ module Notifications
   class RequestFaraday < ApplicationRecord
     enum status: {
       pending: 0,
-      active: 1,
-      archive: 2
+      processed: 1
     }, _prefix: true
   end
 end
