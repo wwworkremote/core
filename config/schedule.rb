@@ -99,6 +99,8 @@ def scheduler(start_at:, slots:)
     cron = "#{time.min} #{time.hour} * * *"
     task = slot.last
 
+    next if task.blank?
+
     host = hosts[i.even? ? 0 : 1]
 
     every(cron, roles: [host]) { runner "exe/#{task}" }
