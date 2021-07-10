@@ -75,3 +75,5 @@ gem 'youtokentome' # https://github.com/ankane/youtokentome
 
 gem 'deepsort'
 gem 'memo_wise'
+
+gem 'friendly_id'
