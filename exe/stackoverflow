@@ -5,7 +5,7 @@
 term = ARGV.first
 
 begin
-  Sentry.capture_message(__FILE__)
+  Sentry.capture_message("#{__FILE__} #{term}".strip)
   StackOverflow.jobs(term: term)
 rescue StandardError => e
   Sentry.capture_exception(e)
