@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagAlias < ApplicationRecord
   belongs_to :tag
 end

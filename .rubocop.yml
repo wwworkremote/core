@@ -19,8 +19,11 @@ AllCops:
   TargetRubyVersion: 3.0
   UseCache: true
   Include:
-    - 'exe/**/*'
+    - 'app/**/*.rb'
+    - 'config/**/*.rb'
     - 'db/**/*.rb'
+    - 'exe/**/*'
+    - 'lib/**/*.rb'
   Exclude:
     - 'exe/dice'
     - '**/node_modules/**/*'
