@@ -99,7 +99,7 @@ def scheduler(start_at:, slots:)
     cron = "#{time.min} #{time.hour} * * *"
     task = slot.last
 
-    next if task.blank?
+    next if task.to_s.strip.empty?
 
     host = hosts[i.even? ? 0 : 1]
 
