@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-module Notifications
-  class RequestFaraday < ApplicationRecord
-    enum status: {
-      pending: 0,
-      processed: 1
-    }, _prefix: true
+class Source < ApplicationRecord
+  enum status: {
+    pending: 0,
+    processed: 1
+  }, _prefix: true
 
-    has_many :messages, inverse_of: :requests, dependent: :nullify, foreign_key: 'notifications_request_faradays_id'
-  end
+  has_many :messages, inverse_of: :sources, dependent: :nullify
 end
 
 # == Schema Information

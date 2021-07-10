@@ -6,7 +6,7 @@ ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
   signature = Digest::SHA2.hexdigest(payload.deep_sort.to_json)
 
   begin
-    ::Notifications::RequestFaraday.create(
+    Source.create(
       signature: signature,
       payload: payload,
       event: event_json
