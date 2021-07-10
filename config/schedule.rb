@@ -3,19 +3,25 @@
 TASKS = %w[
   hackernews
   indeed
+  monster\ ansible
   monster\ api
   monster\ bash
+  monster\ capistrano
   monster\ css
+  monster\ devops
   monster\ git
   monster\ github
   monster\ gitlab
   monster\ golang
+  monster\ java
   monster\ javascript
   monster\ jquery
   monster\ json
+  monster\ kafka
   monster\ nodejs
   monster\ postgres
   monster\ postgresql
+  monster\ puma
   monster\ python
   monster\ rails
   monster\ redis
@@ -29,19 +35,25 @@ TASKS = %w[
   nexxt
   remoteok
   remotepython
+  stackoverflow\ ansible
   stackoverflow\ api
   stackoverflow\ bash
+  stackoverflow\ capistrano
   stackoverflow\ css
+  stackoverflow\ devops
   stackoverflow\ git
   stackoverflow\ github
   stackoverflow\ gitlab
   stackoverflow\ golang
+  stackoverflow\ java
   stackoverflow\ javascript
   stackoverflow\ jquery
   stackoverflow\ json
+  stackoverflow\ kafka
   stackoverflow\ nodejs
   stackoverflow\ postgres
   stackoverflow\ postgresql
+  stackoverflow\ puma
   stackoverflow\ python
   stackoverflow\ rails
   stackoverflow\ redis
