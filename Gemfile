@@ -33,7 +33,6 @@ gem 'rspec-rails'
 group :development do
   gem 'annotate'
   gem 'brakeman'
-  gem 'bullet'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', require: false
@@ -47,6 +46,10 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
+end
+
+group :development, :test do
+  gem 'bullet'
 end
 
 group :test do
