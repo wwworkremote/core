@@ -1,0 +1,19 @@
+#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+begin
+  puts "#{__FILE__}: #{Process.pid}"
+  Sentry.capture_message(__FILE__)
+
+  Message.data_where(tags: []).where('created_at >= ?', 3.hours.ago).find_each(batch_size: 100) do |message|
+    message.tags.map do |name|
+      tag = Tag.find_or_create_by(name: name)
+      tag.tag_aliases.create(name: name)
+    rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation => e
+      Rails.logger.debug { [e.message, name].inspect }
+    end
+  end
+rescue StandardError => e
+  Sentry.capture_exception(e)
+end

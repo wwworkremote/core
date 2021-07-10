@@ -3,9 +3,10 @@
 # frozen_string_literal: true
 
 begin
-  puts "exe/messages: #{Process.pid}"
+  puts "#{__FILE__}: #{Process.pid}"
+  Sentry.capture_message(__FILE__)
 
-  Source.where(status: 0).find_each(order: :asc, batch_size: 100) do |notification|
+  Source.where(status: 0).where('create_at >= ?', 3.hours.ago).find_each(order: :asc, batch_size: 100) do |notification|
     payload = notification.payload
     response_body = payload['response_body']
 
@@ -104,103 +105,97 @@ begin
 
     in rss: { channel: { item: [*items] } }
 
-      begin
-        items.flat_map do |item|
-          case item
-          in \
-            link: String,
-            title: String => title \
-            if title.include?('No job postings found')
+      items.flat_map do |item|
+        case item
+        in \
+          link: String,
+          title: String => title \
+          if title.include?('No job postings found')
 
-            nil
+          nil
 
-          in \
-            company: String => company,
-            description: String => description,
-            guid: String => guid,
-            image: String,
-            link: String => link,
-            location: String => location,
-            pubDate: String => pub_date,
-            tags: String => tags,
-            title: String => title
+        in \
+          company: String => company,
+          description: String => description,
+          guid: String => guid,
+          image: String,
+          link: String => link,
+          location: String => location,
+          pubDate: String => pub_date,
+          tags: String => tags,
+          title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip,
-              company: company,
-              external_id: guid.to_s.strip,
-              location: location.strip,
-              published_at: DateTime.parse(pub_date).to_time,
-              tags: tags.split(',').map(&:strip),
-              target_url: link.strip,
-              title: title.strip
-            }.deep_sort)
+          notification.messages.create(data: {
+            body: description.strip,
+            company: company,
+            external_id: guid.to_s.strip,
+            location: location.strip,
+            published_at: DateTime.parse(pub_date).to_time,
+            tags: tags.split(',').map(&:strip),
+            target_url: link.strip,
+            title: title.strip
+          }.deep_sort)
 
-          in \
-            company: String => company,
-            description: String => description,
-            guid: String => guid,
-            image: String,
-            link: String => link,
-            location:,
-            pubDate: String => pub_date,
-            tags: String => tags,
-            title: String => title
+        in \
+          company: String => company,
+          description: String => description,
+          guid: String => guid,
+          image: String,
+          link: String => link,
+          location:,
+          pubDate: String => pub_date,
+          tags: String => tags,
+          title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip,
-              company: company,
-              external_id: guid.to_s.strip,
-              published_at: DateTime.parse(pub_date).to_time,
-              tags: tags.split(',').map(&:strip),
-              target_url: link.strip,
-              title: title.strip
-            }.deep_sort)
+          notification.messages.create(data: {
+            body: description.strip,
+            company: company,
+            external_id: guid.to_s.strip,
+            published_at: DateTime.parse(pub_date).to_time,
+            tags: tags.split(',').map(&:strip),
+            target_url: link.strip,
+            title: title.strip
+          }.deep_sort)
 
-          in \
-            description: String => description,
-            guid: { __content__: String => guid },
-            link: String => link,
-            pubDate: String => pub_date,
-            title: String => title
+        in \
+          description: String => description,
+          guid: { __content__: String => guid },
+          link: String => link,
+          pubDate: String => pub_date,
+          title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip,
-              external_id: guid.to_s.strip,
-              published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
-              target_url: link.strip,
-              title: title.strip
-            }.deep_sort)
+          notification.messages.create(data: {
+            body: description.strip,
+            external_id: guid.to_s.strip,
+            published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+            target_url: link.strip,
+            title: title.strip
+          }.deep_sort)
 
-          in \
-            description: String => description,
-            guid: String => guid,
-            link: String => link,
-            pubDate: String => pub_date,
-            title: String => title
+        in \
+          description: String => description,
+          guid: String => guid,
+          link: String => link,
+          pubDate: String => pub_date,
+          title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip,
-              external_id: guid.to_s.strip,
-              published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
-              target_url: link.strip,
-              title: title.strip
-            }.deep_sort)
+          notification.messages.create(data: {
+            body: description.strip,
+            external_id: guid.to_s.strip,
+            published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'),
+            target_url: link.strip,
+            title: title.strip
+          }.deep_sort)
 
-          else
-            Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
-          end
+        else
+          Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
         end
-      rescue SignalException => e
-        puts "Received Signal during items #{e}"
-        exit
       end
 
     else
       Rails.logger.warn { [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class)].inspect }
     end
   end
-rescue SignalException => e
-  puts "Received Signal during payload #{e}"
-  exit
+rescue StandardError => e
+  Sentry.capture_exception(e)
 end

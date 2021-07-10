@@ -3,6 +3,7 @@
 # frozen_string_literal: true
 
 begin
+  puts "#{__FILE__}: #{Process.pid}"
   Sentry.capture_message(__FILE__)
   HackerNews.jobs
 rescue StandardError => e
