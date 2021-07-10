@@ -105,6 +105,9 @@ def scheduler(start_at:, slots:)
   end
 end
 
+# every 30 minutes on the quarter hour
+every('15,45 * * * *') { runner 'exe/messages' }
+
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
   slots: planner(slots: TASKS.shuffle, duration: 7.hours)
