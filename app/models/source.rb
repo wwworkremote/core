@@ -10,9 +10,9 @@ class Source < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210710001701
+# Schema version: 20210707203641
 #
-# Table name: notifications_request_faradays
+# Table name: sources
 #
 #  id         :bigint           not null, primary key
 #  event      :jsonb            not null
