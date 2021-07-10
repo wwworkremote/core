@@ -200,12 +200,45 @@ ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
 
 
 --
+-- Name: tag_aliases; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tag_aliases (
+    id bigint NOT NULL,
+    tag_id bigint NOT NULL,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: tag_aliases_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tag_aliases_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tag_aliases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tag_aliases_id_seq OWNED BY public.tag_aliases.id;
+
+
+--
 -- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.tags (
     id bigint NOT NULL,
     slug character varying,
+    name character varying,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -242,6 +275,13 @@ ALTER TABLE ONLY public.messages ALTER COLUMN id SET DEFAULT nextval('public.mes
 --
 
 ALTER TABLE ONLY public.sources ALTER COLUMN id SET DEFAULT nextval('public.sources_id_seq'::regclass);
+
+
+--
+-- Name: tag_aliases id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_aliases ALTER COLUMN id SET DEFAULT nextval('public.tag_aliases_id_seq'::regclass);
 
 
 --
@@ -284,6 +324,14 @@ ALTER TABLE ONLY public.sources
 
 
 --
+-- Name: tag_aliases tag_aliases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_aliases
+    ADD CONSTRAINT tag_aliases_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -306,10 +354,39 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 
 
 --
+-- Name: index_tag_aliases_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_tag_aliases_on_name ON public.tag_aliases USING btree (name);
+
+
+--
+-- Name: index_tag_aliases_on_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_aliases_on_tag_id ON public.tag_aliases USING btree (tag_id);
+
+
+--
+-- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
+
+
+--
 -- Name: index_tags_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_tags_on_slug ON public.tags USING btree (slug);
+
+
+--
+-- Name: tag_aliases fk_rails_f56b013bd9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_aliases
+    ADD CONSTRAINT fk_rails_f56b013bd9 FOREIGN KEY (tag_id) REFERENCES public.tags(id);
 
 
 --
@@ -322,6 +399,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210626222927'),
 ('20210703173154'),
 ('20210707203641'),
-('20210710142759');
+('20210710142759'),
+('20210710143627');
 
 
