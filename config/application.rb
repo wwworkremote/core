@@ -27,6 +27,7 @@ module OutlierJobs
     #
     config.time_zone = 'UTC'
     config.active_record.default_timezone = :utc
+    config.active_record.schema_format = :sql
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.api_only = true
