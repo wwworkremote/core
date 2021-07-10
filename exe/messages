@@ -5,7 +5,7 @@
 begin
   puts "App PID: #{Process.pid}"
 
-  Source.find_each do |notification|
+  Source.where(status: 0).find_each do |notification|
     payload = notification.payload
     response_body = payload['response_body']
 

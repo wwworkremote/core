@@ -7,6 +7,12 @@ class Message < ApplicationRecord
   }, _prefix: true
 
   belongs_to :source, optional: true
+
+  after_commit :update_source, on: :create
+
+  def update_source
+    source.status_processed! unless source.status_processed?
+  end
 end
 
 # == Schema Information
