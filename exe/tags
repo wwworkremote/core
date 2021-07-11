@@ -2,8 +2,10 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+puts "#{__FILE__}: #{Process.pid}"
+transaction = Sentry.start_transaction(op: :"#{__FILE__}")
+
 begin
-  puts "#{__FILE__}: #{Process.pid}"
   Sentry.capture_message(__FILE__)
 
   Message.data_where(tags: []).where('created_at >= ?', 3.hours.ago).find_each(batch_size: 100) do |message|
@@ -16,4 +18,6 @@ begin
   end
 rescue StandardError => e
   Sentry.capture_exception(e)
+ensure
+  transaction.finish
 end

@@ -4,9 +4,14 @@
 
 term = ARGV.first
 
+puts "#{__FILE__} #{term}: #{Process.pid}"
+transaction = Sentry.start_transaction(op: :"#{__FILE__} #{term}")
+
 begin
   Sentry.capture_message("#{__FILE__} #{term}".strip)
   StackOverflow.jobs(term: term)
 rescue StandardError => e
   Sentry.capture_exception(e)
+ensure
+  transaction.finish
 end

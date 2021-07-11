@@ -2,9 +2,14 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+puts "#{__FILE__}: #{Process.pid}"
+transaction = Sentry.start_transaction(op: :"#{__FILE__}")
+
 begin
   Sentry.capture_message(__FILE__)
   Indeed.jobs
 rescue StandardError => e
   Sentry.capture_exception(e)
+ensure
+  transaction.finish
 end
