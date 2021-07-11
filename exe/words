@@ -1,0 +1,32 @@
+#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+module Words
+  # STOPWORDS = File.open('/Users/mike/GitHub/Stopwords/src/common/stopwords_10000_most_frequent_filtered.txt').readlines(chomp: true).map(&:downcase).sort.uniq.freeze
+
+  def self.dump(input)
+    # input = SearchResult.last.data['description']
+
+    str = ActionController::Base.helpers.strip_tags(
+      Sanitize.fragment(
+        RubyPants.new(input.downcase.strip, stupefy: true).to_html
+      )
+    ).tr('’', "'")
+
+    list = str.split(/[[:space:]]+/).map(&:strip).map do |word|
+      word.gsub(/\W+$/,
+                '')
+    end.map do |word|
+      word.gsub(/^\W+/,
+                '')
+    end.map(&:strip).reject(&:blank?).reject { |word| word =~ /^\d+$/i }.reject { |word| word.length < 2 }.sort.uniq
+
+    # list -= STOPWORDS
+
+    list.each_with_object(Hash.new(0)) { |e, h| h[e] += 1; }
+  end
+end
+
+binding.pry
+puts

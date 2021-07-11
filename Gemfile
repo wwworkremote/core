@@ -77,3 +77,8 @@ gem 'deepsort'
 gem 'memo_wise'
 
 gem 'friendly_id'
+
+gem 'loofah'
+gem 'rails-html-sanitizer'
+gem 'rubypants'
+gem 'sanitize'

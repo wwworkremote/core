@@ -5,33 +5,51 @@ TERMS = %w[
   api
   bash
   capistrano
+  clojure
   css
   devops
+  docker
+  eruby
   git
   github
   gitlab
+  go
   golang
+  html
+  http
   java
   javascript
   jquery
   json
   jsonapi
   kafka
+  kubernetes
+  lisp
+  markdown
   middleware
   mysql
   nodejs
   postgres
   postgresql
+  prolog
   puma
   python
   rails
   redis
+  rest
   rspec
   ruby
+  rust
   sass
+  scala
+  shell
   sidekiq
   sql
+  typescript
   vim
+  viml
+  xml
+  yaml
   zsh
 ].freeze
 
