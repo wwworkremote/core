@@ -2,14 +2,13 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-
 require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
 puts "#{__FILE__} #{term}: #{Process.pid}"
 
-transaction = Sentry.start_transaction(name: "#{__FILE__} #{term}")
+transaction = Sentry.start_transaction(name: "#{__FILE__} #{term}", op: "source.stackoverflow.#{term}")
 
 begin
   Sentry.capture_message("#{__FILE__} #{term}".strip)

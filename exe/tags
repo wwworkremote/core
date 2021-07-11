@@ -3,7 +3,7 @@
 # frozen_string_literal: true
 
 puts "#{__FILE__}: #{Process.pid}"
-transaction = Sentry.start_transaction(op: :"#{__FILE__}")
+transaction = Sentry.start_transaction(name: __FILE__, op: 'messages.tags')
 
 begin
   Sentry.capture_message(__FILE__)
