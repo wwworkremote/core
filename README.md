@@ -1,3 +1,3 @@
 # README
 
-Zdalnie
+Praca Zdalna
