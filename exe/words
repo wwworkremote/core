@@ -33,11 +33,14 @@ module Words
     list.reject! { |word| word =~ /^\d+$/i }
     list.reject! { |word| word.length <= 2 }
 
-    Stopwords::Snowball::Filter.new('en').filter(list)
+    # Stopwords::Snowball::Filter.new('en').filter(list)
+    Stopwords::Snowball::WordSieve.new.filter(lang: :en, words: list)
   end
 
   def self.dump(list)
-    list.each_with_object(Hash.new(0)) { |e, h| h[e] += 1; }.deep_sort
+    list \
+      .each_with_object(Hash.new(0)) { |e, h| h[e] += 1; }
+      .deep_sort
   end
 end
 
