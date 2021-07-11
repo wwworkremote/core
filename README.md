@@ -1,4 +1,3 @@
 # README
 
-OutlierJobs
-
+Zdalnie
