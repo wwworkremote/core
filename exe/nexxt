@@ -2,9 +2,13 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+transaction = Sentry.start_transaction(name: __FILE__)
+
 begin
   Sentry.capture_message(__FILE__)
   Nexxt.jobs
 rescue StandardError => e
   Sentry.capture_exception(e)
+ensure
+  transaction.finish
 end

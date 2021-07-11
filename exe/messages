@@ -3,7 +3,8 @@
 # frozen_string_literal: true
 
 puts "#{__FILE__}: #{Process.pid}"
-transaction = Sentry.start_transaction(op: :"#{__FILE__}")
+
+transaction = Sentry.start_transaction(name: __FILE__)
 
 begin
   Sentry.capture_message(__FILE__)
@@ -56,40 +57,47 @@ begin
       end
 
     in rss: { channel: { item: [*items] } }
-      transaction.with_child_span(op: :'exe/messages.items', description: 'Process items from nested array') do |_span|
-        items.each do |item|
-          case item
-          in link: String, title: String => title if title.include?('No job postings found')
+      # transaction.with_child_span(name: :"exe/messages.items", description: 'Process items from nested array') do |span|
+      Sentry.get_current_scope.get_span do |span|
+        begin
+          items.each do |item|
+            case item
+              in link: String, title: String => title if title.include?('No job postings found')
 
-            nil
+              nil
 
-          in company: String => company, description: String => description, guid: String => guid, image: String, link: String => link, location: String => location, pubDate: String => pub_date, tags: String => tags, title: String => title
+              in company: String => company, description: String => description, guid: String => guid, image: String, link: String => link, location: String => location, pubDate: String => pub_date, tags: String => tags, title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip, company: company, external_id: guid.to_s.strip, location: location.strip, published_at: DateTime.parse(pub_date).to_time, tags: tags.split(',').map(&:strip), target_url: link.strip, title: title.strip
-            }.deep_sort)
+              notification.messages.create(data: {
+                body: description.strip, company: company, external_id: guid.to_s.strip, location: location.strip, published_at: DateTime.parse(pub_date).to_time, tags: tags.split(',').map(&:strip), target_url: link.strip, title: title.strip
+              }.deep_sort)
 
-          in company: String => company, description: String => description, guid: String => guid, image: String, link: String => link, location:, pubDate: String => pub_date, tags: String => tags, title: String => title
+              in company: String => company, description: String => description, guid: String => guid, image: String, link: String => link, location:, pubDate: String => pub_date, tags: String => tags, title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip, company: company, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, tags: tags.split(',').map(&:strip), target_url: link.strip, title: title.strip
-            }.deep_sort)
+              notification.messages.create(data: {
+                body: description.strip, company: company, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, tags: tags.split(',').map(&:strip), target_url: link.strip, title: title.strip
+              }.deep_sort)
 
-          in description: String => description, guid: { __content__: String => guid }, link: String => link, pubDate: String => pub_date, title: String => title
+              in description: String => description, guid: { __content__: String => guid }, link: String => link, pubDate: String => pub_date, title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
-            }.deep_sort)
+              notification.messages.create(data: {
+                body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
+              }.deep_sort)
 
-          in description: String => description, guid: String => guid, link: String => link, pubDate: String => pub_date, title: String => title
+              in description: String => description, guid: String => guid, link: String => link, pubDate: String => pub_date, title: String => title
 
-            notification.messages.create(data: {
-              body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
-            }.deep_sort)
+              notification.messages.create(data: {
+                body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
+              }.deep_sort)
 
-          else
-            Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
+            else
+              Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
+            end
           end
+        rescue StandardError => e
+          Sentry.capture_exception(e)
+        ensure
+          span.finish
         end
       end
 
