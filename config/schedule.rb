@@ -1,71 +1,50 @@
 # frozen_string_literal: true
 
+TERMS = %w[
+  ansible
+  api
+  bash
+  capistrano
+  css
+  devops
+  git
+  github
+  gitlab
+  golang
+  java
+  javascript
+  jquery
+  json
+  jsonapi
+  kafka
+  middleware
+  mysql
+  nodejs
+  postgres
+  postgresql
+  puma
+  python
+  rails
+  redis
+  rspec
+  ruby
+  sass
+  sidekiq
+  sql
+  vim
+  zsh
+].freeze
+
+TASKS_WITH_TERMS = %w[monster stackoverflow].flat_map { |task| TERMS.flat_map { |term| "#{task} #{term}" } }.freeze
+
 TASKS = %w[
   hackernews
   indeed
-  monster\ ansible
-  monster\ api
-  monster\ bash
-  monster\ capistrano
-  monster\ css
-  monster\ devops
-  monster\ git
-  monster\ github
-  monster\ gitlab
-  monster\ golang
-  monster\ java
-  monster\ javascript
-  monster\ jquery
-  monster\ json
-  monster\ kafka
-  monster\ nodejs
-  monster\ postgres
-  monster\ postgresql
-  monster\ puma
-  monster\ python
-  monster\ rails
-  monster\ redis
-  monster\ rspec
-  monster\ ruby
-  monster\ sass
-  monster\ sidekiq
-  monster\ sql
-  monster\ vim
-  monster\ zsh
   nexxt
   remoteok
   remotepython
-  stackoverflow\ ansible
-  stackoverflow\ api
-  stackoverflow\ bash
-  stackoverflow\ capistrano
-  stackoverflow\ css
-  stackoverflow\ devops
-  stackoverflow\ git
-  stackoverflow\ github
-  stackoverflow\ gitlab
-  stackoverflow\ golang
-  stackoverflow\ java
-  stackoverflow\ javascript
-  stackoverflow\ jquery
-  stackoverflow\ json
-  stackoverflow\ kafka
-  stackoverflow\ nodejs
-  stackoverflow\ postgres
-  stackoverflow\ postgresql
-  stackoverflow\ puma
-  stackoverflow\ python
-  stackoverflow\ rails
-  stackoverflow\ redis
-  stackoverflow\ rspec
-  stackoverflow\ ruby
-  stackoverflow\ sass
-  stackoverflow\ sidekiq
-  stackoverflow\ sql
-  stackoverflow\ vim
-  stackoverflow\ zsh
   weworkremotely
-].freeze
+].concat(TASKS_WITH_TERMS).freeze
 
 require 'whenever'
 
