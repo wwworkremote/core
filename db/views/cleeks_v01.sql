@@ -1,6 +1,6 @@
 select
   'messages' as name,
-  now() as timestamp,
+  now() as created_at,
   count(*) as value,
   min(created_at) as lbound,
   count(*) filter (where created_at >= now() - '1 week'::interval) as lbound_week_value,
@@ -15,7 +15,7 @@ from
 union all
 select
   'sources' as name,
-  now() as timestamp,
+  now() as created_at,
   count(*) as value,
   min(created_at) as lbound,
   count(*) filter (where created_at >= now() - '1 week'::interval) as lbound_week_value,
@@ -30,7 +30,7 @@ from
 union all
 select
   'tags' as name,
-  now() as timestamp,
+  now() as created_at,
   count(*) as value,
   min(created_at) as lbound,
   count(*) filter (where created_at >= now() - '1 week'::interval) as lbound_week_value,

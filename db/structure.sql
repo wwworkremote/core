@@ -171,7 +171,7 @@ CREATE TABLE public.tags (
 
 CREATE VIEW public.cleeks AS
  SELECT 'messages'::text AS name,
-    now() AS "timestamp",
+    now() AS created_at,
     count(*) AS value,
     min(messages.created_at) AS lbound,
     count(*) FILTER (WHERE (messages.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
@@ -184,7 +184,7 @@ CREATE VIEW public.cleeks AS
    FROM public.messages
 UNION ALL
  SELECT 'sources'::text AS name,
-    now() AS "timestamp",
+    now() AS created_at,
     count(*) AS value,
     min(sources.created_at) AS lbound,
     count(*) FILTER (WHERE (sources.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
@@ -197,7 +197,7 @@ UNION ALL
    FROM public.sources
 UNION ALL
  SELECT 'tags'::text AS name,
-    now() AS "timestamp",
+    now() AS created_at,
     count(*) AS value,
     min(tags.created_at) AS lbound,
     count(*) FILTER (WHERE (tags.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
