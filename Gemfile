@@ -82,3 +82,5 @@ gem 'loofah'
 gem 'rails-html-sanitizer'
 gem 'rubypants'
 gem 'sanitize'
+gem 'stopwords-filter', require: 'stopwords'
+

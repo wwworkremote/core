@@ -2,31 +2,55 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+#
+#                                                  single_left_quote: ' ',  single_right_quote: ' ',
+#                                                  double_left_quote: ' ', double_right_quote: ' ',
+#                                                  em_dash: ' ', en_dash: ' ',
+#                                                  ellipsis: ' ',
+#                                                  non_breaking_space: ' ', word_joiner: ' '
 module Words
   # STOPWORDS = File.open('/Users/mike/GitHub/Stopwords/src/common/stopwords_10000_most_frequent_filtered.txt').readlines(chomp: true).map(&:downcase).sort.uniq.freeze
+  def self.dehtml(input)
+    ActionController::Base \
+      .helpers
+      .strip_tags(Sanitize.fragment(RubyPants.new(input.downcase.strip, stupefy: true).to_html))
+      .tr('’', "'")
+      .gsub(/[^[:word:]\s]/i, ' ')
+      .gsub(/[[:space:]]+/, ' ')
+      .strip
+  end
 
-  def self.dump(input)
-    # input = SearchResult.last.data['description']
-
-    str = ActionController::Base.helpers.strip_tags(
-      Sanitize.fragment(
-        RubyPants.new(input.downcase.strip, stupefy: true).to_html
-      )
-    ).tr('’', "'")
+  def self.filtrate(input)
+    str = dehtml(input)
 
     list = str.split(/[[:space:]]+/).map(&:strip).map do |word|
-      word.gsub(/\W+$/,
-                '')
-    end.map do |word|
-      word.gsub(/^\W+/,
-                '')
-    end.map(&:strip).reject(&:blank?).reject { |word| word =~ /^\d+$/i }.reject { |word| word.length < 2 }.sort.uniq
+      word.gsub(/\W+$/, '')
+    end
 
-    # list -= STOPWORDS
+    list.map!(&:strip)
+    list.sort!
+    list.reject!(&:blank?)
+    list.reject! { |word| word =~ /^\d+$/i }
+    list.reject! { |word| word.length <= 2 }
 
-    list.each_with_object(Hash.new(0)) { |e, h| h[e] += 1; }
+    Stopwords::Snowball::Filter.new('en').filter(list)
+  end
+
+  def self.dump(list)
+    list.each_with_object(Hash.new(0)) { |e, h| h[e] += 1; }.deep_sort
   end
 end
 
-binding.pry
-puts
+text = Message.find(244_888).body
+list = Words.filtrate(text)
+words = Words.dump(list)
+ap words
+
+# text = Words.dehtml(input)
+# ap text
+
+# model = BlingFire::Model.new
+# ap model.text_to_words(text)
+
+# binding.pry
+# puts
