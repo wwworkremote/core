@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SENTRY_ORG: just3ws
+      SENTRY_AUTH_TOKEN: '0e29254fac624501bae3c56d405d07b26863e9f1485b44c3aa5b12226d5157b7'
 
     # Steps represent a sequence of tasks that will be executed as part of the
     # job
