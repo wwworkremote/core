@@ -124,6 +124,93 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.messages (
+    id bigint NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    status integer DEFAULT 0,
+    source_id bigint,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources (
+    id bigint NOT NULL,
+    signature character varying NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    status integer DEFAULT 0,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tags (
+    id bigint NOT NULL,
+    slug character varying,
+    name public.citext,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: cleeks; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.cleeks AS
+ SELECT 'messages'::text AS name,
+    now() AS "timestamp",
+    count(*) AS value,
+    min(messages.created_at) AS lbound,
+    count(*) FILTER (WHERE (messages.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
+    COALESCE(min(messages.created_at) FILTER (WHERE (messages.created_at >= (now() - '7 days'::interval))), min(messages.created_at)) AS lbound_week,
+    count(*) FILTER (WHERE (messages.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
+    COALESCE(min(messages.created_at) FILTER (WHERE (messages.created_at >= (now() - '1 day'::interval))), min(messages.created_at)) AS lbound_day,
+    count(*) FILTER (WHERE (messages.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
+    COALESCE(min(messages.created_at) FILTER (WHERE (messages.created_at >= (now() - '01:00:00'::interval))), min(messages.created_at)) AS lbound_hour,
+    max(messages.created_at) AS rbound
+   FROM public.messages
+UNION ALL
+ SELECT 'sources'::text AS name,
+    now() AS "timestamp",
+    count(*) AS value,
+    min(sources.created_at) AS lbound,
+    count(*) FILTER (WHERE (sources.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
+    COALESCE(min(sources.created_at) FILTER (WHERE (sources.created_at >= (now() - '7 days'::interval))), min(sources.created_at)) AS lbound_week,
+    count(*) FILTER (WHERE (sources.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
+    COALESCE(min(sources.created_at) FILTER (WHERE (sources.created_at >= (now() - '1 day'::interval))), min(sources.created_at)) AS lbound_day,
+    count(*) FILTER (WHERE (sources.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
+    COALESCE(min(sources.created_at) FILTER (WHERE (sources.created_at >= (now() - '01:00:00'::interval))), min(sources.created_at)) AS lbound_hour,
+    max(sources.created_at) AS rbound
+   FROM public.sources
+UNION ALL
+ SELECT 'tags'::text AS name,
+    now() AS "timestamp",
+    count(*) AS value,
+    min(tags.created_at) AS lbound,
+    count(*) FILTER (WHERE (tags.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
+    COALESCE(min(tags.created_at) FILTER (WHERE (tags.created_at >= (now() - '7 days'::interval))), min(tags.created_at)) AS lbound_week,
+    count(*) FILTER (WHERE (tags.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
+    COALESCE(min(tags.created_at) FILTER (WHERE (tags.created_at >= (now() - '1 day'::interval))), min(tags.created_at)) AS lbound_day,
+    count(*) FILTER (WHERE (tags.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
+    COALESCE(min(tags.created_at) FILTER (WHERE (tags.created_at >= (now() - '01:00:00'::interval))), min(tags.created_at)) AS lbound_hour,
+    max(tags.created_at) AS rbound
+   FROM public.tags;
+
+
+--
 -- Name: friendly_id_slugs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -157,20 +244,6 @@ ALTER SEQUENCE public.friendly_id_slugs_id_seq OWNED BY public.friendly_id_slugs
 
 
 --
--- Name: messages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.messages (
-    id bigint NOT NULL,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    status integer DEFAULT 0,
-    source_id bigint,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
 -- Name: messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -195,21 +268,6 @@ ALTER SEQUENCE public.messages_id_seq OWNED BY public.messages.id;
 
 CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
-);
-
-
---
--- Name: sources; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.sources (
-    id bigint NOT NULL,
-    signature character varying NOT NULL,
-    event jsonb DEFAULT '{}'::jsonb NOT NULL,
-    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
-    status integer DEFAULT 0,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -262,19 +320,6 @@ CREATE SEQUENCE public.tag_aliases_id_seq
 --
 
 ALTER SEQUENCE public.tag_aliases_id_seq OWNED BY public.tag_aliases.id;
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tags (
-    id bigint NOT NULL,
-    slug character varying,
-    name public.citext,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
 
 
 --
@@ -470,6 +515,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210707203641'),
 ('20210710142759'),
 ('20210710143627'),
-('20210710144921');
+('20210710144921'),
+('20210711230518');
 
 
