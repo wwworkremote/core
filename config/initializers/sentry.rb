@@ -8,12 +8,17 @@ Sentry.init do |config|
   config.breadcrumbs_logger = %i[sentry_logger active_support_logger http_logger]
 
   config.enabled_environments = %w[production]
-  #
+
   # config.logger = Sentry::Logger.new(STDOUT)
-  #
-  # config.inspect_exception_causes_for_exclusion = false
-  # config.excluded_exceptions += ['ActionController::RoutingError', 'ActiveRecord::RecordNotFound']
-  #
+
+  config.inspect_exception_causes_for_exclusion = true
+  config.excluded_exceptions += %w[
+    ActionController::RoutingError
+    ActiveRecord::RecordNotFound
+    ActiveRecord::RecordNotUnique
+    PG::UniqueViolation
+  ]
+
   # Set tracesSampleRate to 1.0 to capture 100%
   # of transactions for performance monitoring.
   # We recommend adjusting this value in production

@@ -46,6 +46,7 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
+  gem 'capistrano-sentry', require: false
 end
 
 group :development, :test do
