@@ -2,7 +2,9 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-transaction = Sentry.start_transaction(name: 'Ingest Jobs', op: __FILE__.tr('/', '.'), data: { cmd: __FILE__, term: ARGV.first })
+puts "#{__FILE__}: #{Process.pid}"
+
+transaction = Sentry.start_transaction(name: 'Ingest Jobs', op: __FILE__.tr('/', '.')) # , data: { cmd: __FILE__, term: ARGV.first })
 
 begin
   Sentry.capture_message(__FILE__)
