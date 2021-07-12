@@ -1,6 +1,23 @@
 # frozen_string_literal: true
 
 class Moment < ApplicationRecord
+  def self.snapshot!
+    Cleek.all.find_each do |cleek|
+      Moment.create(
+        cleek: cleek.id,
+        cleeked_at: cleek.cleeked_at,
+        lbound: cleek.lbound,
+        lbound_week: cleek.lbound_week,
+        lbound_week_value: cleek.lbound_week_value,
+        lbound_day: cleek.lbound_day,
+        lbound_day_value: cleek.lbound_day_value,
+        lbound_hour: cleek.lbound_hour,
+        lbound_hour_value: cleek.lbound_hour_value,
+        rbound: cleek.rbound,
+        value: cleek.value
+      )
+    end
+  end
 end
 
 # == Schema Information
