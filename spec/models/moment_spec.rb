@@ -1,24 +1,25 @@
 require 'rails_helper'
 
-RSpec.describe Cleek, type: :model do
+RSpec.describe Moment, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end
 
 # == Schema Information
 # Schema version: 20210712004243
 #
-# Table name: cleeks
+# Table name: moments
 #
-#  id                :integer
+#  id                :bigint           not null, primary key
+#  cleek             :integer
 #  cleeked_at        :datetime
 #  lbound            :datetime
 #  lbound_day        :datetime
-#  lbound_day_value  :bigint
+#  lbound_day_value  :integer
 #  lbound_hour       :datetime
-#  lbound_hour_value :bigint
+#  lbound_hour_value :integer
 #  lbound_week       :datetime
-#  lbound_week_value :bigint
-#  name              :text
+#  lbound_week_value :integer
 #  rbound            :datetime
-#  value             :bigint
+#  value             :integer
+#  created_at        :datetime         not null
 #

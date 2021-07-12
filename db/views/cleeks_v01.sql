@@ -1,7 +1,7 @@
 select
   1 as id,
   'messages' as name,
-  now() as created_at,
+  now() as cleeked_at,
   count(*) as value,
   min(created_at) as lbound,
   count(*) filter (where created_at >= now() - '1 week'::interval) as lbound_week_value,
@@ -17,7 +17,7 @@ union all
 select
   2 as id,
   'sources' as name,
-  now() as created_at,
+  now() as cleeked_at,
   count(*) as value,
   min(created_at) as lbound,
   count(*) filter (where created_at >= now() - '1 week'::interval) as lbound_week_value,
@@ -33,7 +33,7 @@ union all
 select
   3 as id,
   'tags' as name,
-  now() as created_at,
+  now() as cleeked_at,
   count(*) as value,
   min(created_at) as lbound,
   count(*) filter (where created_at >= now() - '1 week'::interval) as lbound_week_value,

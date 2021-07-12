@@ -15,12 +15,12 @@ class Tag < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210710142759
+# Schema version: 20210712004243
 #
 # Table name: tags
 #
 #  id         :bigint           not null, primary key
-#  name       :string           indexed
+#  name       :citext           indexed
 #  slug       :string           indexed
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

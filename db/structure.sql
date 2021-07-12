@@ -172,7 +172,7 @@ CREATE TABLE public.tags (
 CREATE VIEW public.cleeks AS
  SELECT 1 AS id,
     'messages'::text AS name,
-    now() AS created_at,
+    now() AS cleeked_at,
     count(*) AS value,
     min(messages.created_at) AS lbound,
     count(*) FILTER (WHERE (messages.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
@@ -186,7 +186,7 @@ CREATE VIEW public.cleeks AS
 UNION ALL
  SELECT 2 AS id,
     'sources'::text AS name,
-    now() AS created_at,
+    now() AS cleeked_at,
     count(*) AS value,
     min(sources.created_at) AS lbound,
     count(*) FILTER (WHERE (sources.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
@@ -200,7 +200,7 @@ UNION ALL
 UNION ALL
  SELECT 3 AS id,
     'tags'::text AS name,
-    now() AS created_at,
+    now() AS cleeked_at,
     count(*) AS value,
     min(tags.created_at) AS lbound,
     count(*) FILTER (WHERE (tags.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
@@ -263,6 +263,46 @@ CREATE SEQUENCE public.messages_id_seq
 --
 
 ALTER SEQUENCE public.messages_id_seq OWNED BY public.messages.id;
+
+
+--
+-- Name: moments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.moments (
+    id bigint NOT NULL,
+    cleek integer,
+    cleeked_at timestamp without time zone,
+    value integer,
+    lbound timestamp without time zone,
+    lbound_week_value integer,
+    lbound_week timestamp without time zone,
+    lbound_day_value integer,
+    lbound_day timestamp without time zone,
+    lbound_hour_value integer,
+    lbound_hour timestamp without time zone,
+    rbound timestamp without time zone,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: moments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.moments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: moments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.moments_id_seq OWNED BY public.moments.id;
 
 
 --
@@ -359,6 +399,13 @@ ALTER TABLE ONLY public.messages ALTER COLUMN id SET DEFAULT nextval('public.mes
 
 
 --
+-- Name: moments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.moments ALTER COLUMN id SET DEFAULT nextval('public.moments_id_seq'::regclass);
+
+
+--
 -- Name: sources id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -401,6 +448,14 @@ ALTER TABLE ONLY public.friendly_id_slugs
 
 ALTER TABLE ONLY public.messages
     ADD CONSTRAINT messages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: moments moments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.moments
+    ADD CONSTRAINT moments_pkey PRIMARY KEY (id);
 
 
 --
@@ -519,6 +574,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210710142759'),
 ('20210710143627'),
 ('20210710144921'),
-('20210711230518');
+('20210711230518'),
+('20210712004243');
 
 
