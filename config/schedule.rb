@@ -260,3 +260,6 @@ scheduler(
   start_at: Date.today.to_datetime.to_time.utc + 8.hours,
   slots: planner(slots: TASKS.shuffle, duration: 16.hours)
 )
+
+every(1.day) { rake 'pghero:capture_space_stats' }
+every(5.minutes) { rake 'pghero:capture_query_stats' }
