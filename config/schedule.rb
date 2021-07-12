@@ -247,19 +247,13 @@ every('20 * * * *', roles: [:cron2]) { runner 'exe/tags' }
 every('25 * * * *', roles: [:cron1]) { runner 'exe/moment' }
 every('55 * * * *', roles: [:cron2]) { runner 'exe/moment' }
 
-scheduler(
-  start_at: Date.today.to_datetime.to_time.utc,
-  slots: planner(slots: TASKS.shuffle, duration: 7.hours)
-)
+# scheduler(start_at: Date.today.to_datetime.to_time.utc          , slots: planner(slots: TASKS.shuffle, duration:  7.hours))
+# scheduler(start_at: Date.today.to_datetime.to_time.utc + 8.hours, slots: planner(slots: TASKS.shuffle, duration: 16.hours))
+scheduler(start_at: Date.today.to_datetime.to_time.utc, slots: planner(slots: TASKS.shuffle, duration: 1.day))
 
-every :day, at: '8:08am', roles: [:cron2] do # UTC
-  command 'exe/dice'
-end
-
-scheduler(
-  start_at: Date.today.to_datetime.to_time.utc + 8.hours,
-  slots: planner(slots: TASKS.shuffle, duration: 16.hours)
-)
+# every :day, at: '8:08am', roles: [:cron2] do # UTC
+#   command 'exe/dice'
+# end
 
 every(1.day, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
 every(5.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
