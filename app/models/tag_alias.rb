@@ -5,15 +5,15 @@ class TagAlias < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210710143627
+# Schema version: 20210712004243
 #
 # Table name: tag_aliases
 #
 #  id         :bigint           not null, primary key
-#  name       :string           indexed
+#  name       :citext           not null, indexed
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  tag_id     :bigint           not null, indexed
+#  tag_id     :bigint           indexed
 #
 # Foreign Keys
 #
