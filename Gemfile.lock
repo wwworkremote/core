@@ -208,6 +208,8 @@ GEM
     pg (1.2.3)
     pg_query (2.1.0)
       google-protobuf (>= 3.17.1)
+    pghero (2.8.1)
+      activerecord (>= 5)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -398,7 +400,8 @@ DEPENDENCIES
   multi_xml
   notable
   pg (~> 1.1)
-  pg_query
+  pg_query (>= 0.9.0)
+  pghero
   pry-byebug
   pry-rails
   puma (~> 5.0)

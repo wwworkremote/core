@@ -306,6 +306,41 @@ ALTER SEQUENCE public.moments_id_seq OWNED BY public.moments.id;
 
 
 --
+-- Name: pghero_query_stats; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pghero_query_stats (
+    id bigint NOT NULL,
+    database text,
+    "user" text,
+    query text,
+    query_hash bigint,
+    total_time double precision,
+    calls bigint,
+    captured_at timestamp without time zone
+);
+
+
+--
+-- Name: pghero_query_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pghero_query_stats_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pghero_query_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_stats.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -406,6 +441,13 @@ ALTER TABLE ONLY public.moments ALTER COLUMN id SET DEFAULT nextval('public.mome
 
 
 --
+-- Name: pghero_query_stats id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('public.pghero_query_stats_id_seq'::regclass);
+
+
+--
 -- Name: sources id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -456,6 +498,14 @@ ALTER TABLE ONLY public.messages
 
 ALTER TABLE ONLY public.moments
     ADD CONSTRAINT moments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pghero_query_stats pghero_query_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_query_stats
+    ADD CONSTRAINT pghero_query_stats_pkey PRIMARY KEY (id);
 
 
 --
@@ -519,6 +569,13 @@ CREATE INDEX index_messages_on_source_id ON public.messages USING btree (source_
 
 
 --
+-- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghero_query_stats USING btree (database, captured_at);
+
+
+--
 -- Name: index_sources_on_signature; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -575,6 +632,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210710143627'),
 ('20210710144921'),
 ('20210711230518'),
-('20210712004243');
+('20210712004243'),
+('20210712020439');
 
 
