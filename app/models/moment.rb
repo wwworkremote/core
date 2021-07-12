@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class Moment < ApplicationRecord
+  enum cleek: { messages: 1, sources: 2, tags: 3 }, _prefix: true
+
   def self.snapshot!
-    Cleek.all.find_each do |cleek|
+    cleeks = Cleek.all.to_a
+    cleeks.each do |cleek|
       Moment.create(
         cleek: cleek.id,
         cleeked_at: cleek.cleeked_at,

@@ -235,13 +235,17 @@ def scheduler(start_at:, slots:)
   end
 end
 
-# every 30 minutes on the quarter hour alternate hosts
+every('40 * * * *', roles: [:malina101]) { runner 'exe/sources' }
+every('10 * * * *', roles: [:malina102]) { runner 'exe/sources' }
+
 every('15 * * * *', roles: [:malina101]) { runner 'exe/messages' }
 every('45 * * * *', roles: [:malina102]) { runner 'exe/messages' }
 
-# every 30 minutes on the twenty alternate hosts
-every('50 * * * *', roles: [:malina101]) { runner 'exe/messages' }
-every('20 * * * *', roles: [:malina102]) { runner 'exe/messages' }
+every('50 * * * *', roles: [:malina101]) { runner 'exe/tags' }
+every('20 * * * *', roles: [:malina102]) { runner 'exe/tags' }
+
+every('25 * * * *', roles: [:malina101]) { runner 'exe/moment' }
+every('55 * * * *', roles: [:malina102]) { runner 'exe/moment' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
