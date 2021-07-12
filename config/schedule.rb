@@ -235,24 +235,24 @@ def scheduler(start_at:, slots:)
   end
 end
 
-every('40 * * * *', roles: [:malina101]) { runner 'exe/sources' }
-every('10 * * * *', roles: [:malina102]) { runner 'exe/sources' }
+every('40 * * * *', roles: [:cron1]) { runner 'exe/sources' }
+every('10 * * * *', roles: [:cron2]) { runner 'exe/sources' }
 
-every('15 * * * *', roles: [:malina101]) { runner 'exe/messages' }
-every('45 * * * *', roles: [:malina102]) { runner 'exe/messages' }
+every('15 * * * *', roles: [:cron1]) { runner 'exe/messages' }
+every('45 * * * *', roles: [:cron2]) { runner 'exe/messages' }
 
-every('50 * * * *', roles: [:malina101]) { runner 'exe/tags' }
-every('20 * * * *', roles: [:malina102]) { runner 'exe/tags' }
+every('50 * * * *', roles: [:cron1]) { runner 'exe/tags' }
+every('20 * * * *', roles: [:cron2]) { runner 'exe/tags' }
 
-every('25 * * * *', roles: [:malina101]) { runner 'exe/moment' }
-every('55 * * * *', roles: [:malina102]) { runner 'exe/moment' }
+every('25 * * * *', roles: [:cron1]) { runner 'exe/moment' }
+every('55 * * * *', roles: [:cron2]) { runner 'exe/moment' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
   slots: planner(slots: TASKS.shuffle, duration: 7.hours)
 )
 
-every :day, at: '8:08am', roles: [:cron] do # UTC
+every :day, at: '8:08am', roles: [:cron2] do # UTC
   command 'exe/dice'
 end
 
@@ -261,5 +261,5 @@ scheduler(
   slots: planner(slots: TASKS.shuffle, duration: 16.hours)
 )
 
-every(1.day) { rake 'pghero:capture_space_stats' }
-every(5.minutes) { rake 'pghero:capture_query_stats' }
+every(1.day, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
+every(5.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
