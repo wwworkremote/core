@@ -19,7 +19,13 @@ AllCops:
   TargetRubyVersion: 3.0
   UseCache: true
   Include:
+    - 'Capfile'
+    - 'Gemfile'
+    - 'Guardfile'
+    - 'Rakefile'
     - 'app/**/*.rb'
+    - 'bin/**/*.rb'
+    - 'config.ru'
     - 'config/**/*.rb'
     - 'db/**/*.rb'
     - 'exe/**/*'

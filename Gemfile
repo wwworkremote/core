@@ -36,6 +36,7 @@ group :development do
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', require: false
+  gem 'capistrano-sentry', require: false
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.3'
   gem 'rubocop', require: false
@@ -46,7 +47,6 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
-  gem 'capistrano-sentry', require: false
 end
 
 group :development, :test do
@@ -84,4 +84,3 @@ gem 'rails-html-sanitizer'
 gem 'rubypants'
 gem 'sanitize'
 gem 'stopwords-filter', require: 'stopwords'
-
