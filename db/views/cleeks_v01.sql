@@ -1,4 +1,5 @@
 select
+  1 as id,
   'messages' as name,
   now() as created_at,
   count(*) as value,
@@ -14,6 +15,7 @@ from
   messages
 union all
 select
+  2 as id,
   'sources' as name,
   now() as created_at,
   count(*) as value,
@@ -29,6 +31,7 @@ from
   sources
 union all
 select
+  3 as id,
   'tags' as name,
   now() as created_at,
   count(*) as value,

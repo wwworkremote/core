@@ -170,7 +170,8 @@ CREATE TABLE public.tags (
 --
 
 CREATE VIEW public.cleeks AS
- SELECT 'messages'::text AS name,
+ SELECT 1 AS id,
+    'messages'::text AS name,
     now() AS created_at,
     count(*) AS value,
     min(messages.created_at) AS lbound,
@@ -183,7 +184,8 @@ CREATE VIEW public.cleeks AS
     max(messages.created_at) AS rbound
    FROM public.messages
 UNION ALL
- SELECT 'sources'::text AS name,
+ SELECT 2 AS id,
+    'sources'::text AS name,
     now() AS created_at,
     count(*) AS value,
     min(sources.created_at) AS lbound,
@@ -196,7 +198,8 @@ UNION ALL
     max(sources.created_at) AS rbound
    FROM public.sources
 UNION ALL
- SELECT 'tags'::text AS name,
+ SELECT 3 AS id,
+    'tags'::text AS name,
     now() AS created_at,
     count(*) AS value,
     min(tags.created_at) AS lbound,
