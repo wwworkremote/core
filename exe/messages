@@ -1,15 +1,25 @@
-#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+#!/usr/bin/env rails runner
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-puts "#{__FILE__}: #{Process.pid}"
-
-transaction = Sentry.start_transaction(name: 'Sources to Messages', op: 'sources.messages')
-
 begin
-  Sentry.capture_message(__FILE__)
+  transaction = Sentry.start_transaction(name: 'sources => messages', op: 'sources.messages')
+  Sentry.capture_message("exe/messages pid:#{Process.pid}")
 
-  Source.where(status: 0).where('create_at >= ?', 1.day.ago).find_each(order: :asc, batch_size: 100) do |notification|
+  require 'tty-progressbar'
+  require 'tty-spinner'
+  require 'pastel'
+
+  spinner = TTY::Spinner.new('[:spinner] Counting sources ...', format: :classic).tap(&:auto_spin)
+
+  total = Source.where(status: 0).where(created_at: 1.day.ago..).count
+
+  spinner.stop("#{total} sources found")
+
+  bar = TTY::ProgressBar.new('sources => messages [:bar]', total: total)
+
+  Source.where(status: 0).where(created_at: 1.day.ago..).find_each(order: :asc, batch_size: 100) do |notification|
+    bar.advance
     payload = notification.payload
     response_body = payload['response_body']
 

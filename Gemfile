@@ -86,3 +86,29 @@ gem 'sanitize'
 gem 'stopwords-filter', require: 'stopwords'
 
 gem 'pghero'
+
+gem 'pastel', require: false
+gem 'tty', require: false
+gem 'tty-box', require: false
+gem 'tty-color', require: false
+gem 'tty-command', require: false
+gem 'tty-config', require: false
+gem 'tty-cursor', require: false
+gem 'tty-editor', require: false
+gem 'tty-file', require: false
+gem 'tty-font', require: false
+gem 'tty-link', require: false
+gem 'tty-logger', require: false
+gem 'tty-markdown', require: false
+gem 'tty-option', require: false
+gem 'tty-pager', require: false
+gem 'tty-pie', require: false
+gem 'tty-platform', require: false
+gem 'tty-progressbar', require: false
+gem 'tty-prompt', require: false
+gem 'tty-reader', require: false
+gem 'tty-screen', require: false
+gem 'tty-spinner', require: false
+gem 'tty-table', require: false
+gem 'tty-tree', require: false
+gem 'tty-which', require: false
