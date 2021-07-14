@@ -25,7 +25,7 @@ Rails.application.configure do
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
-  config.log_level = :debug
+  config.log_level = :info
 
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
@@ -43,6 +43,7 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation_warnings = []
 
   config.log_formatter = ::Logger::Formatter.new
+  config.colorize_logging = false
 
   # # Use a different logger for distributed setups.
   # require 'syslog/logger'
