@@ -43,10 +43,6 @@ Style/Documentation:
 Layout/LineLength:
   Enabled: false
 
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'config/initializers/sentry.rb'
-
 Metrics/MethodLength:
   Exclude:
     - 'app/models/moment.rb'
