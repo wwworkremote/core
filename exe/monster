@@ -7,7 +7,7 @@ begin
 
   term = Shellwords.escape(ARGV.first || 'programming')
 
-  Rails.logger.info { "exe/monster '#{term}' pid:#{Process.pid}" }
+  Rails.logger.info { "START exe/monster '#{term}' pid:#{Process.pid}" }
 
   Monster.jobs(term: term)
 rescue StandardError => e
