@@ -47,13 +47,13 @@ end
 text = Message.find(244_888).body
 list = Words.filtrate(text)
 words = Words.dump(list)
-ap words
+puts words.inspect
 
 # text = Words.dehtml(input)
-# ap text
+# puts text.inspect
 
 # model = BlingFire::Model.new
-# ap model.text_to_words(text)
+# puts model.text_to_words(text).inspect
 
 # binding.pry
 # puts
