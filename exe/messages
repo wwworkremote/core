@@ -2,6 +2,8 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+Rails.logger.info { "exe/messages pid:#{Process.pid}" }
+
 begin
   transaction = Sentry.start_transaction(name: 'sources => messages', op: 'sources.messages')
   Sentry.capture_message("exe/messages pid:#{Process.pid}")
