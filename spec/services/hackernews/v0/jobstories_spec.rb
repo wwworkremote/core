@@ -6,7 +6,7 @@ module HackerNews
   module V0
     RSpec.describe Jobstories do
       it 'requests a list of jobstories', :vcr do
-        ap described_class.new.call
+        puts described_class.new.call.inspect
       end
     end
   end
