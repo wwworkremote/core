@@ -1,13 +1,9 @@
-#!/usr/bin/env /Users/mike/projects/outlier_jobs/rails runner
+#!/usr/bin/env rails runner
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-puts "#{__FILE__}: #{Process.pid}"
-
-transaction = Sentry.start_transaction(name: 'Messages to Tags', op: 'messages.tags')
-
 begin
-  Sentry.capture_message(__FILE__)
+  Rails.logger.info { "START exe/tags pid:#{Process.pid}" }
 
   Message.where('created_at >= ?', 1.year.ago).find_each(batch_size: 100) do |message|
     next if message.tags.blank?
@@ -20,7 +16,7 @@ begin
     end
   end
 rescue StandardError => e
-  Sentry.capture_exception(e)
+  Rails.logger.error { "ERROR exe/tags pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  transaction.finish
+  Rails.logger.info { "END exe/tags pid:#{Process.pid}" }
 end

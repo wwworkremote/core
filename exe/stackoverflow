@@ -2,19 +2,16 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-require 'shellwords'
-
-term = Shellwords.escape(ARGV.first || 'programming')
-
-Rails.logger.info { "exe/stackoverflow '#{term}' pid:#{Process.pid}" }
-
-transaction = Sentry.start_transaction(name: 'Ingest Jobs', op: __FILE__.tr('/', '.'))
-
 begin
-  Sentry.capture_message("#{__FILE__} #{term}".strip)
+  require 'shellwords'
+
+  term = Shellwords.escape(ARGV.first || 'programming')
+
+  Rails.logger.info { "START exe/stackoverflow '#{term}' pid:#{Process.pid}" }
+
   StackOverflow.jobs(term: term)
 rescue StandardError => e
-  Sentry.capture_exception(e)
+  Rails.logger.error { "ERROR exe/stackoverflow '#{term}' pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  transaction.finish
+  Rails.logger.info { "END exe/stackoverflow '#{term}' pid:#{Process.pid}" }
 end

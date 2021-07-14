@@ -2,15 +2,11 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-puts "#{__FILE__}: #{Process.pid}"
-
-transaction = Sentry.start_transaction(name: 'Ingest Jobs', op: __FILE__.tr('/', '.')) # , data: { cmd: __FILE__, term: ARGV.first })
-
 begin
-  Sentry.capture_message(__FILE__)
+  Rails.logger.info { "START exe/nexxt pid:#{Process.pid}" }
   Nexxt.jobs
 rescue StandardError => e
-  Sentry.capture_exception(e)
+  Rails.logger.error { "ERROR exe/nexxt pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  transaction.finish
+  Rails.logger.info { "END exe/nexxt pid:#{Process.pid}" }
 end

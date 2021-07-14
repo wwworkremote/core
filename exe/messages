@@ -2,11 +2,8 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-Rails.logger.info { "exe/messages pid:#{Process.pid}" }
-
 begin
-  transaction = Sentry.start_transaction(name: 'sources => messages', op: 'sources.messages')
-  Sentry.capture_message("exe/messages pid:#{Process.pid}")
+  Rails.logger.info { "START exe/messages pid:#{Process.pid}" }
 
   require 'tty-progressbar'
   require 'tty-spinner'
@@ -69,8 +66,7 @@ begin
       end
 
     in rss: { channel: { item: [*items] } }
-      # transaction.with_child_span(name: :"exe/messages.items", description: 'Process items from nested array') do |span|
-      Sentry.get_current_scope.get_span do |span|
+      begin
         items.each do |item|
           case item
           in link: String, title: String => title if title.include?('No job postings found')
@@ -106,9 +102,7 @@ begin
           end
         end
       rescue StandardError => e
-        Sentry.capture_exception(e)
-      ensure
-        span.finish
+        Rails.logger.error { [e.message, e].inspect }
       end
 
     else
@@ -116,7 +110,7 @@ begin
     end
   end
 rescue StandardError => e
-  Sentry.capture_exception(e)
+  Rails.logger.error { "ERROR exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  transaction.finish
+  Rails.logger.info { "END exe/messages pid:#{Process.pid}" }
 end

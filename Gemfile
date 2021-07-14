@@ -36,7 +36,6 @@ group :development do
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', require: false
-  gem 'capistrano-sentry', require: false
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.3'
   gem 'rubocop', require: false
@@ -59,9 +58,6 @@ end
 
 gem 'jsonb_accessor'
 gem 'scenic'
-
-gem 'sentry-rails'
-gem 'sentry-ruby'
 
 gem 'active_median'
 gem 'blingfire' # https://github.com/ankane/blingfire
