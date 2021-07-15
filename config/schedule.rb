@@ -1,162 +1,282 @@
 # frozen_string_literal: true
 
-module Searches
-  TERMS = [
-    'a11y',
-    'agile',
-    'airbrake',
-    'ansible',
-    'apache',
-    'api',
-    'aws',
-    'backbone.js',
-    'bash',
-    'bootstrap',
-    'capistrano',
-    'ccnet',
-    'centos',
-    'chargify',
-    'circle ci',
-    'clojure',
-    'codesmith api',
-    'coffeescript',
-    'couchdb',
-    'css',
-    'cucumber',
-    'devops',
-    'digitalocean',
-    'docker',
-    'ec2',
-    'elasticsearch',
-    'ember.js',
-    'emberjs',
-    'eruby',
-    'etl',
-    'facebook graph api',
-    'graph api',
-    'fail2ban',
-    'git',
-    'github api',
-    'github',
-    'gitlab',
-    'go',
-    'golang',
-    'google analytics',
-    'hadoop',
-    'heroku',
-    'html',
-    'html5',
-    'http',
-    'hubot',
-    'instagram api',
-    'java',
-    'javascript',
-    'jira',
-    'jquery',
-    'jruby',
-    'json api',
-    'json',
-    'jsonapi',
-    'jwt',
-    'kafka',
-    'kubernetes',
-    'linux',
-    'lisp',
-    'lodash',
-    'logentries',
-    'markdown',
-    'memcached',
-    'middleware',
-    'mongodb',
-    'mongrel',
-    'monit',
-    'mssql',
-    'mysql',
-    'new relic',
-    'nginx',
-    'node.js',
-    'nodejs',
-    'openstack',
-    'passenger',
-    'php',
-    'phpunit',
-    'postgres',
-    'postgresql',
-    'prolog',
-    'puma',
-    'puppet',
-    'python',
-    'qunit',
-    'rails',
-    'raphael.js',
-    'rds',
-    'react',
-    'redis',
-    'redux',
-    'resque',
-    'rest',
-    'riak',
-    'rollbar',
-    'rspec',
-    'ruby on rails',
-    'ruby',
-    'rust',
-    's3',
-    'sass',
-    'scala',
-    'scrum',
-    'semaphore ci',
-    'sendgrid api',
-    'shell',
-    'sidekiq',
-    'soap',
-    'sql',
-    'stripe',
-    'subversion',
-    'sumo logic',
-    't-sql',
-    'thin',
-    'transact-sql',
-    'trello',
-    'twitter api',
-    'typescript',
-    'ubuntu',
-    'uml',
-    'underscore.js',
-    'unicorn',
-    'vagrant',
-    'vertica',
-    'vim',
-    'viml',
-    'vmware',
-    'web api',
-    'xhtml',
-    'xml',
-    'yaml',
-    'z shell',
-    'zsh'
-  ].uniq.shuffle.freeze
-
-  SEARCHES = {
-    'hackernews' => [],
-    'indeed' => [],
-    'monster' => TERMS.shuffle.freeze,
-    'nexxt' => [],
-    'remoteok' => [],
-    'remotepython' => [],
-    'stackoverflow' => TERMS.shuffle.freeze,
-    'weworkremotely' => []
-  }.freeze
-
-  module_function
-
-  def searches
-    SEARCHES.each_pair.each_with_object([]) do |(k, v), o|
-      o << [k, 'programming']
-      v.each { |term| o << [k, term] }
-    end.shuffle.freeze
-  end
-end
+TASKS = %w[
+  exe/hackernews
+  exe/indeed
+  exe/monster\ "a11y"
+  exe/monster\ "agile"
+  exe/monster\ "airbrake"
+  exe/monster\ "ansible"
+  exe/monster\ "apache"
+  exe/monster\ "api"
+  exe/monster\ "aws"
+  exe/monster\ "backbone.js"
+  exe/monster\ "bash"
+  exe/monster\ "bootstrap"
+  exe/monster\ "capistrano"
+  exe/monster\ "ccnet"
+  exe/monster\ "centos"
+  exe/monster\ "chargify"
+  exe/monster\ "circle\ ci"
+  exe/monster\ "clojure"
+  exe/monster\ "codesmith\ api"
+  exe/monster\ "coffeescript"
+  exe/monster\ "couchdb"
+  exe/monster\ "css"
+  exe/monster\ "cucumber"
+  exe/monster\ "devops"
+  exe/monster\ "digitalocean"
+  exe/monster\ "docker"
+  exe/monster\ "ec2"
+  exe/monster\ "elasticsearch"
+  exe/monster\ "ember.js"
+  exe/monster\ "emberjs"
+  exe/monster\ "eruby"
+  exe/monster\ "etl"
+  exe/monster\ "facebook\ graph\ api"
+  exe/monster\ "fail2ban"
+  exe/monster\ "git"
+  exe/monster\ "github\ api"
+  exe/monster\ "github"
+  exe/monster\ "gitlab"
+  exe/monster\ "go"
+  exe/monster\ "golang"
+  exe/monster\ "google\ analytics"
+  exe/monster\ "graph\ api"
+  exe/monster\ "hadoop"
+  exe/monster\ "heroku"
+  exe/monster\ "html"
+  exe/monster\ "html5"
+  exe/monster\ "http"
+  exe/monster\ "hubot"
+  exe/monster\ "instagram\ api"
+  exe/monster\ "java"
+  exe/monster\ "javascript"
+  exe/monster\ "jira"
+  exe/monster\ "jquery"
+  exe/monster\ "jruby"
+  exe/monster\ "json\ api"
+  exe/monster\ "json"
+  exe/monster\ "jsonapi"
+  exe/monster\ "jwt"
+  exe/monster\ "kafka"
+  exe/monster\ "kubernetes"
+  exe/monster\ "linux"
+  exe/monster\ "lisp"
+  exe/monster\ "lodash"
+  exe/monster\ "logentries"
+  exe/monster\ "markdown"
+  exe/monster\ "memcached"
+  exe/monster\ "middleware"
+  exe/monster\ "mongodb"
+  exe/monster\ "mongrel"
+  exe/monster\ "monit"
+  exe/monster\ "mssql"
+  exe/monster\ "mysql"
+  exe/monster\ "new\ relic"
+  exe/monster\ "nginx"
+  exe/monster\ "node.js"
+  exe/monster\ "nodejs"
+  exe/monster\ "openstack"
+  exe/monster\ "passenger"
+  exe/monster\ "php"
+  exe/monster\ "phpunit"
+  exe/monster\ "postgres"
+  exe/monster\ "postgresql"
+  exe/monster\ "programming"
+  exe/monster\ "prolog"
+  exe/monster\ "puma"
+  exe/monster\ "puppet"
+  exe/monster\ "python"
+  exe/monster\ "qunit"
+  exe/monster\ "rails"
+  exe/monster\ "raphael.js"
+  exe/monster\ "rds"
+  exe/monster\ "react"
+  exe/monster\ "redis"
+  exe/monster\ "redux"
+  exe/monster\ "resque"
+  exe/monster\ "rest"
+  exe/monster\ "riak"
+  exe/monster\ "rollbar"
+  exe/monster\ "rspec"
+  exe/monster\ "ruby\ on\ rails"
+  exe/monster\ "ruby"
+  exe/monster\ "rust"
+  exe/monster\ "s3"
+  exe/monster\ "sass"
+  exe/monster\ "scala"
+  exe/monster\ "scrum"
+  exe/monster\ "semaphore\ ci"
+  exe/monster\ "sendgrid\ api"
+  exe/monster\ "shell"
+  exe/monster\ "sidekiq"
+  exe/monster\ "soap"
+  exe/monster\ "sql"
+  exe/monster\ "stripe"
+  exe/monster\ "subversion"
+  exe/monster\ "sumo\ logic"
+  exe/monster\ "t-sql"
+  exe/monster\ "thin"
+  exe/monster\ "transact-sql"
+  exe/monster\ "trello"
+  exe/monster\ "twitter\ api"
+  exe/monster\ "typescript"
+  exe/monster\ "ubuntu"
+  exe/monster\ "uml"
+  exe/monster\ "underscore.js"
+  exe/monster\ "unicorn"
+  exe/monster\ "vagrant"
+  exe/monster\ "vertica"
+  exe/monster\ "vim"
+  exe/monster\ "neovim"
+  exe/monster\ "viml"
+  exe/monster\ "vmware"
+  exe/monster\ "web\ api"
+  exe/monster\ "xhtml"
+  exe/monster\ "xml"
+  exe/monster\ "yaml"
+  exe/monster\ "z\ shell"
+  exe/monster\ "zsh"
+  exe/nexxt
+  exe/remoteok
+  exe/remotepython
+  exe/stackoverflow\ "a11y"
+  exe/stackoverflow\ "agile"
+  exe/stackoverflow\ "airbrake"
+  exe/stackoverflow\ "ansible"
+  exe/stackoverflow\ "apache"
+  exe/stackoverflow\ "api"
+  exe/stackoverflow\ "aws"
+  exe/stackoverflow\ "backbone.js"
+  exe/stackoverflow\ "bash"
+  exe/stackoverflow\ "bootstrap"
+  exe/stackoverflow\ "capistrano"
+  exe/stackoverflow\ "ccnet"
+  exe/stackoverflow\ "centos"
+  exe/stackoverflow\ "chargify"
+  exe/stackoverflow\ "circle\ ci"
+  exe/stackoverflow\ "clojure"
+  exe/stackoverflow\ "codesmith\ api"
+  exe/stackoverflow\ "coffeescript"
+  exe/stackoverflow\ "couchdb"
+  exe/stackoverflow\ "css"
+  exe/stackoverflow\ "cucumber"
+  exe/stackoverflow\ "devops"
+  exe/stackoverflow\ "digitalocean"
+  exe/stackoverflow\ "docker"
+  exe/stackoverflow\ "ec2"
+  exe/stackoverflow\ "elasticsearch"
+  exe/stackoverflow\ "ember.js"
+  exe/stackoverflow\ "emberjs"
+  exe/stackoverflow\ "eruby"
+  exe/stackoverflow\ "etl"
+  exe/stackoverflow\ "facebook\ graph\ api"
+  exe/stackoverflow\ "fail2ban"
+  exe/stackoverflow\ "git"
+  exe/stackoverflow\ "github\ api"
+  exe/stackoverflow\ "github"
+  exe/stackoverflow\ "gitlab"
+  exe/stackoverflow\ "go"
+  exe/stackoverflow\ "golang"
+  exe/stackoverflow\ "google\ analytics"
+  exe/stackoverflow\ "graph\ api"
+  exe/stackoverflow\ "hadoop"
+  exe/stackoverflow\ "heroku"
+  exe/stackoverflow\ "html"
+  exe/stackoverflow\ "html5"
+  exe/stackoverflow\ "http"
+  exe/stackoverflow\ "hubot"
+  exe/stackoverflow\ "instagram\ api"
+  exe/stackoverflow\ "java"
+  exe/stackoverflow\ "javascript"
+  exe/stackoverflow\ "jira"
+  exe/stackoverflow\ "jquery"
+  exe/stackoverflow\ "jruby"
+  exe/stackoverflow\ "json\ api"
+  exe/stackoverflow\ "json"
+  exe/stackoverflow\ "jsonapi"
+  exe/stackoverflow\ "jwt"
+  exe/stackoverflow\ "kafka"
+  exe/stackoverflow\ "kubernetes"
+  exe/stackoverflow\ "linux"
+  exe/stackoverflow\ "lisp"
+  exe/stackoverflow\ "lodash"
+  exe/stackoverflow\ "logentries"
+  exe/stackoverflow\ "markdown"
+  exe/stackoverflow\ "memcached"
+  exe/stackoverflow\ "middleware"
+  exe/stackoverflow\ "mongodb"
+  exe/stackoverflow\ "mongrel"
+  exe/stackoverflow\ "monit"
+  exe/stackoverflow\ "mssql"
+  exe/stackoverflow\ "mysql"
+  exe/stackoverflow\ "new\ relic"
+  exe/stackoverflow\ "nginx"
+  exe/stackoverflow\ "node.js"
+  exe/stackoverflow\ "nodejs"
+  exe/stackoverflow\ "openstack"
+  exe/stackoverflow\ "passenger"
+  exe/stackoverflow\ "php"
+  exe/stackoverflow\ "phpunit"
+  exe/stackoverflow\ "postgres"
+  exe/stackoverflow\ "postgresql"
+  exe/stackoverflow\ "programming"
+  exe/stackoverflow\ "prolog"
+  exe/stackoverflow\ "puma"
+  exe/stackoverflow\ "puppet"
+  exe/stackoverflow\ "python"
+  exe/stackoverflow\ "qunit"
+  exe/stackoverflow\ "rails"
+  exe/stackoverflow\ "raphael.js"
+  exe/stackoverflow\ "rds"
+  exe/stackoverflow\ "react"
+  exe/stackoverflow\ "redis"
+  exe/stackoverflow\ "redux"
+  exe/stackoverflow\ "resque"
+  exe/stackoverflow\ "rest"
+  exe/stackoverflow\ "riak"
+  exe/stackoverflow\ "rollbar"
+  exe/stackoverflow\ "rspec"
+  exe/stackoverflow\ "ruby\ on\ rails"
+  exe/stackoverflow\ "ruby"
+  exe/stackoverflow\ "rust"
+  exe/stackoverflow\ "s3"
+  exe/stackoverflow\ "sass"
+  exe/stackoverflow\ "scala"
+  exe/stackoverflow\ "scrum"
+  exe/stackoverflow\ "semaphore\ ci"
+  exe/stackoverflow\ "sendgrid\ api"
+  exe/stackoverflow\ "shell"
+  exe/stackoverflow\ "sidekiq"
+  exe/stackoverflow\ "soap"
+  exe/stackoverflow\ "sql"
+  exe/stackoverflow\ "stripe"
+  exe/stackoverflow\ "subversion"
+  exe/stackoverflow\ "sumo\ logic"
+  exe/stackoverflow\ "t-sql"
+  exe/stackoverflow\ "thin"
+  exe/stackoverflow\ "transact-sql"
+  exe/stackoverflow\ "trello"
+  exe/stackoverflow\ "twitter\ api"
+  exe/stackoverflow\ "typescript"
+  exe/stackoverflow\ "ubuntu"
+  exe/stackoverflow\ "uml"
+  exe/stackoverflow\ "underscore.js"
+  exe/stackoverflow\ "unicorn"
+  exe/stackoverflow\ "vagrant"
+  exe/stackoverflow\ "vertica"
+  exe/stackoverflow\ "vim"
+  exe/stackoverflow\ "viml"
+  exe/stackoverflow\ "vmware"
+  exe/stackoverflow\ "web\ api"
+  exe/stackoverflow\ "xhtml"
+  exe/stackoverflow\ "xml"
+  exe/stackoverflow\ "yaml"
+  exe/stackoverflow\ "z\ shell"
+  exe/stackoverflow\ "zsh"
+  exe/weworkremotely
+].uniq.freeze
 
 require 'whenever'
 
@@ -190,14 +310,11 @@ def scheduler(start_at:, slots:)
     cron = "#{time.min} #{time.hour} * * *"
     task = slot.last
 
-    cmd = task.first
-    term = task.last
-
     next if task.to_s.strip.empty?
 
     host = hosts[i.even? ? 0 : 1]
 
-    every(cron, roles: [host]) { runner "exe/#{cmd} \"#{term}\"" }
+    every(cron, roles: [host]) { runner task }
   end
 end
 
@@ -217,7 +334,7 @@ every('55 * * * *', roles: [:cron2]) { runner 'exe/moment' }
 # scheduler(start_at: Date.today.to_datetime.to_time.utc + 8.hours, slots: planner(slots: TASKS.shuffle, duration: 16.hours))
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
-  slots: planner(slots: Searches.searches, duration: 1.day)
+  slots: planner(slots: TASKS.shuffle.freeze, duration: 1.day)
 )
 
 # every :day, at: '8:08am', roles: [:cron2] do # UTC
