@@ -184,7 +184,7 @@ TERMS = %w[
   zsh
 ].shuffle.freeze
 
-TASKS_WITH_TERMS = %w[monster stackoverflow].flat_map { |task| TERMS.flat_map { |term| "#{task} '#{term}'" } }.flatten.shuffle.freeze
+TASKS_WITH_TERMS = %w[monster stackoverflow].flat_map { |task| TERMS.flat_map { |term| "#{task} #{term}" } }.flatten.shuffle.freeze
 
 TASKS = %w[
   hackernews
