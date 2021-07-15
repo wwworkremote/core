@@ -1,199 +1,6 @@
 # frozen_string_literal: true
 
-TERMS = %w[
-  a11y
-  active\ directory
-  active\ server\ pages\
-  activex
-  agile
-  airbrake
-  amazon\ rds
-  ansible
-  apache
-  api
-  asp
-  asp.net
-  aws\ ec2
-  aws\ rds
-  aws\ s3
-  backbone.js
-  bash
-  bootstrap
-  c#
-  capistrano
-  ccnet
-  centos
-  chargify
-  circleci
-  clojure
-  codesmith\ api
-  coffeescript
-  coldfusion
-  couchdb
-  cruisecontrol.net
-  css
-  cucumber
-  devops
-  digitalocean
-  docker
-  elasticsearch
-  ember.js
-  eruby
-  etl
-  facebook\ graph\ api
-  fail2ban
-  git
-  github
-  github\ api
-  gitlab
-  go
-  golang
-  google\ analytics
-  hadoop
-  heroku
-  html
-  html/sass
-  html5
-  http
-  hubot
-  iis
-  imb\ rational
-  instagram\ api
-  internet\ information\ services
-  java
-  java\ server\ pages
-  java\ websphere
-  javalite
-  javascript
-  jetty
-  jira
-  jquery
-  jruby
-  json
-  json\ api
-  jsonapi
-  jsp
-  jwt
-  kafka
-  kubernetes
-  linux
-  lisp
-  lodash
-  logentries
-  markdown
-  mbunit
-  memcached
-  mercurial
-  microsoft\ access
-  microsoft\ biztalk\ server
-  microsoft\ sql\ server
-  microsoft\ sql\ server\ reporting\ services
-  middleware
-  mongodb
-  mongrel
-  monit
-  mysql
-  nant
-  new\ relic
-  nginx
-  nlog
-  node.js
-  nodejs
-  nunit
-  openstack
-  oracle\ fusion
-  packer
-  passenger
-  php
-  phpunit
-  postgres
-  postgresql
-  prolog
-  puma
-  puppet
-  python
-  qunit
-  rails
-  raphael.js
-  react
-  redis
-  redux
-  resque
-  rest
-  riak
-  rollbar
-  rspec
-  ruby
-  ruby\ on\ rails
-  rust
-  sass
-  scala
-  scrum
-  semaphore\ ci
-  sendgrid\ api
-  sharepoint
-  shell
-  sidekiq
-  soap
-  solomon\ accounting\ software
-  sourcegear\ vault
-  sql
-  ssrs
-  stripe
-  stun
-  subsonic\ orm
-  subversion
-  sumo\ logic
-  t-sql
-  thin
-  trac
-  transact-sql
-  trello
-  twitter\ api
-  typescript
-  ubuntu
-  uml
-  underscore.js
-  unicorn
-  vagrant
-  vb.net
-  vba
-  vbscript
-  vertica
-  vim
-  viml
-  visual\ basic
-  visual\ basic\ .net
-  visual\ basic\ for\ applications
-  visual\ interdev
-  visual\ j++
-  visual\ sourcesafe
-  visual\ studio\ .net
-  visual\ studio\ team\ services
-  vmware
-  watir
-  web\ api
-  windows\ 2000\ server
-  windows\ 98
-  windows\ nt
-  windows\ server
-  xhtml
-  xml
-  yaml
-  z\ shell
-  zsh
-].shuffle.freeze
-
-TASKS_WITH_TERMS = %w[monster stackoverflow].flat_map { |task| TERMS.flat_map { |term| "#{task} \"#{term}\"" } }.flatten.shuffle.freeze
-
-TASKS = %w[
-  hackernews
-  indeed
-  nexxt
-  remoteok
-  remotepython
-  weworkremotely
-].concat(TASKS_WITH_TERMS).shuffle.freeze
+require 'searches'
 
 require 'whenever'
 
@@ -227,11 +34,14 @@ def scheduler(start_at:, slots:)
     cron = "#{time.min} #{time.hour} * * *"
     task = slot.last
 
+    cmd = task.first
+    term = task.last
+
     next if task.to_s.strip.empty?
 
     host = hosts[i.even? ? 0 : 1]
 
-    every(cron, roles: [host]) { runner "exe/#{task}" }
+    every(cron, roles: [host]) { runner "exe/#{cmd} \"#{term}\"" }
   end
 end
 
@@ -249,7 +59,10 @@ every('55 * * * *', roles: [:cron2]) { runner 'exe/moment' }
 
 # scheduler(start_at: Date.today.to_datetime.to_time.utc          , slots: planner(slots: TASKS.shuffle, duration:  7.hours))
 # scheduler(start_at: Date.today.to_datetime.to_time.utc + 8.hours, slots: planner(slots: TASKS.shuffle, duration: 16.hours))
-scheduler(start_at: Date.today.to_datetime.to_time.utc, slots: planner(slots: TASKS.shuffle, duration: 1.day))
+scheduler(
+  start_at: Date.today.to_datetime.to_time.utc,
+  slots: planner(slots: Searches.searches, duration: 1.day)
+)
 
 # every :day, at: '8:08am', roles: [:cron2] do # UTC
 #   command 'exe/dice'
