@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require '../lib/searches'
+require 'searches'
 
 require 'whenever'
 
