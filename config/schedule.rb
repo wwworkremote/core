@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'lib/searches'
+require Rails.root.join('lib/searches.rb')
 
 require 'whenever'
 
