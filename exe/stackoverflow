@@ -7,11 +7,11 @@ begin
 
   term = Shellwords.escape(ARGV.first || 'programming')
 
-  Rails.logger.info { "START exe/stackoverflow '#{term}' pid:#{Process.pid}" }
+  Rails.logger.info { "START exe/stackoverflow #{term} pid:#{Process.pid}" }
 
   StackOverflow.jobs(term: term)
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/stackoverflow '#{term}' pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { "ERROR exe/stackoverflow #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  Rails.logger.info { "END exe/stackoverflow '#{term}' pid:#{Process.pid}" }
+  Rails.logger.info { "END exe/stackoverflow #{term} pid:#{Process.pid}" }
 end
