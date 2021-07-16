@@ -51,34 +51,20 @@ group :test do
   gem 'vcr'
 end
 
-# gem 'youtokentome' # https://github.com/ankane/youtokentome
 # gem 'active_median'
 # gem 'awesome_print'
 # gem 'blingfire' # https://github.com/ankane/blingfire
-gem 'deepsort'
+# gem 'dry-transformer'
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'faraday-http-cache'
-gem 'friendly_id'
 # gem 'groupdate'
 # gem 'hightop'
-gem 'jsonb_accessor'
 # gem 'loofah'
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
-gem 'multi_xml'
 # gem 'notable' # https://github.com/ankane/notable
-gem 'pastel', require: false
-gem 'pghero'
-gem 'pg_query', '>= 0.9.0'
-gem 'rails-html-sanitizer'
 # gem 'rainbow'
-gem 'rollups' # https://github.com/ankane/rollup
-gem 'rubypants'
 # gem 'safely_block' # https://github.com/ankane/safely
-gem 'sanitize'
-gem 'scenic'
-gem 'stopwords-filter', require: 'stopwords'
-gem 'tty', require: false
 # gem 'tty-box', require: false
 # gem 'tty-color', require: false
 # gem 'tty-command', require: false
@@ -94,11 +80,26 @@ gem 'tty', require: false
 # gem 'tty-pager', require: false
 # gem 'tty-pie', require: false
 # gem 'tty-platform', require: false
-gem 'tty-progressbar', require: false
 # gem 'tty-prompt', require: false
 # gem 'tty-reader', require: false
 # gem 'tty-screen', require: false
-gem 'tty-spinner', require: false
 # gem 'tty-table', require: false
 # gem 'tty-tree', require: false
 # gem 'tty-which', require: false
+# gem 'youtokentome' # https://github.com/ankane/youtokentome
+gem 'deepsort'
+gem 'friendly_id'
+gem 'jsonb_accessor'
+gem 'multi_xml'
+gem 'pastel', require: false
+gem 'pghero'
+gem 'pg_query', '>= 0.9.0'
+gem 'rails-html-sanitizer'
+gem 'rollups' # https://github.com/ankane/rollup
+gem 'rubypants', require: false
+gem 'sanitize', require: false
+gem 'scenic'
+gem 'stopwords-filter', require: 'stopwords'
+gem 'tty', require: false
+gem 'tty-progressbar', require: false
+gem 'tty-spinner', require: false
