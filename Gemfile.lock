@@ -293,7 +293,7 @@ GEM
     rubocop-thread_safety (0.4.2)
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
-    ruby2_keywords (0.0.4)
+    ruby2_keywords (0.0.5)
     rubypants (0.7.1)
     sanitize (5.2.3)
       crass (~> 1.0.2)
