@@ -11,7 +11,7 @@ begin
 
   spinner = TTY::Spinner.new('[:spinner] Counting sources ...', format: :classic).tap(&:auto_spin)
 
-  total = Source.where(status: 0).where(created_at: 1.day.ago..).count
+  total = Source.where(status: 0).where(created_at: 3.days.ago..).count
 
   spinner.stop("#{total} sources found")
 
