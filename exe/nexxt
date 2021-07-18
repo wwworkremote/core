@@ -3,10 +3,15 @@
 # frozen_string_literal: true
 
 begin
-  Rails.logger.info { "START exe/nexxt pid:#{Process.pid}" }
-  Nexxt.jobs
+  require 'shellwords'
+
+  term = Shellwords.escape(ARGV.first || 'programming')
+
+  Rails.logger.info { "START exe/nexxt #{term} pid:#{Process.pid}" }
+
+  Nexxt.jobs(term: term)
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/nexxt pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { "ERROR exe/nexxt #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  Rails.logger.info { "END exe/nexxt pid:#{Process.pid}" }
+  Rails.logger.info { "END exe/nexxt #{term} pid:#{Process.pid}" }
 end

@@ -3,8 +3,8 @@
 module Nexxt
   module_function
 
-  def jobs
-    service = Nexxt::Feed.new
+  def jobs(term: nil)
+    service = Nexxt::Feed.new(term: term.presence)
 
     service.call
 
