@@ -4,17 +4,16 @@ module Indeed
   class Feed
     attr_reader :client, :params, :path
 
-    DEFAULT_PARAMS = {
-      remotejob: '032b3046-06a3-4876-8dfd-474eb5e7ed11',
-      jlid: 'aaa2b906602aa8f5',
-      rbl: 'Remote',
-      l: 'Remote',
-      q: 'Ruby'
-    }.freeze
-
-    def initialize(client: nil, params: nil, path: nil)
+    def initialize(client: nil, params: nil, path: nil, term: nil)
       @client = client || Indeed.client
-      @params = params || DEFAULT_PARAMS
+      @params = params || {
+        remotejob: '032b3046-06a3-4876-8dfd-474eb5e7ed11',
+        jlid: 'aaa2b906602aa8f5',
+        rbl: 'Remote',
+        l: 'Remote',
+        q: term.presence || 'ruby'
+      }
+
       @path = path.to_s.strip
     end
 
