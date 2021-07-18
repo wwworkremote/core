@@ -3,10 +3,15 @@
 # frozen_string_literal: true
 
 begin
-  Rails.logger.info { "START exe/indeed pid:#{Process.pid}" }
-  Indeed.jobs
+  require 'shellwords'
+
+  term = Shellwords.escape(ARGV.first || 'programming')
+
+  Rails.logger.info { "START exe/indeed #{term} pid:#{Process.pid}" }
+
+  Indeed.jobs(term: term)
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/indeed pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { "ERROR exe/indeed #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  Rails.logger.info { "END exe/indeed pid:#{Process.pid}" }
+  Rails.logger.info { "END exe/indeed #{term} pid:#{Process.pid}" }
 end

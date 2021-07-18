@@ -3,8 +3,8 @@
 module Indeed
   module_function
 
-  def jobs
-    service = Indeed::Feed.new
+  def jobs(term: nil)
+    service = Indeed::Feed.new(term: term.presence)
 
     service.call
 
