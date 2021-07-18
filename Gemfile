@@ -52,7 +52,6 @@ group :test do
 end
 
 # gem 'active_median'
-# gem 'awesome_print'
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'dry-transformer'
 # gem 'eps' # https://github.com/ankane/eps
@@ -87,6 +86,7 @@ end
 # gem 'tty-tree', require: false
 # gem 'tty-which', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+gem 'awesome_print'
 gem 'deepsort'
 gem 'friendly_id'
 gem 'jsonb_accessor'
