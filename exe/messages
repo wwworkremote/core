@@ -61,6 +61,12 @@ begin
           body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip
         }.deep_sort)
 
+      in { guid: String => guid, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
+
+        notification.messages.create(data: {
+          body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip
+        }.deep_sort)
+
       else
         Rails.logger.warn { [:PAYLOAD_ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)].inspect }
       end
