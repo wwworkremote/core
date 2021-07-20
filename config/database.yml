@@ -6,7 +6,8 @@ default: &default
 
 development:
   <<: *default
-  database: outlier_jobs_development
+  # database: outlier_jobs_development
+  url: <%= ENV['OUTLIER_JOBS_DATABASE_URL'] %>
 
 test:
   <<: *default
