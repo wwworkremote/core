@@ -23,10 +23,6 @@ begin
     payload = notification.payload
     response_body = payload['response_body']
 
-    binding.pry
-    puts
-    exit
-
     next if response_body.blank? || response_body.is_a?(Array)
 
     response_body = response_body.deep_symbolize_keys
@@ -72,8 +68,9 @@ begin
           body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip
         }.deep_sort)
 
-        # else
-        #   Rails.logger.warn { [:PAYLOAD_ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)].inspect }
+      else
+        Rails.logger.warn { [:PAYLOAD_ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)].inspect }
+
       end
 
     in rss: { channel: { item: [*items] } }
@@ -108,28 +105,18 @@ begin
             body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
           }.deep_sort)
 
-          # else
-          #   Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
+        else
+          Rails.logger.warn { [:ITEM_MISMATCH, item.class, item.keys, item.transform_values(&:class)] }
         end
       end
-      # rescue StandardError => e
-      #   Rails.logger.error { [e.message, e].inspect }
-
-      # else
-      #   Rails.logger.warn { [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class), payload['response_body']].inspect }
+    else
+      Rails.logger.warn { [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class), payload['response_body']].inspect }
     end
   end
-
-rescue NoMethodError => e
+rescue NoMethodError, NoMatchingPatternError => e
   Sentry.capture_exception(e)
-rescue NoMatchingPatternError => e
-  Sentry.capture_exception(e)
-  #   # throw
 rescue StandardError => e
   Rails.logger.error { "ERROR exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
-
-  binding.pry
-  puts
-  # ensure
-  #   Rails.logger.info { "END exe/messages pid:#{Process.pid}" }
+ensure
+  Rails.logger.info { "END exe/messages pid:#{Process.pid}" }
 end
