@@ -103,3 +103,6 @@ gem 'stopwords-filter', require: 'stopwords'
 gem 'tty', require: false
 gem 'tty-progressbar', require: false
 gem 'tty-spinner', require: false
+
+gem 'sentry-rails'
+gem 'sentry-ruby'
