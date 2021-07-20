@@ -112,7 +112,7 @@ begin
       end
 
     else
-      Rails.logger.warn { [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class)].inspect }
+      Rails.logger.warn { [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class), payload['response_body']].inspect }
     end
   end
 rescue StandardError => e
