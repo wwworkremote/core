@@ -9,7 +9,7 @@ begin
 
   Rails.logger.info { "START exe/stackoverflow #{term} pid:#{Process.pid}" }
 
-  StackOverflow.jobs(term: term)
+  Pullers::StackOverflow.jobs(term: term)
 rescue StandardError => e
   Rails.logger.error { "ERROR exe/stackoverflow #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure

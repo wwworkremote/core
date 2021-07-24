@@ -9,7 +9,7 @@ begin
 
   Rails.logger.info { "START exe/nexxt #{term} pid:#{Process.pid}" }
 
-  Nexxt.jobs(term: term)
+  Pullers::Nexxt.jobs(term: term)
 rescue StandardError => e
   Rails.logger.error { "ERROR exe/nexxt #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure

@@ -9,7 +9,7 @@ begin
 
   Rails.logger.info { "START exe/monster #{term} pid:#{Process.pid}" }
 
-  Monster.jobs(term: term)
+  Pullers::Monster.jobs(term: term)
 rescue StandardError => e
   Rails.logger.error { "ERROR exe/monster #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
