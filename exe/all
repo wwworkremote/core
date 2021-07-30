@@ -1,35 +1,10 @@
 # frozen_string_literal: true
 
-be rails runner exe / moment
-be rails runner exe / hackernews
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / indeed
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / monster
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / nexxt
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / remoteok
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / remotepython
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / stackoverflow
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
-be rails runner exe / weworkremotely
-be rails runner exe / messages
-be rails runner exe / tags
-be rails runner exe / moment
+be rails runner exe/hackernews &
+be rails runner exe/indeed &
+be rails runner exe/monster &
+be rails runner exe/nexxt &
+be rails runner exe/remoteok &
+be rails runner exe/remotepython &
+be rails runner exe/stackoverflow &
+be rails runner exe/weworkremotely &
