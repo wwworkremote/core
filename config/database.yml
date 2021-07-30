@@ -7,7 +7,7 @@ default: &default
 development:
   <<: *default
   # database: outlier_jobs_development
-  url: <%= ENV['OUTLIER_JOBS_DATABASE_URL'] %>
+  url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL') %>
 
 test:
   <<: *default
@@ -15,7 +15,7 @@ test:
 
 production:
   <<: *default
-  url: <%= ENV['OUTLIER_JOBS_DATABASE_URL'] %>
+  url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL') %>
 
 # For details on connection pooling, see Rails configuration guide
 # https://guides.rubyonrails.org/configuring.html#database-pooling
