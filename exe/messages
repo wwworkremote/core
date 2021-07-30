@@ -2,16 +2,16 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+require 'tty-progressbar'
+require 'tty-spinner'
+require 'pastel'
+
 begin
   Rails.logger.info { "START exe/messages pid:#{Process.pid}" }
 
-  require 'tty-progressbar'
-  require 'tty-spinner'
-  require 'pastel'
-
   spinner = TTY::Spinner.new('[:spinner] Counting sources ...', format: :classic).tap(&:auto_spin)
 
-  total = Source.where(status: 0).where(created_at: 3.days.ago..).count
+  total = Source.where(status: 0).where(created_at: 3.months.ago..).count
 
   spinner.stop("#{total} sources found")
 

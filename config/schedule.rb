@@ -3,47 +3,13 @@
 TASKS = %w[
   ./exe/hackernews
   ./exe/indeed
-  ./exe/indeed\ "javascript"
-  ./exe/indeed\ "linux"
-  ./exe/indeed\ "postgresql"
-  ./exe/indeed\ "python"
-  ./exe/indeed\ "rails"
-  ./exe/indeed\ "redis"
-  ./exe/indeed\ "ruby"
-  ./exe/indeed\ "sidekiq"
   ./exe/monster
-  ./exe/monster\ "javascript"
-  ./exe/monster\ "linux"
-  ./exe/monster\ "postgresql"
-  ./exe/monster\ "python"
-  ./exe/monster\ "rails"
-  ./exe/monster\ "redis"
-  ./exe/monster\ "ruby"
-  ./exe/monster\ "sidekiq"
   ./exe/nexxt
-  ./exe/nexxt\ "javascript"
-  ./exe/nexxt\ "linux"
-  ./exe/nexxt\ "postgresql"
-  ./exe/nexxt\ "python"
-  ./exe/nexxt\ "rails"
-  ./exe/nexxt\ "redis"
-  ./exe/nexxt\ "ruby"
-  ./exe/nexxt\ "shell"
-  ./exe/nexxt\ "sidekiq"
   ./exe/remoteok
   ./exe/remotepython
   ./exe/stackoverflow
-  ./exe/stackoverflow\ "javascript"
-  ./exe/stackoverflow\ "linux"
-  ./exe/stackoverflow\ "postgresql"
-  ./exe/stackoverflow\ "python"
-  ./exe/stackoverflow\ "rails"
-  ./exe/stackoverflow\ "redis"
-  ./exe/stackoverflow\ "ruby"
-  ./exe/stackoverflow\ "shell"
-  ./exe/stackoverflow\ "sidekiq"
   ./exe/weworkremotely
-].uniq.shuffle.freeze
+].freeze
 
 require 'whenever'
 
