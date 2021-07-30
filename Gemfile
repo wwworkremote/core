@@ -109,3 +109,5 @@ gem 'sentry-ruby'
 
 gem 'bcrypt_pbkdf'
 gem 'ed25519'
+
+gem 'slack-notifier'
