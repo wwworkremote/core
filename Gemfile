@@ -107,5 +107,5 @@ gem 'tty-spinner', require: false
 gem 'sentry-rails'
 gem 'sentry-ruby'
 
-gem 'ed25519'
 gem 'bcrypt_pbkdf'
+gem 'ed25519'
