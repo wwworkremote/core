@@ -6,7 +6,7 @@ set :application, 'outlier_jobs'
 set :repo_url, 'git@github.com:just3ws/outlier_jobs'
 set :asdf_tools, %w[ruby nodejs yarn]
 set :branch, 'main'
-set :deploy_to, '/home/ubuntu/outlier_jobs'
+set :deploy_to, '/home/deploy/projects/outlier_jobs'
 
 set :conditionally_migrate, true
 set :migration_role, :app

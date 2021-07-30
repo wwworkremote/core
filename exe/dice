@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 DATE="$(date -u +'%Y-%m-%d')"
-mkdir -p "/home/ubuntu/outlier_jobs/shared/data/dice/$DATE"
-cd "/home/ubuntu/outlier_jobs/shared/data/dice/$DATE" || exit
+mkdir -p "/home/deploy/projects/outlier_jobs/shared/data/dice/$DATE"
+cd "/home/deploy/projects/outlier_jobs/shared/data/dice/$DATE" || exit
 
 wget https://rss.dice.com/generic/all_jobs.xml.gz --header="Accept: application/octet-stream"
 gunzip all_jobs.xml.gz
