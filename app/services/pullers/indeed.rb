@@ -4,8 +4,11 @@ module Pullers
   module Indeed
     module_function
 
+    # Errno::ECONNREFUSED
+    # Redis::CannotConnectError
+
     def jobs(term: nil)
-      service = Indeed::Feed.new(term: term.presence)
+      service = Pullers::Indeed::Feed.new(term: term.presence)
 
       service.call
 

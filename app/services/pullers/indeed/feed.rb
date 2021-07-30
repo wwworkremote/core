@@ -6,6 +6,8 @@ module Pullers
       attr_reader :client, :params, :path
 
       def initialize(client: nil, params: nil, path: nil, term: nil)
+        ap [self.class, __method__, { client: client, params: params, path: path, term: term }]
+
         @client = client || Indeed.client
         @params = params || {
           remotejob: '032b3046-06a3-4876-8dfd-474eb5e7ed11',
