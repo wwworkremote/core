@@ -68,6 +68,7 @@ GEM
     ast (2.4.2)
     awesome_print (1.9.2)
     bcrypt (3.1.16)
+    bcrypt_pbkdf (1.1.0)
     brakeman (5.1.1)
     builder (3.2.4)
     bullet (6.1.4)
@@ -93,6 +94,7 @@ GEM
     crass (1.0.6)
     deepsort (0.4.5)
     diff-lcs (1.4.4)
+    ed25519 (1.2.4)
     erubi (1.10.0)
     ethon (0.14.0)
       ffi (>= 1.15.0)
@@ -200,7 +202,7 @@ GEM
       pry (~> 0.13.0)
     pry-rails (0.3.9)
       pry (>= 0.10.4)
-    puma (5.3.2)
+    puma (5.4.0)
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
@@ -306,11 +308,11 @@ GEM
     sentry-rails (4.6.4)
       railties (>= 5.0)
       sentry-ruby-core (~> 4.6.0)
-    sentry-ruby (4.6.3)
+    sentry-ruby (4.6.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       faraday (>= 1.0)
-      sentry-ruby-core (= 4.6.3)
-    sentry-ruby-core (4.6.3)
+      sentry-ruby-core (= 4.6.4)
+    sentry-ruby-core (4.6.4)
       concurrent-ruby
       faraday
     shellany (0.0.1)
@@ -360,6 +362,7 @@ DEPENDENCIES
   annotate
   awesome_print
   bcrypt (~> 3.1.7)
+  bcrypt_pbkdf
   brakeman
   bullet
   byebug
@@ -367,6 +370,7 @@ DEPENDENCIES
   capistrano-asdf
   capistrano-rails (~> 1.6)
   deepsort
+  ed25519
   faraday
   faraday-encoding
   faraday_middleware
