@@ -52,14 +52,14 @@ Layout/LineLength:
 Metrics/MethodLength:
   Exclude:
     - 'app/models/moment.rb'
-    - 'app/pullers/hackernews.rb'
-    - 'app/pullers/indeed.rb'
-    - 'app/pullers/monster.rb'
-    - 'app/pullers/nexxt.rb'
-    - 'app/pullers/remoteok.rb'
-    - 'app/pullers/remotepython.rb'
-    - 'app/pullers/stackoverflow.rb'
-    - 'app/pullers/weworkremotely.rb'
+    - 'app/lib/pullers/hackernews.rb'
+    - 'app/lib/pullers/indeed.rb'
+    - 'app/lib/pullers/monster.rb'
+    - 'app/lib/pullers/nexxt.rb'
+    - 'app/lib/pullers/remoteok.rb'
+    - 'app/lib/pullers/remotepython.rb'
+    - 'app/lib/pullers/stackoverflow.rb'
+    - 'app/lib/pullers/weworkremotely.rb'
     - 'bin/bundle'
     - 'db/migrate/20210712004243_create_moments.rb'
 
