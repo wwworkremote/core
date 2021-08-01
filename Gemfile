@@ -17,13 +17,15 @@ gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'typhoeus'
 gem 'whenever', require: false
 
-# group :development, :test do
-gem 'byebug'
-gem 'fuubar', require: false
-gem 'pry-byebug'
-gem 'pry-rails'
-gem 'rspec-rails'
-# end
+group :development, :test do
+  gem 'byebug'
+  gem 'faker'
+  gem 'fuubar', require: false
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'rspec-rails'
+  gem 'webmock'
+end
 
 group :development do
   gem 'annotate'
@@ -33,6 +35,7 @@ group :development do
   gem 'capistrano-rails', '~> 1.6', require: false
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.3', require: false
+  gem 'lol_dba', require: false
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
@@ -73,7 +76,6 @@ end
 # gem 'tty-markdown', require: false
 # gem 'tty-option', require: false
 # gem 'tty-pager', require: false
-gem 'tty-pie', require: false
 # gem 'tty-platform', require: false
 # gem 'tty-prompt', require: false
 # gem 'tty-reader', require: false
@@ -106,7 +108,6 @@ gem 'slack-notifier'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'tty', require: false
 gem 'tty-box', require: false
+gem 'tty-pie', require: false
 gem 'tty-progressbar', require: false
 gem 'tty-spinner', require: false
-
-gem 'lol_dba'
