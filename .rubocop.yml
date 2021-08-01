@@ -35,6 +35,7 @@ AllCops:
     - '**/node_modules/**/*'
     - '**/templates/**/*'
     - '**/tmp/**/*'
+    - 'vendor/**/*'
     - '**/vendor/**/*'
     - 'exe/dice'
 
@@ -51,14 +52,14 @@ Layout/LineLength:
 Metrics/MethodLength:
   Exclude:
     - 'app/models/moment.rb'
-    - 'app/services/pullers/hackernews.rb'
-    - 'app/services/pullers/indeed.rb'
-    - 'app/services/pullers/monster.rb'
-    - 'app/services/pullers/nexxt.rb'
-    - 'app/services/pullers/remoteok.rb'
-    - 'app/services/pullers/remotepython.rb'
-    - 'app/services/pullers/stackoverflow.rb'
-    - 'app/services/pullers/weworkremotely.rb'
+    - 'app/pullers/hackernews.rb'
+    - 'app/pullers/indeed.rb'
+    - 'app/pullers/monster.rb'
+    - 'app/pullers/nexxt.rb'
+    - 'app/pullers/remoteok.rb'
+    - 'app/pullers/remotepython.rb'
+    - 'app/pullers/stackoverflow.rb'
+    - 'app/pullers/weworkremotely.rb'
     - 'bin/bundle'
     - 'db/migrate/20210712004243_create_moments.rb'
 
