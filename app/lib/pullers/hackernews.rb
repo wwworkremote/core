@@ -5,9 +5,9 @@ module Pullers
     module_function
 
     def jobs
-      jobstories = HackerNews::V0::Jobstories.new.call
+      jobstories = V0::Jobstories.new.call
 
-      service = HackerNews::V0::Item::Jobs.new(job_ids: jobstories.data, client: jobstories.client)
+      service = V0::Item::Jobs.new(job_ids: jobstories.data, client: jobstories.client)
 
       service.call
 
