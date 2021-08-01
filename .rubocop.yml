@@ -30,6 +30,7 @@ AllCops:
     - 'db/**/*.rb'
     - 'exe/**/*'
     - 'lib/**/*.rb'
+    - 'spec/**/*.rb'
   Exclude:
     - '**/node_modules/**/*'
     - '**/templates/**/*'
