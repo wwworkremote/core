@@ -51,20 +51,16 @@ group :test do
   gem 'vcr'
 end
 
-# gem 'active_median'
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'dry-transformer'
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'faraday-http-cache'
-# gem 'groupdate'
-# gem 'hightop'
 # gem 'loofah'
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
 # gem 'notable' # https://github.com/ankane/notable
 # gem 'rainbow'
 # gem 'safely_block' # https://github.com/ankane/safely
-# gem 'tty-box', require: false
 # gem 'tty-color', require: false
 # gem 'tty-command', require: false
 # gem 'tty-config', require: false
@@ -77,7 +73,7 @@ end
 # gem 'tty-markdown', require: false
 # gem 'tty-option', require: false
 # gem 'tty-pager', require: false
-# gem 'tty-pie', require: false
+gem 'tty-pie', require: false
 # gem 'tty-platform', require: false
 # gem 'tty-prompt', require: false
 # gem 'tty-reader', require: false
@@ -86,9 +82,14 @@ end
 # gem 'tty-tree', require: false
 # gem 'tty-which', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+gem 'active_median'
 gem 'awesome_print'
+gem 'bcrypt_pbkdf'
 gem 'deepsort'
+gem 'ed25519'
 gem 'friendly_id'
+gem 'groupdate'
+gem 'hightop'
 gem 'jsonb_accessor'
 gem 'multi_xml'
 gem 'pastel', require: false
@@ -99,15 +100,13 @@ gem 'rollups' # https://github.com/ankane/rollup
 gem 'rubypants', require: false
 gem 'sanitize', require: false
 gem 'scenic'
+gem 'sentry-rails'
+gem 'sentry-ruby'
+gem 'slack-notifier'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'tty', require: false
+gem 'tty-box', require: false
 gem 'tty-progressbar', require: false
 gem 'tty-spinner', require: false
 
-gem 'sentry-rails'
-gem 'sentry-ruby'
-
-gem 'bcrypt_pbkdf'
-gem 'ed25519'
-
-gem 'slack-notifier'
+gem 'lol_dba'
