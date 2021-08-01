@@ -6,7 +6,8 @@ default: &default
 
 development:
   <<: *default
-  database: outlier_jobs_development
+  # database: outlier_jobs_development
+  url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL', 'postgres://outlier_jobs:window.snow@malina103/outlier_jobs_production') %>
 
 test:
   <<: *default
@@ -15,6 +16,3 @@ test:
 production:
   <<: *default
   url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL', 'postgres://outlier_jobs:window.snow@malina103/outlier_jobs_production') %>
-
-# For details on connection pooling, see Rails configuration guide
-# https://guides.rubyonrails.org/configuring.html#database-pooling

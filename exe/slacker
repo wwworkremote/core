@@ -1,0 +1,15 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+puts 'hello'
+
+WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+
+require 'slack-notifier'
+
+notifier = Slack::Notifier.new(WEBHOOK_URL)
+notifier.ping('hey')
+
+binding.pry
+puts
