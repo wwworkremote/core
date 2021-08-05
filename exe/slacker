@@ -8,6 +8,16 @@ WEBHOOK_URL = 'https://hooks.slack.com/services/T03BKSQ2K/B029YLZ5TBN/8rptuavyNN
 
 require 'slack-notifier'
 
+module Uma
+  def self.matcr(obj)
+    case obj
+    in foo: String => foo
+      return foo
+    end
+  rescue NoMatchingPatternError
+  end
+end
+
 notifier = Slack::Notifier.new(WEBHOOK_URL)
 notifier.ping('hey')
 

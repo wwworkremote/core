@@ -87,6 +87,9 @@ Rails/Date:
   Exclude:
     - 'config/schedule.rb'
 
+Lint/SuppressedException:
+  Enabled: false
+
 Rails/CreateTableWithTimestamps:
   Exclude:
     - 'db/migrate/20210712020439_create_pghero_query_stats.rb'
