@@ -140,6 +140,7 @@ GEM
       activesupport (>= 5.0)
     google-protobuf (3.17.3)
     google-protobuf (3.17.3-universal-darwin)
+    google-protobuf (3.17.3-x86_64-linux)
     groupdate (5.2.2)
       activesupport (>= 5)
     guard (2.18.0)
@@ -197,6 +198,8 @@ GEM
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri (1.12.2-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.12.2-x86_64-linux)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -431,6 +434,7 @@ GEM
 PLATFORMS
   aarch64-linux
   x86_64-darwin-20
+  x86_64-linux
 
 DEPENDENCIES
   active_median
