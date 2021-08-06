@@ -115,3 +115,4 @@ gem 'tty-spinner', require: false
 gem 'act-fluent-logger-rails'
 gem 'fluent-logger'
 gem 'lograge'
+gem 'lograge-sql'
