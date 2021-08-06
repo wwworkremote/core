@@ -71,6 +71,7 @@ Metrics/BlockLength:
   Exclude:
     - 'exe/messages'
     - 'Guardfile'
+    - 'config/initializers/lograge.rb' 
 
 Metrics/CyclomaticComplexity:
   Exclude:
