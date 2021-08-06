@@ -1,6 +1,10 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    act-fluent-logger-rails (0.6.3)
+      activesupport (>= 4, < 6.2)
+      fluent-logger
+      railties (>= 4, < 6.2)
     actioncable (6.1.4)
       actionpack (= 6.1.4)
       activesupport (= 6.1.4)
@@ -174,6 +178,11 @@ GEM
     listen (3.6.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    lograge (0.11.2)
+      actionpack (>= 4)
+      activesupport (>= 4)
+      railties (>= 4)
+      request_store (~> 1.0)
     lol_dba (2.2.0)
       actionpack (>= 3.0, < 7.0)
       activerecord (>= 3.0, < 7.0)
@@ -265,6 +274,8 @@ GEM
       ffi (~> 1.0)
     redis (4.4.0)
     regexp_parser (2.1.1)
+    request_store (1.5.0)
+      rack (>= 1.4)
     rexml (3.2.5)
     rollups (0.1.2)
       activesupport (>= 5.1)
@@ -440,6 +451,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  act-fluent-logger-rails
   active_median
   annotate
   awesome_print
@@ -466,6 +478,7 @@ DEPENDENCIES
   hiredis
   jsonb_accessor
   listen (~> 3.3)
+  lograge
   lol_dba
   multi_xml
   pastel
