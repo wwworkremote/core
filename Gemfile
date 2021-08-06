@@ -112,5 +112,6 @@ gem 'tty-pie', require: false
 gem 'tty-progressbar', require: false
 gem 'tty-spinner', require: false
 
-
+gem 'act-fluent-logger-rails'
 gem 'fluent-logger'
+gem 'lograge'
