@@ -111,3 +111,6 @@ gem 'tty-box', require: false
 gem 'tty-pie', require: false
 gem 'tty-progressbar', require: false
 gem 'tty-spinner', require: false
+
+
+gem 'fluent-logger'
