@@ -2,14 +2,27 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-puts 'hello'
+puts '---'
 
-WEBHOOK_URL = 'https://hooks.slack.com/services/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'
-
-require 'slack-notifier'
+# WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+# require 'slack-notifier'
+# notifier = Slack::Notifier.new(WEBHOOK_URL)
+# notifier.ping('hey')
 
 module Uma
-  def self.matcr(obj)
+  def self.bbb(obj)
+    case obj
+    in foo: String => foo, bar: bar
+      puts '[foo, bar]'
+      [foo, bar]
+    in foo: String => foo
+      puts 'foo'
+      return foo
+    end
+  rescue NoMatchingPatternError
+  end
+
+  def self.aaa(obj)
     case obj
     in foo: String => foo
       return foo
@@ -17,9 +30,6 @@ module Uma
   rescue NoMatchingPatternError
   end
 end
-
-notifier = Slack::Notifier.new(WEBHOOK_URL)
-notifier.ping('hey')
 
 binding.pry
 puts
