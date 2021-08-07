@@ -113,10 +113,14 @@ begin
       Rails.logger.warn { [:PAYLOAD_MISMATCH, payload.class, payload.keys, payload['response_body'].transform_values(&:class), payload['response_body']].inspect }
     end
   end
-rescue NoMethodError, NoMatchingPatternError => e
+rescue NoMethodError => e
   Sentry.capture_exception(e)
+  Rails.logger.error { "ERROR:NO_METHOD exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+rescue NoMatchingPatternError => e
+  Sentry.capture_exception(e)
+  Rails.logger.warn { "ERROR:NO_MATCHING_PATTERN exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { "ERROR:STANDARD exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
   Rails.logger.info { "END exe/messages pid:#{Process.pid}" }
 end

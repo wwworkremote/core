@@ -24,7 +24,7 @@ if Rails.env.production?
     config.lograge.keep_original_rails_log = false
     # config.lograge.logger = ActiveSupport::Logger.new(Rails.root.join("/log/lograge_#{Rails.env}.log"))
 
-    config.lograge.formatter = Lograge::Formatters::Json.new
+    config.lograge.formatter = Lograge::Formatters::LTSV.new
 
     config.lograge.custom_payload do |controller|
       ip = begin
