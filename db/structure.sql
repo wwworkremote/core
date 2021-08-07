@@ -589,13 +589,6 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type ON public.friendly_id_slugs USING btree (slug, sluggable_type);
-
-
---
 -- Name: index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -697,6 +690,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210712004243'),
 ('20210712020439'),
 ('20210712021013'),
-('20210807232217');
+('20210807232217'),
+('20210807232527');
 
 
