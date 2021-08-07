@@ -49,19 +49,19 @@ def scheduler(start_at:, slots:)
   end
 end
 
-every('3,33 * * * *', roles: [:cron1]) { runner './exe/messages' }
-every('18,48 * * * *', roles: [:cron2]) { runner './exe/messages' }
+every('10 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/messages' }
+every('10 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/messages' }
 
-every('7,37 * * * *', roles: [:cron1]) { runner './exe/moment' }
-every('22,57 * * * *', roles: [:cron2]) { runner './exe/moment' }
+every('30 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/moment' }
+every('30 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/moment' }
 
-every('8 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron1]) { runner './exe/tags' }
-every('8 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron2]) { runner './exe/tags' }
+every('50 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/tags' }
+every('50 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/tags' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
   slots: planner(slots: TASKS.shuffle, duration: 1.day)
 )
 
-every(1.day, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
-every(9.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
+every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
+every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
