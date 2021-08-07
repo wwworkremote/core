@@ -9,8 +9,6 @@ begin
 
   Rails.logger.info { "START exe/indeed #{term} pid:#{Process.pid}" }
 
-  ap [term: term]
-
   Pullers::Indeed.jobs(term: term)
 rescue StandardError => e
   Rails.logger.error { "ERROR exe/indeed #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
