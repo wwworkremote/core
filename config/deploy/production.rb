@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # role :web, %w[malina101]
-role :app, %w[malina101 malina102 jagodka105]
+role :web, %w[jagodka105]
+role :app, %w[malina101 malina102]
 
 role :cron1, %w[malina101]
 role :cron2, %w[malina102]
