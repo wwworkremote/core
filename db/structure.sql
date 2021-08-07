@@ -146,9 +146,9 @@ CREATE TABLE public.sources (
     signature character varying NOT NULL,
     event jsonb DEFAULT '{}'::jsonb NOT NULL,
     payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    status integer DEFAULT 0,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    status integer DEFAULT 0
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -610,6 +610,13 @@ CREATE INDEX index_friendly_id_slugs_on_sluggable_type_and_sluggable_id ON publi
 
 
 --
+-- Name: index_messages_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_messages_on_created_at ON public.messages USING btree (created_at);
+
+
+--
 -- Name: index_messages_on_source_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -689,6 +696,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210711230518'),
 ('20210712004243'),
 ('20210712020439'),
-('20210712021013');
+('20210712021013'),
+('20210807232217');
 
 
