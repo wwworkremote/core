@@ -16,7 +16,7 @@ require 'whenever'
 env 'MAILTO', 'mike@just3ws.com'
 
 set :job_template, "/usr/bin/env bash -l -c ':job' "
-set :output, '/home/deploy/projects/outlier_jobs/shared/log/cron_production.log'
+set :output, '/home/deploy/projects/outlier_jobs/core/shared/log/cron_production.log'
 
 JOB_PREFIX = ' cd :path && :environment_variable=:environment nice -n 20 '
 
