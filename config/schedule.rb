@@ -60,7 +60,7 @@ every('38 * * * *', roles: [:cron2]) { runner './exe/tags' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
-  slots: planner(slots: TASKS.shuffle.freeze, duration: 1.day)
+  slots: planner(slots: TASKS.shuffle, duration: 1.day)
 )
 
 every(1.day, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
