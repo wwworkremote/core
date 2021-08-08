@@ -596,20 +596,6 @@ CREATE UNIQUE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope
 
 
 --
--- Name: index_friendly_id_slugs_on_sluggable_type_and_sluggable_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_friendly_id_slugs_on_sluggable_type_and_sluggable_id ON public.friendly_id_slugs USING btree (sluggable_type, sluggable_id);
-
-
---
--- Name: index_messages_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_messages_on_created_at ON public.messages USING btree (created_at);
-
-
---
 -- Name: index_messages_on_source_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -624,13 +610,6 @@ CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghe
 
 
 --
--- Name: index_pghero_space_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pghero_space_stats_on_database_and_captured_at ON public.pghero_space_stats USING btree (database, captured_at);
-
-
---
 -- Name: index_sources_on_signature; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -642,13 +621,6 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 --
 
 CREATE UNIQUE INDEX index_tag_aliases_on_name ON public.tag_aliases USING btree (name);
-
-
---
--- Name: index_tag_aliases_on_tag_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tag_aliases_on_tag_id ON public.tag_aliases USING btree (tag_id);
 
 
 --
@@ -691,6 +663,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210712020439'),
 ('20210712021013'),
 ('20210807232217'),
-('20210807232527');
+('20210807232527'),
+('20210808002655');
 
 
