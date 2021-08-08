@@ -28,7 +28,6 @@ gem 'faraday_middleware'
 gem 'friendly_id'
 gem 'groupdate'
 gem 'hightop'
-gem 'hiredis'
 gem 'jsonb_accessor'
 gem 'lograge'
 gem 'lograge-sql'
@@ -40,7 +39,6 @@ gem 'pg_query', '>= 0.9.0'
 gem 'puma', '~> 5.0', require: false
 gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
 gem 'rails-html-sanitizer'
-gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'rollups' # https://github.com/ankane/rollup
 gem 'rubypants', require: false
 gem 'sanitize', require: false
@@ -113,3 +111,7 @@ end
 group :test do
   gem 'vcr'
 end
+
+gem 'connection_pool'
+gem 'hiredis'
+gem 'redis', require: %w[redis redis/connection/hiredis]
