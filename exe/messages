@@ -18,7 +18,7 @@ begin
   bar = TTY::ProgressBar.new('sources => messages [:bar]', total: total)
 
   # Source.where(status: 0).where(created_at: 1.week.ago..).find_each(order: :asc, batch_size: 100) do |notification|
-  Source.where(created_at: 1.week.ago..).find_each(order: :asc, batch_size: 100) do |notification|
+  Source.where(created_at: 1.day.ago..).find_each(order: :asc, batch_size: 1000) do |notification|
     bar.advance
     payload = notification.payload
     response_body = payload['response_body']
