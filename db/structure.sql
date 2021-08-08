@@ -596,6 +596,13 @@ CREATE UNIQUE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope
 
 
 --
+-- Name: index_messages_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_messages_on_created_at ON public.messages USING btree (created_at);
+
+
+--
 -- Name: index_messages_on_source_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -664,6 +671,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210712021013'),
 ('20210807232217'),
 ('20210807232527'),
-('20210808002655');
+('20210808002655'),
+('20210808003026');
 
 
