@@ -8,7 +8,7 @@ ruby '3.0.2'
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'dry-transformer'
 # gem 'eps' # https://github.com/ankane/eps
-# gem 'faraday-http-cache'
+gem 'faraday-http-cache'
 # gem 'loofah'
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
