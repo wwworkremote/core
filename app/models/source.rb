@@ -7,6 +7,7 @@ class Source < ApplicationRecord
   }, _prefix: true
 
   has_many :messages, dependent: :nullify
+  has_many :job_postings, dependent: :nullify
 end
 
 # == Schema Information

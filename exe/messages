@@ -18,7 +18,7 @@ begin
   bar = TTY::ProgressBar.new('sources => messages [:bar]', total: total)
 
   # Source.where(status: 0).where(created_at: 1.week.ago..).find_each(order: :asc, batch_size: 100) do |notification|
-  Source.where(created_at: 1.day.ago..).find_each(order: :asc, batch_size: 1000) do |notification|
+  Source.where(created_at: ..1.hour.ago).find_each(order: :asc, batch_size: 1000) do |notification|
     bar.advance
     payload = notification.payload
     response_body = payload['response_body']
@@ -59,13 +59,21 @@ begin
       in { guid: { __content__: String => guid }, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
 
         notification.messages.create(data: {
-          body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip
+          body: description.strip,
+          external_id: guid.to_s.strip,
+          published_at: DateTime.parse(pub_date).to_time,
+          target_url: link.strip,
+          title: title.strip
         }.deep_sort)
 
       in { guid: String => guid, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
 
         notification.messages.create(data: {
-          body: description.strip, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, target_url: link.strip, title: title.strip
+          body: description.strip,
+          external_id: guid.to_s.strip,
+          published_at: DateTime.parse(pub_date).to_time,
+          target_url: link.strip,
+          title: title.strip
         }.deep_sort)
 
       else
