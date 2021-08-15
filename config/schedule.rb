@@ -49,8 +49,8 @@ def scheduler(start_at:, slots:)
   end
 end
 
-# every('10 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/messages' }
-# every('10 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/messages' }
+# every('10 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/job_postings' }
+# every('10 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/job_postings' }
 #
 # every('30 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/moment' }
 # every('30 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/moment' }
