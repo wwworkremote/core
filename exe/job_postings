@@ -9,12 +9,10 @@ require 'pastel'
 begin
   Rails.logger.info { "START exe/job_postings pid:#{Process.pid}" }
   spinner = TTY::Spinner.new('[:spinner] Counting sources ...', format: :classic).tap(&:auto_spin)
-  total = Source.where(status: 0).where(created_at: 3.months.ago..).count
+  total = Source.where(status: 0).count
   spinner.stop("#{total} sources found")
   bar = TTY::ProgressBar.new('sources => messages [:bar]', total: total)
-  # Source.where(status: 0).where(created_at: 1.week.ago..).find_each(order: :asc, batch_size: 100) do |notification|
-  # Source.where(status: 0).where(created_at: ..1.hour.ago).find_each(order: :asc, batch_size: 1000) do |notification|
-  Source.where(status: 0).find_each(order: :asc) do |notification|
+  Source.where(status: 0).find_each(order: :asc, batch_size: 100) do |notification|
     bar.advance
     payload = notification.payload
     response_body = payload['response_body']
