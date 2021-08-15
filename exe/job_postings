@@ -7,7 +7,7 @@ require 'tty-spinner'
 require 'pastel'
 
 begin
-  Rails.logger.info { "START exe/messages pid:#{Process.pid}" }
+  Rails.logger.info { "START exe/job_postings pid:#{Process.pid}" }
 
   spinner = TTY::Spinner.new('[:spinner] Counting sources ...', format: :classic).tap(&:auto_spin)
 
@@ -33,19 +33,19 @@ begin
 
     in by: String => by, id: Integer => id, score: Integer, text: String => text, time: Integer => time, title: String => title, type: String => type if type == 'job'
 
-      notification.messages.create(data: {
+      notification.job_postings.create(data: {
         body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, title: title.strip
       }.deep_sort)
 
     in by: String => by, id: Integer => id, score: Integer, time: Integer => time, title: String => title, type: String => type, url: String => url if type == 'job'
 
-      notification.messages.create(data: {
+      notification.job_postings.create(data: {
         external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip
       }.deep_sort)
 
     in by: String => by, id: Integer => id, score: Integer, text: String => text, time: Integer => time, title: String => title, type: String => type, url: String => url if type == 'job'
 
-      notification.messages.create(data: {
+      notification.job_postings.create(data: {
         body: text.strip, external_author_id: by, external_id: id.to_s.strip, published_at: Time.at(time, in: 'UTC').utc, target_url: url, title: title.strip
       }.deep_sort)
 
@@ -58,7 +58,7 @@ begin
 
       in { guid: { __content__: String => guid }, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
 
-        notification.messages.create(data: {
+        notification.job_postings.create(data: {
           body: description.strip,
           external_id: guid.to_s.strip,
           published_at: DateTime.parse(pub_date).to_time,
@@ -68,7 +68,7 @@ begin
 
       in { guid: String => guid, link: String => link, title: String => title, pubDate: String => pub_date, description: String => description }
 
-        notification.messages.create(data: {
+        notification.job_postings.create(data: {
           body: description.strip,
           external_id: guid.to_s.strip,
           published_at: DateTime.parse(pub_date).to_time,
@@ -91,25 +91,25 @@ begin
 
         in company: String => company, description: String => description, guid: String => guid, image: String, link: String => link, location: String => location, pubDate: String => pub_date, tags: String => tags, title: String => title
 
-          notification.messages.create(data: {
+          notification.job_postings.create(data: {
             body: description.strip, company: company, external_id: guid.to_s.strip, location: location.strip, published_at: DateTime.parse(pub_date).to_time, tags: tags.split(',').map(&:strip), target_url: link.strip, title: title.strip
           }.deep_sort)
 
         in company: String => company, description: String => description, guid: String => guid, image: String, link: String => link, location:, pubDate: String => pub_date, tags: String => tags, title: String => title
 
-          notification.messages.create(data: {
+          notification.job_postings.create(data: {
             body: description.strip, company: company, external_id: guid.to_s.strip, published_at: DateTime.parse(pub_date).to_time, tags: tags.split(',').map(&:strip), target_url: link.strip, title: title.strip
           }.deep_sort)
 
         in description: String => description, guid: { __content__: String => guid }, link: String => link, pubDate: String => pub_date, title: String => title
 
-          notification.messages.create(data: {
+          notification.job_postings.create(data: {
             body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
           }.deep_sort)
 
         in description: String => description, guid: String => guid, link: String => link, pubDate: String => pub_date, title: String => title
 
-          notification.messages.create(data: {
+          notification.job_postings.create(data: {
             body: description.strip, external_id: guid.to_s.strip, published_at: Time.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %Z'), target_url: link.strip, title: title.strip
           }.deep_sort)
 
@@ -123,12 +123,12 @@ begin
   end
 rescue NoMethodError => e
   Sentry.capture_exception(e)
-  Rails.logger.error { "ERROR:NO_METHOD exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { "ERROR:NO_METHOD exe/job_postings pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 rescue NoMatchingPatternError => e
   Sentry.capture_exception(e)
-  Rails.logger.warn { "ERROR:NO_MATCHING_PATTERN exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.warn { "ERROR:NO_MATCHING_PATTERN exe/job_postings pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 rescue StandardError => e
-  Rails.logger.error { "ERROR:STANDARD exe/messages pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { "ERROR:STANDARD exe/job_postings pid:#{Process.pid} -- #{e.class}: #{e.message}" }
 ensure
-  Rails.logger.info { "END exe/messages pid:#{Process.pid}" }
+  Rails.logger.info { "END exe/job_postings pid:#{Process.pid}" }
 end
