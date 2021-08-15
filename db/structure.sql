@@ -426,6 +426,41 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: source_urls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.source_urls (
+    id bigint NOT NULL,
+    url character varying NOT NULL,
+    protocol character varying,
+    host character varying,
+    path character varying,
+    querystring jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: source_urls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.source_urls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: source_urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.source_urls_id_seq OWNED BY public.source_urls.id;
+
+
+--
 -- Name: sources_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -538,6 +573,13 @@ ALTER TABLE ONLY public.pghero_space_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: source_urls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.source_urls ALTER COLUMN id SET DEFAULT nextval('public.source_urls_id_seq'::regclass);
+
+
+--
 -- Name: sources id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -620,6 +662,14 @@ ALTER TABLE ONLY public.pghero_space_stats
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: source_urls source_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.source_urls
+    ADD CONSTRAINT source_urls_pkey PRIMARY KEY (id);
 
 
 --
@@ -738,6 +788,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210807232527'),
 ('20210808002655'),
 ('20210808003026'),
-('20210815003805');
+('20210815003805'),
+('20210815191413');
 
 
