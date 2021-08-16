@@ -32,16 +32,17 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   config.cache_store = :redis_cache_store, {
-    connect_timeout: 30, # Defaults to 20 seconds
     driver: :hiredis,
     namespace: 'oj',
-    pool_size: 5,
-    pool_timeout: 5,
-    read_timeout: 0.2, # Defaults to 1 second
-    reconnect_attempts: 3, # Defaults to 0
-    url: 'redis://localhost:6379',
-    write_timeout: 0.2 # Defaults to 1 second
+    url: 'redis://localhost:6379'
   }
+
+  # connect_timeout: 30, # Defaults to 20 seconds
+  # pool_size: 15,
+  # pool_timeout: 15,
+  # read_timeout: 15, # Defaults to 1 second
+  # reconnect_attempts: 15, # Defaults to 0
+  # write_timeout: 15 # Defaults to 1 second
 
   config.i18n.fallbacks = true
 

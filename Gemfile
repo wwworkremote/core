@@ -76,11 +76,8 @@ gem 'typhoeus'
 gem 'whenever', require: false
 
 group :development, :test do
-  gem 'byebug'
   gem 'faker'
   gem 'fuubar', require: false
-  gem 'pry-byebug'
-  gem 'pry-rails'
   gem 'rspec-rails'
   gem 'webmock'
 end
@@ -112,6 +109,10 @@ group :test do
   gem 'vcr'
 end
 
-gem 'connection_pool'
+# gem 'connection_pool'
 gem 'hiredis'
 gem 'redis', require: %w[redis redis/connection/hiredis]
+
+gem 'byebug'
+gem 'pry-byebug'
+gem 'pry-rails'
