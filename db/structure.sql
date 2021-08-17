@@ -124,14 +124,24 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
--- Name: messages; Type: TABLE; Schema: public; Owner: -
+-- Name: job_postings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.messages (
+CREATE TABLE public.job_postings (
     id bigint NOT NULL,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    signature character varying NOT NULL,
     status integer DEFAULT 0,
     source_id bigint,
+    title character varying,
+    body character varying,
+    company character varying,
+    location character varying,
+    external_author_id character varying,
+    external_id character varying,
+    published_at timestamp without time zone,
+    tags character varying[],
+    target_url character varying,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -171,18 +181,18 @@ CREATE TABLE public.tags (
 
 CREATE VIEW public.cleeks AS
  SELECT 1 AS id,
-    'messages'::text AS name,
+    'job_postings'::text AS name,
     now() AS cleeked_at,
     count(*) AS value,
-    min(messages.created_at) AS lbound,
-    count(*) FILTER (WHERE (messages.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
-    COALESCE(min(messages.created_at) FILTER (WHERE (messages.created_at >= (now() - '7 days'::interval))), min(messages.created_at)) AS lbound_week,
-    count(*) FILTER (WHERE (messages.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
-    COALESCE(min(messages.created_at) FILTER (WHERE (messages.created_at >= (now() - '1 day'::interval))), min(messages.created_at)) AS lbound_day,
-    count(*) FILTER (WHERE (messages.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
-    COALESCE(min(messages.created_at) FILTER (WHERE (messages.created_at >= (now() - '01:00:00'::interval))), min(messages.created_at)) AS lbound_hour,
-    max(messages.created_at) AS rbound
-   FROM public.messages
+    min(job_postings.created_at) AS lbound,
+    count(*) FILTER (WHERE (job_postings.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
+    COALESCE(min(job_postings.created_at) FILTER (WHERE (job_postings.created_at >= (now() - '7 days'::interval))), min(job_postings.created_at)) AS lbound_week,
+    count(*) FILTER (WHERE (job_postings.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
+    COALESCE(min(job_postings.created_at) FILTER (WHERE (job_postings.created_at >= (now() - '1 day'::interval))), min(job_postings.created_at)) AS lbound_day,
+    count(*) FILTER (WHERE (job_postings.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
+    COALESCE(min(job_postings.created_at) FILTER (WHERE (job_postings.created_at >= (now() - '01:00:00'::interval))), min(job_postings.created_at)) AS lbound_hour,
+    max(job_postings.created_at) AS rbound
+   FROM public.job_postings
 UNION ALL
  SELECT 2 AS id,
     'sources'::text AS name,
@@ -247,30 +257,6 @@ ALTER SEQUENCE public.friendly_id_slugs_id_seq OWNED BY public.friendly_id_slugs
 
 
 --
--- Name: job_postings; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.job_postings (
-    id bigint NOT NULL,
-    signature character varying NOT NULL,
-    status integer DEFAULT 0,
-    source_id bigint,
-    title character varying,
-    body character varying,
-    company character varying,
-    location character varying,
-    external_author_id character varying,
-    external_id character varying,
-    published_at timestamp without time zone,
-    tags character varying[],
-    target_url character varying,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
 -- Name: job_postings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -287,6 +273,20 @@ CREATE SEQUENCE public.job_postings_id_seq
 --
 
 ALTER SEQUENCE public.job_postings_id_seq OWNED BY public.job_postings.id;
+
+
+--
+-- Name: messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.messages (
+    id bigint NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    status integer DEFAULT 0,
+    source_id bigint,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 
 
 --
@@ -816,6 +816,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210808003026'),
 ('20210815003805'),
 ('20210815191413'),
-('20210815192505');
+('20210815192505'),
+('20210817230954');
 
 
