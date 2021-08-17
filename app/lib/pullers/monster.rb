@@ -12,7 +12,7 @@ module Pullers
       service.data.dig('rss', 'channel', 'item')
     end
 
-    def client
+    def client # rubocop:disable Metrics/AbcSize
       Faraday.new do |f|
         f.request :retry, max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 3, max_interval: 900
 
