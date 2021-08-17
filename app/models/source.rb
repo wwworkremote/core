@@ -2,6 +2,7 @@
 
 class Source < ApplicationRecord
   enum status: {
+    no_results: -1,
     pending: 0,
     processed: 1
   }, _prefix: true
