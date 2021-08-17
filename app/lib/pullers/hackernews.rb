@@ -7,7 +7,10 @@ module Pullers
     def jobs
       jobstories = V0::Jobstories.new.call
 
-      service = V0::Item::Jobs.new(job_ids: jobstories.data, client: jobstories.client)
+      service = V0::Item::Jobs.new(
+        job_ids: jobstories.data,
+        client: jobstories.client
+      )
 
       service.call
 
