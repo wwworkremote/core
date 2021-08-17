@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Moment < ApplicationRecord
-  enum cleek: { messages: 1, sources: 2, tags: 3 }, _prefix: true
+  enum cleek: { job_postings: 1, sources: 2, tags: 3 }, _prefix: true
 
   def self.snapshot!
     cleeks = Cleek.all.to_a
