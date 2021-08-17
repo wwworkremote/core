@@ -531,6 +531,32 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: transform_source_urls; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.transform_source_urls AS
+ SELECT t2.source_id,
+    t2.url,
+    t2.protocol,
+    t2.host,
+    t2.path,
+    qs2.querystring
+   FROM (( SELECT s.id AS source_id,
+            (url.source_url ->> 'url'::text) AS url,
+            (url.source_url ->> 'protocol'::text) AS protocol,
+            (url.source_url ->> 'host'::text) AS host,
+            split_part((url.source_url ->> 'url_path'::text), '?'::text, 1) AS path,
+            string_to_array(split_part(regexp_replace(regexp_replace((url.source_url ->> 'url_path'::text), '%5B'::text, '['::text), '%5D'::text, ']'::text), '?'::text, 2), '&'::text) AS querystring
+           FROM (public.sources s
+             LEFT JOIN LATERAL ( SELECT jsonb_object(array_agg(ts_token_type.alias), array_agg(parsed.token)) AS source_url
+                   FROM (ts_parse('default'::text, (s.payload ->> 'url'::text)) parsed(tokid, token)
+                     JOIN ts_token_type('default'::text) ts_token_type(tokid, alias, description) USING (tokid))
+                  WHERE (parsed.tokid = ANY (ARRAY[5, 14, 6, 18]))) url ON (true))) t2
+     LEFT JOIN LATERAL ( SELECT jsonb_object(array_agg(split_part(qs.qs, '='::text, 1)), array_agg(split_part(qs.qs, '='::text, 2))) AS querystring
+           FROM unnest(t2.querystring) WITH ORDINALITY qs(qs, ordinality)) qs2 ON (true));
+
+
+--
 -- Name: friendly_id_slugs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -789,6 +815,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210808002655'),
 ('20210808003026'),
 ('20210815003805'),
-('20210815191413');
+('20210815191413'),
+('20210815192505');
 
 
