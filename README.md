@@ -39,3 +39,16 @@ where
   ) 
 ;
 ```
+
+## HackerNews Jobstories are automatically resolved
+
+```
+update
+  sources
+set
+  status = 1
+where
+  status = 0
+  and payload->>'url' = 'https://hacker-news.firebaseio.com/v0/jobstories.json'
+;
+```
