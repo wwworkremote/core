@@ -7,7 +7,7 @@ RSpec.describe TagAlias, type: :model do
 end
 
 # == Schema Information
-# Schema version: 20210712004243
+# Schema version: 20210817230954
 #
 # Table name: tag_aliases
 #
@@ -15,7 +15,7 @@ end
 #  name       :citext           not null, indexed
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  tag_id     :bigint           indexed
+#  tag_id     :bigint
 #
 # Foreign Keys
 #

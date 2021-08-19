@@ -27,14 +27,14 @@ class Message < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210707203641
+# Schema version: 20210817230954
 #
 # Table name: messages
 #
 #  id         :bigint           not null, primary key
 #  data       :jsonb            not null
 #  status     :integer          default("pending")
-#  created_at :datetime         not null
+#  created_at :datetime         not null, indexed
 #  updated_at :datetime         not null
 #  source_id  :bigint           indexed
 #
