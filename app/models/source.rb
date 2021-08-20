@@ -2,10 +2,14 @@
 
 class Source < ApplicationRecord
   enum status: {
-    no_results: -1,
+    empty: -1,
     pending: 0,
     processed: 1
   }, _prefix: true
+
+  scope :empty, -> { where(status: -1) }
+  scope :pending, -> { where(status: 0) }
+  scope :processed, -> { where(status: 1) }
 
   has_many :messages, dependent: :nullify
   has_many :job_postings, dependent: :nullify
