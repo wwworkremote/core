@@ -24,6 +24,20 @@ COMMENT ON EXTENSION citext IS 'data type for case-insensitive character strings
 
 
 --
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
+--
 -- Name: hstore; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -105,6 +119,15 @@ CREATE EXTENSION IF NOT EXISTS sslinfo WITH SCHEMA public;
 --
 
 COMMENT ON EXTENSION sslinfo IS 'information about SSL certificates';
+
+
+--
+-- Name: pg_search_dmetaphone(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.pg_search_dmetaphone(text) RETURNS text
+    LANGUAGE sql IMMUTABLE STRICT
+    AS $_$ SELECT array_to_string(ARRAY(SELECT dmetaphone(unnest(regexp_split_to_array($1, E'\\s+')))), ' ') $_$;
 
 
 SET default_tablespace = '';
@@ -817,6 +840,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210815003805'),
 ('20210815191413'),
 ('20210815192505'),
-('20210817230954');
+('20210817230954'),
+('20210820215739');
 
 

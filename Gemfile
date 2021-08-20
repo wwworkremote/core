@@ -116,3 +116,5 @@ gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'byebug'
 gem 'pry-byebug'
 gem 'pry-rails'
+
+gem 'pg_search'
