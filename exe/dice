@@ -5,6 +5,6 @@ mkdir -p "/home/deploy/projects/outlier_jobs/core/shared/data/dice/$DATE"
 cd "/home/deploy/projects/outlier_jobs/core/shared/data/dice/$DATE" || exit
 
 wget https://rss.dice.com/generic/all_jobs.xml.gz --header="Accept: application/octet-stream"
-gunzip all_jobs.xml.gz
-xml_split -l2 all_jobs.xml
-rm -f all_jobs.xml
+# gunzip all_jobs.xml.gz
+# xml_split -l2 all_jobs.xml
+# rm -f all_jobs.xml
