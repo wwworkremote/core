@@ -14,7 +14,7 @@ module Pullers
 
     def client
       Faraday.new do |f|
-        f.request :retry, max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 3, max_interval: 900
+        f.request :retry, max: 5, interval: 0.05, interval_randomness: 0.5, backoff_factor: 3, max_interval: 900
 
         f.headers[:user_agent] = 'OutlierJobs::Nexxt/1.0'
 

@@ -18,6 +18,8 @@ module Pullers
 
       def request
         @request ||= client.get(path, params)
+      rescue NoMethodError => e
+        Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
       end
 
       def data
