@@ -3,3 +3,4 @@ python 3.9.6
 ruby 3.0.2
 yarn 1.22.11
 tmux 3.2a
+golang 1.17
