@@ -1,5 +1,6 @@
+clojure 1.10.3.943
 golang 1.17
-nodejs 16.7.0
+nodejs 16.8.0
 python 3.9.6
 ruby 3.0.2
 tmux 3.2a
