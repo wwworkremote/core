@@ -2,19 +2,10 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-# require 'tty-progressbar'
-# require 'tty-spinner'
-# require 'pastel'
-
 begin
   Rails.logger.info { "START exe/job_postings pid:#{Process.pid}" }
-  # spinner = TTY::Spinner.new('[:spinner] Counting sources ...', format: :classic).tap(&:auto_spin)
-  # total = Source.where(status: 0).count
-  # spinner.stop("#{total} sources found")
-  # bar = TTY::ProgressBar.new('sources => messages [:bar]', total: total)
 
   Source.where(status: 0).where(created_at: 8.hours.ago..).find_each(order: :asc, batch_size: 100) do |notification|
-    # bar.advance
     payload = notification.payload
     response_body = payload['response_body']
 
@@ -27,8 +18,6 @@ begin
     end
 
     case response_body
-    in nil
-      nil
     in response_body: String | Array
       nil
     in by: String => by, id: Integer => id, score: Integer, text: String => text, time: Integer => time, title: String => title, type: String => type if type == 'job'
