@@ -1,7 +1,10 @@
 clojure 1.10.3.943
+elixir 1.12.2-otp-24
+erlang 24.0.5
 golang 1.17
+leiningen 2.9.6
 nodejs 16.8.0
-python 3.9.6
+python 3.9.6 2.7.18
 ruby 3.0.2
 tmux 3.2a
 yarn 1.22.11
