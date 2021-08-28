@@ -1,8 +1,10 @@
 SQLAlchemy>=1.1
 ipywidgets>=7.6
+jupyterlab-git>=0.30
 jupyterlab>=3
 kaleido==0.2.1
 numpy==1.21.0
 plotly==5.2.1
 psycopg2==2.9.1
-jupyterlab-git>=0.30
+scikit-learn>=0.24.2
+scipy>=1.7.1
