@@ -51,12 +51,13 @@ def clean_docs(docs):
 def run_td_idf_example():
     descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"] # [:100]
     descriptions = clean_docs(descriptions)
-    td_idf_example(descriptions)
 
-    # names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"] # [:100]
-    # names = clean_docs(names)
+    names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"] # [:100]
+    names = clean_docs(names)
 
-def td_idf_example(descriptions):
+    td_idf_example(descriptions, names)
+
+def td_idf_example(descriptions, names):
     vectorizer = TfidfVectorizer(
         lowercase=True,
         max_features=100,
@@ -84,7 +85,8 @@ def td_idf_example(descriptions):
                 idx = idx + 1
         all_keywords.append(keywords)
 
-    true_k = 20
+    # basically number of clusters
+    true_k = 5
 
     model = KMeans(n_clusters=true_k, init="k-means++", max_iter=100, n_init=1)
     model.fit(vectors)
@@ -107,6 +109,31 @@ def td_idf_example(descriptions):
     #             file.write("\n")
     #         file.write("\n")
     #         file.write("\n")
+
+    from matplotlib import rcParams
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.sans-serif'] = ['FiraCode Nerd Font Mono', 'Fira Code', 'Menlo']
+    import matplotlib.pyplot as plt
+    from sklearn.decomposition import PCA
+
+    kmean_indices = model.fit_predict(vectors)
+
+    pca = PCA(n_components=2)
+    scatter_plot_points = pca.fit_transform(vectors.toarray())
+    colors = ["r", "b", "c", "y", "m"]
+
+    x_axis = [o[0] for o in scatter_plot_points]
+    y_axis = [o[1] for o in scatter_plot_points]
+
+    fig, ax = plt.subplots(figsize=(50, 50))
+
+    print(kmean_indices)
+    ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
+
+    for i, txt in enumerate(names):
+        ax.annotate(txt[0:9], (x_axis[i], y_axis[i]))
+
+    plt.savefig("data.png")
 
 if __name__ == '__main__':
     run_td_idf_example()
