@@ -79,7 +79,7 @@ if __name__ == '__main__':
     print("-")
     print(all_keywords[0])
 
-    TRUE_K = 20
+    TRUE_K = 5
 
     model = KMeans(n_clusters=TRUE_K, init="k-means++", max_iter=100, n_init=1)
     model.fit(vectors)
@@ -98,5 +98,3 @@ if __name__ == '__main__':
             f.write("\n")
 
     print("-")
-
-
