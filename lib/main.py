@@ -49,10 +49,10 @@ def clean_docs(docs):
     return(final)
 
 def run_td_idf_example():
-    descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"] # [:100]
+    descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"]
     descriptions = clean_docs(descriptions)
 
-    names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"] # [:100]
+    names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"]
     names = clean_docs(names)
 
     td_idf_example(descriptions, names)
@@ -100,19 +100,10 @@ def td_idf_example(descriptions, names):
             print('  %s' % terms[ind],)
         print("")
 
-    # with open("/Users/mike/Desktop/results.txt", "w", encoding="utf-8") as file:
-    #     for i in range(true_k):
-    #         file.write(f"Cluster {i}")
-    #         file.write("\n")
-    #         for ind in order_centroids[i, :10]:
-    #             file.write('  %s' % terms[ind],)
-    #             file.write("\n")
-    #         file.write("\n")
-    #         file.write("\n")
-
     from matplotlib import rcParams
-    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.family'] = 'sans'
     rcParams['font.sans-serif'] = ['FiraCode Nerd Font Mono', 'Fira Code', 'Menlo']
+
     import matplotlib.pyplot as plt
     from sklearn.decomposition import PCA
 
@@ -131,9 +122,19 @@ def td_idf_example(descriptions, names):
     ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
 
     for i, txt in enumerate(names):
-        ax.annotate(txt[0:9], (x_axis[i], y_axis[i]))
+        ax.annotate(txt[0:20], (x_axis[i], y_axis[i]))
 
     plt.savefig("data.png")
 
 if __name__ == '__main__':
     run_td_idf_example()
+
+# with open("/Users/mike/Desktop/results.txt", "w", encoding="utf-8") as file:
+#     for i in range(true_k):
+#         file.write(f"Cluster {i}")
+#         file.write("\n")
+#         for ind in order_centroids[i, :10]:
+#             file.write('  %s' % terms[ind],)
+#             file.write("\n")
+#         file.write("\n")
+#         file.write("\n")
