@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 import string
 import nltk
-nltk.download('stopwords')
+# nltk.download('stopwords')
 from nltk.corpus import stopwords
 import json
 import glob
@@ -22,42 +22,81 @@ def write_data(file, data):
         json.dump(data, f, indent=4)
 
 def remove_stops(text, stops):
-    # clean = re.compile('<.*?>')
-    text = bs4.BeautifulSoup(text).get_text()
+    soup = bs4.BeautifulSoup(text, "html.parser")
+
+    for data in soup(['style', 'script']):
+        print(data.decompose())
+
+    text = ' '.join(soup.stripped_strings)
+
     words = text.split()
-
     final = []
-
     for word in words:
         if word not in stops:
             final.append(word)
-
     final = " ".join(final)
-
-    final = re.sub(r"[[:space:]]+", " ", final)
-
+    final = final.translate(str.maketrans("", "", string.punctuation))
+    final = re.sub(r"\s+", " ", final)
     final = "".join([i for i in final if not i.isdigit()])
-    
     return(final)
 
 def clean_docs(docs):
     stops = stopwords.words("english")
-
     final = []
-
     for doc in docs:
         clean_doc = remove_stops(doc, stops)
         final.append(clean_doc)
     return(final)
 
-
-def print_hi(name):
-    descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"][:100]
-
-    cleaned_docs = clean_docs(descriptions)
-
-    print(cleaned_docs)
-    print(f'Hi, {name}')
-
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"] # [:100]
+    descriptions = clean_docs(descriptions)
+
+    names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"] # [:100]
+    names = clean_docs(names)
+
+    vectorizer = TfidfVectorizer(lowercase=True, max_features=100, max_df=0.8, min_df=5, ngram_range=(1,3), stop_words="english")
+
+    vectors = vectorizer.fit_transform(descriptions)
+
+    feature_names = vectorizer.get_feature_names()
+
+    dense = vectors.todense()
+    denselist = dense.tolist()
+
+    all_keywords = []
+
+    for description in denselist:
+        X = 0
+        keywords = []
+        for word in description:
+            if word > 0:
+                keywords.append(feature_names[X])
+                X = X + 1
+        all_keywords.append(keywords)
+
+    print(descriptions[0])
+    print("-")
+    print(all_keywords[0])
+
+    TRUE_K = 20
+
+    model = KMeans(n_clusters=TRUE_K, init="k-means++", max_iter=100, n_init=1)
+    model.fit(vectors)
+
+    order_centroids = model.cluster_centers_.argsort()[:, ::-1]
+    terms = vectorizer.get_feature_names()
+
+    with open("/Users/mike/Desktop/results.txt", "w", encoding="utf-8") as f:
+        for i in range(TRUE_K):
+            f.write(f"Cluster {i}")
+            f.write("\n")
+            for ind in order_centroids[i, :10]:
+                f.write('  %s' % terms[ind],)
+                f.write("\n")
+            f.write("\n")
+            f.write("\n")
+
+    print("-")
+
+
