@@ -48,6 +48,7 @@ gem 'scenic'
 gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'slack-notifier'
+gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter-text', require: false
 gem 'typhoeus'

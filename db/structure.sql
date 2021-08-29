@@ -299,39 +299,6 @@ ALTER SEQUENCE public.job_postings_id_seq OWNED BY public.job_postings.id;
 
 
 --
--- Name: messages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.messages (
-    id bigint NOT NULL,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    status integer DEFAULT 0,
-    source_id bigint,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.messages_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.messages_id_seq OWNED BY public.messages.id;
-
-
---
 -- Name: moments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -627,13 +594,6 @@ ALTER TABLE ONLY public.job_postings ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: messages id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.messages ALTER COLUMN id SET DEFAULT nextval('public.messages_id_seq'::regclass);
-
-
---
 -- Name: moments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -711,14 +671,6 @@ ALTER TABLE ONLY public.friendly_id_slugs
 
 ALTER TABLE ONLY public.job_postings
     ADD CONSTRAINT job_postings_pkey PRIMARY KEY (id);
-
-
---
--- Name: messages messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.messages
-    ADD CONSTRAINT messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -805,20 +757,6 @@ CREATE UNIQUE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope
 --
 
 CREATE INDEX index_job_postings_on_source_id ON public.job_postings USING btree (source_id);
-
-
---
--- Name: index_messages_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_messages_on_created_at ON public.messages USING btree (created_at);
-
-
---
--- Name: index_messages_on_source_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_messages_on_source_id ON public.messages USING btree (source_id);
 
 
 --
