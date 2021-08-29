@@ -1,0 +1,21 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+require 'set'
+
+File.open('/Users/mike/projects/outlier_jobs/core/lib/corpus.json', 'w') do |f|
+  job_postings = JobPosting.all.pluck(:title, :body)
+
+  corpus = { names: [], descriptions: [] }
+  job_postings.each_with_object(corpus) { |jp, c| 
+    c[:names] << jp.first.to_s.strip.gsub(/\s\+/, ' ')
+    c[:descriptions] << jp.last.to_s.strip.gsub(/\s\+/, ' ')
+  }
+  f.print corpus.to_json
+
+  # # uniqued and sorted
+  # ss = job_postings.each_with_object(SortedSet.new) { |jp, ss| ss << [jp.first.to_s, jp.last.to_s] }
+  # h = { names: ss.map(&:first), descriptions: ss.map(&:last) }
+  # f.print h.to_json
+end

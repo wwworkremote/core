@@ -48,14 +48,23 @@ def clean_docs(docs):
         final.append(clean_doc)
     return(final)
 
-if __name__ == '__main__':
+def run_td_idf_example():
     descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"] # [:100]
     descriptions = clean_docs(descriptions)
+    td_idf_example(descriptions)
 
-    names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"] # [:100]
-    names = clean_docs(names)
+    # names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"] # [:100]
+    # names = clean_docs(names)
 
-    vectorizer = TfidfVectorizer(lowercase=True, max_features=100, max_df=0.8, min_df=5, ngram_range=(1,3), stop_words="english")
+def td_idf_example(descriptions):
+    vectorizer = TfidfVectorizer(
+        lowercase=True,
+        max_features=100,
+        max_df=0.8,
+        min_df=5,
+        ngram_range=(1,3),
+        stop_words="english"
+    )
 
     vectors = vectorizer.fit_transform(descriptions)
 
@@ -67,34 +76,37 @@ if __name__ == '__main__':
     all_keywords = []
 
     for description in denselist:
-        X = 0
+        idx = 0
         keywords = []
         for word in description:
             if word > 0:
-                keywords.append(feature_names[X])
-                X = X + 1
+                keywords.append(feature_names[idx])
+                idx = idx + 1
         all_keywords.append(keywords)
 
-    print(descriptions[0])
-    print("-")
-    print(all_keywords[0])
+    true_k = 20
 
-    TRUE_K = 5
-
-    model = KMeans(n_clusters=TRUE_K, init="k-means++", max_iter=100, n_init=1)
+    model = KMeans(n_clusters=true_k, init="k-means++", max_iter=100, n_init=1)
     model.fit(vectors)
 
     order_centroids = model.cluster_centers_.argsort()[:, ::-1]
     terms = vectorizer.get_feature_names()
 
-    with open("/Users/mike/Desktop/results.txt", "w", encoding="utf-8") as f:
-        for i in range(TRUE_K):
-            f.write(f"Cluster {i}")
-            f.write("\n")
-            for ind in order_centroids[i, :10]:
-                f.write('  %s' % terms[ind],)
-                f.write("\n")
-            f.write("\n")
-            f.write("\n")
+    for i in range(true_k):
+        print(f"Cluster {i}")
+        for ind in order_centroids[i, :10]:
+            print('  %s' % terms[ind],)
+        print("")
 
-    print("-")
+    # with open("/Users/mike/Desktop/results.txt", "w", encoding="utf-8") as file:
+    #     for i in range(true_k):
+    #         file.write(f"Cluster {i}")
+    #         file.write("\n")
+    #         for ind in order_centroids[i, :10]:
+    #             file.write('  %s' % terms[ind],)
+    #             file.write("\n")
+    #         file.write("\n")
+    #         file.write("\n")
+
+if __name__ == '__main__':
+    run_td_idf_example()
