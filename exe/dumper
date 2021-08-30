@@ -5,7 +5,7 @@
 require 'set'
 
 File.open('/Users/mike/projects/outlier_jobs/core/lib/corpus.json', 'w') do |f|
-  job_postings = JobPosting.all.pluck(:title, :body)
+  job_postings = JobPosting.all.order(id: :desc).limit(10000).pluck(:title, :body)
 
   corpus = { names: [], descriptions: [] }
   job_postings.each_with_object(corpus) { |jp, c| 
