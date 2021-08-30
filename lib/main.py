@@ -1,16 +1,18 @@
+import string
+import json
+import glob
+import re
+
 import pandas as pd
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
-import string
 import nltk
-# nltk.download('stopwords')
 from nltk.corpus import stopwords
-import json
-import glob
-import re
 import bs4
+
+# nltk.download('stopwords')
 
 def load_data(file):
     with open(file, "r", encoding="utf-8") as f:
