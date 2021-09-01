@@ -2,19 +2,20 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-require 'set'
+job_postings = JobPosting.where(created_at: Time.zone.now.all_month).order(id: :desc).limit(10_000).pluck(:title, :body)
 
-File.open('/Users/mike/projects/outlier_jobs/core/lib/corpus.json', 'w') do |f|
-  job_postings = JobPosting.where(created_at: (Time.now.beginning_of_month..Time.now.end_of_month)).order(id: :desc).limit(10000).pluck(:title, :body)
-
+File.open("/Users/mike/projects/outlier_jobs/corpus.json", "w") do |f|
   corpus = { names: [], descriptions: [] }
-  job_postings.each_with_object(corpus) { |jp, c| 
-    c[:names] << jp.first.to_s.strip.gsub(/\s\+/, ' ')
-    c[:descriptions] << jp.last.to_s.strip.gsub(/\s\+/, ' ')
-  }
+
+  job_postings.each_with_object(corpus) do |jp, c| 
+    c[:names] << jp.first.to_s.gsub(/\s\+/, " ").downcase.strip
+    c[:descriptions] << jp.last.to_s.gsub(/\s\+/, " ").downcase.strip
+  end
+
   f.print corpus.to_json
 
   # # uniqued and sorted
+  # require 'set'
   # ss = job_postings.each_with_object(SortedSet.new) { |jp, ss| ss << [jp.first.to_s, jp.last.to_s] }
   # h = { names: ss.map(&:first), descriptions: ss.map(&:last) }
   # f.print h.to_json
