@@ -4,12 +4,12 @@
 
 job_postings = JobPosting.where(created_at: Time.zone.now.all_month).order(id: :desc).limit(10_000).pluck(:title, :body)
 
-File.open("/Users/mike/projects/outlier_jobs/corpus.json", "w") do |f|
+File.open('/Users/mike/projects/outlier_jobs/corpus.json', 'w') do |f|
   corpus = { names: [], descriptions: [] }
 
-  job_postings.each_with_object(corpus) do |jp, c| 
-    c[:names] << jp.first.to_s.gsub(/\s\+/, " ").downcase.strip
-    c[:descriptions] << jp.last.to_s.gsub(/\s\+/, " ").downcase.strip
+  job_postings.each_with_object(corpus) do |jp, c|
+    c[:names] << jp.first.to_s.gsub(/\s\+/, ' ').downcase.strip
+    c[:descriptions] << jp.last.to_s.gsub(/\s\+/, ' ').downcase.strip
   end
 
   f.print corpus.to_json
