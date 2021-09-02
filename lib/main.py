@@ -51,10 +51,10 @@ def clean_docs(docs):
     return(final)
 
 def run_td_idf_example():
-    descriptions = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["descriptions"]
+    descriptions = load_data("/Users/mike/projects/outlier_jobs/corpus.json")["descriptions"]
     descriptions = clean_docs(descriptions)
 
-    names = load_data("/Users/mike/projects/outlier_jobs/core/lib/corpus.json")["names"]
+    names = load_data("/Users/mike/projects/outlier_jobs/corpus.json")["names"]
     names = clean_docs(names)
 
     td_idf_example(descriptions, names)
