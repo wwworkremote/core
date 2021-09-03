@@ -30,6 +30,3 @@ module Uma
   rescue NoMatchingPatternError
   end
 end
-
-binding.pry
-puts
