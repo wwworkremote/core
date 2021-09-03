@@ -66,18 +66,13 @@ def td_idf_example(descriptions, names):
         max_df=0.8,
         min_df=5,
         ngram_range=(1,3),
-        stop_words="english"
+       stop_words="english"
     )
-
     vectors = vectorizer.fit_transform(descriptions)
-
     feature_names = vectorizer.get_feature_names()
-
     dense = vectors.todense()
     denselist = dense.tolist()
-
     all_keywords = []
-
     for description in denselist:
         idx = 0
         keywords = []
@@ -86,25 +81,21 @@ def td_idf_example(descriptions, names):
                 keywords.append(feature_names[idx])
                 idx = idx + 1
         all_keywords.append(keywords)
-
     # basically number of clusters
     true_k = 5
-
     model = KMeans(n_clusters=true_k, init="k-means++", max_iter=100, n_init=1)
     model.fit(vectors)
-
     order_centroids = model.cluster_centers_.argsort()[:, ::-1]
     terms = vectorizer.get_feature_names()
-
     for i in range(true_k):
         print(f"Cluster {i}")
         for ind in order_centroids[i, :10]:
             print('  %s' % terms[ind],)
         print("")
 
-    from matplotlib import rcParams
-    rcParams['font.family'] = 'sans'
-    rcParams['font.sans-serif'] = ['FiraCode Nerd Font Mono', 'Fira Code', 'Menlo']
+    # from matplotlib import rcParams
+    # rcParams['font.family'] = 'sans'
+    # rcParams['font.sans-serif'] = ['Fira Code', 'Menlo']
 
     import matplotlib.pyplot as plt
     from sklearn.decomposition import PCA
