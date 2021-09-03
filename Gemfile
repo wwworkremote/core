@@ -34,7 +34,7 @@ gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'whenever', require: false
 
 gem 'puma', '~> 5.0'
-gem 'puma_worker_killer', require: false
+gem 'puma_worker_killer'
 gem 'sd_notify'
 
 gem 'pg', '~> 1.1'
