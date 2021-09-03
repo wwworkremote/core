@@ -39,8 +39,6 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    active_median (0.3.3)
-      activesupport (>= 5.2)
     activejob (6.1.4.1)
       activesupport (= 6.1.4.1)
       globalid (>= 0.3.6)
@@ -66,21 +64,14 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
-    ancestry (4.1.0)
-      activerecord (>= 5.2.6)
     annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
     ast (2.4.2)
     awesome_print (1.9.2)
-    babosa (2.0.0)
-    bcrypt (3.1.16)
     bcrypt_pbkdf (1.1.0)
     brakeman (5.1.1)
     builder (3.2.4)
-    bullet (6.1.5)
-      activesupport (>= 3.0.0)
-      uniform_notifier (~> 1.11)
     byebug (11.1.3)
     capistrano (3.16.0)
       airbrussh (>= 1.0.0)
@@ -106,8 +97,6 @@ GEM
     druuid (1.0.2)
     ed25519 (1.2.4)
     erubi (1.10.0)
-    et-orbi (1.2.4)
-      tzinfo
     ethon (0.14.0)
       ffi (>= 1.15.0)
     faker (2.19.0)
@@ -141,19 +130,14 @@ GEM
     formatador (0.3.0)
     friendly_id (5.4.2)
       activerecord (>= 4.0.0)
-    fugit (1.5.1)
-      et-orbi (~> 1.1, >= 1.1.8)
-      raabro (~> 1.4)
     fuubar (2.5.1)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
+    get_process_mem (0.2.7)
+      ffi (~> 1.0)
     globalid (0.5.2)
       activesupport (>= 5.0)
-    google-protobuf (3.17.3)
     google-protobuf (3.17.3-universal-darwin)
-    google-protobuf (3.17.3-x86_64-linux)
-    groupdate (5.2.2)
-      activesupport (>= 5)
     guard (2.18.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -169,12 +153,9 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
-    hightop (0.3.0)
-      activesupport (>= 5.2)
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
-    idn-ruby (0.1.2)
     jsonb_accessor (1.3.2)
       activerecord (>= 5.0)
       activesupport (>= 5.0)
@@ -190,10 +171,6 @@ GEM
     lograge-sql (1.3.1)
       activerecord (>= 4, < 7.0)
       lograge (~> 0.4)
-    lol_dba (2.2.0)
-      actionpack (>= 3.0, < 7.0)
-      activerecord (>= 3.0, < 7.0)
-      railties (>= 3.0, < 7.0)
     loofah (2.12.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -203,7 +180,6 @@ GEM
     marcel (1.0.1)
     method_source (1.0.0)
     mini_mime (1.1.1)
-    mini_portile2 (2.6.1)
     minitest (5.14.4)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -212,26 +188,17 @@ GEM
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
     nio4r (2.5.8)
-    nokogiri (1.12.4)
-      mini_portile2 (~> 2.6.1)
-      racc (~> 1.4)
     nokogiri (1.12.4-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.12.4-x86_64-linux)
-      racc (~> 1.4)
-    nori (2.6.0)
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    parallel (1.20.2)
+    parallel (1.20.1)
     parser (3.0.2.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     pg_query (2.1.0)
       google-protobuf (>= 3.17.1)
-    pg_search (2.3.5)
-      activerecord (>= 5.2)
-      activesupport (>= 5.2)
     pghero (2.8.1)
       activerecord (>= 5)
     pry (0.13.1)
@@ -245,7 +212,9 @@ GEM
     public_suffix (4.0.6)
     puma (5.4.0)
       nio4r (~> 2.0)
-    raabro (1.4.0)
+    puma_worker_killer (0.3.1)
+      get_process_mem (~> 0.2)
+      puma (>= 2.7)
     racc (1.5.2)
     rack (2.2.3)
     rack-test (1.1.0)
@@ -281,15 +250,11 @@ GEM
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rbtree (0.4.4)
     redis (4.4.0)
     regexp_parser (2.1.1)
     request_store (1.5.0)
       rack (>= 1.4)
     rexml (3.2.5)
-    rollups (0.1.2)
-      activesupport (>= 5.1)
-      groupdate (>= 5.2)
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
@@ -342,29 +307,11 @@ GEM
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
-    rubypants (0.7.1)
-    sanitize (6.0.0)
-      crass (~> 1.0.2)
-      nokogiri (>= 1.12.0)
     scenic (1.5.4)
       activerecord (>= 4.0.0)
       railties (>= 4.0.0)
-    sentry-rails (4.7.1)
-      railties (>= 5.0)
-      sentry-ruby-core (~> 4.7.0)
-    sentry-ruby (4.7.1)
-      concurrent-ruby (~> 1.0, >= 1.0.2)
-      faraday (>= 1.0)
-      sentry-ruby-core (= 4.7.1)
-    sentry-ruby-core (4.7.1)
-      concurrent-ruby
-      faraday
-    set (1.0.1)
+    sd_notify (0.1.1)
     shellany (0.0.1)
-    slack-notifier (2.4.0)
-    sorted_set (1.0.3)
-      rbtree
-      set (~> 1.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -375,20 +322,12 @@ GEM
     sshkit (1.21.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    stopwords-filter (0.5.0)
     thor (1.1.0)
-    twitter-text (3.1.0)
-      idn-ruby
-      unf (~> 0.1.0)
     typhoeus (1.4.0)
       ethon (>= 0.9.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.7.7)
     unicode-display_width (2.0.0)
-    uniform_notifier (1.14.2)
     vcr (6.0.0)
     webmock (3.14.0)
       addressable (>= 2.8.0)
@@ -402,20 +341,13 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
-  aarch64-linux
   x86_64-darwin-20
-  x86_64-linux
 
 DEPENDENCIES
-  active_median
-  ancestry
   annotate
   awesome_print
-  babosa
-  bcrypt (~> 3.1.7)
   bcrypt_pbkdf
   brakeman
-  bullet
   byebug
   capistrano (~> 3.10)
   capistrano-asdf
@@ -429,32 +361,23 @@ DEPENDENCIES
   faraday-http-cache
   faraday_middleware
   friendly_id
-  fugit
   fuubar
-  groupdate
   guard-rspec
-  hightop
   hiredis
   jsonb_accessor
   listen (~> 3.3)
   lograge
   lograge-sql
-  lol_dba
-  loofah
   multi_xml
-  nokogiri
-  nori
   pg (~> 1.1)
   pg_query (>= 0.9.0)
-  pg_search
   pghero
   pry-byebug
   pry-rails
   puma (~> 5.0)
-  rails (~> 6.1.3, >= 6.1.3.2)
-  rails-html-sanitizer
+  puma_worker_killer
+  rails (~> 6.1.4, >= 6.1.4)
   redis
-  rollups
   rspec-rails
   rubocop
   rubocop-performance
@@ -464,15 +387,8 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-rubycw
   rubocop-thread_safety
-  rubypants
-  sanitize
   scenic
-  sentry-rails
-  sentry-ruby
-  slack-notifier
-  sorted_set
-  stopwords-filter
-  twitter-text
+  sd_notify
   typhoeus
   vcr
   webmock
@@ -482,4 +398,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.26
+   2.2.27

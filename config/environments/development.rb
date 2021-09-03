@@ -3,10 +3,10 @@
 require 'active_support/core_ext/integer/time'
 
 Rails.application.configure do
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-  end
+  # config.after_initialize do
+  #   Bullet.enable = true
+  #   Bullet.bullet_logger = true
+  # end
 
   config.action_controller.enable_fragment_cache_logging = true
   config.action_controller.perform_caching = true
