@@ -21,7 +21,10 @@ class Source < ApplicationRecord
     return if payload&.send(:[], 'url').blank?
 
     name = URI.parse(payload['url']).host
+
     self.origin = Origin.find_or_create_by(name: name)
+
+    self
   end
 end
 
