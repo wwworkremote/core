@@ -7,13 +7,12 @@ RSpec.describe Tag, type: :model do
 end
 
 # == Schema Information
-# Schema version: 20210712004243
 #
 # Table name: tags
 #
 #  id         :bigint           not null, primary key
-#  name       :citext           indexed
-#  slug       :string           indexed
+#  slug       :string
+#  name       :citext
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

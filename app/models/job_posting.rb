@@ -25,24 +25,23 @@ class JobPosting < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210817230954
 #
 # Table name: job_postings
 #
 #  id                 :bigint           not null, primary key
-#  body               :string
-#  company            :string
-#  data               :jsonb            not null
-#  location           :string
-#  published_at       :datetime
 #  signature          :string           not null
 #  status             :integer          default("pending")
-#  tags               :string           is an Array
-#  target_url         :string
+#  source_id          :bigint
 #  title              :string
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
+#  body               :string
+#  company            :string
+#  location           :string
 #  external_author_id :string
 #  external_id        :string
-#  source_id          :bigint           indexed
+#  published_at       :datetime
+#  tags               :string           is an Array
+#  target_url         :string
+#  data               :jsonb            not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
 #
