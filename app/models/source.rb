@@ -13,6 +13,16 @@ class Source < ApplicationRecord
 
   has_many :messages, dependent: :nullify
   has_many :job_postings, dependent: :nullify
+
+  belongs_to :origin, optional: true
+
+  after_commit :infer_origin, on: :create
+
+  def infer_origin
+    host = URI.parse(Source.last.payload['url']).host
+
+    self.origin = Origin.find_or_create_by(name: host)
+  end
 end
 
 # == Schema Information
@@ -26,4 +36,5 @@ end
 #  status     :integer          default("pending")
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  origin_id  :bigint
 #
