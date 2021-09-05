@@ -56,6 +56,3 @@ puts words.inspect
 
 # model = BlingFire::Model.new
 # puts model.text_to_words(text).inspect
-
-# binding.pry
-# puts

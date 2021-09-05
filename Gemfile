@@ -47,11 +47,11 @@ gem 'ed25519', require: false
 gem 'awesome_print'
 
 group :development, :test do
-  gem 'byebug', require: false
+  gem 'byebug'
   gem 'faker', require: false
   gem 'fuubar', require: false
-  gem 'pry-byebug', require: false
-  gem 'pry-rails', require: false
+  gem 'pry-byebug'
+  gem 'pry-rails'
   gem 'rspec-rails', require: false
   gem 'webmock', require: false
 end
