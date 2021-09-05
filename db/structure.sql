@@ -181,7 +181,8 @@ CREATE TABLE public.sources (
     payload jsonb DEFAULT '{}'::jsonb NOT NULL,
     status integer DEFAULT 0,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    origin_id bigint
 );
 
 
@@ -822,6 +823,13 @@ CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghe
 
 
 --
+-- Name: index_sources_on_origin_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sources_on_origin_id ON public.sources USING btree (origin_id);
+
+
+--
 -- Name: index_sources_on_signature; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -847,6 +855,14 @@ CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
 --
 
 CREATE UNIQUE INDEX index_tags_on_slug ON public.tags USING btree (slug);
+
+
+--
+-- Name: sources fk_rails_cbbe8839f4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources
+    ADD CONSTRAINT fk_rails_cbbe8839f4 FOREIGN KEY (origin_id) REFERENCES public.origins(id);
 
 
 --
@@ -884,6 +900,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210817230954'),
 ('20210820215739'),
 ('20210820231818'),
-('20210905163739');
+('20210905163739'),
+('20210905171239');
 
 

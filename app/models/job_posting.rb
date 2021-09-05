@@ -19,8 +19,19 @@ class JobPosting < ApplicationRecord
 
   private
 
-  def sign
-    self.signature ||= Digest::SHA2.hexdigest([title, body, company, external_author_id, location, published_at, tags&.sort&.join, target_url].join)
+  def sign # rubocop:disable Metrics/MethodLength
+    self.signature ||= Digest::SHA2.hexdigest(
+      [
+        title,
+        body,
+        company,
+        external_author_id,
+        location,
+        published_at,
+        tags&.sort&.join,
+        target_url
+      ].join
+    )
   end
 end
 
