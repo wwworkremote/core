@@ -121,15 +121,6 @@ CREATE EXTENSION IF NOT EXISTS sslinfo WITH SCHEMA public;
 COMMENT ON EXTENSION sslinfo IS 'information about SSL certificates';
 
 
---
--- Name: pg_search_dmetaphone(text); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.pg_search_dmetaphone(text) RETURNS text
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$ SELECT array_to_string(ARRAY(SELECT dmetaphone(unnest(regexp_split_to_array($1, E'\\s+')))), ' ') $_$;
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -373,39 +364,6 @@ ALTER SEQUENCE public.origins_id_seq OWNED BY public.origins.id;
 
 
 --
--- Name: pg_search_documents; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.pg_search_documents (
-    id bigint NOT NULL,
-    content text,
-    searchable_type character varying,
-    searchable_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: pg_search_documents_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.pg_search_documents_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pg_search_documents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.pg_search_documents_id_seq OWNED BY public.pg_search_documents.id;
-
-
---
 -- Name: pghero_query_stats; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -642,13 +600,6 @@ ALTER TABLE ONLY public.origins ALTER COLUMN id SET DEFAULT nextval('public.orig
 
 
 --
--- Name: pg_search_documents id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pg_search_documents ALTER COLUMN id SET DEFAULT nextval('public.pg_search_documents_id_seq'::regclass);
-
-
---
 -- Name: pghero_query_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -731,14 +682,6 @@ ALTER TABLE ONLY public.origins
 
 
 --
--- Name: pg_search_documents pg_search_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pg_search_documents
-    ADD CONSTRAINT pg_search_documents_pkey PRIMARY KEY (id);
-
-
---
 -- Name: pghero_query_stats pghero_query_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -795,10 +738,24 @@ ALTER TABLE ONLY public.tags
 
 
 --
+-- Name: index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type ON public.friendly_id_slugs USING btree (slug, sluggable_type);
+
+
+--
 -- Name: index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope ON public.friendly_id_slugs USING btree (slug, sluggable_type, scope);
+
+
+--
+-- Name: index_friendly_id_slugs_on_sluggable_type_and_sluggable_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_friendly_id_slugs_on_sluggable_type_and_sluggable_id ON public.friendly_id_slugs USING btree (sluggable_type, sluggable_id);
 
 
 --
@@ -809,17 +766,17 @@ CREATE INDEX index_job_postings_on_source_id ON public.job_postings USING btree 
 
 
 --
--- Name: index_pg_search_documents_on_searchable; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pg_search_documents_on_searchable ON public.pg_search_documents USING btree (searchable_type, searchable_id);
-
-
---
 -- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghero_query_stats USING btree (database, captured_at);
+
+
+--
+-- Name: index_pghero_space_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pghero_space_stats_on_database_and_captured_at ON public.pghero_space_stats USING btree (database, captured_at);
 
 
 --
@@ -841,6 +798,13 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 --
 
 CREATE UNIQUE INDEX index_tag_aliases_on_name ON public.tag_aliases USING btree (name);
+
+
+--
+-- Name: index_tag_aliases_on_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_aliases_on_tag_id ON public.tag_aliases USING btree (tag_id);
 
 
 --
@@ -882,24 +846,16 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210626222927'),
 ('20210703173154'),
-('20210707203641'),
 ('20210710142759'),
 ('20210710143627'),
 ('20210710144921'),
-('20210711230518'),
 ('20210712004243'),
 ('20210712020439'),
 ('20210712021013'),
-('20210807232217'),
-('20210807232527'),
-('20210808002655'),
-('20210808003026'),
 ('20210815003805'),
 ('20210815191413'),
 ('20210815192505'),
-('20210817230954'),
-('20210820215739'),
-('20210820231818'),
+('20210816000001'),
 ('20210905163739'),
 ('20210905171239');
 

@@ -1,6 +1,6 @@
 select
   1 as id,
-  'messages' as name,
+  'job_postings' as name,
   now() as cleeked_at,
   count(*) as value,
   min(created_at) as lbound,
@@ -12,7 +12,7 @@ select
   coalesce(min(created_at) filter (where created_at >= now() - '1 hour'::interval), min(created_at)) as lbound_hour,
   max(created_at) as rbound
 from
-  messages
+  job_postings
 union all
 select
   2 as id,
