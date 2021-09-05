@@ -16,14 +16,13 @@ class Source < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210707203641
 #
 # Table name: sources
 #
 #  id         :bigint           not null, primary key
+#  signature  :string           not null
 #  event      :jsonb            not null
 #  payload    :jsonb            not null
-#  signature  :string           not null, indexed
 #  status     :integer          default("pending")
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
