@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-class CreateMessages < ActiveRecord::Migration[6.1]
+class CreateOrigins < ActiveRecord::Migration[6.1]
   def change
-    create_table :messages do |t|
+    create_table :origins do |t|
+      t.string :slug
+      t.citext :name
+
       t.jsonb :data, default: {}, null: false
-      t.integer :status, default: 0
-      t.references :source
 
       t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
       t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
