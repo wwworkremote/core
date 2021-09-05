@@ -15,12 +15,12 @@ class Source < ApplicationRecord
 
   belongs_to :origin, optional: true
 
-  after_commit :infer_origin, on: :create
+  after_initialize :assign_origin_by_url, unless: -> { origin.presence }
 
-  def infer_origin
-    host = URI.parse(Source.last.payload['url']).host
+  def assign_origin_by_url
+    return if origin.presence
 
-    self.origin = Origin.find_or_create_by(name: host)
+    self.origin = Origin.find_or_create_by(name: URI.parse(payload['url']).host)
   end
 end
 
