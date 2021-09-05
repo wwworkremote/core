@@ -10,6 +10,7 @@ class Init < ActiveRecord::Migration[6.1]
     enable_extension 'pgcrypto'
     enable_extension 'plpgsql'
     enable_extension 'sslinfo'
+    enable_extension 'fuzzystrmatch'
   end
 
   def down

@@ -11,7 +11,6 @@ class Source < ApplicationRecord
   scope :pending, -> { where(status: 0) }
   scope :processed, -> { where(status: 1) }
 
-  has_many :messages, dependent: :nullify
   has_many :job_postings, dependent: :nullify
 
   belongs_to :origin, optional: true
