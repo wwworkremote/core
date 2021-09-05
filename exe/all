@@ -1,40 +1,38 @@
 #!/usr/bin/env bash
 
-export RAILS_ENV=development
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/hackernews
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/hackernews
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/indeed
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/indeed
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/monster
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/monster
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/nexxt
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/nexxt
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/remoteok
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/remoteok
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/remotepython
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/remotepython
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/stackoverflow
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
 
-bundle exec rails runner -e development exe/stackoverflow
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
-
-bundle exec rails runner -e development exe/weworkremotely
-bundle exec rails runner -e development exe/job_postings
-bundle exec rails runner -e development exe/moment
+bundle exec rails runner exe/weworkremotely
+bundle exec rails runner exe/job_postings
+bundle exec rails runner exe/moment
