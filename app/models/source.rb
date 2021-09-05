@@ -7,8 +7,6 @@ class Source < ApplicationRecord
     processed: 1
   }, _prefix: true
 
-  jsonb_accessor :payload, url: :string
-
   scope :empty, -> { where(status: -1) }
   scope :pending, -> { where(status: 0) }
   scope :processed, -> { where(status: 1) }
@@ -17,12 +15,12 @@ class Source < ApplicationRecord
 
   belongs_to :origin, optional: true
 
-  after_initialize :assign_origin_by_url, unless: -> { origin.presence }
+  before_save :assign_origin_by_url, unless: -> { origin.presence }
 
   def assign_origin_by_url
-    return if origin.presence
+    return if payload&.send(:[], 'url').blank?
 
-    name = URI.parse(url).host
+    name = URI.parse(payload['url']).host
     self.origin = Origin.find_or_create_by(name: name)
   end
 end
