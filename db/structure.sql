@@ -339,6 +339,39 @@ ALTER SEQUENCE public.moments_id_seq OWNED BY public.moments.id;
 
 
 --
+-- Name: origins; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.origins (
+    id bigint NOT NULL,
+    slug character varying,
+    name public.citext,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: origins_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.origins_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: origins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.origins_id_seq OWNED BY public.origins.id;
+
+
+--
 -- Name: pg_search_documents; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -601,6 +634,13 @@ ALTER TABLE ONLY public.moments ALTER COLUMN id SET DEFAULT nextval('public.mome
 
 
 --
+-- Name: origins id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.origins ALTER COLUMN id SET DEFAULT nextval('public.origins_id_seq'::regclass);
+
+
+--
 -- Name: pg_search_documents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -679,6 +719,14 @@ ALTER TABLE ONLY public.job_postings
 
 ALTER TABLE ONLY public.moments
     ADD CONSTRAINT moments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: origins origins_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.origins
+    ADD CONSTRAINT origins_pkey PRIMARY KEY (id);
 
 
 --
@@ -835,6 +883,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210815192505'),
 ('20210817230954'),
 ('20210820215739'),
-('20210820231818');
+('20210820231818'),
+('20210905163739');
 
 
