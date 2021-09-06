@@ -46,7 +46,7 @@ module Words
   end
 end
 
-text = Message.find(244_888).body
+text = JobPosting.last.body
 list = Words.filtrate(text)
 words = Words.dump(list)
 puts words.inspect

@@ -83,31 +83,32 @@ group :test do
   gem 'vcr', require: false
 end
 
-# gem 'active_median'
-# gem 'ancestry'
-# gem 'blingfire' # https://github.com/ankane/blingfire
-# gem 'connection_pool'
-# gem 'eps' # https://github.com/ankane/eps
-# gem 'fugit'
-# gem 'groupdate'
-# gem 'hightop'
-# gem 'loofah'
-# gem 'memo_wise'
-# gem 'mitie' # https://github.com/ankane/mitie
-# gem 'nokogiri'
-# gem 'nori'
-# gem 'notable' # https://github.com/ankane/notable
-# gem 'pg_search'
-# gem 'rails-html-sanitizer'
-# gem 'rainbow'
-# gem 'rollups' # https://github.com/ankane/rollup
-# gem 'rubypants', require: false
-# gem 'safely_block' # https://github.com/ankane/safely
-# gem 'sanitize', require: false
-# gem 'sentry-rails'
-# gem 'sentry-ruby'
-# gem 'slack-notifier'
-# gem 'sorted_set'
-# gem 'stopwords-filter', require: 'stopwords'
-# gem 'twitter-text', require: false
+gem 'loofah'
+gem 'nokogiri'
+gem 'nori'
+gem 'rails-html-sanitizer'
+gem 'rubypants', require: false
+gem 'sanitize', require: false
+gem 'stopwords-filter', require: 'stopwords'
+
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+# gem 'twitter-text', require: false
+# gem 'sorted_set'
+# gem 'slack-notifier'
+# gem 'sentry-ruby'
+# gem 'sentry-rails'
+# gem 'safely_block' # https://github.com/ankane/safely
+# gem 'rollups' # https://github.com/ankane/rollup
+# gem 'rainbow'
+# gem 'pg_search'
+# gem 'notable' # https://github.com/ankane/notable
+# gem 'mitie' # https://github.com/ankane/mitie
+# gem 'memo_wise'
+# gem 'hightop'
+# gem 'groupdate'
+# gem 'fugit'
+# gem 'eps' # https://github.com/ankane/eps
+# gem 'connection_pool'
+# gem 'blingfire' # https://github.com/ankane/blingfire
+# gem 'ancestry'
+# gem 'active_median'
