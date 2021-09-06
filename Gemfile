@@ -93,7 +93,7 @@ gem 'stopwords-filter', require: 'stopwords'
 
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
 # gem 'twitter-text', require: false
-# gem 'sorted_set'
+gem 'sorted_set'
 # gem 'slack-notifier'
 # gem 'sentry-ruby'
 # gem 'sentry-rails'
@@ -112,3 +112,5 @@ gem 'stopwords-filter', require: 'stopwords'
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'ancestry'
 # gem 'active_median'
+
+gem 'twitter_cldr', '~> 6.7'
