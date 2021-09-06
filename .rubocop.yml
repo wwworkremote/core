@@ -51,6 +51,7 @@ Layout/LineLength:
   Enabled: false
 
 Metrics/MethodLength:
+  Enabled: false
   Exclude:
     - 'app/lib/pullers/hackernews.rb'
     - 'app/lib/pullers/indeed.rb'
