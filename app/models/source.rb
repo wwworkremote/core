@@ -22,7 +22,7 @@ class Source < ApplicationRecord
 
     name = URI.parse(payload['url']).host
 
-    self.origin = Origin.find_or_create_by(name: name)
+    self.origin_id = Origin.find_or_create_by(name: name).id
 
     self
   end
