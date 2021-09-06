@@ -12,6 +12,8 @@ begin
   Pullers::Monster.jobs(term: term)
 rescue StandardError => e
   Rails.logger.error { "ERROR exe/monster #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+
+  raise unless Rails.env.production?
 ensure
   Rails.logger.info { "END exe/monster #{term} pid:#{Process.pid}" }
 end

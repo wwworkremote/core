@@ -6,12 +6,18 @@ ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
   signature = Digest::SHA2.hexdigest(payload.deep_sort.to_json)
 
   begin
-    Source.create(
-      signature: signature,
-      payload: payload,
-      event: event_json
-    )
+    SourceUrl.create_by_uri(event.payload.url)
   rescue ActiveRecord::RecordNotUnique => e
     Rails.logger.debug { [e.class, e].inspect }
+  ensure
+    begin
+      Source.create(
+        signature: signature,
+        payload: payload,
+        event: event_json
+      )
+    rescue ActiveRecord::RecordNotUnique => e
+      Rails.logger.debug { [e.class, e].inspect }
+    end
   end
 end
