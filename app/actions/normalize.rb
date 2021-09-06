@@ -25,15 +25,15 @@ class Normalize
     @result ||= self.class.normalize(params[:text]).freeze
   end
 
+  delegate :blank?, to: :result
+
   def to_csv
     [result].to_csv if result
   end
 
-  def to_s
-    to_csv.to_s
-  end
+  delegate :to_s, to: :result
 
-  def to_json
+  def to_json(*_args)
     result&.to_json
   end
 
@@ -45,10 +45,12 @@ class Normalize
       .strip_tags(
         Sanitize.fragment(
           RubyPants.new(
-            I18n.transliterate(
-              text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc),
-              locale: :en
-            ),
+            # I18n.transliterate(
+            # text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc).localize.transliterate_into(:en),
+            # text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc),
+            text.downcase.strip.scrub.unicode_normalize(:nfkc).tr('', '').tr('`’“”—–', '\'\'""--'),
+            # locale: :en
+            # ),
             stupefy: true
           ).to_html
         )
