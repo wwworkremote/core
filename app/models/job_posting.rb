@@ -19,7 +19,7 @@ class JobPosting < ApplicationRecord
 
   private
 
-  def sign # rubocop:disable Metrics/MethodLength
+  def sign
     self.signature ||= Digest::SHA2.hexdigest(
       [
         title,
