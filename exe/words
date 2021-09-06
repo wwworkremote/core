@@ -4,26 +4,22 @@
 
 require 'sanitize'
 require 'rubypants'
-#
-#                                                  single_left_quote: ' ',  single_right_quote: ' ',
-#                                                  double_left_quote: ' ', double_right_quote: ' ',
-#                                                  em_dash: ' ', en_dash: ' ',
-#                                                  ellipsis: ' ',
-#                                                  non_breaking_space: ' ', word_joiner: ' '
+
 module Words
-  # STOPWORDS = File.open('/Users/mike/GitHub/Stopwords/src/common/stopwords_10000_most_frequent_filtered.txt').readlines(chomp: true).map(&:downcase).sort.uniq.freeze
-  def self.dehtml(input)
+  def self.normalize(text)
     ActionController::Base \
       .helpers
-      .strip_tags(Sanitize.fragment(RubyPants.new(input.downcase.strip, stupefy: true).to_html))
-      .tr('’', "'")
-      .gsub(/[^[:word:]\s]/i, ' ')
+      .strip_tags(Sanitize.fragment(RubyPants.new(text.downcase.strip, stupefy: true).to_html))
+      .gsub(/&lt;/, '<')
+      .gsub(/&gt;/, '>')
+      .gsub(/&amp;/, '&')
       .gsub(/[[:space:]]+/, ' ')
       .strip
+      .downcase
   end
 
-  def self.filtrate(input)
-    str = dehtml(input)
+  def self.filtrate(text)
+    str = normalize(text)
 
     list = str.split(/[[:space:]]+/).map(&:strip).map do |word|
       word.gsub(/\W+$/, '')
@@ -46,13 +42,5 @@ module Words
   end
 end
 
-text = JobPosting.last.body
-list = Words.filtrate(text)
-words = Words.dump(list)
-puts words.inspect
-
-# text = Words.dehtml(input)
-# puts text.inspect
-
-# model = BlingFire::Model.new
-# puts model.text_to_words(text).inspect
+require 'csv'
+JobPosting.pluck(:body).filter(&:present?).each { |jp| puts [Words.normalize(jp)].to_csv }
