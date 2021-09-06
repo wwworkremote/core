@@ -27,10 +27,6 @@ class Normalize
 
   delegate :blank?, to: :result
 
-  def to_csv
-    [result].to_csv if result
-  end
-
   delegate :to_s, to: :result
 
   def to_json(*_args)
@@ -38,27 +34,40 @@ class Normalize
   end
 
   def self.normalize(text)
-    return text if text.blank?
+    return if text.blank?
 
     ActionController::Base \
       .helpers
-      .strip_tags(
-        Sanitize.fragment(
-          RubyPants.new(
-            # I18n.transliterate(
-            # text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc).localize.transliterate_into(:en),
-            # text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc),
-            text.downcase.strip.scrub.unicode_normalize(:nfkc).tr('', '').tr('`’“”—–', '\'\'""--'),
-            # locale: :en
-            # ),
-            stupefy: true
-          ).to_html
-        )
-      )
+      .strip_tags(Sanitize.fragment(RubyPants.new(text.strip.scrub.downcase, stupefy: true).to_html))
+      .unicode_normalize(:nfkc)
       .gsub(/[[:space:]]+/, ' ')
-      .gsub(/&lt;/, '<')
-      .gsub(/&gt;/, '>')
+      .gsub(/[^[:print:]]/, '')
       .gsub(/&amp;/, '&')
+      .gsub(/&gt;/, '>')
+      .gsub(/&lt;/, '<')
+      .tr('–', '-')
+      .tr('—', '-')
+      .tr('‘', "'")
+      .tr('’', "'")
+      .tr('“', '"')
+      .tr('”', '"')
+      .tr('', '')
       .strip
   end
 end
+
+# .gsub(/(θ|ð)/, 'th')
+# .gsub(/@/, '@')
+# .gsub(/^[[:print:]]/, '')
+# .gsub(/résumé/, 'resume')
+# .gsub(/‍/, '')
+# .localize.transliterate_into(:en)
+# .scrub
+# .tr("ü", 'u'),
+# .tr('`’“”—–', '\'\'""--')
+# .tr('ú', 'u')
+# .tr('ü', 'u')
+# .tr('', '')
+# .unicode_normalize(:nfkc)
+# text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc),
+# text.downcase.strip.force_encoding('UTF-8').unicode_normalize(:nfkc).localize.transliterate_into(:en),
