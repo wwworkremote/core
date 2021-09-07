@@ -67,6 +67,7 @@ Metrics/MethodLength:
     - 'db/migrate/20210815003805_create_job_postings.rb'
 
 Metrics/AbcSize:
+  Enabled: false
   Exclude:
     - 'app/services/pullers/monster.rb'
     - 'db/migrate/20210815003805_create_job_postings.rb'
