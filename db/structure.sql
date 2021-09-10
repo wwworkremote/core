@@ -138,107 +138,6 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
--- Name: job_postings; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.job_postings (
-    id bigint NOT NULL,
-    signature character varying NOT NULL,
-    status integer DEFAULT 0,
-    source_id bigint,
-    title character varying,
-    body character varying,
-    company character varying,
-    location character varying,
-    external_author_id character varying,
-    external_id character varying,
-    published_at timestamp without time zone,
-    tags character varying[],
-    target_url character varying,
-    data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: sources; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.sources (
-    id bigint NOT NULL,
-    signature character varying NOT NULL,
-    event jsonb DEFAULT '{}'::jsonb NOT NULL,
-    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
-    status integer DEFAULT 0,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    origin_id bigint
-);
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tags (
-    id bigint NOT NULL,
-    slug character varying,
-    name public.citext,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: cleeks; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.cleeks AS
- SELECT 1 AS id,
-    'job_postings'::text AS name,
-    now() AS cleeked_at,
-    count(*) AS value,
-    min(job_postings.created_at) AS lbound,
-    count(*) FILTER (WHERE (job_postings.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
-    COALESCE(min(job_postings.created_at) FILTER (WHERE (job_postings.created_at >= (now() - '7 days'::interval))), min(job_postings.created_at)) AS lbound_week,
-    count(*) FILTER (WHERE (job_postings.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
-    COALESCE(min(job_postings.created_at) FILTER (WHERE (job_postings.created_at >= (now() - '1 day'::interval))), min(job_postings.created_at)) AS lbound_day,
-    count(*) FILTER (WHERE (job_postings.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
-    COALESCE(min(job_postings.created_at) FILTER (WHERE (job_postings.created_at >= (now() - '01:00:00'::interval))), min(job_postings.created_at)) AS lbound_hour,
-    max(job_postings.created_at) AS rbound
-   FROM public.job_postings
-UNION ALL
- SELECT 2 AS id,
-    'sources'::text AS name,
-    now() AS cleeked_at,
-    count(*) AS value,
-    min(sources.created_at) AS lbound,
-    count(*) FILTER (WHERE (sources.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
-    COALESCE(min(sources.created_at) FILTER (WHERE (sources.created_at >= (now() - '7 days'::interval))), min(sources.created_at)) AS lbound_week,
-    count(*) FILTER (WHERE (sources.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
-    COALESCE(min(sources.created_at) FILTER (WHERE (sources.created_at >= (now() - '1 day'::interval))), min(sources.created_at)) AS lbound_day,
-    count(*) FILTER (WHERE (sources.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
-    COALESCE(min(sources.created_at) FILTER (WHERE (sources.created_at >= (now() - '01:00:00'::interval))), min(sources.created_at)) AS lbound_hour,
-    max(sources.created_at) AS rbound
-   FROM public.sources
-UNION ALL
- SELECT 3 AS id,
-    'tags'::text AS name,
-    now() AS cleeked_at,
-    count(*) AS value,
-    min(tags.created_at) AS lbound,
-    count(*) FILTER (WHERE (tags.created_at >= (now() - '7 days'::interval))) AS lbound_week_value,
-    COALESCE(min(tags.created_at) FILTER (WHERE (tags.created_at >= (now() - '7 days'::interval))), min(tags.created_at)) AS lbound_week,
-    count(*) FILTER (WHERE (tags.created_at >= (now() - '1 day'::interval))) AS lbound_day_value,
-    COALESCE(min(tags.created_at) FILTER (WHERE (tags.created_at >= (now() - '1 day'::interval))), min(tags.created_at)) AS lbound_day,
-    count(*) FILTER (WHERE (tags.created_at >= (now() - '01:00:00'::interval))) AS lbound_hour_value,
-    COALESCE(min(tags.created_at) FILTER (WHERE (tags.created_at >= (now() - '01:00:00'::interval))), min(tags.created_at)) AS lbound_hour,
-    max(tags.created_at) AS rbound
-   FROM public.tags;
-
-
---
 -- Name: friendly_id_slugs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -272,6 +171,30 @@ ALTER SEQUENCE public.friendly_id_slugs_id_seq OWNED BY public.friendly_id_slugs
 
 
 --
+-- Name: job_postings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.job_postings (
+    id bigint NOT NULL,
+    signature character varying NOT NULL,
+    status integer DEFAULT 0,
+    source_id bigint,
+    title character varying,
+    body character varying,
+    company character varying,
+    location character varying,
+    external_author_id character varying,
+    external_id character varying,
+    published_at timestamp without time zone,
+    tags character varying[],
+    target_url character varying,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: job_postings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -288,46 +211,6 @@ CREATE SEQUENCE public.job_postings_id_seq
 --
 
 ALTER SEQUENCE public.job_postings_id_seq OWNED BY public.job_postings.id;
-
-
---
--- Name: moments; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.moments (
-    id bigint NOT NULL,
-    cleek integer,
-    cleeked_at timestamp without time zone,
-    value integer,
-    lbound timestamp without time zone,
-    lbound_week_value integer,
-    lbound_week timestamp without time zone,
-    lbound_day_value integer,
-    lbound_day timestamp without time zone,
-    lbound_hour_value integer,
-    lbound_hour timestamp without time zone,
-    rbound timestamp without time zone,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: moments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.moments_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: moments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.moments_id_seq OWNED BY public.moments.id;
 
 
 --
@@ -476,6 +359,22 @@ ALTER SEQUENCE public.source_urls_id_seq OWNED BY public.source_urls.id;
 
 
 --
+-- Name: sources; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources (
+    id bigint NOT NULL,
+    signature character varying NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    status integer DEFAULT 0,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    origin_id bigint
+);
+
+
+--
 -- Name: sources_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -524,6 +423,19 @@ CREATE SEQUENCE public.tag_aliases_id_seq
 --
 
 ALTER SEQUENCE public.tag_aliases_id_seq OWNED BY public.tag_aliases.id;
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tags (
+    id bigint NOT NULL,
+    slug character varying,
+    name public.citext,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 
 
 --
@@ -583,13 +495,6 @@ ALTER TABLE ONLY public.friendly_id_slugs ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.job_postings ALTER COLUMN id SET DEFAULT nextval('public.job_postings_id_seq'::regclass);
-
-
---
--- Name: moments id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.moments ALTER COLUMN id SET DEFAULT nextval('public.moments_id_seq'::regclass);
 
 
 --
@@ -663,14 +568,6 @@ ALTER TABLE ONLY public.friendly_id_slugs
 
 ALTER TABLE ONLY public.job_postings
     ADD CONSTRAINT job_postings_pkey PRIMARY KEY (id);
-
-
---
--- Name: moments moments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.moments
-    ADD CONSTRAINT moments_pkey PRIMARY KEY (id);
 
 
 --

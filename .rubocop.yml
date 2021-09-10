@@ -61,9 +61,7 @@ Metrics/MethodLength:
     - 'app/lib/pullers/remotepython.rb'
     - 'app/lib/pullers/stackoverflow.rb'
     - 'app/lib/pullers/weworkremotely.rb'
-    - 'app/models/moment.rb'
     - 'bin/bundle'
-    - 'db/migrate/20210712004243_create_moments.rb'
     - 'db/migrate/20210815003805_create_job_postings.rb'
 
 Metrics/AbcSize:
