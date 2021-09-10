@@ -13,4 +13,4 @@ role :cron2, %w[malina102]
 #
 role :redis, %w[malina101 malina102]
 
-role :db, %w[malina103], primary: true
+role :db, %w[malina108], primary: true
