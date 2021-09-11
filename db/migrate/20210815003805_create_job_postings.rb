@@ -5,7 +5,7 @@ class CreateJobPostings < ActiveRecord::Migration[6.1]
     create_table :job_postings do |t|
       t.string :signature, null: false, uniq: true
 
-      t.integer :status, default: 0
+      t.bigint :status, default: 0
 
       t.references :source
 

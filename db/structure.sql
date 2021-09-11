@@ -144,7 +144,7 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.friendly_id_slugs (
     id bigint NOT NULL,
     slug character varying NOT NULL,
-    sluggable_id integer NOT NULL,
+    sluggable_id bigint NOT NULL,
     sluggable_type character varying(50),
     scope character varying,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -177,7 +177,7 @@ ALTER SEQUENCE public.friendly_id_slugs_id_seq OWNED BY public.friendly_id_slugs
 CREATE TABLE public.job_postings (
     id bigint NOT NULL,
     signature character varying NOT NULL,
-    status integer DEFAULT 0,
+    status bigint DEFAULT 0,
     source_id bigint,
     title character varying,
     body character varying,
@@ -367,7 +367,7 @@ CREATE TABLE public.sources (
     signature character varying NOT NULL,
     event jsonb DEFAULT '{}'::jsonb NOT NULL,
     payload jsonb DEFAULT '{}'::jsonb NOT NULL,
-    status integer DEFAULT 0,
+    status bigint DEFAULT 0,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     origin_id bigint
@@ -746,13 +746,11 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210710142759'),
 ('20210710143627'),
 ('20210710144921'),
-('20210712004243'),
 ('20210712020439'),
 ('20210712021013'),
 ('20210815003805'),
 ('20210815191413'),
 ('20210815192505'),
-('20210816000001'),
 ('20210905163739'),
 ('20210905171239');
 
