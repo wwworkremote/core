@@ -6,7 +6,7 @@ class CreatePgheroSpaceStats < ActiveRecord::Migration[6.1]
       t.text :database
       t.text :schema
       t.text :relation
-      t.integer :size, limit: 8
+      t.bigint :size, limit: 8
       t.timestamp :captured_at
     end
 
