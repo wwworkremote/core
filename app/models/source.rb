@@ -15,7 +15,11 @@ class Source < ApplicationRecord
 
   belongs_to :origin, optional: true
 
+  has_many :source_urls, dependent: :nullify
+
   before_save :assign_origin_by_url, unless: -> { origin.presence }
+
+  jsonb_accessor :payload, url: :string
 
   def assign_origin_by_url
     return if payload&.send(:[], 'url').blank?
@@ -36,7 +40,7 @@ end
 #  signature  :string           not null
 #  event      :jsonb            not null
 #  payload    :jsonb            not null
-#  status     :integer          default("pending")
+#  status     :bigint           default("pending")
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  origin_id  :bigint

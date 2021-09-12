@@ -12,7 +12,7 @@ end
 #
 #  id                 :bigint           not null, primary key
 #  signature          :string           not null
-#  status             :integer          default("pending")
+#  status             :bigint           default("pending")
 #  source_id          :bigint
 #  title              :string
 #  body               :string

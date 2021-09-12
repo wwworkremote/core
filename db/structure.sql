@@ -335,7 +335,8 @@ CREATE TABLE public.source_urls (
     path character varying,
     querystring jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    source_id bigint
 );
 
 
@@ -752,6 +753,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210815191413'),
 ('20210815192505'),
 ('20210905163739'),
-('20210905171239');
+('20210905171239'),
+('20210912002608');
 
 

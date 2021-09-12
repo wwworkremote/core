@@ -3,14 +3,32 @@
 class SourceUrl < ApplicationRecord
   belongs_to :source, optional: true
 
-  def self.create_by_uri(uri)
-    create(
+  validates :url, presence: true
+  # t.string :protocol
+  # t.string :host
+  # t.string :path
+
+  # t.jsonb :querystring, default: {}, null: false
+
+  before_validation :assign_from_url, on: :create
+
+  def assign_from_url
+    params = self.class.params_from(uri: url)
+
+    self.host = params[:host]
+    self.protocol = params[:protocol]
+    self.path = params[:path]
+    self.querystring = params[:querystring]
+  end
+
+  def self.params_from(uri:)
+    {
       url: uri.to_s,
       host: uri.host,
       protocol: uri.scheme,
       querystring: extract_querystring(uri),
       path: uri.path
-    )
+    }
   end
 
   def self.extract_querystring(uri)
