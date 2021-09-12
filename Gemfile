@@ -113,3 +113,5 @@ gem 'twitter_cldr', '~> 6.7'
 # gem 'slack-notifier'
 # gem 'twitter-text', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+
+gem 'rails-observers', '~> 0.1.5'

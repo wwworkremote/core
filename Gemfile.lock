@@ -250,6 +250,8 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.4.2)
       loofah (~> 2.3)
+    rails-observers (0.1.5)
+      activemodel (>= 4.0)
     railties (6.1.4.1)
       actionpack (= 6.1.4.1)
       activesupport (= 6.1.4.1)
@@ -408,6 +410,7 @@ DEPENDENCIES
   puma_worker_killer
   rails (~> 6.1.4, >= 6.1.4)
   rails-html-sanitizer
+  rails-observers (~> 0.1.5)
   redis
   rspec-rails
   rubocop
