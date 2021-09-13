@@ -4,11 +4,6 @@ class SourceUrl < ApplicationRecord
   belongs_to :source, optional: true
 
   validates :url, presence: true
-  # t.string :protocol
-  # t.string :host
-  # t.string :path
-
-  # t.jsonb :querystring, default: {}, null: false
 
   before_validation :assign_from_url, on: :create
 
@@ -44,16 +39,16 @@ class SourceUrl < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20210817230954
 #
 # Table name: source_urls
 #
 #  id          :bigint           not null, primary key
+#  url         :string           not null
+#  protocol    :string
 #  host        :string
 #  path        :string
-#  protocol    :string
 #  querystring :jsonb            not null
-#  url         :string           not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  source_id   :bigint
 #
