@@ -6,7 +6,7 @@ class CreateSources < ActiveRecord::Migration[6.1]
       t.string :signature, unique: true, null: false
       t.jsonb :event, default: {}, null: false
       t.jsonb :payload, default: {}, null: false
-      t.bigint :status, default: 0
+      t.bigint :status, default: 0, limit: 8
 
       t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
       t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false

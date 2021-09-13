@@ -4,9 +4,10 @@ class CreateSourceUrls < ActiveRecord::Migration[6.1]
   def change
     create_table :source_urls do |t|
       t.string :url, null: false, uniq: true
+
       t.string :protocol
       t.string :host
-      t.string :path
+      t.string :path, array: true, default: [], null: false
 
       t.jsonb :querystring, default: {}, null: false
 
