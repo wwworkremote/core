@@ -324,41 +324,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: source_urls; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.source_urls (
-    id bigint NOT NULL,
-    url character varying NOT NULL,
-    protocol character varying,
-    host character varying,
-    path character varying[] DEFAULT '{}'::character varying[] NOT NULL,
-    querystring jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: source_urls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.source_urls_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: source_urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.source_urls_id_seq OWNED BY public.source_urls.id;
-
-
---
 -- Name: sources; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -391,96 +356,6 @@ CREATE SEQUENCE public.sources_id_seq
 --
 
 ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
-
-
---
--- Name: tag_aliases; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tag_aliases (
-    id bigint NOT NULL,
-    tag_id bigint,
-    name public.citext NOT NULL,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: tag_aliases_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.tag_aliases_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tag_aliases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.tag_aliases_id_seq OWNED BY public.tag_aliases.id;
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tags (
-    id bigint NOT NULL,
-    slug character varying,
-    name public.citext,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.tags_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
-
-
---
--- Name: transform_source_urls; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.transform_source_urls AS
- SELECT t2.source_id,
-    t2.url,
-    t2.protocol,
-    t2.host,
-    t2.path,
-    qs2.querystring
-   FROM (( SELECT s.id AS source_id,
-            (url.source_url ->> 'url'::text) AS url,
-            (url.source_url ->> 'protocol'::text) AS protocol,
-            (url.source_url ->> 'host'::text) AS host,
-            split_part((url.source_url ->> 'url_path'::text), '?'::text, 1) AS path,
-            string_to_array(split_part(regexp_replace(regexp_replace((url.source_url ->> 'url_path'::text), '%5B'::text, '['::text), '%5D'::text, ']'::text), '?'::text, 2), '&'::text) AS querystring
-           FROM (public.sources s
-             LEFT JOIN LATERAL ( SELECT jsonb_object(array_agg(ts_token_type.alias), array_agg(parsed.token)) AS source_url
-                   FROM (ts_parse('default'::text, (s.payload ->> 'url'::text)) parsed(tokid, token)
-                     JOIN ts_token_type('default'::text) ts_token_type(tokid, alias, description) USING (tokid))
-                  WHERE (parsed.tokid = ANY (ARRAY[5, 14, 6, 18]))) url ON (true))) t2
-     LEFT JOIN LATERAL ( SELECT jsonb_object(array_agg(split_part(qs.qs, '='::text, 1)), array_agg(split_part(qs.qs, '='::text, 2))) AS querystring
-           FROM unnest(t2.querystring) WITH ORDINALITY qs(qs, ordinality)) qs2 ON (true));
 
 
 --
@@ -519,31 +394,10 @@ ALTER TABLE ONLY public.pghero_space_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: source_urls id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.source_urls ALTER COLUMN id SET DEFAULT nextval('public.source_urls_id_seq'::regclass);
-
-
---
 -- Name: sources id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sources ALTER COLUMN id SET DEFAULT nextval('public.sources_id_seq'::regclass);
-
-
---
--- Name: tag_aliases id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tag_aliases ALTER COLUMN id SET DEFAULT nextval('public.tag_aliases_id_seq'::regclass);
-
-
---
--- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
 
 
 --
@@ -603,35 +457,11 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: source_urls source_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.source_urls
-    ADD CONSTRAINT source_urls_pkey PRIMARY KEY (id);
-
-
---
 -- Name: sources sources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sources
     ADD CONSTRAINT sources_pkey PRIMARY KEY (id);
-
-
---
--- Name: tag_aliases tag_aliases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tag_aliases
-    ADD CONSTRAINT tag_aliases_pkey PRIMARY KEY (id);
-
-
---
--- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tags
-    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
 
 
 --
@@ -691,47 +521,11 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 
 
 --
--- Name: index_tag_aliases_on_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_tag_aliases_on_name ON public.tag_aliases USING btree (name);
-
-
---
--- Name: index_tag_aliases_on_tag_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tag_aliases_on_tag_id ON public.tag_aliases USING btree (tag_id);
-
-
---
--- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
-
-
---
--- Name: index_tags_on_slug; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_tags_on_slug ON public.tags USING btree (slug);
-
-
---
 -- Name: sources fk_rails_cbbe8839f4; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sources
     ADD CONSTRAINT fk_rails_cbbe8839f4 FOREIGN KEY (origin_id) REFERENCES public.origins(id);
-
-
---
--- Name: tag_aliases fk_rails_f56b013bd9; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tag_aliases
-    ADD CONSTRAINT fk_rails_f56b013bd9 FOREIGN KEY (tag_id) REFERENCES public.tags(id);
 
 
 --
@@ -743,14 +537,10 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210626222927'),
 ('20210703173154'),
-('20210710142759'),
-('20210710143627'),
 ('20210710144921'),
 ('20210712020439'),
 ('20210712021013'),
 ('20210815003805'),
-('20210815191413'),
-('20210815192505'),
 ('20210905163739'),
 ('20210905171239');
 
