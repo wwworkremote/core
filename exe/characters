@@ -1,0 +1,23 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+docs = JobPosting
+       .pluck(:body)
+       .take(1_000)
+       .filter_map { |jp| jp.present? && Normalize.new(jp).call }
+
+require 'sorted_set'
+characters = SortedSet.new
+
+docs.each do |d|
+  d.to_s.gsub(/\w+/, '').chars.each do |c|
+    characters << c.strip
+  end
+end
+
+list = characters.compact_blank
+list.each do |c|
+  warn("#{c} #{{ c => c.bytes }.to_json}")
+end
+warn(list.count)

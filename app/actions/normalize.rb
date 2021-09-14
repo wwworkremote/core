@@ -6,8 +6,6 @@ require 'sanitize'
 require 'rubypants'
 require 'json'
 
-# I18n.locale = :en
-
 class Normalize
   attr_reader :params
 

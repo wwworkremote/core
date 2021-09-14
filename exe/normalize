@@ -2,24 +2,27 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
+require 'sorted_set'
+
 docs = JobPosting
        .pluck(:body)
-       .take(1000)
-       .filter_map { |jp| jp.present? && Normalize.new(jp).call }
+       .take(1_000)
+       .filter_map { |jp| jp.present? && jp }
 
-require 'sorted_set'
-characters = SortedSet.new
+# .filter_map { |jp| jp.present? && Normalize.new(jp).call }
 
-docs.each do |d|
-  puts d
-
-  d.to_s.gsub(/\w+/, '').chars.each do |c|
-    characters << c.strip
+module App
+  def self.dump_words(docs)
+    words = SortedSet.new
+    docs.each do |d|
+      d.result.split(/[[:space:]]+/).each do |w|
+        words << w.strip.tr(',', '').tr(';', '').tr('"', '')
+      end
+    end
+    words.compact_blank.each { |w| puts w }
   end
 end
 
-list = characters.compact_blank
-list.each do |c|
-  warn("#{c} #{{ c => [c.ord, c.bytes, c.ord.to_s(16)] }.to_json}")
+docs.each do |d|
+  ap CLD.detect_language(d)
 end
-warn(list.count)
