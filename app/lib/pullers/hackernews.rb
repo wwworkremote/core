@@ -31,7 +31,7 @@ module Pullers
         f.use :instrumentation
         f.response :json, content_type: /\bjson$/
         f.response :encoding
-        f.response :follow_redirects
+        # f.response :follow_redirects
 
         f.adapter :typhoeus
       end
