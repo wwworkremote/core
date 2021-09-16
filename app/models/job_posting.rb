@@ -4,7 +4,6 @@ class JobPosting < ApplicationRecord
   belongs_to :source, optional: true
 
   before_validation :sign, on: :create
-  after_commit :update_source, on: :create
 
   validates :signature, presence: true
 
