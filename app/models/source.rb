@@ -31,7 +31,6 @@ end
 #  signature  :string           not null
 #  event      :jsonb            not null
 #  payload    :jsonb            not null
-#  status     :bigint           default("pending")
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  origin_id  :bigint
