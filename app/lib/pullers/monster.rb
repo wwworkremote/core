@@ -27,9 +27,10 @@ module Pullers
         f.headers[:accept_charset] = 'charset=utf-8'
 
         f.use :instrumentation
+
         f.response :xml, content_type: /\bxml$/
         f.response :encoding
-        f.response :follow_redirects
+        # f.response :follow_redirects
 
         f.adapter :typhoeus
       end
