@@ -23,13 +23,6 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
-  # Include generic and useful information about system operation, but avoid logging too much
-  # information to avoid inadvertent exposure of personally identifiable information (PII).
-  config.log_level = :info
-
-  # Prepend all log lines with the following tags.
-  config.log_tags = [:request_id]
-
   # Use a different cache store in production.
   config.cache_store = :redis_cache_store, {
     driver: :hiredis,
@@ -51,9 +44,6 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation = :log
 
   config.active_support.disallowed_deprecation_warnings = []
-
-  config.log_formatter = ::Logger::Formatter.new
-  config.colorize_logging = false
 
   # # Use a different logger for distributed setups.
   # require 'syslog/logger'
@@ -83,6 +73,10 @@ Rails.application.configure do
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
 
+  config.log_formatter = ::Logger::Formatter.new
+  config.log_tags = [:request_id]
+  config.colorize_logging = false
+  config.log_level = :info
   logger = ActiveSupport::Logger.new($stdout)
   logger.formatter = config.log_formatter
   config.logger = ActiveSupport::TaggedLogging.new(logger)

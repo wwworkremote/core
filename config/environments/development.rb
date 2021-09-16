@@ -8,7 +8,6 @@ Rails.application.configure do
   config.active_record.migration_error = :page_load
   config.active_record.verbose_query_logs = true
   config.active_support.deprecation = :log
-  config.log_level = :debug
   config.active_support.disallowed_deprecation = :raise
   config.active_support.disallowed_deprecation_warnings = []
   config.cache_classes = false
@@ -17,6 +16,9 @@ Rails.application.configure do
   config.eager_load = false
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
+  config.log_formatter = ::Logger::Formatter.new
+  config.colorize_logging = true
+  config.log_level = :info
   logger = ActiveSupport::Logger.new($stdout)
   logger.formatter = config.log_formatter
   config.logger = ActiveSupport::TaggedLogging.new(logger)
