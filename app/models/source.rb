@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
 class Source < ApplicationRecord
-  enum status: {
-    empty: -1,
-    pending: 0,
-    processed: 1
-  }, _prefix: true
-
-  scope :empty, -> { where(status: -1) }
-  scope :pending, -> { where(status: 0) }
-  scope :processed, -> { where(status: 1) }
-
   has_many :job_postings, dependent: :nullify
 
   belongs_to :origin, optional: true

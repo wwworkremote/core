@@ -5,14 +5,6 @@
 begin
   Rails.logger.info { "START exe/hackernews pid:#{Process.pid}" }
   Pullers::HackerNews.jobs
-
-  ActiveRecord::Base.connection.execute(<<~SQL.squish)
-    update sources
-    set status = 1
-    where
-      status = 0
-      and payload->>'url' = 'https://hacker-news.firebaseio.com/v0/jobstories.json'
-  SQL
 rescue StandardError => e
   # Rails.logger.error { "ERROR exe/hackernews pid:#{Process.pid} -- #{e.class}: #{e.message}" }
   # Rails.logger.error { "DEBUG exe/hackernews #{term} pid:#{Process.pid} -- #{e.backtrace.join("\n")}" }
