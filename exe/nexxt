@@ -11,7 +11,9 @@ begin
 
   Pullers::Nexxt.jobs(term: term)
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/nexxt #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  # Rails.logger.error { "ERROR exe/nexxt #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+
+  Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 ensure
   Rails.logger.info { "END exe/nexxt #{term} pid:#{Process.pid}" }
 end

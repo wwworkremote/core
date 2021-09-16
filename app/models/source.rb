@@ -28,6 +28,7 @@ class Source < ApplicationRecord
 
     self.origin_id = Origin.find_or_create_by(name: name).id
 
+    # Source.find_each { |s| s.assign_origin_by_url.save! }
     self
   end
 end

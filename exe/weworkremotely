@@ -6,7 +6,8 @@ begin
   Rails.logger.info { "START exe/weworkremotely pid:#{Process.pid}" }
   Pullers::WeWorkRemotely.jobs
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/weworkremotely pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  # Rails.logger.error { "ERROR exe/weworkremotely pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 ensure
   Rails.logger.info { "END exe/weworkremotely pid:#{Process.pid}" }
 end
