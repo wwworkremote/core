@@ -14,7 +14,10 @@ begin
       and payload->>'url' = 'https://hacker-news.firebaseio.com/v0/jobstories.json'
   SQL
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/hackernews pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  # Rails.logger.error { "ERROR exe/hackernews pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  # Rails.logger.error { "DEBUG exe/hackernews #{term} pid:#{Process.pid} -- #{e.backtrace.join("\n")}" }
+
+  Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 ensure
   Rails.logger.info { "END exe/hackernews pid:#{Process.pid}" }
 end

@@ -6,7 +6,9 @@ begin
   Rails.logger.info { "START exe/remoteok pid:#{Process.pid}" }
   Pullers::RemoteOK.jobs
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/remoteok pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  # Rails.logger.error { "ERROR exe/remoteok pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+
+  Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 ensure
   Rails.logger.info { "END exe/remoteok pid:#{Process.pid}" }
 end

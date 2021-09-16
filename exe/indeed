@@ -11,8 +11,10 @@ begin
 
   Pullers::Indeed.jobs(term: term)
 rescue StandardError => e
-  Rails.logger.error { "ERROR exe/indeed #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
-  Rails.logger.debug { "DEBUG exe/indeed #{term} pid:#{Process.pid} -- #{e.backtrace.join("\n")}" }
+  # Rails.logger.error { "ERROR exe/indeed #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
+  # Rails.logger.error { "DEBUG exe/indeed #{term} pid:#{Process.pid} -- #{e.backtrace.join("\n")}" }
+
+  Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 ensure
   Rails.logger.info { "END exe/indeed #{term} pid:#{Process.pid}" }
 end
