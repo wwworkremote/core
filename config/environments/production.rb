@@ -45,10 +45,6 @@ Rails.application.configure do
 
   config.active_support.disallowed_deprecation_warnings = []
 
-  # # Use a different logger for distributed setups.
-  # require 'syslog/logger'
-  # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new('outlier_jobs'))
-
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
@@ -77,7 +73,7 @@ Rails.application.configure do
   config.log_tags = [:request_id]
   config.colorize_logging = false
   config.log_level = :info
-  logger = ActiveSupport::Logger.new($stdout)
-  logger.formatter = config.log_formatter
-  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+  require 'syslog/logger'
+  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new('olj-core'))
 end
