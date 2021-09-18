@@ -22,7 +22,7 @@ if Rails.env.production?
     end
 
     config.lograge.keep_original_rails_log = false
-    config.lograge.formatter = Lograge::Formatters::JSON.new
+    config.lograge.formatter = Lograge::Formatters::Json.new
 
     config.lograge.custom_payload do |controller|
       ip = begin
