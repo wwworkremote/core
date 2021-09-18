@@ -18,7 +18,7 @@ gem 'lograge-sql'
 gem 'friendly_id'
 
 gem 'deepsort'
-gem 'druuid', require: false
+gem 'druuid'
 
 gem 'faraday'
 gem 'faraday-encoding'
@@ -26,7 +26,11 @@ gem 'faraday-http-cache'
 gem 'faraday_middleware'
 gem 'typhoeus'
 
+gem 'brotli'
+gem 'hashie'
 gem 'multi_xml'
+gem 'rash_alt'
+gem 'safe_yaml'
 
 gem 'hiredis'
 gem 'redis', require: %w[redis redis/connection/hiredis]

@@ -2,18 +2,8 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-begin
-  require 'shellwords'
+require 'shellwords'
 
-  term = Shellwords.escape(ARGV.first || 'programming')
+term = Shellwords.escape(ARGV.first || 'programming')
 
-  Rails.logger.info { "START exe/monster #{term} pid:#{Process.pid}" }
-
-  Pullers::Monster.jobs(term: term)
-rescue StandardError => e
-  Rails.logger.error { "ERROR exe/monster #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
-
-  raise unless Rails.env.production?
-ensure
-  Rails.logger.info { "END exe/monster #{term} pid:#{Process.pid}" }
-end
+Runners::Monster.run(term: term)
