@@ -9,6 +9,8 @@ module Pullers
 
       service.call
 
+      return {} if service.data.blank?
+
       service.data.dig('rss', 'channel', 'item')
     end
 
