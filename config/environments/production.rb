@@ -72,8 +72,8 @@ Rails.application.configure do
   config.log_formatter = ::Logger::Formatter.new
   config.log_tags = [:request_id]
   config.colorize_logging = false
-  config.log_level = :info
+  config.log_level = :debug
 
   require 'syslog/logger'
-  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new('olj-core'))
+  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new('outliers-core'))
 end
