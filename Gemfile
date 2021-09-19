@@ -48,7 +48,8 @@ gem 'pg_query', '>= 0.9.0'
 gem 'bcrypt_pbkdf', require: false
 gem 'ed25519', require: false
 
-gem 'awesome_print'
+# gem 'awesome_print'
+gem 'amazing_print'
 
 group :development, :test do
   gem 'byebug'
@@ -119,3 +120,5 @@ gem 'twitter_cldr', '~> 6.7'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
 
 # gem 'cld'
+#
+gem 'ougai'

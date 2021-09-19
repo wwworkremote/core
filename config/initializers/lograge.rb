@@ -22,7 +22,12 @@ if Rails.env.production?
     end
 
     config.lograge.keep_original_rails_log = false
-    config.lograge.formatter = Lograge::Formatters::Json.new
+    # config.lograge.formatter = Lograge::Formatters::Json.new
+    config.lograge.formatter = Class.new do |fmt|
+      def fmt.call(data)
+        { msg: 'Request', request: data }
+      end
+    end
 
     config.lograge.custom_payload do |controller|
       ip = begin
