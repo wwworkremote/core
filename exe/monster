@@ -6,4 +6,6 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
+Rails.configuration.x.context[:entrypoint] = __FILE__
+
 Runners::Monster.run(term: term)

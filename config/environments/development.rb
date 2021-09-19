@@ -2,6 +2,22 @@
 
 require 'active_support/core_ext/integer/time'
 
+module ActiveSupport
+  module TaggedLogging
+    module Formatter
+      def call(severity, time, progname, data)
+        data = { msg: data.to_s } unless data.is_a?(Hash)
+
+        tags = current_tags
+
+        data[:tags] = tags if tags.present?
+
+        _call(severity, time, progname, data)
+      end
+    end
+  end
+end
+
 Rails.application.configure do
   config.action_controller.enable_fragment_cache_logging = true
   config.action_controller.perform_caching = true
@@ -17,9 +33,12 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.log_formatter = ::Logger::Formatter.new
+  config.log_tags = %i[uuid request_id]
   config.colorize_logging = true
-  config.log_level = :info
-  logger = ActiveSupport::Logger.new($stdout)
-  logger.formatter = config.log_formatter
+  config.log_level = :debug
+
+  require 'outlier_jobs/logger'
+  logger = OutlierJobs::Logger.new($stdout)
+  logger.level = Ougai::Logger::TRACE
   config.logger = ActiveSupport::TaggedLogging.new(logger)
 end

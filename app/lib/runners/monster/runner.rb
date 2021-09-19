@@ -3,42 +3,22 @@
 module Runners
   module Monster
     class Runner
-      attr_reader :term, :runner_instance_uuid, :tag
+      attr_reader :term, :context
 
       def initialize(term:)
-        @tag = 'exe/monster'
-        @runner_instance_uuid = Druuid.gen.to_s.freeze
-        @term = term.freeze
-      end
-
-      def before
-        Rails.logger.tagged(runner_instance_uuid) do
-          Rails.logger.info { "START #{tag} #{term} pid:#{Process.pid}" }
-        end
-      end
-
-      def after
-        Rails.logger.tagged(runner_instance_uuid) do
-          Rails.logger.info { "END #{tag} #{term} pid:#{Process.pid}" }
-        end
-      end
-
-      def handle_error(err)
-        Rails.logger.tagged(runner_instance_uuid) do
-          Rails.logger.error { "ERROR #{tag} #{term} pid:#{Process.pid} -- #{err.class}: #{err.message}" }
-        end
+        @term = term.strip.freeze
+        @context = Rails.configuration.x.context.merge(term: term)
       end
 
       def call
-        before
+        Rails.logger.info(context.merge(msg: 'Start'))
 
         Pullers::Monster.pull(term: term)
       rescue StandardError => e
-        binding.pry
-        put
-        handle_error(e)
+        Rails.logger.error(e.message, context)
+        Rails.logger.debug { e }
       ensure
-        after
+        Rails.logger.info(context.merge(msg: 'End'))
       end
     end
   end

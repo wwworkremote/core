@@ -3,11 +3,11 @@
 # require Rails.root.join('lib/notifications/request_faraday_subscriber.rb')
 
 ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
-  Rails.logger.debug { event.inspect }
-
   event_json = event.as_json
   payload = event_json.delete('payload')
   signature = Digest::SHA2.hexdigest(payload.deep_sort.to_json)
+
+  context = Rails.configuration.x.context.merge(signature: signature)
 
   begin
     Source.create(
@@ -15,7 +15,10 @@ ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
       payload: payload,
       event: event_json
     )
-  rescue ActiveRecord::RecordNotUnique => e
-    Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
+  rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation => e
+    Rails.logger.debug { ['Duplicate signature', context] }
+  rescue StandardError => e
+    Rails.logger.error(e.message, context.merge(signature: signature))
+    Rails.logger.debug { e }
   end
 end
