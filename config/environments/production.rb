@@ -2,7 +2,6 @@
 
 require 'active_support/core_ext/integer/time'
 
-require 'logger'
 require 'lograge'
 require 'lograge/sql'
 require 'lograge/sql/extension'
@@ -26,6 +25,18 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
   config.i18n.fallbacks = true
   config.public_file_server.enabled = false
 
+  config.cache_store = :redis_cache_store, {
+    connect_timeout: 30, # Defaults to 20 seconds
+    driver: :hiredis,
+    namespace: 'core',
+    pool_size: 5,
+    pool_timeout: 5,
+    read_timeout: 0.2, # Defaults to 1 second
+    reconnect_attempts: 3, # Defaults to 0
+    url: 'redis://localhost:6379',
+    write_timeout: 0.2 # Defaults to 1 second
+  }
+
   config.lograge_sql.extract_event = proc do |event|
     { name: event.payload[:name], duration: event.duration.to_f.round(2), sql: event.payload[:sql] }
   end
@@ -42,7 +53,6 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
     ip = begin
       controller.request.remote_ip
     rescue ActionDispatch::RemoteIp::IpSpoofAttackError
-      nil
     end
 
     { ip: ip }
@@ -103,29 +113,27 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
     {}
   end
 
-  device = OutlierJobs::SyslogDevice.new('outlierjobs-core')
+  progname = 'outlierjobs-core'
+  device = OutlierJobs::SyslogDevice.new(prognam)
   logger = OutlierJobs::Logger.new(device)
   logger.default_message = 'N/A'
   logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
 
-  # config.log_formatter = proc do |severity, time, progname, data|
-  #   data = { msg: data.to_s } unless data.is_a?(Hash)
-  #   tags = current_tags
-  #   data[:tags] = tags if tags.present?
-  #   _call(severity, time, progname, data)
-  # end
+  config.log_formatter = proc do |severity, time, progname, data|
+    data = { msg: data.to_s } unless data.is_a?(Hash)
+    tags = current_tags
+    data[:tags] = tags if tags.present?
+    _call(severity, time, progname, data)
+  end
 
-  # timestamp: Time.now.utc.to_json.tr('"', '').strip.freeze,
   logger.with_fields = {
-    name: 'outlierjobs-core',
+    name: progname,
     hostname: Socket.gethostname,
     instance_id: Druuid.gen.to_s.freeze,
     pid: Process.pid
   }.freeze
 
-  # config.log_tags = [:name, Socket.gethostname, :uuid, :request_id]
   config.log_level = :debug
-  # config.logger = ActiveSupport::TaggedLogging.new(logger)
   config.logger = logger
 
   config.lograge.enabled = true
