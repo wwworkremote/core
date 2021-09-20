@@ -7,6 +7,7 @@ module OutlierJobs
 
     def initialize(*args)
       super
+
       after_initialize if respond_to? :after_initialize
     end
 
