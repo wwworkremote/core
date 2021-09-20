@@ -78,21 +78,21 @@ Rails.application.configure do
     _call(severity, time, progname, data)
   end
 
-  # logger = OutlierJobs::Logger.new(SyslogDevice.new)
   device = SyslogDevice.new('outlierjobs-core')
-  # logger = Ougai::Logger.new(device)
   logger = OutlierJobs::Logger.new(device)
-  # logger.level = Ougai::Logger::WARN
   logger.default_message = 'N/A'
   logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
 
   logger.with_fields = { timestamp: Time.now.utc.to_json.tr('"', ''), instance_id: Druuid.gen.to_s.freeze, pid: Process.pid }
 
   config.log_tags = %i[request_id]
-  config.log_level = :warn
+  config.log_level = :debug
   config.logger = ActiveSupport::TaggedLogging.new(logger)
 end
 
+# logger = OutlierJobs::Logger.new(SyslogDevice.new)
+# logger = Ougai::Logger.new(device)
+# logger.level = Ougai::Logger::WARN
 # syslogger = Syslog::Logger.new('outliers-core')
 # logger.extend Ougai::Logger.broadcast(syslogger)
 # config.log_level = logger.level
