@@ -4,11 +4,8 @@ module Runners
   module StackOverflow
     module_function
 
-    def run(term:, logger:)
-      Runner.new(
-        term: term,
-        logger: logger
-      ).call
+    def run(term:)
+      Runners::StackOverflow::Runner.new(term: term).call
     end
   end
 end

@@ -4,7 +4,7 @@ module Pullers
   module StackOverflow
     module_function
 
-    def jobs(term = 'ruby')
+    def pull(term: nil)
       service = StackOverflow::Jobs::Feed.new(term: term.presence)
 
       service.call

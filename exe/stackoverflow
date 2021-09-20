@@ -6,4 +6,6 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-Runners::StackOverflow.run(term: term, logger: Rails.logger)
+Rails.logger = Rails.logger.child(term: term, entrypoint: __FILE__)
+
+Runners::StackOverflow.run(term: term)
