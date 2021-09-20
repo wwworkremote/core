@@ -2,6 +2,22 @@
 
 require 'active_support/core_ext/integer/time'
 
+module ActiveSupport
+  module TaggedLogging
+    module Formatter
+      def call(severity, time, progname, data)
+        data = { msg: data.to_s } unless data.is_a?(Hash)
+
+        tags = current_tags
+
+        data[:tags] = tags if tags.present?
+
+        _call(severity, time, progname, data)
+      end
+    end
+  end
+end
+
 Rails.application.configure do
   config.cache_classes = true
   config.eager_load = true
