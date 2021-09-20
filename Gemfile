@@ -13,6 +13,7 @@ gem 'scenic'
 
 gem 'lograge'
 gem 'lograge-sql'
+gem 'ougai'
 
 # gem 'babosa', require: false
 gem 'friendly_id'
@@ -48,7 +49,6 @@ gem 'pg_query', '>= 0.9.0'
 gem 'bcrypt_pbkdf', require: false
 gem 'ed25519', require: false
 
-# gem 'awesome_print'
 gem 'amazing_print'
 
 group :development, :test do
@@ -121,4 +121,3 @@ gem 'twitter_cldr', '~> 6.7'
 
 # gem 'cld'
 #
-gem 'ougai'
