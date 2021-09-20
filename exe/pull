@@ -1,0 +1,26 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+require 'shellwords'
+
+term = Shellwords.escape(ARGV.first || 'programming')
+
+Rails.logger = Rails.logger.child(
+  term: term,
+  entrypoint: __FILE__
+)
+
+[
+  Runners::HackerNews,
+  Runners::Indeed,
+  Runners::Monster,
+  Runners::Nexxt,
+  Runners::RemoteOK,
+  Runners::RemotePython,
+  Runners::StackOverflow,
+  Runners::WeWorkRemotely
+].each do |runner|
+  runner.run(term: term)
+rescue StandardError
+end
