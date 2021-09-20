@@ -20,8 +20,8 @@ module OutlierJobs
       LEVEL_MAP[Rails.logger&.level || ::Logger::DEBUG]
     end
 
-    def initialize(prog_name)
-      @log = Syslog.open(prog_name)
+    def initialize(progname)
+      @log = Syslog.open(progname)
       apply_syslog_mask
     end
 

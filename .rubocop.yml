@@ -91,6 +91,9 @@ Rails/Date:
   Exclude:
     - 'config/schedule.rb'
 
+Rails/Output:
+  Enabled: false
+
 Lint/SuppressedException:
   Enabled: false
 
