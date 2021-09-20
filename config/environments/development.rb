@@ -40,5 +40,10 @@ Rails.application.configure do
   require 'outlier_jobs/logger'
   logger = OutlierJobs::Logger.new($stdout)
   logger.level = Ougai::Logger::TRACE
+  logger.with_fields = {
+    timestamp: Time.now.utc.to_json,
+    instance_id: Druuid.gen.to_s.freeze,
+    pid: Process.pid
+  }
   config.logger = ActiveSupport::TaggedLogging.new(logger)
 end
