@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Runner
+module Runners
   module RemotePython
     module_function
 

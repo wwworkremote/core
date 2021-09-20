@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Runner
+module Runners
   module WeWorkRemotely
     module_function
 
