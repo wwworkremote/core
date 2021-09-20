@@ -7,7 +7,7 @@ module Pullers
     # Errno::ECONNREFUSED
     # Redis::CannotConnectError
 
-    def jobs(term: nil)
+    def pull(term: nil)
       service = Pullers::Indeed::Feed.new(term: term.presence)
 
       service.call
@@ -31,7 +31,6 @@ module Pullers
         f.use :instrumentation
         f.response :xml, content_type: /\bxml$/
         f.response :encoding
-        # f.response :follow_redirects
 
         f.adapter :typhoeus
       end

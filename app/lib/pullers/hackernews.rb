@@ -4,7 +4,7 @@ module Pullers
   module HackerNews
     module_function
 
-    def jobs
+    def pull(*)
       jobstories = V0::Jobstories.new.call
 
       service = V0::Item::Jobs.new(
@@ -31,7 +31,6 @@ module Pullers
         f.use :instrumentation
         f.response :json, content_type: /\bjson$/
         f.response :encoding
-        # f.response :follow_redirects
 
         f.adapter :typhoeus
       end

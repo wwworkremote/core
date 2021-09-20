@@ -4,7 +4,7 @@ module Pullers
   module WeWorkRemotely
     module_function
 
-    def jobs
+    def pull(*)
       service = WeWorkRemotely::Feed.new
 
       service.call
@@ -27,7 +27,6 @@ module Pullers
         f.use :instrumentation
         f.response :xml, content_type: /\bxml$/
         f.response :encoding
-        # f.response :follow_redirects
 
         f.adapter :typhoeus
       end
