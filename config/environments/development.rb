@@ -32,7 +32,6 @@ Rails.application.configure do
   config.eager_load = false
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # config.log_formatter = ::Logger::Formatter.new
   config.log_formatter = proc do |severity, time, progname, data|
     data = { msg: data.to_s } unless data.is_a?(Hash)
 
@@ -42,17 +41,18 @@ Rails.application.configure do
 
     _call(severity, time, progname, data)
   end
-  config.log_tags = %i[uuid request_id]
   config.colorize_logging = true
   config.log_level = :debug
 
   require 'outlier_jobs/logger'
   logger = OutlierJobs::Logger.new($stdout)
-  logger.level = Ougai::Logger::TRACE
+
   logger.with_fields = {
     timestamp: Time.now.utc.to_json.tr('"', ''),
     instance_id: Druuid.gen.to_s.freeze,
     pid: Process.pid
   }
+
+  config.log_tags = %i[request_id]
   config.logger = ActiveSupport::TaggedLogging.new(logger)
 end

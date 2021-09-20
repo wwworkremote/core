@@ -69,11 +69,29 @@ Rails.application.configure do
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
 
-  config.log_formatter = ::Logger::Formatter.new
-  config.log_tags = [:request_id]
-  config.colorize_logging = false
-  config.log_level = :debug
+  config.log_formatter = proc do |severity, time, progname, data|
+    data = { msg: data.to_s } unless data.is_a?(Hash)
+
+    tags = current_tags
+
+    data[:tags] = tags if tags.present?
+
+    _call(severity, time, progname, data)
+  end
+
+  require 'outlier_jobs/logger'
+  logger = OutlierJobs::Logger.new($stdout)
 
   require 'syslog/logger'
-  config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new('outliers-core'))
+  syslogger = Syslog::Logger.new('outliers-core')
+  logger.extend Ougai::Logger.broadcast(syslogger)
+
+  logger.with_fields = {
+    timestamp: Time.now.utc.to_json.tr('"', ''),
+    instance_id: Druuid.gen.to_s.freeze,
+    pid: Process.pid
+  }
+
+  config.log_tags = %i[request_id]
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
 end
