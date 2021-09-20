@@ -2,18 +2,10 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-begin
-  require 'shellwords'
+require 'shellwords'
 
-  term = Shellwords.escape(ARGV.first || 'programming')
+term = Shellwords.escape(ARGV.first || 'programming')
 
-  Rails.logger.info { "START exe/nexxt #{term} pid:#{Process.pid}" }
+Rails.logger = Rails.logger.child(term: term, entrypoint: __FILE__)
 
-  Pullers::Nexxt.jobs(term: term)
-rescue StandardError => e
-  # Rails.logger.error { "ERROR exe/nexxt #{term} pid:#{Process.pid} -- #{e.class}: #{e.message}" }
-
-  Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
-ensure
-  Rails.logger.info { "END exe/nexxt #{term} pid:#{Process.pid}" }
-end
+Runners::Nexxt.run(term: term)
