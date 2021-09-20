@@ -113,21 +113,15 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
     {}
   end
 
-  progname = 'outlierjobs-core'
-  device = OutlierJobs::SyslogDevice.new(prognam)
+  prog_name = 'outlierjobs-core'
+
+  device = OutlierJobs::SyslogDevice.new(prog_name)
   logger = OutlierJobs::Logger.new(device)
   logger.default_message = 'N/A'
   logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
 
-  config.log_formatter = proc do |severity, time, progname, data|
-    data = { msg: data.to_s } unless data.is_a?(Hash)
-    tags = current_tags
-    data[:tags] = tags if tags.present?
-    _call(severity, time, progname, data)
-  end
-
   logger.with_fields = {
-    name: progname,
+    name: prog_name,
     hostname: Socket.gethostname,
     instance_id: Druuid.gen.to_s.freeze,
     pid: Process.pid
