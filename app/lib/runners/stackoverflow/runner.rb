@@ -3,37 +3,23 @@
 module Runners
   module StackOverflow
     class Runner
-      attr_reader :term, :runner_instance_uuid, :tag
+      attr_reader :term
 
       def initialize(term:)
-        @tag = 'exe/stackoverflow'
-        @runner_instance_uuid = Druuid.gen.to_s.freeze
-        @term = term.freeze
-      end
-
-      def action
-        Pullers::StackOverflow.jobs(term: term)
-      end
-
-      def before
-        # logger.tagged(runner_instance_uuid) { logger.info { "START #{tag} #{term} pid:#{Process.pid}" } }
-      end
-
-      def after
-        # logger.tagged(runner_instance_uuid) { logger.info { "END #{tag} #{term} pid:#{Process.pid}" } }
-      end
-
-      def error(err)
-        # logger.tagged(runner_instance_uuid) { logger.error { "ERROR #{tag} #{term} pid:#{Process.pid} -- #{err.class}: #{err.message}" } }
+        @term = term.strip.freeze
       end
 
       def call
-        before
-        action
+        Rails.logger.info('Begin')
+
+        Pullers::StackOverflow.pull(term: term)
+
+        Rails.logger.info('Complete')
       rescue StandardError => e
-        error(e)
+        Rails.logger.error(e.message)
+        Rails.logger.debug { e }
       ensure
-        after
+        Rails.logger.info('End')
       end
     end
   end

@@ -3,22 +3,23 @@
 module Runners
   module Monster
     class Runner
-      attr_reader :term, :context
+      attr_reader :term
 
       def initialize(term:)
         @term = term.strip.freeze
-        @context = Rails.configuration.x.context.merge(term: term)
       end
 
       def call
-        Rails.logger.info(context.merge(msg: 'Start'))
+        Rails.logger.info('Begin')
 
         Pullers::Monster.pull(term: term)
+
+        Rails.logger.info('Complete')
       rescue StandardError => e
-        Rails.logger.error(e.message, context)
+        Rails.logger.error(e.message)
         Rails.logger.debug { e }
       ensure
-        Rails.logger.info(context.merge(msg: 'End'))
+        Rails.logger.info('End')
       end
     end
   end
