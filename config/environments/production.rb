@@ -3,60 +3,15 @@
 require 'active_support/core_ext/integer/time'
 
 require 'logger'
-require 'syslog'
-require 'syslog/logger'
+require 'lograge'
+require 'lograge/sql'
+require 'lograge/sql/extension'
 require 'outlier_jobs/logger'
+require 'outlier_jobs/syslog_device'
 
-module ActiveSupport
-  module TaggedLogging
-    module Formatter
-      def call(severity, time, progname, data)
-        data = { msg: data.to_s } unless data.is_a?(Hash)
+LOGRAGE_EXCEPTIONS = %w[controller action format id utf8].freeze
 
-        tags = current_tags
-
-        data[:tags] = tags if tags.present?
-
-        _call(severity, time, progname, data)
-      end
-    end
-  end
-end
-
-class SyslogDevice
-  LEVEL_MAP = {
-    ::Logger::UNKNOWN => Syslog::LOG_ALERT,
-    ::Logger::FATAL => Syslog::LOG_ERR,
-    ::Logger::ERROR => Syslog::LOG_WARNING,
-    ::Logger::WARN => Syslog::LOG_NOTICE,
-    ::Logger::INFO => Syslog::LOG_INFO,
-    ::Logger::DEBUG => Syslog::LOG_DEBUG
-  }.freeze
-
-  def syslog_level
-    LEVEL_MAP[Rails.logger&.level || ::Logger::DEBUG]
-  end
-
-  def initialize(prog_name)
-    @log = Syslog.open(prog_name)
-    update_syslog_mask
-  end
-
-  def write(message)
-    update_syslog_mask
-    @log.log(syslog_level, message)
-  end
-
-  def update_syslog_mask
-    Syslog.mask = Syslog::LOG_UPTO(syslog_level) if Syslog.mask != Syslog::LOG_UPTO(syslog_level)
-  end
-
-  def close
-    @log.close
-  end
-end
-
-Rails.application.configure do
+Rails.application.configure do # rubocop:disable Metrics/BlockLength
   # config.require_master_key = true
   config.action_controller.perform_caching = true
   config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
@@ -78,22 +33,98 @@ Rails.application.configure do
     _call(severity, time, progname, data)
   end
 
-  device = SyslogDevice.new('outlierjobs-core')
+  config.lograge_sql.extract_event = proc do |event|
+    { name: event.payload[:name], duration: event.duration.to_f.round(2), sql: event.payload[:sql] }
+  end
+
+  config.lograge_sql.formatter = proc { |sql_queries| sql_queries }
+
+  # config.lograge.keep_original_rails_log = false
+  config.lograge.formatter = Class.new do |fmt|
+    def fmt.call(data)
+      { msg: 'Request', request: data }
+    end
+  end
+
+  config.lograge.custom_payload do |controller|
+    ip = begin
+      controller.request.remote_ip
+    rescue ActionDispatch::RemoteIp::IpSpoofAttackError
+      nil
+    end
+
+    { ip: ip }
+  rescue StandardError => e
+    Rails.logger.warn { "Failed to append custom payload: #{e.message}\n#{e.backtrace.join("\n")}" }
+
+    {}
+  end
+
+  config.lograge.custom_options = lambda do |event|
+    params = event.payload[:params].except(*LOGRAGE_EXCEPTIONS)
+
+    if (file = params[:file]) && file.respond_to?(:headers)
+      params[:file] = file.headers
+    end
+
+    if (files = params[:files]) && files.respond_to?(:map)
+      params[:files] = files.map do |f|
+        f.respond_to?(:headers) ? f.headers : f
+      end
+    end
+
+    output = { params: params.to_query }
+
+    data = (Thread.current[:_method_profiler] || event.payload[:timings])
+
+    if data
+      sql = data[:sql]
+
+      if sql
+        output[:db] = sql[:duration] * 1000
+        output[:db_calls] = sql[:calls]
+      end
+
+      redis = data[:redis]
+
+      if redis
+        output[:redis] = redis[:duration] * 1000
+        output[:redis_calls] = redis[:calls]
+      end
+
+      net = data[:net]
+
+      if net
+        output[:net] = net[:duration] * 1000
+        output[:net_calls] = net[:calls]
+      end
+    end
+
+    output[:level] = event.payload[:level]
+    output[:type] = :rails
+    output[:environment] = Rails.env
+
+    output
+  rescue StandardError => e
+    Rails.logger.warn { "Failed to append custom options: #{e.message}\n#{e.backtrace.join("\n")}" }
+
+    {}
+  end
+
+  device = OutlierJobs::SyslogDevice.new('outlierjobs-core')
   logger = OutlierJobs::Logger.new(device)
   logger.default_message = 'N/A'
   logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
 
-  logger.with_fields = { timestamp: Time.now.utc.to_json.tr('"', ''), instance_id: Druuid.gen.to_s.freeze, pid: Process.pid }
+  logger.with_fields = {
+    timestamp: Time.now.utc.to_json.tr('"', '').strip.freeze,
+    instance_id: Druuid.gen.to_s.freeze,
+    pid: Process.pid
+  }.freeze
 
-  config.log_tags = %i[request_id]
+  config.log_tags = [Socket.gethostname, :uuid, :request_id]
   config.log_level = :debug
   config.logger = ActiveSupport::TaggedLogging.new(logger)
-end
 
-# logger = OutlierJobs::Logger.new(SyslogDevice.new)
-# logger = Ougai::Logger.new(device)
-# logger.level = Ougai::Logger::WARN
-# syslogger = Syslog::Logger.new('outliers-core')
-# logger.extend Ougai::Logger.broadcast(syslogger)
-# config.log_level = logger.level
-# logger.level = Ougai::Logger::DEBUG
+  config.lograge.enabled = true
+end
