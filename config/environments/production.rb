@@ -39,7 +39,6 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
 
   config.lograge_sql.formatter = proc { |sql_queries| sql_queries }
 
-  # config.lograge.keep_original_rails_log = false
   config.lograge.formatter = Class.new do |fmt|
     def fmt.call(data)
       { msg: 'Request', request: data }
