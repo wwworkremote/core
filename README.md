@@ -3,7 +3,7 @@
 Praca Zdalna
 
 
-## Update Sources with no results
+## Example source queries 
 
 ```
 where
