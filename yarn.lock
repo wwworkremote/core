@@ -50,9 +50,9 @@ pino-std-serializers@^4.0.0:
   integrity sha512-cK0pekc1Kjy5w9V2/n+8MkZwusa6EyyxfeQCB799CQRhRt/CqYKiWs5adeu8Shve2ZNffvfC/7J64A2PJo1W/Q==
 
 pino@^7.0.0-rc.5:
-  version "7.0.0-rc.5"
-  resolved "https://registry.yarnpkg.com/pino/-/pino-7.0.0-rc.5.tgz#126c891d8a2b754a669f28586b00f24378dd22dd"
-  integrity sha512-L6b5jNXQro06CYGRcn889a8vjBTmPj73dJq5PuNjm90fJcmthtuBJtoHvE+PRNSLaVsMMaPxVKIVm4JD6eM+/Q==
+  version "7.0.0-rc.6"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-7.0.0-rc.6.tgz#8bdaabe59d787e323617cb66032c173e2d64c474"
+  integrity sha512-hlA8UAvtDW+5rZincQU7XZFwJRVXOke5JmlP1yvBZeliobAhU98p6a9Hd7Ur9iwqzDk4IoB+Sg1o9xEWlskZ3w==
   dependencies:
     fast-redact "^3.0.0"
     fastify-warning "^0.2.0"
@@ -66,9 +66,9 @@ pino@^7.0.0-rc.5:
     thread-stream "^0.11.1"
 
 quick-format-unescaped@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.3.tgz#6d6b66b8207aa2b35eef12be1421bb24c428f652"
-  integrity sha512-MaL/oqh02mhEo5m5J2rwsVL23Iw2PEaGVHgT2vFt8AAsr0lfvQA5dpXo9TPu0rz7tSBdUPgkbam0j/fj5ZM8yg==
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
+  integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
 readable-stream@^3.0.0:
   version "3.6.0"

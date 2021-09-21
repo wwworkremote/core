@@ -98,9 +98,11 @@ gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~> 6.7'
 
+
 # gem 'active_median'
 # gem 'ancestry'
 # gem 'blingfire' # https://github.com/ankane/blingfire
+# gem 'cld'
 # gem 'connection_pool'
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'fugit'
@@ -118,6 +120,3 @@ gem 'twitter_cldr', '~> 6.7'
 # gem 'slack-notifier'
 # gem 'twitter-text', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
-
-# gem 'cld'
-#

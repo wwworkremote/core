@@ -25,17 +25,17 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
   config.i18n.fallbacks = true
   config.public_file_server.enabled = false
 
-  config.cache_store = :redis_cache_store, {
-    connect_timeout: 30, # Defaults to 20 seconds
-    driver: :hiredis,
-    namespace: 'core',
-    pool_size: 5,
-    pool_timeout: 5,
-    read_timeout: 0.2, # Defaults to 1 second
-    reconnect_attempts: 3, # Defaults to 0
-    url: 'redis://localhost:6379',
-    write_timeout: 0.2 # Defaults to 1 second
-  }
+  # config.cache_store = :redis_cache_store, {
+  #   connect_timeout: 30, # Defaults to 20 seconds
+  #   driver: :hiredis,
+  #   namespace: 'core',
+  #   pool_size: 5,
+  #   pool_timeout: 5,
+  #   read_timeout: 0.2, # Defaults to 1 second
+  #   reconnect_attempts: 3, # Defaults to 0
+  #   url: 'redis://localhost:6379',
+  #   write_timeout: 0.2 # Defaults to 1 second
+  # }
 
   config.lograge_sql.extract_event = proc do |event|
     { name: event.payload[:name], duration: event.duration.to_f.round(2), sql: event.payload[:sql] }
