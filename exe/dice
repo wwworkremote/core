@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+mkdir -p /home/deploy/projects/outlier_jobs/core/shared/log/
+mkdir -p /home/deploy/projects/outlier_jobs/core/shared/data/dice/
+touch /home/deploy/projects/outlier_jobs/core/shared/log/cron_production.log
+
 DATE="$(date -u +'%Y-%m-%d')"
 mkdir -p "/home/deploy/projects/outlier_jobs/core/shared/data/dice/$DATE"
 cd "/home/deploy/projects/outlier_jobs/core/shared/data/dice/$DATE" || exit
