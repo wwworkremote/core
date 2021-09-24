@@ -59,11 +59,9 @@ begin
     end
   end
 rescue NoMethodError => e
-  # Sentry.capture_exception(e)
   Rails.logger.error { "ERROR:NO_METHOD exe/job_postings pid:#{Process.pid} -- #{e.class}: #{e.message}" }
   Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 rescue NoMatchingPatternError => e
-  # Sentry.capture_exception(e)
   Rails.logger.warn { "ERROR:NO_MATCHING_PATTERN exe/job_postings pid:#{Process.pid} -- #{e.class}: #{e.message}" }
   Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
 rescue StandardError => e
