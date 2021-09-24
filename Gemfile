@@ -115,8 +115,6 @@ gem 'twitter_cldr', '~> 6.7'
 # gem 'rainbow'
 # gem 'rollups' # https://github.com/ankane/rollup
 # gem 'safely_block' # https://github.com/ankane/safely
-# gem 'sentry-rails'
-# gem 'sentry-ruby'
 # gem 'slack-notifier'
 # gem 'twitter-text', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome

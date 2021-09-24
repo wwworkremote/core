@@ -40,10 +40,6 @@ AllCops:
     - 'exe/all'
     - 'exe/dice'
 
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'config/initializers/sentry.rb'
-
 Style/Documentation:
   Enabled: false
 

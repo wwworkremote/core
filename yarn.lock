@@ -50,9 +50,9 @@ pino-std-serializers@^4.0.0:
   integrity sha512-cK0pekc1Kjy5w9V2/n+8MkZwusa6EyyxfeQCB799CQRhRt/CqYKiWs5adeu8Shve2ZNffvfC/7J64A2PJo1W/Q==
 
 pino@^7.0.0-rc.5:
-  version "7.0.0-rc.6"
-  resolved "https://registry.yarnpkg.com/pino/-/pino-7.0.0-rc.6.tgz#8bdaabe59d787e323617cb66032c173e2d64c474"
-  integrity sha512-hlA8UAvtDW+5rZincQU7XZFwJRVXOke5JmlP1yvBZeliobAhU98p6a9Hd7Ur9iwqzDk4IoB+Sg1o9xEWlskZ3w==
+  version "7.0.0-rc.7"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-7.0.0-rc.7.tgz#1959a9e7f5ddd43c1c4f3567d8d4580b2d423074"
+  integrity sha512-UN/Ax/jyLX+GKCl4Rhe4Ny+GFWwWgcAb2lIDjGUw0IrCxyfZ4o0a27NUZLPzlP2KIk3PH55YbhkYZ8+eKuXuPA==
   dependencies:
     fast-redact "^3.0.0"
     fastify-warning "^0.2.0"
