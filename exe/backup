@@ -15,7 +15,7 @@ for host in {malina101,malina102,malina103,malina104,malina108,jagodka105} ; do
 
   mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/nginx/sites-available/
   mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/redis/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/systemd/
+  mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/systemd/system/
   mkdir -p ~/projects/outlier_jobs/hosts/$host/mike/
   mkdir -p ~/projects/outlier_jobs/hosts/$host/root/
   mkdir -p ~/projects/outlier_jobs/hosts/$host/var/lib/postgres/data/
@@ -53,8 +53,11 @@ for host in {malina101,malina102,malina103,malina104,malina108,jagodka105} ; do
   ssh $host "sudo cp /etc/nginx/sites-available/dashboard ~/backup/"
   ssh $host "sudo cp /etc/redis/redis.conf ~/backup/"
   ssh $host "sudo cp /etc/rsyslog.conf ~/backup/"
+  ssh $host "sudo cp /etc/sudoers ~/backup/"
   ssh $host "sudo cp /etc/systemd/journald.conf ~/backup/"
   ssh $host "sudo cp /etc/systemd/puma.service ~/backup/"
+  ssh $host "sudo cp /etc/systemd/system/data-backup.automount ~/backup/"
+  ssh $host "sudo cp /etc/systemd/system/data-backup.mount ~/backup/"
   ssh $host "sudo cp /var/lib/postgres/data/pg_hba.conf ~/backup/"
   ssh $host "sudo cp /var/lib/postgres/data/postgresql.conf ~/backup/"
 
@@ -79,8 +82,11 @@ for host in {malina101,malina102,malina103,malina104,malina108,jagodka105} ; do
   scp $host:~/backup/puma.service    ~/projects/outlier_jobs/hosts/$host/etc/systemd/
   scp $host:~/backup/redis.conf      ~/projects/outlier_jobs/hosts/$host/etc/redis/
   scp $host:~/backup/rsyslog.conf    ~/projects/outlier_jobs/hosts/$host/etc/
+  scp $host:~/backup/sudoers    ~/projects/outlier_jobs/hosts/$host/etc/
 
-  ssh $host cat /etc/sudoers >!  ~/projects/outlier_jobs/hosts/$host/etc/sudoers
+  scp $host:~/backup/data-backup.mount    ~/projects/outlier_jobs/hosts/$host/etc/systemd/system/
+  scp $host:~/backup/data-backup.automount    ~/projects/outlier_jobs/hosts/$host/etc/systemd/system/
+
   ssh $host cat /etc/group >!  ~/projects/outlier_jobs/hosts/$host/etc/group
   ssh $host cat /etc/passwd >! ~/projects/outlier_jobs/hosts/$host/etc/passwd
   ssh $host cat /etc/hosts >! ~/projects/outlier_jobs/hosts/$host/etc/hosts
