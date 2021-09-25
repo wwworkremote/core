@@ -6,13 +6,13 @@ default: &default
 
 development:
   <<: *default
-  # database: wwwork_remote_development
-  url: <%= ENV.fetch('WWWORK_REMOTE_DATABASE_URL', 'postgres://wwwork_remote:window.snow@malina108/wwwork_remote_production') %>
+  # database: wwworkremote_development
+  url: <%= ENV.fetch('WWWORKREMOTE_DATABASE_URL', 'postgres://wwworkremote:window.snow@malina108/wwworkremote_production') %>
 
 test:
   <<: *default
-  database: wwwork_remote_test
+  database: wwworkremote_test
 
 production:
   <<: *default
-  url: <%= ENV.fetch('WWWORK_REMOTE_DATABASE_URL', 'postgres://wwwork_remote:window.snow@malina108/wwwork_remote_production') %>
+  url: <%= ENV.fetch('WWWORKREMOTE_DATABASE_URL', 'postgres://wwworkremote:window.snow@malina108/wwworkremote_production') %>

@@ -49,7 +49,7 @@ Rails.application.configure do
   config.colorize_logging = !Rails.env.production?
   config.log_level = :debug
 
-  require 'wwwork_remote/logger'
+  require 'wwworkremote/logger'
   logger = WwworkRemote::Logger.new($stdout)
 
   logger.with_fields = {
