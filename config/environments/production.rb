@@ -2,8 +2,8 @@
 
 require 'active_support/core_ext/integer/time'
 
-require 'wwwork_remote/logger'
-require 'wwwork_remote/syslog_device'
+require 'wwworkremote/logger'
+require 'wwworkremote/syslog_device'
 
 Rails.application.configure do
   # config.require_master_key = true
