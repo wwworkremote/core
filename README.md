@@ -1,6 +1,6 @@
 # README
 
-Praca Zdalna
+wwworkremote
 
 Oh. HI!
 

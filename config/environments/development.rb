@@ -27,10 +27,15 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation = :raise
   config.active_support.disallowed_deprecation_warnings = []
   config.cache_classes = false
-  config.cache_store = :redis_cache_store, { url: 'redis://localhost:6379/0', driver: :hiredis, namespace: 'out' }
   config.consider_all_requests_local = true
   config.eager_load = false
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  config.cache_store = :redis_cache_store, {
+    url: 'redis://localhost:6379/0',
+    driver: :hiredis,
+    namespace: 'wwwr::dev'
+  }
 
   config.log_formatter = proc do |severity, time, progname, data|
     data = { msg: data.to_s } unless data.is_a?(Hash)
@@ -41,7 +46,7 @@ Rails.application.configure do
 
     _call(severity, time, progname, data)
   end
-  config.colorize_logging = true
+  config.colorize_logging = !Rails.env.production?
   config.log_level = :debug
 
   require 'outlier_jobs/logger'
