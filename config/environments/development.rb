@@ -49,8 +49,8 @@ Rails.application.configure do
   config.colorize_logging = !Rails.env.production?
   config.log_level = :debug
 
-  require 'outlier_jobs/logger'
-  logger = OutlierJobs::Logger.new($stdout)
+  require 'wwwork_remote/logger'
+  logger = WwworkRemote::Logger.new($stdout)
 
   logger.with_fields = {
     timestamp: Time.now.utc.to_json.tr('"', ''),

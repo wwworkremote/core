@@ -6,13 +6,13 @@ default: &default
 
 development:
   <<: *default
-  # database: outlier_jobs_development
-  url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL', 'postgres://outlier_jobs:window.snow@malina108/outlier_jobs_production') %>
+  # database: wwwork_remote_development
+  url: <%= ENV.fetch('WWWORK_REMOTE_DATABASE_URL', 'postgres://wwwork_remote:window.snow@malina108/wwwork_remote_production') %>
 
 test:
   <<: *default
-  database: outlier_jobs_test
+  database: wwwork_remote_test
 
 production:
   <<: *default
-  url: <%= ENV.fetch('OUTLIER_JOBS_DATABASE_URL', 'postgres://outlier_jobs:window.snow@malina108/outlier_jobs_production') %>
+  url: <%= ENV.fetch('WWWORK_REMOTE_DATABASE_URL', 'postgres://wwwork_remote:window.snow@malina108/wwwork_remote_production') %>

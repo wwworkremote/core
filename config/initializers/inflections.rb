@@ -2,8 +2,6 @@
 
 DOMAIN_WORDS = %w[
   API
-  OutlierJob
-  OutlierJobs
   AngelList
   BigDataJobs
   BuiltIn
@@ -12,8 +10,8 @@ DOMAIN_WORDS = %w[
   Dice
   FindWork
   FullstackJobs
-  GitLab
   GitHub
+  GitLab
   HackerNews
   Indeed
   MeerkAds
@@ -33,6 +31,9 @@ DOMAIN_WORDS = %w[
   WeWorkRemotely
   WhoIsHiring
   WrkIs
+  Wwwork
+  WwworkRemote
+  Wwwr
   ZipRecruiter
 ].freeze
 

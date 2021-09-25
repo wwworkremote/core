@@ -1,6 +1,6 @@
 # README
 
-wwworkremote
+WwworkRemote
 
 Oh. HI!
 

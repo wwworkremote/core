@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::RemotePython/1.0
+      - WwworkRemote::RemotePython/1.0
       Accept:
       - application/rss+xml;charset=utf-8
       Expect:
@@ -45,7 +45,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::RemotePython/1.0
+      - WwworkRemote::RemotePython/1.0
       Accept:
       - application/rss+xml;charset=utf-8
       Expect:

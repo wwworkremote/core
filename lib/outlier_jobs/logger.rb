@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module OutlierJobs
+module WwworkRemote
   class Logger < Ougai::Logger
     include ActiveSupport::LoggerThreadSafeLevel
     include ActiveSupport::LoggerSilence if defined?(ActiveSupport::LoggerSilence)

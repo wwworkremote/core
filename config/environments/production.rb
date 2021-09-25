@@ -2,8 +2,8 @@
 
 require 'active_support/core_ext/integer/time'
 
-require 'outlier_jobs/logger'
-require 'outlier_jobs/syslog_device'
+require 'wwwork_remote/logger'
+require 'wwwork_remote/syslog_device'
 
 Rails.application.configure do
   # config.require_master_key = true
@@ -22,8 +22,8 @@ Rails.application.configure do
 
   prog_name = 'wwwr::core'
 
-  device = OutlierJobs::SyslogDevice.new(prog_name)
-  logger = OutlierJobs::Logger.new(device)
+  device = WwworkRemote::SyslogDevice.new(prog_name)
+  logger = WwworkRemote::Logger.new(device)
   logger.default_message = 'N/A'
   logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
 
