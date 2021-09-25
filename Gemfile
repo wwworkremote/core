@@ -25,10 +25,10 @@ gem 'faraday_middleware'
 gem 'typhoeus'
 
 gem 'brotli'
-gem 'hashie'
+# gem 'hashie'
 gem 'multi_xml'
-gem 'rash_alt'
-gem 'safe_yaml'
+# gem 'rash_alt'
+# gem 'safe_yaml'
 
 gem 'hiredis'
 gem 'redis', require: %w[redis redis/connection/hiredis]
