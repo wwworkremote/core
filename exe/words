@@ -43,4 +43,9 @@ module Words
 end
 
 require 'csv'
-JobPosting.pluck(:body).filter(&:present?).each { |jp| puts [Words.normalize(jp)].to_csv }
+JobPosting
+  .limit(10)
+  .where.not(body: nil)
+  .pluck(:body)
+  .filter(&:present?)
+  .each { |jp| puts [Words.normalize(jp)].to_csv }

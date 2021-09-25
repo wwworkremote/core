@@ -11,12 +11,9 @@ gem 'jsonb_accessor'
 
 gem 'scenic'
 
-gem 'lograge'
-gem 'lograge-sql'
 gem 'ougai'
 
 # gem 'babosa', require: false
-gem 'friendly_id'
 
 gem 'deepsort'
 gem 'druuid'
@@ -97,7 +94,6 @@ gem 'sanitize', require: false
 gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~> 6.7'
-
 
 # gem 'active_median'
 # gem 'ancestry'

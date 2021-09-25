@@ -32,6 +32,7 @@ AllCops:
     - 'lib/**/*.rb'
     - 'spec/**/*.rb'
   Exclude:
+    - '**/.DS_Store'
     - '**/node_modules/**/*'
     - '**/templates/**/*'
     - '**/tmp/**/*'
@@ -70,7 +71,6 @@ Metrics/BlockLength:
   Exclude:
     - 'exe/job_postings'
     - 'Guardfile'
-    - 'config/initializers/lograge.rb'
 
 Metrics/CyclomaticComplexity:
   Exclude:
