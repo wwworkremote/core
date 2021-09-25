@@ -69,8 +69,11 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Exclude:
-    - 'exe/job_postings'
     - 'Guardfile'
+    - 'config/environments/development.rb'
+    - 'config/environments/test.rb'
+    - 'config/environments/production.rb'
+    - 'exe/job_postings'
 
 Metrics/CyclomaticComplexity:
   Exclude:

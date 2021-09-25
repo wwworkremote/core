@@ -77,10 +77,6 @@ group :development do
   gem 'rubocop-thread_safety', require: false
 end
 
-# group :development, :test do
-#   gem 'bullet', require: false
-# end
-
 group :test do
   gem 'vcr', require: false
 end

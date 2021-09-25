@@ -14,25 +14,13 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation = :log
   config.active_support.disallowed_deprecation_warnings = []
   config.cache_classes = true
-  config.cache_store = :redis_cache_store, { driver: :hiredis, namespace: 'oj', url: 'redis://localhost:6379' }
+  config.cache_store = :redis_cache_store, { driver: :hiredis, url: 'redis://localhost:6379', namespace: 'wwwr' }
   config.consider_all_requests_local = false
   config.eager_load = true
   config.i18n.fallbacks = true
   config.public_file_server.enabled = false
 
-  # config.cache_store = :redis_cache_store, {
-  #   connect_timeout: 30, # Defaults to 20 seconds
-  #   driver: :hiredis,
-  #   namespace: 'core',
-  #   pool_size: 5,
-  #   pool_timeout: 5,
-  #   read_timeout: 0.2, # Defaults to 1 second
-  #   reconnect_attempts: 3, # Defaults to 0
-  #   url: 'redis://localhost:6379',
-  #   write_timeout: 0.2 # Defaults to 1 second
-  # }
-
-  prog_name = 'outlierjobs-core'
+  prog_name = 'wwwr::core'
 
   device = OutlierJobs::SyslogDevice.new(prog_name)
   logger = OutlierJobs::Logger.new(device)
