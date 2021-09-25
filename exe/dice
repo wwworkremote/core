@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-mkdir -p /home/deploy/projects/outlier_jobs/core/shared/log/
-mkdir -p /home/deploy/projects/outlier_jobs/core/shared/data/dice/
-touch /home/deploy/projects/outlier_jobs/core/shared/log/cron_production.log
+mkdir -p /home/deploy/projects/wwworkremote/core/shared/log/
+mkdir -p /home/deploy/projects/wwworkremote/core/shared/data/dice/
+touch /home/deploy/projects/wwworkremote/core/shared/log/cron_production.log
 
 DATE="$(date -u +'%Y-%m-%d')"
-mkdir -p "/home/deploy/projects/outlier_jobs/core/shared/data/dice/$DATE"
-cd "/home/deploy/projects/outlier_jobs/core/shared/data/dice/$DATE" || exit
+mkdir -p "/home/deploy/projects/wwworkremote/core/shared/data/dice/$DATE"
+cd "/home/deploy/projects/wwworkremote/core/shared/data/dice/$DATE" || exit
 
 wget https://rss.dice.com/generic/all_jobs.xml.gz --header="Accept: application/octet-stream"
 # gunzip all_jobs.xml.gz

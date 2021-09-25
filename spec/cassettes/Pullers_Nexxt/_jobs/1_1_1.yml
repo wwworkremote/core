@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::Nexxt/1.0
+      - WwworkRemote::Nexxt/1.0
       Accept:
       - text/xml;charset=utf-8
       Expect:

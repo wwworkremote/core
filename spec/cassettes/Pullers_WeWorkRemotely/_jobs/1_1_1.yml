@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::WeWorkRemotely/1.0
+      - WwworkRemote::WeWorkRemotely/1.0
       Accept:
       - application/rss+xml;charset=utf-8
       Accept-Charset:

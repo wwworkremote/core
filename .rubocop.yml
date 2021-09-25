@@ -36,10 +36,11 @@ AllCops:
     - '**/node_modules/**/*'
     - '**/templates/**/*'
     - '**/tmp/**/*'
-    - 'vendor/**/*'
     - '**/vendor/**/*'
     - 'exe/all'
+    - 'exe/backup'
     - 'exe/dice'
+    - 'vendor/**/*'
 
 Style/Documentation:
   Enabled: false

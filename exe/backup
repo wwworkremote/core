@@ -1,8 +1,8 @@
 #!/usr/bin/env zsh
 
-mkdir -p ~/projects/outlier_jobs/hosts/
+mkdir -p ~/projects/wwworkremote/hosts/
 
-cd ~/projects/outlier_jobs/hosts
+cd ~/projects/wwworkremote/hosts
 
 for host in {malina101,malina102,malina103,malina104,malina108,jagodka105} ; do 
   echo 
@@ -13,38 +13,38 @@ for host in {malina101,malina102,malina103,malina104,malina108,jagodka105} ; do
   echo '------------------------------'
   echo 
 
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/nginx/sites-available/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/redis/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/etc/systemd/system/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/mike/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/root/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/var/lib/postgres/data/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/etc/nginx/sites-available/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/etc/redis/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/etc/systemd/system/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/mike/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/root/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/var/lib/postgres/data/
 
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/deploy/.config/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/deploy/bin/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/deploy/projects/outlier_jobs/core/shared/config/
-  mkdir -p ~/projects/outlier_jobs/hosts/$host/deploy/projects/outlier_jobs/dashboard/shared/config/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/deploy/.config/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/deploy/bin/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/deploy/projects/wwworkremote/core/shared/config/
+  mkdir -p ~/projects/wwworkremote/hosts/$host/deploy/projects/wwworkremote/dashboard/shared/config/
 
-  scp $host:~/.\*hist\*              ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.\*hst\*               ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.asdfrc                ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.bash\*                ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.default\*             ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.dir_colors            ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.gemrc                 ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.hushlogin             ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.profile               ~/projects/outlier_jobs/hosts/$host/deploy/
-  scp $host:~/.tool-versions         ~/projects/outlier_jobs/hosts/$host/deploy/
+  scp $host:~/.\*hist\* ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.\*hst\* ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.asdfrc ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.bash\* ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.default\* ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.dir_colors ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.gemrc ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.hushlogin ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.profile ~/projects/wwworkremote/hosts/$host/deploy/
+  scp $host:~/.tool-versions ~/projects/wwworkremote/hosts/$host/deploy/
 
-  scp -r $host:~/.config/ ~/projects/outlier_jobs/hosts/$host/deploy/
-  rm -rf ~/projects/outlier_jobs/hosts/$host/deploy/.config/tmux/plugins/
+  scp -r $host:~/.config/ ~/projects/wwworkremote/hosts/$host/deploy/
+  rm -rf ~/projects/wwworkremote/hosts/$host/deploy/.config/tmux/plugins/
 
-  scp -r $host:~/bin/ ~/projects/outlier_jobs/hosts/$host/deploy/
+  scp -r $host:~/bin/ ~/projects/wwworkremote/hosts/$host/deploy/
 
-  scp -r $host:~/.ssh/ ~/projects/outlier_jobs/hosts/$host/deploy/
+  scp -r $host:~/.ssh/ ~/projects/wwworkremote/hosts/$host/deploy/
 
-  scp -r $host:~/projects/outlier_jobs/core/shared/config/      ~/projects/outlier_jobs/hosts/$host/deploy/projects/outlier_jobs/core/shared/
-  scp -r $host:~/projects/outlier_jobs/dashboard/shared/config/ ~/projects/outlier_jobs/hosts/$host/deploy/projects/outlier_jobs/dashboard/shared/
+  scp -r $host:~/projects/wwworkremote/core/shared/config/ ~/projects/wwworkremote/hosts/$host/deploy/projects/wwworkremote/core/shared/
+  scp -r $host:~/projects/wwworkremote/dashboard/shared/config/ ~/projects/wwworkremote/hosts/$host/deploy/projects/wwworkremote/dashboard/shared/
 
   ssh $host "mkdir -p ~/backup/root/"
   ssh $host "mkdir -p ~/backup/mike/"
@@ -66,40 +66,37 @@ for host in {malina101,malina102,malina103,malina104,malina108,jagodka105} ; do
 
   ssh $host "sudo chown -R deploy:deploy ~/backup/"
 
-  scp $host:~/backup/root/.bash_history ~/projects/outlier_jobs/hosts/$host/root/
-  scp $host:~/backup/root/.lesshst ~/projects/outlier_jobs/hosts/$host/root/
-  scp $host:~/backup/root/.python_history ~/projects/outlier_jobs/hosts/$host/root/
+  scp $host:~/backup/root/.bash_history ~/projects/wwworkremote/hosts/$host/root/
+  scp $host:~/backup/root/.lesshst ~/projects/wwworkremote/hosts/$host/root/
+  scp $host:~/backup/root/.python_history ~/projects/wwworkremote/hosts/$host/root/
 
-  scp $host:~/backup/mike/.bash_history ~/projects/outlier_jobs/hosts/$host/mike/
-  scp $host:~/backup/mike/.lesshst ~/projects/outlier_jobs/hosts/$host/mike/
-  scp $host:~/backup/mike/.python_history ~/projects/outlier_jobs/hosts/$host/mike/
+  scp $host:~/backup/mike/.bash_history ~/projects/wwworkremote/hosts/$host/mike/
+  scp $host:~/backup/mike/.lesshst ~/projects/wwworkremote/hosts/$host/mike/
+  scp $host:~/backup/mike/.python_history ~/projects/wwworkremote/hosts/$host/mike/
 
-  scp $host:~/backup/dashboard       ~/projects/outlier_jobs/hosts/$host/etc/nginx/sites-available/
-  scp $host:~/backup/journald.conf   ~/projects/outlier_jobs/hosts/$host/etc/systemd/
-  scp $host:~/backup/nginx.conf      ~/projects/outlier_jobs/hosts/$host/etc/nginx/
-  scp $host:~/backup/pg_hba.conf     ~/projects/outlier_jobs/hosts/$host/var/lib/postgres/data/
-  scp $host:~/backup/postgresql.conf ~/projects/outlier_jobs/hosts/$host/var/lib/postgres/data/
-  scp $host:~/backup/puma.service    ~/projects/outlier_jobs/hosts/$host/etc/systemd/
-  scp $host:~/backup/redis.conf      ~/projects/outlier_jobs/hosts/$host/etc/redis/
-  scp $host:~/backup/rsyslog.conf    ~/projects/outlier_jobs/hosts/$host/etc/
-  scp $host:~/backup/sudoers    ~/projects/outlier_jobs/hosts/$host/etc/
+  scp $host:~/backup/dashboard ~/projects/wwworkremote/hosts/$host/etc/nginx/sites-available/
+  scp $host:~/backup/journald.conf ~/projects/wwworkremote/hosts/$host/etc/systemd/
+  scp $host:~/backup/nginx.conf ~/projects/wwworkremote/hosts/$host/etc/nginx/
+  scp $host:~/backup/pg_hba.conf ~/projects/wwworkremote/hosts/$host/var/lib/postgres/data/
+  scp $host:~/backup/postgresql.conf ~/projects/wwworkremote/hosts/$host/var/lib/postgres/data/
+  scp $host:~/backup/puma.service ~/projects/wwworkremote/hosts/$host/etc/systemd/
+  scp $host:~/backup/redis.conf ~/projects/wwworkremote/hosts/$host/etc/redis/
+  scp $host:~/backup/rsyslog.conf ~/projects/wwworkremote/hosts/$host/etc/
+  scp $host:~/backup/sudoers ~/projects/wwworkremote/hosts/$host/etc/
 
-  scp $host:~/backup/data-backup.mount    ~/projects/outlier_jobs/hosts/$host/etc/systemd/system/
-  scp $host:~/backup/data-backup.automount    ~/projects/outlier_jobs/hosts/$host/etc/systemd/system/
+  scp $host:~/backup/data-backup.mount ~/projects/wwworkremote/hosts/$host/etc/systemd/system/
+  scp $host:~/backup/data-backup.automount ~/projects/wwworkremote/hosts/$host/etc/systemd/system/
 
-  ssh $host cat /etc/group >!  ~/projects/outlier_jobs/hosts/$host/etc/group
-  ssh $host cat /etc/passwd >! ~/projects/outlier_jobs/hosts/$host/etc/passwd
-  ssh $host cat /etc/hosts >! ~/projects/outlier_jobs/hosts/$host/etc/hosts
+  ssh $host cat /etc/group >! ~/projects/wwworkremote/hosts/$host/etc/group
+  ssh $host cat /etc/passwd >! ~/projects/wwworkremote/hosts/$host/etc/passwd
+  ssh $host cat /etc/hosts >! ~/projects/wwworkremote/hosts/$host/etc/hosts
 
-  ssh $host pacman -Q >! ~/projects/outlier_jobs/hosts/$host/pacman.txt
-
-  ssh $host systemctl --type=service >! ~/projects/outlier_jobs/hosts/$host/systemd-services.txt
-
-  ssh $host crontab -l >! ~/projects/outlier_jobs/hosts/$host/crontab.txt
-
-  ssh $host env >! ~/projects/outlier_jobs/hosts/$host/deploy/env.txt
+  ssh $host crontab -l >! ~/projects/wwworkremote/hosts/$host/crontab.txt
+  ssh $host env >! ~/projects/wwworkremote/hosts/$host/deploy/env.txt
+  ssh $host pacman -Q >! ~/projects/wwworkremote/hosts/$host/pacman.txt
+  ssh $host systemctl --type=service >! ~/projects/wwworkremote/hosts/$host/systemd-services.txt
 done
 
-ls -alh ~/projects/outlier_jobs/hosts
+ls -alh ~/projects/wwworkremote/hosts
 
-cp -r ~/projects/outlier_jobs/hosts ~/Dropbox/mike/projects/outlier_jobs/backups/
+cp -r ~/projects/wwworkremote/hosts ~/Dropbox/mike/projects/wwworkremote/backups/

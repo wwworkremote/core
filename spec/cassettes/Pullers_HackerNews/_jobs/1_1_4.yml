@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -49,7 +49,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -91,7 +91,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -133,7 +133,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -175,7 +175,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -217,7 +217,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -259,7 +259,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -301,7 +301,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -343,7 +343,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -385,7 +385,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -427,7 +427,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -469,7 +469,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -511,7 +511,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -553,7 +553,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -595,7 +595,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -637,7 +637,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -679,7 +679,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -721,7 +721,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -763,7 +763,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -805,7 +805,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -847,7 +847,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -889,7 +889,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -931,7 +931,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -973,7 +973,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1015,7 +1015,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1057,7 +1057,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1099,7 +1099,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1141,7 +1141,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1183,7 +1183,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1225,7 +1225,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1267,7 +1267,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1309,7 +1309,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1351,7 +1351,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1393,7 +1393,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1435,7 +1435,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1477,7 +1477,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1519,7 +1519,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1561,7 +1561,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1603,7 +1603,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1645,7 +1645,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1687,7 +1687,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1729,7 +1729,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1771,7 +1771,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1813,7 +1813,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1855,7 +1855,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1897,7 +1897,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1939,7 +1939,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -1981,7 +1981,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2023,7 +2023,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2065,7 +2065,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2107,7 +2107,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2149,7 +2149,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2191,7 +2191,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2233,7 +2233,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2275,7 +2275,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2317,7 +2317,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2359,7 +2359,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2401,7 +2401,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2443,7 +2443,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2485,7 +2485,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:
@@ -2527,7 +2527,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - OutlierJobs::HackerNews/1.0
+      - WwworkRemote::HackerNews/1.0
       Accept:
       - application/json; charset=utf-8
       Expect:

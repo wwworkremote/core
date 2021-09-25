@@ -18,7 +18,7 @@ module Pullers
       Faraday.new do |f|
         f.request :retry, max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 3, max_interval: 900
 
-        f.headers[:user_agent] = 'OutlierJobs::RemotePython/1.0'
+        f.headers[:user_agent] = 'WwworkRemote::RemotePython/1.0'
 
         f.url_prefix = 'https://www.remotepython.com'
         f.path_prefix = 'latest/jobs/feed'

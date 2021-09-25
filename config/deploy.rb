@@ -2,19 +2,16 @@
 
 lock '~> 3.16.0'
 
-set :application, 'outlier_jobs'
-set :repo_url, 'git@github.com:just3ws/outlier_jobs'
-set :asdf_tools, %w[ruby nodejs yarn]
+set :application, 'wwworkremote'
+set :repo_url, 'git@github.com:wwworkremote/core'
+set :asdf_tools, %w[python ruby nodejs yarn]
 set :branch, 'main'
-set :deploy_to, '/home/deploy/projects/outlier_jobs/core'
+set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 
 set :conditionally_migrate, true
 set :migration_role, :app
 
-set :whenever_roles, %i[cron1 cron2]
-
-# Default value for :format is :airbrussh.
-# set :format, :airbrussh
+set :whenever_roles, %i[cron1 cron2 cron3]
 
 # You can configure the Airbrussh format using :format_options.
 # These are the defaults.

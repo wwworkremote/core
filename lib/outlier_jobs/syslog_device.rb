@@ -3,7 +3,7 @@
 require 'syslog'
 # require 'syslog/logger'
 
-module OutlierJobs
+module WwworkRemote
   class SyslogDevice
     extend Forwardable
 

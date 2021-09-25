@@ -4,7 +4,7 @@
 
 job_postings = JobPosting.where(published_at: Time.zone.now.all_month).order(id: :desc).limit(1_000).pluck(:title, :body)
 
-File.open("#{Dir.home}/projects/outlier_jobs/corpus.json", 'w+') do |f|
+File.open("#{Dir.home}/projects/wwworkremote/corpus.json", 'w+') do |f|
   corpus = { names: [], descriptions: [] }
 
   job_postings.each_with_object(corpus) do |jp, c|
