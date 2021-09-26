@@ -144,8 +144,8 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.domains (
     id bigint NOT NULL,
     name character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 

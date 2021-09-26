@@ -5,7 +5,8 @@ class CreateDomains < ActiveRecord::Migration[6.1]
     create_table :domains do |t|
       t.string :name
 
-      t.timestamps
+      t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
+      t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
     end
   end
 end

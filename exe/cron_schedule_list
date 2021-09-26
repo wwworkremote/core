@@ -18,6 +18,3 @@ def cron_job_list
 end
 
 # `crontab -l`.split(/\n+/).map(&:strip)
-
-binding.pry
-puts
