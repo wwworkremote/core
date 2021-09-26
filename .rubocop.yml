@@ -105,3 +105,6 @@ Rails/CreateTableWithTimestamps:
   Exclude:
     - 'db/migrate/20210712020439_create_pghero_query_stats.rb'
     - 'db/migrate/20210712021013_create_pghero_space_stats.rb'
+
+Style/RescueModifier:
+  Enabled: false
