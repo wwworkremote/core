@@ -185,7 +185,6 @@ ALTER SEQUENCE public.job_postings_id_seq OWNED BY public.job_postings.id;
 
 CREATE TABLE public.origins (
     id bigint NOT NULL,
-    slug character varying,
     name public.citext,
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,

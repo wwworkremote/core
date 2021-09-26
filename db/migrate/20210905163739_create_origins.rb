@@ -3,7 +3,6 @@
 class CreateOrigins < ActiveRecord::Migration[6.1]
   def change
     create_table :origins do |t|
-      t.string :slug
       t.citext :name
 
       t.jsonb :data, default: {}, null: false

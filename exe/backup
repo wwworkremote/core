@@ -99,4 +99,11 @@ done
 
 ls -alh ~/projects/wwworkremote/hosts
 
+cd ~/projects/wwworkremote/hosts
+
+find ~/projects/wwworkremote/hosts -type f -name .DS_Store -delete 
+find ~/projects/wwworkremote/hosts -type f -empty -delete
+find ~/projects/wwworkremote/hosts -type d -empty -delete
+
+mkdir -p ~/Dropbox/mike/projects/wwworkremote/backups/
 cp -r ~/projects/wwworkremote/hosts ~/Dropbox/mike/projects/wwworkremote/backups/
