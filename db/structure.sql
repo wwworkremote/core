@@ -143,7 +143,7 @@ CREATE TABLE public.ar_internal_metadata (
 
 CREATE TABLE public.domains (
     id bigint NOT NULL,
-    name character varying,
+    name public.citext NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -460,6 +460,13 @@ ALTER TABLE ONLY public.sources
 
 
 --
+-- Name: index_domains_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_domains_on_name ON public.domains USING btree (name);
+
+
+--
 -- Name: index_job_postings_on_source_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -511,7 +518,6 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210626222927'),
 ('20210703173154'),
-('20210710144921'),
 ('20210712020439'),
 ('20210712021013'),
 ('20210815003805'),
