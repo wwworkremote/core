@@ -138,6 +138,37 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: domains; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.domains (
+    id bigint NOT NULL,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.domains_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.domains_id_seq OWNED BY public.domains.id;
+
+
+--
 -- Name: job_postings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -323,6 +354,13 @@ ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
 
 
 --
+-- Name: domains id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.domains ALTER COLUMN id SET DEFAULT nextval('public.domains_id_seq'::regclass);
+
+
+--
 -- Name: job_postings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -363,6 +401,14 @@ ALTER TABLE ONLY public.sources ALTER COLUMN id SET DEFAULT nextval('public.sour
 
 ALTER TABLE ONLY public.ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
+
+
+--
+-- Name: domains domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.domains
+    ADD CONSTRAINT domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -470,6 +516,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210712021013'),
 ('20210815003805'),
 ('20210905163739'),
-('20210905171239');
+('20210905171239'),
+('20210926193251');
 
 
