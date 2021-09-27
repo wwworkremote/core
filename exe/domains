@@ -9,4 +9,4 @@ JobPosting
   .pluck(:target_url)
   .map { |url| URI.parse(url).host rescue nil }
   .compact_blank
-  .each { |name| Domain.create(name: name) rescue nil }
+  .each { |name| Domain.find_or_create_by(name: name) rescue nil }
