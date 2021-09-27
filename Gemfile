@@ -91,6 +91,8 @@ gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~> 6.7'
 
+gem 'sidekiq'
+
 # gem 'active_median'
 # gem 'ancestry'
 # gem 'blingfire' # https://github.com/ankane/blingfire
