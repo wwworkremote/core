@@ -93,6 +93,11 @@ gem 'twitter_cldr', '~> 6.7'
 
 gem 'sidekiq'
 
+gem 'whois'
+gem 'whois-parser'
+
+gem 'domain_name'
+
 # gem 'active_median'
 # gem 'ancestry'
 # gem 'blingfire' # https://github.com/ankane/blingfire

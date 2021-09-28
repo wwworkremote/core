@@ -7,8 +7,9 @@ end
 #
 # Table name: domains
 #
-#  id         :bigint           not null, primary key
-#  name       :citext           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id             :bigint           not null, primary key
+#  name           :citext           not null
+#  root_domain_id :bigint
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
 #
