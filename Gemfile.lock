@@ -98,6 +98,8 @@ GEM
     crass (1.0.6)
     deepsort (0.4.5)
     diff-lcs (1.4.4)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
     druuid (1.0.2)
     ed25519 (1.2.4)
     erubi (1.10.0)
@@ -348,6 +350,9 @@ GEM
       ethon (>= 0.9.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.8)
     unicode-display_width (2.1.0)
     vcr (6.0.0)
     webmock (3.14.0)
@@ -359,6 +364,10 @@ GEM
     websocket-extensions (0.1.5)
     whenever (1.0.0)
       chronic (>= 0.6.3)
+    whois (5.0.2)
+    whois-parser (1.2.0)
+      activesupport (>= 4)
+      whois (>= 4.0.7)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -377,6 +386,7 @@ DEPENDENCIES
   capistrano-asdf
   capistrano-rails (~> 1.6)
   deepsort
+  domain_name
   druuid
   ed25519
   faker
@@ -425,6 +435,8 @@ DEPENDENCIES
   vcr
   webmock
   whenever
+  whois
+  whois-parser
 
 RUBY VERSION
    ruby 3.0.2p107

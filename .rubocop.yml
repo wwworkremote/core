@@ -108,3 +108,9 @@ Rails/CreateTableWithTimestamps:
 
 Style/RescueModifier:
   Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
