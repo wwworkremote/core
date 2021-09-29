@@ -98,6 +98,7 @@ gem 'whois-parser'
 
 gem 'domain_name'
 
+
 # gem 'active_median'
 # gem 'ancestry'
 # gem 'blingfire' # https://github.com/ankane/blingfire
@@ -117,3 +118,6 @@ gem 'domain_name'
 # gem 'slack-notifier'
 # gem 'twitter-text', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+#
+
+gem 'bundler-audit'
