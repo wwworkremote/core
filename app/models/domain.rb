@@ -9,7 +9,11 @@ end
 #
 #  id             :bigint           not null, primary key
 #  name           :citext           not null
-#  root_domain_id :bigint
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  root_domain_id :bigint
+#
+# Indexes
+#
+#  index_domains_on_name  (name) UNIQUE
 #

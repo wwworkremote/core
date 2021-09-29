@@ -59,7 +59,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'annotate', require: false
+  gem 'annotate'
   gem 'brakeman', require: false
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false

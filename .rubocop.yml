@@ -19,6 +19,7 @@ AllCops:
   TargetRubyVersion: 3.0
   UseCache: true
   Include:
+    - 'lib/tasks/**.rake'
     - 'Capfile'
     - 'Gemfile'
     - 'Guardfile'
