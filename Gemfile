@@ -98,7 +98,6 @@ gem 'whois-parser'
 
 gem 'domain_name'
 
-
 # gem 'active_median'
 # gem 'ancestry'
 # gem 'blingfire' # https://github.com/ankane/blingfire
