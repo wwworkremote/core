@@ -32,10 +32,11 @@ def planner(slots:, duration:)
   count_from.step(duration, count_by).map(&:to_i).zip(slots)
 end
 
-CRONS = %i[cron1 cron2].freeze
+CRONS = %i[cron1 cron2 cron3].freeze
 
 def scheduler(start_at:, slots:)
-  slots.each_with_index do |slot, i|
+  i = 0
+  slots.each do |slot|
     time = start_at + slot.first
 
     cron = "#{time.min} #{time.hour} * * *"
@@ -43,19 +44,25 @@ def scheduler(start_at:, slots:)
 
     next if task.to_s.strip.empty?
 
-    host = CRONS[i.even? ? 0 : 1]
+    i += 1
+    i = 0 if i > 2
+
+    host = CRONS[i]
 
     every(cron, roles: [host]) { runner task.to_s.strip }
   end
 end
 
-every('10 0,2,4,6,8,10,12,14,16,18,20,22 * * *', roles: [:cron1]) { runner './exe/job_postings' }
-every('10 1,3,5,7,9,11,13,15,17,19,21,23 * * *', roles: [:cron2]) { runner './exe/job_postings' }
+every('10 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_postings' }
+every('10 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_postings' }
+every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron3]) { runner './exe/job_postings' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
   slots: planner(slots: TASKS.shuffle, duration: 1.day)
 )
+
+every(3.hours, roles: [:cron3]) { runner 'exe/domains' }
 
 every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
 every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
