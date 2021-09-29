@@ -5,7 +5,7 @@
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
 JobPosting
-  .where(created_at: 8.hours.ago..)
+  .where(created_at: 1.day.ago..)
   .where.not(target_url: nil)
   .pluck(:target_url)
   .map { |url| URI.parse(url).host rescue nil }
