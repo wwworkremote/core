@@ -13,10 +13,19 @@ end
 # Table name: sources
 #
 #  id         :bigint           not null, primary key
-#  signature  :string           not null
 #  event      :jsonb            not null
 #  payload    :jsonb            not null
+#  signature  :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  origin_id  :bigint
+#
+# Indexes
+#
+#  index_sources_on_origin_id  (origin_id)
+#  index_sources_on_signature  (signature) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (origin_id => origins.id)
 #
