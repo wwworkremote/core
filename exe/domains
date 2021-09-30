@@ -18,3 +18,19 @@ JobPosting
 
     Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
   }
+
+Source
+  .where(created_at: 1.year.ago..)
+  .where("payload->>'url' is not null")
+  .select("payload->>'url' as source_url")
+  .map(&:source_url)
+  .map { |url| URI.parse(url).host rescue nil }
+  .compact_blank
+  .each { |name|
+    root_name = DomainName(name).domain
+
+    root_domain = Domain.find_or_create_by(name: root_name)
+    root_domain.update_attribute(:root_domain_id, root_domain.id)
+
+    Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
+  }
