@@ -355,6 +355,38 @@ ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
 
 
 --
+-- Name: target_domains; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.target_domains (
+    id bigint NOT NULL,
+    job_posting_id bigint NOT NULL,
+    domain_id bigint NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: target_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.target_domains_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: target_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.target_domains_id_seq OWNED BY public.target_domains.id;
+
+
+--
 -- Name: domains id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -394,6 +426,13 @@ ALTER TABLE ONLY public.pghero_space_stats ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.sources ALTER COLUMN id SET DEFAULT nextval('public.sources_id_seq'::regclass);
+
+
+--
+-- Name: target_domains id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_domains ALTER COLUMN id SET DEFAULT nextval('public.target_domains_id_seq'::regclass);
 
 
 --
@@ -461,6 +500,14 @@ ALTER TABLE ONLY public.sources
 
 
 --
+-- Name: target_domains target_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_domains
+    ADD CONSTRAINT target_domains_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: index_domains_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -503,6 +550,36 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 
 
 --
+-- Name: index_target_domains_on_domain_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_target_domains_on_domain_id ON public.target_domains USING btree (domain_id);
+
+
+--
+-- Name: index_target_domains_on_job_posting_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_target_domains_on_job_posting_id ON public.target_domains USING btree (job_posting_id);
+
+
+--
+-- Name: target_domains fk_rails_94b9410c80; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_domains
+    ADD CONSTRAINT fk_rails_94b9410c80 FOREIGN KEY (domain_id) REFERENCES public.domains(id);
+
+
+--
+-- Name: target_domains fk_rails_c053cd46b2; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_domains
+    ADD CONSTRAINT fk_rails_c053cd46b2 FOREIGN KEY (job_posting_id) REFERENCES public.job_postings(id);
+
+
+--
 -- Name: sources fk_rails_cbbe8839f4; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -524,6 +601,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210815003805'),
 ('20210905163739'),
 ('20210905171239'),
-('20210926193251');
+('20210926193251'),
+('20210930221729');
 
 
