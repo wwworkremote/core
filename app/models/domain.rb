@@ -4,6 +4,9 @@ class Domain < ApplicationRecord
   def root?
     id == root_domain_id
   end
+
+  has_many :target_domains, dependent: :destroy
+  has_many :job_postings, through: :target_domains
 end
 
 # == Schema Information

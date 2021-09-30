@@ -7,6 +7,9 @@ class JobPosting < ApplicationRecord
 
   validates :signature, presence: true
 
+  has_many :target_domains, dependent: :destroy
+  has_many :domains, through: :target_domains
+
   private
 
   def sign
