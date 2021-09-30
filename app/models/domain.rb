@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Domain < ApplicationRecord
+  def root?
+    id == root_domain_id
+  end
 end
 
 # == Schema Information

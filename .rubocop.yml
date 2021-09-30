@@ -76,6 +76,7 @@ Metrics/BlockLength:
     - 'config/environments/test.rb'
     - 'config/environments/production.rb'
     - 'exe/job_postings'
+    - 'lib/tasks/auto_annotate_models.rake'
 
 Metrics/CyclomaticComplexity:
   Exclude:

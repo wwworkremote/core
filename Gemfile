@@ -66,6 +66,7 @@ group :development do
   gem 'capistrano-rails', '~> 1.6', require: false
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.3', require: false
+  gem 'retest'
   # gem 'lol_dba', require: false
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
