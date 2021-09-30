@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'vcr'
-require 'awesome_print'
+require 'amazing_print'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

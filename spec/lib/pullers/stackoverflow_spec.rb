@@ -5,7 +5,7 @@ require 'rails_helper'
 module Pullers
   RSpec.describe StackOverflow, vcr: true do
     describe '.jobs' do
-      subject(:jobs) { described_class.jobs }
+      subject(:jobs) { described_class.pull }
 
       before { jobs }
 
