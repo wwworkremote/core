@@ -4,21 +4,8 @@
 
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
-# JobPosting
-#   .where.not(target_url: nil)
-#   .pluck(:target_url)
-#   .map { |url| URI.parse(url).host rescue nil }
-#   .compact_blank
-#   .each { |name|
-#     root_name = DomainName(name).domain
-#
-#     root_domain = Domain.find_or_create_by(name: root_name)
-#     root_domain.update_attribute(:root_domain_id, root_domain.id)
-#
-#     Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
-#   }
-
 JobPosting
+  .where(created_at: 1.day.ago..)
   .where.not(target_url: nil)
   .find_each(order: :asc, batch_size: 100) { |jp|
     name = URI.parse(jp.target_url).host rescue nil
