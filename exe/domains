@@ -20,7 +20,7 @@ Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
 JobPosting
   .where.not(target_url: nil)
-  .each { |jp|
+  .find_each(order: :asc, batch_size: 100) { |jp|
     name = URI.parse(jp.target_url).host rescue nil
     next if name.blank?
 
