@@ -5,8 +5,7 @@
 begin
   Rails.logger.info { "START exe/job_postings pid:#{Process.pid}" }
 
-  # Source.where(created_at: 8.hours.ago..).find_each(order: :asc, batch_size: 100) do |notification|
-  Source.find_each(order: :asc, batch_size: 100) do |notification|
+  Source.where(created_at: 8.hours.ago..).find_each(order: :asc, batch_size: 100) do |notification|
     payload = notification.payload
     response_body = payload['response_body']
 
