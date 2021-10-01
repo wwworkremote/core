@@ -17,8 +17,10 @@ end
 #
 # Indexes
 #
-#  index_target_domains_on_domain_id       (domain_id)
-#  index_target_domains_on_job_posting_id  (job_posting_id)
+#  index_target_domains_on_domain_id                     (domain_id)
+#  index_target_domains_on_domain_id_and_job_posting_id  (domain_id,job_posting_id) UNIQUE
+#  index_target_domains_on_job_posting_id                (job_posting_id)
+#  index_target_domains_on_job_posting_id_and_domain_id  (job_posting_id,domain_id) UNIQUE
 #
 # Foreign Keys
 #
