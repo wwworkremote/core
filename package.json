@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "pino": "^7.0.0-rc.5"
+    "pino": "^7.0.0-rc.5",
+    "prettier": "^2.4.1"
   }
 }
