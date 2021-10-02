@@ -165,6 +165,7 @@ GEM
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    idn-ruby (0.1.2)
     jsonb_accessor (1.3.2)
       activerecord (>= 5.0)
       activesupport (>= 5.0)
@@ -351,6 +352,9 @@ GEM
     string-similarity (2.1.0)
     thor (1.1.0)
     tty-option (0.2.0)
+    twitter-text (3.1.0)
+      idn-ruby
+      unf (~> 0.1.0)
     twitter_cldr (6.7.0)
       camertron-eprun
       cldr-plurals-runtime-rb (~> 1.1)
@@ -441,6 +445,7 @@ DEPENDENCIES
   sidekiq
   sorted_set
   stopwords-filter
+  twitter-text
   twitter_cldr (~> 6.7)
   typhoeus
   vcr

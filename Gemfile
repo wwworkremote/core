@@ -116,7 +116,7 @@ gem 'domain_name'
 # gem 'rollups' # https://github.com/ankane/rollup
 # gem 'safely_block' # https://github.com/ankane/safely
 # gem 'slack-notifier'
-# gem 'twitter-text', require: false
+gem 'twitter-text'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
 #
 
