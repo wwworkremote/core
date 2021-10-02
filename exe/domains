@@ -21,6 +21,7 @@ JobPosting
   }
 
 JobPosting
+  .where(created_at: 1.day.ago..)
   .where.not(body: nil)
   .find_each(order: :asc, batch_size: 100) { |jp|
     urls = Twitter::TwitterText::Extractor.extract_urls(jp.body.downcase) if jp.body.present?
