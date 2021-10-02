@@ -28,6 +28,10 @@ module WwworkRemote
     # config.paths.add 'lib', eager_load: true
     # config.paths.add 'actions', eager_load: true
 
+    config.hosts << 'core.test'
+    config.hosts << 'core.wwworkremote.lan'
+    config.hosts << 'localhost'
+
     config.api_only = true
   end
 end
