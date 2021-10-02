@@ -116,3 +116,9 @@ Style/BlockDelimiters:
 
 Rails/SkipsModelValidations:
   Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/RescueStandardError:
+  Enabled: false

@@ -20,6 +20,30 @@ JobPosting
     TargetDomain.find_or_create_by(job_posting_id: jp.id, domain_id: domain.id)
   }
 
+JobPosting
+  .where.not(body: nil)
+  .find_each(order: :asc, batch_size: 100) { |jp|
+    urls = Twitter::TwitterText::Extractor.extract_urls(jp.body.downcase) if jp.body.present?
+    next if urls.blank?
+
+    urls.each do |url|
+      name = URI.parse(url).host rescue nil
+      next if name.blank?
+
+      begin
+        root_name = DomainName(name).domain
+        root_domain = Domain.find_or_create_by(name: root_name)
+        root_domain.update_attribute(:root_domain_id, root_domain.id)
+      rescue
+      end
+
+      begin
+        Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
+      rescue
+      end
+    end
+  }
+
 # Source
 #   .where(created_at: 1.year.ago..)
 #   .where("payload->>'url' is not null")
