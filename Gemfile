@@ -7,46 +7,47 @@ ruby '3.0.2'
 
 gem 'rails', '~> 6.1.4', '>= 6.1.4'
 
-gem 'jsonb_accessor'
-
-gem 'scenic'
-
-gem 'ougai'
-
-# gem 'babosa', require: false
-
+gem 'addressable'
+gem 'amazing_print'
+gem 'bcrypt_pbkdf', require: false
+gem 'brotli'
+gem 'bundler-audit'
 gem 'deepsort'
+gem 'domain_name'
 gem 'druuid'
-
+gem 'ed25519', require: false
 gem 'faraday'
 gem 'faraday-encoding'
 gem 'faraday-http-cache'
 gem 'faraday_middleware'
-gem 'typhoeus'
-
-gem 'brotli'
-# gem 'hashie'
-gem 'multi_xml'
-# gem 'rash_alt'
-# gem 'safe_yaml'
-
 gem 'hiredis'
-gem 'redis', require: %w[redis redis/connection/hiredis]
-
-gem 'whenever', require: false
-
-gem 'puma', '~> 5.0'
-gem 'puma_worker_killer'
-gem 'sd_notify'
-
+gem 'jsonb_accessor'
+gem 'loofah'
+gem 'multi_xml'
+gem 'nokogiri'
+gem 'nori'
+gem 'ougai'
 gem 'pg', '~> 1.1'
 gem 'pghero'
 gem 'pg_query', '>= 0.9.0'
-
-gem 'bcrypt_pbkdf', require: false
-gem 'ed25519', require: false
-
-gem 'amazing_print'
+gem 'public_suffix'
+gem 'puma', '~> 5.0'
+gem 'puma_worker_killer'
+gem 'rails-html-sanitizer'
+gem 'redis', require: %w[redis redis/connection/hiredis]
+gem 'rubypants', require: false
+gem 'sanitize', require: false
+gem 'scenic'
+gem 'sd_notify'
+gem 'sidekiq'
+gem 'sorted_set'
+gem 'stopwords-filter', require: 'stopwords'
+gem 'twitter_cldr', '~> 6.7'
+gem 'twitter-text'
+gem 'typhoeus'
+gem 'whenever', require: false
+gem 'whois'
+gem 'whois-parser'
 
 group :development, :test do
   gem 'byebug'
@@ -82,39 +83,25 @@ group :test do
   gem 'vcr', require: false
 end
 
-gem 'addressable'
-gem 'bundler-audit'
-gem 'domain_name'
-gem 'loofah'
-gem 'nokogiri'
-gem 'nori'
-gem 'public_suffix'
-gem 'rails-html-sanitizer'
-gem 'rubypants', require: false
-gem 'sanitize', require: false
-gem 'sidekiq'
-gem 'sorted_set'
-gem 'stopwords-filter', require: 'stopwords'
-gem 'twitter_cldr', '~> 6.7'
-gem 'twitter-text'
-gem 'whois'
-gem 'whois-parser'
-
 # gem 'active_median'
 # gem 'ancestry'
+# gem 'babosa', require: false
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'cld'
 # gem 'connection_pool'
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'fugit'
 # gem 'groupdate'
+# gem 'hashie'
 # gem 'hightop'
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
 # gem 'notable' # https://github.com/ankane/notable
 # gem 'pg_search'
 # gem 'rainbow'
+# gem 'rash_alt'
 # gem 'rollups' # https://github.com/ankane/rollup
+# gem 'safe_yaml'
 # gem 'safely_block' # https://github.com/ankane/safely
 # gem 'slack-notifier'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
