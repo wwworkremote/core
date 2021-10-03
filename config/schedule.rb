@@ -62,7 +62,7 @@ scheduler(
   slots: planner(slots: TASKS.shuffle, duration: 1.day)
 )
 
-every(3.hours, roles: [:cron3]) { runner 'exe/domains' }
+# every(3.hours, roles: [:cron3]) { runner 'exe/domains' }
 
 every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
 every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }

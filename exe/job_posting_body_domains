@@ -1,0 +1,31 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+Rails.logger = Rails.logger.child(entrypoint: __FILE__)
+
+JobPosting
+  .where(created_at: 1.year.ago..)
+  .where.not(body: nil)
+  .find_each(order: :asc, batch_size: 100) { |jp|
+    urls = Twitter::TwitterText::Extractor.extract_urls(jp.body.downcase) if jp.body.present?
+
+    next if urls.blank?
+
+    urls = urls.map(&:strip).map(&:downcase).uniq.sort_by(&:length)
+
+    urls.each do |url|
+      extractor = DomainExtractor.new(url).call
+
+      next if extractor.empty?
+
+      root_name = extractor.root_domain
+      root_domain = Domain.find_or_create_by(name: root_name)
+      root_domain.update_attribute(:root_domain_id, root_domain.id)
+
+      extractor.domains.each do |name|
+        domain = Domain.find_or_create_by(name: name)
+        domain.update_attribute(:root_domain_id, root_domain.id)
+      end
+    end
+  }
