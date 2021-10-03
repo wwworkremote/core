@@ -82,22 +82,23 @@ group :test do
   gem 'vcr', require: false
 end
 
+gem 'addressable'
+gem 'bundler-audit'
+gem 'domain_name'
 gem 'loofah'
 gem 'nokogiri'
 gem 'nori'
+gem 'public_suffix'
 gem 'rails-html-sanitizer'
 gem 'rubypants', require: false
 gem 'sanitize', require: false
+gem 'sidekiq'
 gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~> 6.7'
-
-gem 'sidekiq'
-
+gem 'twitter-text'
 gem 'whois'
 gem 'whois-parser'
-
-gem 'domain_name'
 
 # gem 'active_median'
 # gem 'ancestry'
@@ -116,8 +117,4 @@ gem 'domain_name'
 # gem 'rollups' # https://github.com/ankane/rollup
 # gem 'safely_block' # https://github.com/ankane/safely
 # gem 'slack-notifier'
-gem 'twitter-text'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
-#
-
-gem 'bundler-audit'

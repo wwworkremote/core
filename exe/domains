@@ -5,58 +5,84 @@
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
 JobPosting
-  .where(created_at: 1.day.ago..)
+  .where(created_at: 1.year.ago..)
   .where.not(target_url: nil)
   .find_each(order: :asc, batch_size: 100) { |jp|
-    name = URI.parse(jp.target_url).host rescue nil
-    next if name.blank?
+    extractor = DomainExtractor.new(jp.target_url).call
 
-    root_name = DomainName(name).domain
+    next if extractor.empty?
+
+    root_name = extractor.root_domain
     root_domain = Domain.find_or_create_by(name: root_name)
     root_domain.update_attribute(:root_domain_id, root_domain.id)
     TargetDomain.find_or_create_by(job_posting_id: jp.id, domain_id: root_domain.id)
 
-    domain = Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
-    TargetDomain.find_or_create_by(job_posting_id: jp.id, domain_id: domain.id)
+    extractor.domains.each do |name|
+      domain = Domain.find_or_create_by(name: name)
+      domain.update_attribute(:root_domain_id, root_domain.id)
+      TargetDomain.find_or_create_by(job_posting_id: jp.id, domain_id: domain.id)
+    end
   }
 
 JobPosting
-  .where(created_at: 1.day.ago..)
+  .where(created_at: 1.year.ago..)
   .where.not(body: nil)
   .find_each(order: :asc, batch_size: 100) { |jp|
     urls = Twitter::TwitterText::Extractor.extract_urls(jp.body.downcase) if jp.body.present?
+
     next if urls.blank?
 
+    urls = urls.flat_map { |url| url.split(']').first }.sort_by(&:length).uniq
+
     urls.each do |url|
-      name = URI.parse(url).host rescue nil
-      next if name.blank?
+      extractor = DomainExtractor.new(url).call
 
-      begin
-        root_name = DomainName(name).domain
-        root_domain = Domain.find_or_create_by(name: root_name)
-        root_domain.update_attribute(:root_domain_id, root_domain.id)
-      rescue
-      end
+      next if extractor.empty?
 
-      begin
-        Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
-      rescue
+      root_name = extractor.root_domain
+      root_domain = Domain.find_or_create_by(name: root_name)
+      root_domain.update_attribute(:root_domain_id, root_domain.id)
+
+      extractor.domains.each do |name|
+        domain = Domain.find_or_create_by(name: name)
+        domain.update_attribute(:root_domain_id, root_domain.id)
       end
     end
   }
 
-# Source
-#   .where(created_at: 1.year.ago..)
-#   .where("payload->>'url' is not null")
-#   .select("payload->>'url' as source_url")
-#   .map(&:source_url)
-#   .map { |url| URI.parse(url).host rescue nil }
-#   .compact_blank
-#   .each { |name|
-#     root_name = DomainName(name).domain
-#
-#     root_domain = Domain.find_or_create_by(name: root_name)
-#     root_domain.update_attribute(:root_domain_id, root_domain.id)
-#
-#     Domain.find_or_create_by(name: name, root_domain_id: root_domain.id)
-#   }
+Source
+  .where(created_at: 1.year.ago..)
+  .where("payload->>'url' is not null")
+  .select("id, payload->>'url' as url")
+  .find_each(order: :asc, batch_size: 100) { |source|
+    next if source.url.blank?
+
+    extractor = DomainExtractor.new(source.url).call
+
+    next if extractor.empty?
+
+    root_name = extractor.root_domain
+    root_domain = Domain.find_or_create_by(name: root_name)
+    root_domain.update_attribute(:root_domain_id, root_domain.id)
+
+    extractor.domains.each do |name|
+      domain = Domain.find_or_create_by(name: name)
+      domain.update_attribute(:root_domain_id, root_domain.id)
+    end
+  }
+
+Domain
+  .find_each(order: :asc, batch_size: 100) { |d|
+    extractor = DomainExtractor.new(d.name).call
+
+    next if extractor.empty?
+
+    root_name = extractor.root_domain
+    root_domain = Domain.find_or_create_by(name: root_name)
+    root_domain.update_attribute(:root_domain_id, root_domain.id)
+
+    extractor.domains.each do |name|
+      domain = Domain.find_or_create_by(name: name)
+      domain.update_attribute(:root_domain_id, root_domain.id)
+    end
+  }

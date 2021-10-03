@@ -389,6 +389,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  addressable
   amazing_print
   annotate
   bcrypt_pbkdf
@@ -423,6 +424,7 @@ DEPENDENCIES
   pghero
   pry-byebug
   pry-rails
+  public_suffix
   puma (~> 5.0)
   puma_worker_killer
   rails (~> 6.1.4, >= 6.1.4)
