@@ -5,6 +5,8 @@ class Domain < ApplicationRecord
     id == root_domain_id
   end
 
+  scope :roots, -> { where('id = root_domain_id') }
+
   has_many :target_domains, dependent: :destroy
   has_many :job_postings, through: :target_domains
 end
