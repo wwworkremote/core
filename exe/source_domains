@@ -5,7 +5,7 @@
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
 Source
-  .where(created_at: 1.year.ago..)
+  .where(created_at: 4.hours.ago..)
   .where("payload->>'url' is not null")
   .select("id, payload->>'url' as url")
   .find_each(order: :asc, batch_size: 100) { |source|

@@ -5,7 +5,7 @@
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
 JobPosting
-  .where(created_at: 1.year.ago..)
+  .where(created_at: 4.hours.ago..)
   .where.not(target_url: nil)
   .find_each(order: :asc, batch_size: 100) { |jp|
     extractor = DomainExtractor.new(jp.target_url).call
