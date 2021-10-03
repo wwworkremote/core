@@ -550,24 +550,10 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 
 
 --
--- Name: index_target_domains_on_domain_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_target_domains_on_domain_id ON public.target_domains USING btree (domain_id);
-
-
---
 -- Name: index_target_domains_on_domain_id_and_job_posting_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_target_domains_on_domain_id_and_job_posting_id ON public.target_domains USING btree (domain_id, job_posting_id);
-
-
---
--- Name: index_target_domains_on_job_posting_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_target_domains_on_job_posting_id ON public.target_domains USING btree (job_posting_id);
 
 
 --
@@ -617,6 +603,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210905171239'),
 ('20210926193251'),
 ('20210930221729'),
-('20211001125635');
+('20211001125635'),
+('20211003201634');
 
 
