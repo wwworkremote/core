@@ -32,7 +32,7 @@ JobPosting
 
     next if urls.blank?
 
-    urls = urls.flat_map { |url| url.split(']').first }.sort_by(&:length).uniq
+    urls = urls.map(&:strip).map(&:downcase).uniq.sort_by(&:length)
 
     urls.each do |url|
       extractor = DomainExtractor.new(url).call
