@@ -4,18 +4,22 @@
 
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
-Domain
-  .find_each(order: :asc, batch_size: 100) { |d|
-    extractor = DomainExtractor.new(d.name).call
+JobPosting
+  .where(created_at: 1.year.ago..)
+  .where.not(target_url: nil)
+  .find_each(order: :asc, batch_size: 100) { |jp|
+    extractor = DomainExtractor.new(jp.target_url).call
 
     next if extractor.empty?
 
     root_name = extractor.root_domain
     root_domain = Domain.find_or_create_by(name: root_name)
     root_domain.update_attribute(:root_domain_id, root_domain.id)
+    TargetDomain.find_or_create_by(job_posting_id: jp.id, domain_id: root_domain.id)
 
     extractor.domains.each do |name|
       domain = Domain.find_or_create_by(name: name)
       domain.update_attribute(:root_domain_id, root_domain.id)
+      TargetDomain.find_or_create_by(job_posting_id: jp.id, domain_id: domain.id)
     end
   }
