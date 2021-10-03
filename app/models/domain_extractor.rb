@@ -31,6 +31,7 @@ class DomainExtractor
 
   def self.format(url)
     url = url.to_s.strip.downcase
+    url = url.split(']').first.strip # handle upstream parsing error
     return "http://#{url}" unless url.match?(/^http/i)
 
     url
