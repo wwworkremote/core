@@ -64,8 +64,9 @@ scheduler(
 
 every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/job_posting_body_domains' }
 every('25 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/source_domains' }
+every('5 2,5,8,11,14,17,20,23 * * *',  roles: [:cron3]) { runner 'exe/job_posting_body_emails' }
 every('40 2,5,8,11,14,17,20,23 * * *', roles: [:cron3]) { runner 'exe/target_domains' }
-every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/domains' }
+every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/domains' }
 
 every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
 every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }

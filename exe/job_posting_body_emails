@@ -4,10 +4,10 @@
 
 Rails.logger = Rails.logger.child(entrypoint: __FILE__)
 
-# .where(created_at: 4.hours.ago..)
 JobPosting
+  .where(created_at: 4.hours.ago..)
   .where.not(body: nil)
-  .where("body like '%@%'")
+  .where("position('@' in body) > 0")
   .find_each(order: :asc, batch_size: 100) { |jp|
     addresses = jp
                 .body
