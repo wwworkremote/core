@@ -1,0 +1,26 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+Rails.logger = Rails.logger.child(entrypoint: __FILE__)
+
+# .where(created_at: 4.hours.ago..)
+JobPosting
+  .where.not(body: nil)
+  .where("body like '%'")
+  .find_each(order: :asc, batch_size: 100) { |jp|
+    addresses = jp
+                .body
+                .scan(%r{[a-zA-Z0-9.!\#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+}i)
+                .compact_blank
+                .map(&:downcase)
+                .map(&:strip)
+                .sort
+                .uniq
+
+    next if addresses.blank?
+
+    addresses.each do |address|
+      Email.find_or_create_by(address: address)
+    end
+  }

@@ -170,6 +170,37 @@ ALTER SEQUENCE public.domains_id_seq OWNED BY public.domains.id;
 
 
 --
+-- Name: emails; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.emails (
+    id bigint NOT NULL,
+    address public.citext NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.emails_id_seq OWNED BY public.emails.id;
+
+
+--
 -- Name: job_postings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -394,6 +425,13 @@ ALTER TABLE ONLY public.domains ALTER COLUMN id SET DEFAULT nextval('public.doma
 
 
 --
+-- Name: emails id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.emails ALTER COLUMN id SET DEFAULT nextval('public.emails_id_seq'::regclass);
+
+
+--
 -- Name: job_postings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -449,6 +487,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.domains
     ADD CONSTRAINT domains_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: emails emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.emails
+    ADD CONSTRAINT emails_pkey PRIMARY KEY (id);
 
 
 --
@@ -512,6 +558,13 @@ ALTER TABLE ONLY public.target_domains
 --
 
 CREATE UNIQUE INDEX index_domains_on_name ON public.domains USING btree (name);
+
+
+--
+-- Name: index_emails_on_address; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_emails_on_address ON public.emails USING btree (address);
 
 
 --
@@ -604,6 +657,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210926193251'),
 ('20210930221729'),
 ('20211001125635'),
-('20211003201634');
+('20211003201634'),
+('20211004134953');
 
 
