@@ -91,6 +91,7 @@ GEM
     capistrano-rails (1.6.1)
       capistrano (~> 3.1)
       capistrano-bundler (>= 1.1, < 3)
+    choice (0.2.0)
     chronic (0.10.2)
     cldr-plurals-runtime-rb (1.1.0)
     coderay (1.1.3)
@@ -144,9 +145,9 @@ GEM
       ffi (~> 1.0)
     globalid (0.5.2)
       activesupport (>= 5.0)
-    google-protobuf (3.18.0)
-    google-protobuf (3.18.0-universal-darwin)
-    google-protobuf (3.18.0-x86_64-linux)
+    google-protobuf (3.18.1)
+    google-protobuf (3.18.1-universal-darwin)
+    google-protobuf (3.18.1-x86_64-linux)
     guard (2.18.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -249,6 +250,11 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
+    rails-erd (1.6.1)
+      activerecord (>= 4.2)
+      activesupport (>= 4.2)
+      choice (~> 0.2.0)
+      ruby-graphviz (~> 1.2)
     rails-html-sanitizer (1.4.2)
       loofah (~> 2.3)
     railties (6.1.4.1)
@@ -305,7 +311,7 @@ GEM
     rubocop-performance (1.11.5)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    rubocop-rails (2.12.2)
+    rubocop-rails (2.12.3)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.7.0, < 2.0)
@@ -319,6 +325,8 @@ GEM
       rubocop (~> 1.0)
     rubocop-thread_safety (0.4.4)
       rubocop (>= 0.53.0)
+    ruby-graphviz (1.2.5)
+      rexml
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
     rubypants (0.7.1)
@@ -428,6 +436,7 @@ DEPENDENCIES
   puma (~> 5.0)
   puma_worker_killer
   rails (~> 6.1.4, >= 6.1.4)
+  rails-erd
   rails-html-sanitizer
   redis
   retest

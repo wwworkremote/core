@@ -67,8 +67,8 @@ group :development do
   gem 'capistrano-rails', '~> 1.6', require: false
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.3', require: false
+  gem 'rails-erd'
   gem 'retest'
-  # gem 'lol_dba', require: false
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
@@ -94,6 +94,7 @@ end
 # gem 'groupdate'
 # gem 'hashie'
 # gem 'hightop'
+# gem 'lol_dba', require: false
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
 # gem 'notable' # https://github.com/ankane/notable
