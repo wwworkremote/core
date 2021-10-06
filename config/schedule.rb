@@ -53,6 +53,8 @@ def scheduler(start_at:, slots:)
   end
 end
 
+every(1.hour, roles: [:cron3]) { runner './exe/domain_hierarchy_refresh' }
+
 every('10 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_postings' }
 every('10 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_postings' }
 every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron3]) { runner './exe/job_postings' }
