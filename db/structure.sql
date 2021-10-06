@@ -151,6 +151,23 @@ CREATE TABLE public.domains (
 
 
 --
+-- Name: domain_hierarchies; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+--
+
+CREATE MATERIALIZED VIEW public.domain_hierarchies AS
+ SELECT root_domains.id,
+    root_domains.name,
+    jsonb_object_agg(DISTINCT domains.id, domains.name ORDER BY domains.id) AS subdomains,
+    count(DISTINCT domains.id) AS subdomain_count
+   FROM (public.domains root_domains
+     LEFT JOIN public.domains ON ((root_domains.root_domain_id = domains.root_domain_id)))
+  WHERE ((root_domains.id = root_domains.root_domain_id) AND (domains.root_domain_id <> domains.id))
+  GROUP BY root_domains.id, root_domains.name
+  ORDER BY (count(DISTINCT domains.id)) DESC, root_domains.id DESC
+  WITH NO DATA;
+
+
+--
 -- Name: domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -554,6 +571,13 @@ ALTER TABLE ONLY public.target_domains
 
 
 --
+-- Name: index_domain_hierarchies_on_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_domain_hierarchies_on_id ON public.domain_hierarchies USING btree (id);
+
+
+--
 -- Name: index_domains_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -658,6 +682,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210930221729'),
 ('20211001125635'),
 ('20211003201634'),
-('20211004134953');
+('20211004134953'),
+('20211006115849'),
+('20211006120147');
 
 

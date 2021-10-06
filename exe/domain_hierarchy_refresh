@@ -1,0 +1,7 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+Rails.logger = Rails.logger.child(entrypoint: __FILE__)
+
+DomainHierarchy.refresh
