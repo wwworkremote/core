@@ -39,6 +39,8 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    active_median (0.3.3)
+      activesupport (>= 5.2)
     activejob (6.1.4.1)
       activesupport (= 6.1.4.1)
       globalid (>= 0.3.6)
@@ -64,7 +66,7 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
-    amazing_print (1.3.0)
+    amazing_print (1.4.0)
     annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
@@ -106,6 +108,9 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     druuid (1.0.2)
     ed25519 (1.2.4)
+    eps (0.3.8)
+      lightgbm (>= 0.1.7)
+      nokogiri
     erubi (1.10.0)
     ethon (0.14.0)
       ffi (>= 1.15.0)
@@ -148,6 +153,8 @@ GEM
     google-protobuf (3.18.1)
     google-protobuf (3.18.1-universal-darwin)
     google-protobuf (3.18.1-x86_64-linux)
+    groupdate (5.2.2)
+      activesupport (>= 5)
     guard (2.18.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -163,6 +170,8 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
+    hightop (0.3.0)
+      activesupport (>= 5.2)
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
@@ -171,6 +180,8 @@ GEM
       activerecord (>= 5.0)
       activesupport (>= 5.0)
       pg (>= 0.18.1)
+    lightgbm (0.2.5)
+      ffi
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -203,7 +214,7 @@ GEM
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    oj (3.13.8)
+    oj (3.13.9)
     ougai (2.0.0)
       oj (~> 3.10)
     parallel (1.21.0)
@@ -212,8 +223,23 @@ GEM
     pg (1.2.3)
     pg_query (2.1.0)
       google-protobuf (>= 3.17.1)
+    pg_search (2.3.5)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
+    pgdexter (0.3.9)
+      pg (>= 0.18.2)
+      pg_query
+      slop (>= 4.8.2)
     pghero (2.8.1)
       activerecord (>= 5)
+    pgslice (0.4.7)
+      pg (>= 0.18.2)
+      thor
+    pgsync (0.6.8)
+      parallel
+      pg (>= 0.18.2)
+      slop (>= 4.8.2)
+      tty-spinner
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -343,6 +369,7 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
+    slop (4.9.1)
     sorted_set (1.0.3)
       rbtree
       set (~> 1.0)
@@ -359,7 +386,10 @@ GEM
     stopwords-filter (0.5.0)
     string-similarity (2.1.0)
     thor (1.1.0)
+    tty-cursor (0.7.1)
     tty-option (0.2.0)
+    tty-spinner (0.9.3)
+      tty-cursor (~> 0.7)
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
@@ -397,6 +427,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  active_median
   addressable
   amazing_print
   annotate
@@ -412,13 +443,16 @@ DEPENDENCIES
   domain_name
   druuid
   ed25519
+  eps
   faker
   faraday
   faraday-encoding
   faraday-http-cache
   faraday_middleware
   fuubar
+  groupdate
   guard-rspec
+  hightop
   hiredis
   jsonb_accessor
   listen (~> 3.3)
@@ -429,7 +463,11 @@ DEPENDENCIES
   ougai
   pg (~> 1.1)
   pg_query (>= 0.9.0)
+  pg_search
+  pgdexter
   pghero
+  pgslice
+  pgsync
   pry-byebug
   pry-rails
   public_suffix
@@ -469,4 +507,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.27
+   2.2.28

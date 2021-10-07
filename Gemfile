@@ -7,6 +7,7 @@ ruby '3.0.2'
 
 gem 'rails', '~> 6.1.4', '>= 6.1.4'
 
+gem 'active_median'
 gem 'addressable'
 gem 'amazing_print'
 gem 'bcrypt_pbkdf', require: false
@@ -16,10 +17,13 @@ gem 'deepsort'
 gem 'domain_name'
 gem 'druuid'
 gem 'ed25519', require: false
+gem 'eps' # https://github.com/ankane/eps
 gem 'faraday'
 gem 'faraday-encoding'
 gem 'faraday-http-cache'
 gem 'faraday_middleware'
+gem 'groupdate'
+gem 'hightop'
 gem 'hiredis'
 gem 'jsonb_accessor'
 gem 'loofah'
@@ -28,8 +32,12 @@ gem 'nokogiri'
 gem 'nori'
 gem 'ougai'
 gem 'pg', '~> 1.1'
+gem 'pgdexter'
 gem 'pghero'
 gem 'pg_query', '>= 0.9.0'
+gem 'pg_search'
+gem 'pgslice'
+gem 'pgsync'
 gem 'public_suffix'
 gem 'puma', '~> 5.0'
 gem 'puma_worker_killer'
@@ -83,22 +91,17 @@ group :test do
   gem 'vcr', require: false
 end
 
-# gem 'active_median'
 # gem 'ancestry'
 # gem 'babosa', require: false
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'cld'
 # gem 'connection_pool'
-# gem 'eps' # https://github.com/ankane/eps
 # gem 'fugit'
-# gem 'groupdate'
 # gem 'hashie'
-# gem 'hightop'
 # gem 'lol_dba', require: false
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
 # gem 'notable' # https://github.com/ankane/notable
-# gem 'pg_search'
 # gem 'rainbow'
 # gem 'rash_alt'
 # gem 'rollups' # https://github.com/ankane/rollup
