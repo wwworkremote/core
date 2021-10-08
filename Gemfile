@@ -12,7 +12,6 @@ gem 'addressable'
 gem 'amazing_print'
 gem 'bcrypt_pbkdf', require: false
 gem 'brotli'
-gem 'bundler-audit'
 gem 'deepsort'
 gem 'domain_name'
 gem 'druuid'
@@ -57,26 +56,24 @@ gem 'whenever', require: false
 gem 'whois'
 gem 'whois-parser'
 
-group :development, :test do
-  gem 'byebug'
-  gem 'faker', require: false
-  gem 'fuubar', require: false
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'rspec-rails', require: false
-  gem 'webmock', require: false
-end
-
 group :development do
   gem 'annotate'
   gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
+
+  gem 'sshkit', require: false
+  gem 'sshkit-sudo', require: false
+
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-asdf', require: false
+  gem 'capistrano-bundler', require: false
   gem 'capistrano-rails', '~> 1.6', require: false
-  gem 'guard-rspec', require: false
+
+  gem 'erb_lint', require: false
   gem 'listen', '~> 3.3', require: false
   gem 'rails-erd'
   gem 'retest'
+
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
@@ -85,6 +82,18 @@ group :development do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
+
+  gem 'webrick', require: false
+end
+
+group :development, :test do
+  gem 'byebug'
+  gem 'faker', require: false
+  gem 'fuubar', require: false
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'rspec-rails', require: false
+  gem 'webmock', require: false
 end
 
 group :test do
