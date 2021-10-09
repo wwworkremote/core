@@ -12,15 +12,15 @@ Rails.logger = Rails.logger.child(
 )
 
 [
-  Runners::HackerNews,
-  Runners::Indeed,
-  Runners::Monster,
-  Runners::Nexxt,
-  Runners::RemoteOK,
-  Runners::RemotePython,
-  Runners::StackOverflow,
-  Runners::WeWorkRemotely
+  Runners::HackerNews::Async,
+  Runners::Indeed::Async,
+  Runners::Monster::Async,
+  Runners::Nexxt::Async,
+  Runners::RemoteOK::Async,
+  Runners::RemotePython::Async,
+  Runners::StackOverflow::Async,
+  Runners::WeWorkRemotely::Async
 ].each do |runner|
-  runner.run(term: term)
+  runner.perform_async(term)
 rescue StandardError
 end
