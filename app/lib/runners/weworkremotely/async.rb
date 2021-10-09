@@ -3,9 +3,8 @@
 module Runners
   module WeWorkRemotely
     class Async
-      sidekiq_options queue: :runners
-
       include Sidekiq::Worker
+      sidekiq_options queue: :runners
 
       def perform(term = nil)
         term = 'sidekiq' if term.blank?
