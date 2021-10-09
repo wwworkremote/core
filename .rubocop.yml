@@ -25,7 +25,6 @@ AllCops:
     - 'Guardfile'
     - 'Rakefile'
     - 'app/**/*.rb'
-    - 'bin/**/*.rb'
     - 'config.ru'
     - 'config/**/*.rb'
     - 'db/**/*.rb'
@@ -42,6 +41,7 @@ AllCops:
     - 'exe/backup'
     - 'exe/dice'
     - 'vendor/**/*'
+    - 'bin/**/*'
 
 Style/Documentation:
   Enabled: false
