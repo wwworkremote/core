@@ -8,4 +8,4 @@ term = Shellwords.escape(ARGV.first || 'programming')
 
 Rails.logger = Rails.logger.child(term: term, entrypoint: __FILE__)
 
-Runners::RemoteOK.run(term: term)
+Runners::RemoteOK::Async.perform_async(term)
