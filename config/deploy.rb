@@ -11,7 +11,7 @@ set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 set :conditionally_migrate, true
 set :migration_role, :app
 
-set :whenever_roles, %i[cron1 cron2 cron3]
+set :whenever_roles, %i[cron1 cron2]
 
 # You can configure the Airbrussh format using :format_options.
 # These are the defaults.

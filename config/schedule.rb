@@ -32,7 +32,7 @@ def planner(slots:, duration:)
   count_from.step(duration, count_by).map(&:to_i).zip(slots)
 end
 
-CRONS = %i[cron1 cron2 cron3].freeze
+CRONS = %i[cron1 cron2].freeze
 
 def scheduler(start_at:, slots:)
   i = 0
@@ -53,11 +53,10 @@ def scheduler(start_at:, slots:)
   end
 end
 
-every(1.hour, roles: [:cron3]) { runner './exe/domain_hierarchy_refresh' }
-
 every('10 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_postings' }
 every('10 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_postings' }
-every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron3]) { runner './exe/job_postings' }
+
+every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner './exe/domain_hierarchy_refresh' }
 
 scheduler(
   start_at: Date.today.to_datetime.to_time.utc,
@@ -66,10 +65,10 @@ scheduler(
 
 every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/job_posting_body_domains' }
 every('25 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/source_domains' }
-every('5 2,5,8,11,14,17,20,23 * * *',  roles: [:cron3]) { runner 'exe/job_posting_body_emails' }
-every('40 2,5,8,11,14,17,20,23 * * *', roles: [:cron3]) { runner 'exe/target_domains' }
-every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/domains' }
-every('50 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/email_domains' }
+every('5 2,5,8,11,14,17,20,23 * * *',  roles: [:cron1]) { runner 'exe/job_posting_body_emails' }
+every('40 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/target_domains' }
+every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/domains' }
+every('50 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/email_domains' }
 
 every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
 every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
