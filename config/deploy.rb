@@ -23,7 +23,7 @@ namespace :deploy do
   namespace :sidekiq do
     desc 'Restart Sidekiq'
     task :restart do
-      on roles(:app) do
+      on roles(:sidekiq) do
         execute :sudo, :systemctl, :restart, :sidekiq
       end
     end
