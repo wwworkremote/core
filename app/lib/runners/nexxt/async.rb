@@ -8,7 +8,7 @@ module Runners
 
       def perform(term = nil)
         term = 'sidekiq' if term.blank?
-        Rails.logger = Rails.logger.child(term: term, entrypoint: self.class.name)
+        #         Rails.logger = Rails.logger.child(term: term, entrypoint: self.class.name)
         Runners::Nexxt.run(term: term)
       end
     end

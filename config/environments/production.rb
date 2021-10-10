@@ -34,7 +34,6 @@ Rails.application.configure do
   #   pid: Process.pid
   # }.freeze
 
-  config.log_level = :debug
   # config.logger = logger
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
@@ -44,6 +43,7 @@ Rails.application.configure do
   # require "syslog/logger"
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
 
+  config.log_level = :debug
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new($stdout)
     logger.formatter = config.log_formatter
