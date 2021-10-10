@@ -20,20 +20,33 @@ Rails.application.configure do
   config.i18n.fallbacks = true
   config.public_file_server.enabled = false
 
-  prog_name = 'wwwr::core'
+  # prog_name = 'wwwr::core'
 
-  device = WwworkRemote::SyslogDevice.new(prog_name)
-  logger = WwworkRemote::Logger.new(device)
-  logger.default_message = 'N/A'
-  logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
+  # device = WwworkRemote::SyslogDevice.new(prog_name)
+  # logger = WwworkRemote::Logger.new(device)
+  # logger.default_message = 'N/A'
+  # logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
 
-  logger.with_fields = {
-    name: prog_name,
-    hostname: Socket.gethostname,
-    instance_id: Druuid.gen.to_s.freeze,
-    pid: Process.pid
-  }.freeze
+  # logger.with_fields = {
+  #   name: prog_name,
+  #   hostname: Socket.gethostname,
+  #   instance_id: Druuid.gen.to_s.freeze,
+  #   pid: Process.pid
+  # }.freeze
 
   config.log_level = :debug
-  config.logger = logger
+  # config.logger = logger
+
+  # Use default logging formatter so that PID and timestamp are not suppressed.
+  config.log_formatter = ::Logger::Formatter.new
+
+  # Use a different logger for distributed setups.
+  # require "syslog/logger"
+  # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
+
+  if ENV['RAILS_LOG_TO_STDOUT'].present?
+    logger           = ActiveSupport::Logger.new($stdout)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  end
 end
