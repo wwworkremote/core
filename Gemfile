@@ -10,6 +10,7 @@ gem 'rails', '~> 6.1.4', '>= 6.1.4'
 gem 'active_median'
 gem 'addressable'
 gem 'amazing_print'
+gem 'babosa'
 gem 'bcrypt_pbkdf', require: false
 gem 'brotli'
 gem 'deepsort'
@@ -21,6 +22,7 @@ gem 'faraday'
 gem 'faraday-encoding'
 gem 'faraday-http-cache'
 gem 'faraday_middleware'
+gem 'friendly_id'
 gem 'groupdate'
 gem 'hightop'
 gem 'hiredis'
@@ -101,7 +103,6 @@ group :test do
 end
 
 # gem 'ancestry'
-# gem 'babosa', require: false
 # gem 'blingfire' # https://github.com/ankane/blingfire
 # gem 'cld'
 # gem 'connection_pool'
