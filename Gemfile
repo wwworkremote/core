@@ -119,3 +119,6 @@ end
 # gem 'safely_block' # https://github.com/ankane/safely
 # gem 'slack-notifier'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+
+gem 'sentry-rails'
+gem 'sentry-ruby'
