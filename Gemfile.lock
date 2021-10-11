@@ -359,6 +359,16 @@ GEM
       activerecord (>= 4.0.0)
       railties (>= 4.0.0)
     sd_notify (0.1.1)
+    sentry-rails (4.7.3)
+      railties (>= 5.0)
+      sentry-ruby-core (~> 4.7.0)
+    sentry-ruby (4.7.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      faraday (>= 1.0)
+      sentry-ruby-core (= 4.7.3)
+    sentry-ruby-core (4.7.3)
+      concurrent-ruby
+      faraday
     set (1.0.1)
     sidekiq (6.2.2)
       connection_pool (>= 2.2.2)
@@ -493,6 +503,8 @@ DEPENDENCIES
   sanitize
   scenic
   sd_notify
+  sentry-rails
+  sentry-ruby
   sidekiq
   sorted_set
   sshkit
