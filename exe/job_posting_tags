@@ -1,0 +1,13 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+# Rails.logger = Rails.logger.child(entrypoint: __FILE__)
+
+JobPosting
+  .where.not(tags: nil)
+  .find_each(order: :asc, batch_size: 100) do |jp|
+    jp.tags.each do |name|
+      Tag.create(name: name) rescue nil
+    end
+  end
