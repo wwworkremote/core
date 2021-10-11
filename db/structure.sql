@@ -403,6 +403,39 @@ ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
 
 
 --
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tags (
+    id bigint NOT NULL,
+    name public.citext NOT NULL,
+    slug public.citext NOT NULL,
+    root_tag_id integer,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
+
+
+--
 -- Name: target_domains; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -481,6 +514,13 @@ ALTER TABLE ONLY public.pghero_space_stats ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.sources ALTER COLUMN id SET DEFAULT nextval('public.sources_id_seq'::regclass);
+
+
+--
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
 
 
 --
@@ -563,6 +603,14 @@ ALTER TABLE ONLY public.sources
 
 
 --
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: target_domains target_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -627,6 +675,20 @@ CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (si
 
 
 --
+-- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
+
+
+--
+-- Name: index_tags_on_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_tags_on_slug ON public.tags USING btree (slug);
+
+
+--
 -- Name: index_target_domains_on_domain_id_and_job_posting_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -684,6 +746,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211003201634'),
 ('20211004134953'),
 ('20211006115849'),
-('20211006120147');
+('20211006120147'),
+('20211011133311');
 
 
