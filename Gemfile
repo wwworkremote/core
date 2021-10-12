@@ -40,7 +40,7 @@ gem 'pg_search'
 gem 'pgslice'
 gem 'pgsync'
 gem 'public_suffix'
-gem 'puma', '~> 5.0'
+gem 'puma', '~> 5.5'
 gem 'puma_worker_killer'
 gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
