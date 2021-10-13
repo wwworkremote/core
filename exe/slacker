@@ -19,7 +19,9 @@ module Uma
       puts 'foo'
       return foo
     end
-  rescue NoMatchingPatternError
+  rescue NoMatchingPatternError => e
+    Sentry.capture_exception(e)
+    nil
   end
 
   def self.aaa(obj)
@@ -27,6 +29,8 @@ module Uma
     in foo: String => foo
       return foo
     end
-  rescue NoMatchingPatternError
+  rescue NoMatchingPatternError => e
+    Sentry.capture_exception(e)
+    nil
   end
 end

@@ -16,6 +16,7 @@ module Runners
 
         Rails.logger.info('Complete')
       rescue StandardError => e
+        Sentry.capture_exception(e)
         Rails.logger.error(e.message)
         Rails.logger.debug { e }
       ensure

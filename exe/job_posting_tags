@@ -9,6 +9,11 @@ JobPosting
   .find_each(order: :asc, batch_size: 100) do |jp|
     jp.tags.each do |name|
       clean_name = name.downcase.gsub(/[[:space:]]/i, ' ').strip
-      Tag.find_or_create_by(name: clean_name) rescue nil
+      begin
+        Tag.find_or_create_by(name: clean_name)
+      rescue StandardError => e
+        Sentry.capture_exception(e)
+        nil
+      end
     end
   end
