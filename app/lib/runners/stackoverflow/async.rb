@@ -4,11 +4,12 @@ module Runners
   module StackOverflow
     class Async
       include Sidekiq::Worker
-      sidekiq_options queue: :runners
+      include Sidekiq::Throttled::Worker
+      sidekiq_options queue: :stackoverflow_runners
+      sidekiq_throttled(concurrency: { limit: 1 }, threshold: { limit: 1, period: 30.minutes })
 
       def perform(term = nil)
         term = 'sidekiq' if term.blank?
-        #         Rails.logger = Rails.logger.child(term: term, entrypoint: self.class.name)
         Runners::StackOverflow.run(term: term)
       end
     end

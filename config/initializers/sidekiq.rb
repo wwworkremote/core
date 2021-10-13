@@ -2,6 +2,7 @@
 
 require 'sidekiq'
 require 'sidekiq/api'
+require 'sidekiq/throttled'
 
 Sidekiq.default_worker_options = {
   backtrace: true,
@@ -26,3 +27,5 @@ Sidekiq.configure_server do |config|
     network_timeout: 10
   }
 end
+
+Sidekiq::Throttled.setup!

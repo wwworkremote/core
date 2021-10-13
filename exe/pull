@@ -6,8 +6,6 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-# Rails.logger = Rails.logger.child( term: term, entrypoint: __FILE__)
-
 [
   Runners::HackerNews::Async,
   Runners::Indeed::Async,

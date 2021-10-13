@@ -124,3 +124,5 @@ gem 'sentry-rails'
 gem 'sentry-ruby'
 
 gem 'newrelic_rpm'
+
+gem 'sidekiq-throttled'
