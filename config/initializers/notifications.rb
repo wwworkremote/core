@@ -16,8 +16,10 @@ ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
       event: event_json
     )
   rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation => e
+    Sentry.capture_exception(e)
     Rails.logger.debug { ['Duplicate signature', context] }
   rescue StandardError => e
+    Sentry.capture_exception(e)
     Rails.logger.error(e.message, context.merge(signature: signature))
     Rails.logger.debug { e }
   end

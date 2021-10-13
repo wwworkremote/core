@@ -19,5 +19,6 @@ term = Shellwords.escape(ARGV.first || 'programming')
   Runners::WeWorkRemotely::Async
 ].each do |runner|
   runner.perform_async(term)
-rescue StandardError
+rescue StandardError => e
+  Sentry.capture_exception(e)
 end

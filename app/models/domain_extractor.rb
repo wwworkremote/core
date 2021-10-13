@@ -21,9 +21,25 @@ class DomainExtractor
 
       url = self.class.format(name)
 
-      data << fqdn = self.class.using_addressable(url) rescue nil
-      data << self.class.using_public_suffix(fqdn) rescue nil
-      data << self.class.using_domain_name(fqdn) rescue nil
+      data << fqdn = begin
+        self.class.using_addressable(url)
+      rescue StandardError => e
+        Sentry.capture_exception(e)
+        nil
+      end
+
+      data << begin
+        self.class.using_public_suffix(fqdn)
+      rescue StandardError => e
+        Sentry.capture_exception(e)
+        nil
+      end
+      data << begin
+        self.class.using_domain_name(fqdn)
+      rescue StandardError => e
+        Sentry.capture_exception(e)
+        nil
+      end
 
       data.compact_blank.sort_by(&:length)
     end

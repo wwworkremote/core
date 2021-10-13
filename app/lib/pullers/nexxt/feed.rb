@@ -19,6 +19,7 @@ module Pullers
       def request
         @request ||= client.get(path, params)
       rescue NoMethodError => e
+        Sentry.capture_exception(e)
         Rails.logger.error { [self.class, __method__, e.class, e.message, e.backtrace.take(10)].inspect }
       end
 
