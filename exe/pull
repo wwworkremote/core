@@ -6,46 +6,7 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-TERMS = %w[
-  apache
-  as400
-  bash
-  clojure
-  cobol
-  csharp
-  docker
-  dotnet
-  flask
-  golang
-  java
-  javascript
-  json
-  jvm
-  kafka
-  kotlin
-  kubernetes
-  linux
-  macos
-  nginx
-  node
-  nodejs
-  ops
-  postgresql
-  python
-  rails
-  react
-  redis
-  resque
-  rspec
-  ruby
-  rust
-  sidekiq
-  spark
-  sql
-  swift
-  typescript
-  zsh
-].freeze
+TERMS = %w[apache as400 bash clojure cobol csharp docker dotnet flask golang java javascript json jvm kafka kotlin kubernetes linux macos nginx node nodejs ops postgresql python rails react redis resque rspec ruby rust sidekiq spark sql swift typescript zsh].freeze
 
 [
   Runners::HackerNews::Async,
@@ -57,7 +18,6 @@ TERMS = %w[
   Runners::StackOverflow::Async,
   Runners::WeWorkRemotely::Async
 ].each do |runner|
-
   runner.perform_async(term)
 
   TERMS.each do |t|
