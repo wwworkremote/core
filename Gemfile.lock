@@ -490,7 +490,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   public_suffix
-  puma (~> 5.0)
+  puma (~> 5.5.2)
   puma_worker_killer
   rails (~> 6.1.4, >= 6.1.4)
   rails-erd
