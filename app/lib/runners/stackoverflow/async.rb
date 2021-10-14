@@ -6,7 +6,7 @@ module Runners
       include Sidekiq::Worker
       include Sidekiq::Throttled::Worker
       sidekiq_options queue: :stackoverflow_runners
-      sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 30.minutes })
+      sidekiq_throttle(concurrency: { limit: 2 }, threshold: { limit: 2, period: 15.minutes })
 
       def perform(term = nil)
         term = 'sidekiq' if term.blank?
