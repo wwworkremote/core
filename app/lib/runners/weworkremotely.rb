@@ -7,5 +7,9 @@ module Runners
     def run(term:)
       Runners::WeWorkRemotely::Runner.new(term: term).call
     end
+
+    def async(term:)
+      Runners::WeWorkRemotely::Async.perform_async(term)
+    end
   end
 end

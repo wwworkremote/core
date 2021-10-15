@@ -7,5 +7,9 @@ module Runners
     def run(term:)
       Runners::Monster::Runner.new(term: term).call
     end
+
+    def async(term:)
+      Runners::Monster::Async.perform_async(term)
+    end
   end
 end

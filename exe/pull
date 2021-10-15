@@ -2,27 +2,19 @@
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
-require 'shellwords'
-
-term = Shellwords.escape(ARGV.first || 'programming')
-
-TERMS = %w[apache as400 bash clojure cobol csharp docker dotnet flask golang java javascript json jvm kafka kotlin kubernetes linux macos nginx node nodejs ops postgresql python rails react redis resque rspec ruby rust sidekiq spark sql swift typescript zsh].freeze
+TERMS = Rails.application.config_for(:search)[:terms].freeze
 
 [
-  Runners::HackerNews::Async,
-  Runners::Indeed::Async,
-  Runners::Monster::Async,
-  Runners::Nexxt::Async,
-  Runners::RemoteOK::Async,
-  Runners::RemotePython::Async,
-  Runners::StackOverflow::Async,
-  Runners::WeWorkRemotely::Async
+  Runners::HackerNews,
+  Runners::Indeed,
+  Runners::Monster,
+  Runners::Nexxt,
+  Runners::RemoteOK,
+  Runners::RemotePython,
+  Runners::StackOverflow,
+  Runners::WeWorkRemotely
 ].each do |runner|
-  runner.perform_async(term)
-
-  TERMS.each do |t|
-    runner.perform_async(t)
-  end
+  TERMS.each { |term| runner.async(term: term) }
 rescue StandardError => e
   Sentry.capture_exception(e)
 end

@@ -7,5 +7,9 @@ module Runners
     def run(term:)
       Runners::HackerNews::Runner.new(term: term).call
     end
+
+    def async(term:)
+      Runners::HackerNews::Async.perform_async(term)
+    end
   end
 end
