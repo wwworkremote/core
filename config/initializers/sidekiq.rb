@@ -2,7 +2,7 @@
 
 require 'sidekiq'
 require 'sidekiq/api'
-require 'sidekiq/throttled'
+# require 'sidekiq/throttled'
 
 Sidekiq.default_worker_options = {
   backtrace: true,
@@ -28,4 +28,4 @@ Sidekiq.configure_server do |config|
   }
 end
 
-Sidekiq::Throttled.setup!
+# Sidekiq::Throttled.setup!

@@ -296,8 +296,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rbtree (0.4.4)
-    redis (4.5.0)
-    redis-prescription (1.0.0)
+    redis (4.5.1)
     regexp_parser (2.1.1)
     retest (1.4.0)
       listen (~> 3.2)
@@ -376,10 +375,6 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
-    sidekiq-throttled (0.13.0)
-      concurrent-ruby
-      redis-prescription
-      sidekiq
     slop (4.9.1)
     smart_properties (1.16.3)
     sorted_set (1.0.3)
@@ -513,7 +508,6 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   sidekiq
-  sidekiq-throttled
   sorted_set
   sshkit
   sshkit-sudo
