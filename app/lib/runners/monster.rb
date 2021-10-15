@@ -9,7 +9,7 @@ module Runners
     end
 
     def async(term:)
-      Runners::Monster::Async.perform_async(term: term)
+      Runners::Monster::Async.perform_async(term)
     end
   end
 end

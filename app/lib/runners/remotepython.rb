@@ -9,7 +9,7 @@ module Runners
     end
 
     def async(term:)
-      Runners::RemotePython::Async.perform_async(term: term)
+      Runners::RemotePython::Async.perform_async(term)
     end
   end
 end

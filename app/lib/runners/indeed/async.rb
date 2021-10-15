@@ -8,7 +8,7 @@ module Runners
       sidekiq_options queue: :indeed_runners
       sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 
-      def perform(term: 'sidekiq')
+      def perform(term)
         Runners::Indeed.run(term: term)
       end
     end
