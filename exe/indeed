@@ -6,10 +6,4 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-TERMS = Rails.application.config_for(:search)[:terms].freeze
-
-Runners::Indeed::Async.perform_async(term)
-
-TERMS.each do |t|
-  Runners::Indeed::Async.perform_async(t)
-end
+Runners::Indeed::Async.perform_async(term: term)

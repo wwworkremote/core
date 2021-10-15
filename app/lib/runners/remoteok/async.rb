@@ -20,7 +20,7 @@ module Runners
         }
       )
 
-      def perform(term)
+      def perform(term:)
         Runners::RemoteOK.run(term: term)
       end
     end
