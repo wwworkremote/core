@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'sorted_set'
+require 'set'
 
 class DomainExtractor
   attr_reader :name
@@ -17,7 +17,7 @@ class DomainExtractor
 
   def domains
     @domains ||= begin
-      data = SortedSet.new
+      data = Set.new
 
       url = self.class.format(name)
 
@@ -41,7 +41,7 @@ class DomainExtractor
         nil
       end
 
-      data.compact_blank.sort_by(&:length)
+      data.compact_blank.sort.sort_by(&:length)
     end
   end
 

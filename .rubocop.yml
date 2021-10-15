@@ -19,7 +19,6 @@ AllCops:
   TargetRubyVersion: 3.0
   UseCache: true
   Include:
-    - 'lib/tasks/**.rake'
     - 'Capfile'
     - 'Gemfile'
     - 'Guardfile'
@@ -28,8 +27,8 @@ AllCops:
     - 'config.ru'
     - 'config/**/*.rb'
     - 'db/**/*.rb'
-    - 'exe/**/*'
     - 'lib/**/*.rb'
+    - 'lib/tasks/**.rake'
     - 'spec/**/*.rb'
   Exclude:
     - '**/.DS_Store'
@@ -37,11 +36,9 @@ AllCops:
     - '**/templates/**/*'
     - '**/tmp/**/*'
     - '**/vendor/**/*'
-    - 'exe/all'
-    - 'exe/backup'
-    - 'exe/dice'
-    - 'vendor/**/*'
+    - 'exe/**/*'
     - 'sbin/**/*'
+    - 'vendor/**/*'
 
 Style/Documentation:
   Enabled: false
