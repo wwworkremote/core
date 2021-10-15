@@ -6,17 +6,7 @@ module Runners
       include Sidekiq::Worker
       include Sidekiq::Throttled::Worker
       sidekiq_options queue: :hackernews_runners
-      sidekiq_throttle(
-        concurrency: {
-          limit: 1,
-          key_suffix: ->(term:) { term.to_s }
-        },
-        threshold: {
-          limit: 1,
-          period: 15.minutes,
-          key_suffix: ->(term:) { term.to_s }
-        }
-      )
+      sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 
       def perform(term: 'sidekiq')
         Runners::HackerNews.run(term: term)
