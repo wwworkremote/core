@@ -18,7 +18,7 @@ module Runners
         }
       )
 
-      def perform(term)
+      def perform(term:)
         Runners::Indeed.run(term: term)
       end
     end

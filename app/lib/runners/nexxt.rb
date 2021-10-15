@@ -9,7 +9,7 @@ module Runners
     end
 
     def async(term:)
-      Runners::Nexxt::Async.perform_async(term).call
+      Runners::Nexxt::Async.perform_async(term: term)
     end
   end
 end
