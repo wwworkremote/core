@@ -49,7 +49,6 @@ gem 'sanitize', require: false
 gem 'scenic'
 gem 'sd_notify'
 gem 'sidekiq'
-gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~> 6.7'
 gem 'twitter-text'

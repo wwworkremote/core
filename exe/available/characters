@@ -7,8 +7,8 @@ docs = JobPosting
        .take(1_000)
        .filter_map { |jp| jp.present? && Normalize.new(jp).call }
 
-require 'sorted_set'
-characters = SortedSet.new
+require 'set'
+characters = Set.new
 
 docs.each do |d|
   d.to_s.gsub(/\w+/, '').chars.each do |c|
@@ -16,7 +16,7 @@ docs.each do |d|
   end
 end
 
-list = characters.compact_blank
+list = characters.compact_blank.sort
 list.each do |c|
   warn("#{c} #{{ c => c.bytes }.to_json}")
 end
