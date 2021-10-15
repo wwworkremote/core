@@ -58,6 +58,12 @@ gem 'whenever', require: false
 gem 'whois'
 gem 'whois-parser'
 
+group :production do
+  gem 'newrelic_rpm'
+  gem 'sentry-rails'
+  gem 'sentry-ruby'
+end
+
 group :development do
   gem 'annotate'
   gem 'brakeman', require: false
@@ -120,9 +126,4 @@ end
 # gem 'slack-notifier'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
 
-gem 'sentry-rails'
-gem 'sentry-ruby'
-
-gem 'newrelic_rpm'
-
-gem 'sidekiq-throttled'
+# gem 'sidekiq-throttled'
