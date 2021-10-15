@@ -8,7 +8,7 @@ module Runners
       sidekiq_options queue: :monster_runners
       sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 
-      def perform(term: 'sidekiq')
+      def perform(term)
         Runners::Monster.run(term: term)
       end
     end
