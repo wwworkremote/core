@@ -6,10 +6,4 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-Runners::RemotePython::Async.perform_async(term)
-
-TERMS = %w[apache as400 bash clojure cobol csharp docker dotnet flask golang java javascript json jvm kafka kotlin kubernetes linux macos nginx node nodejs ops postgresql python rails react redis resque rspec ruby rust sidekiq spark sql swift typescript zsh].freeze
-
-TERMS.each do |t|
-  Runners::RemotePython::Async.perform_async(t)
-end
+Runners::RemotePython.async(term: term)

@@ -7,5 +7,9 @@ module Runners
     def run(term:)
       Runners::StackOverflow::Runner.new(term: term).call
     end
+
+    def async(term:)
+      Runners::StackOverflow::Async.perform_async(term)
+    end
   end
 end

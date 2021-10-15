@@ -7,5 +7,9 @@ module Runners
     def run(term:)
       Runners::Indeed::Runner.new(term: term).call
     end
+
+    def async(term:)
+      Runners::Indeed::Async.perform_async(term)
+    end
   end
 end
