@@ -41,7 +41,7 @@ AllCops:
     - 'exe/backup'
     - 'exe/dice'
     - 'vendor/**/*'
-    - 'bin/**/*'
+    - 'sbin/**/*'
 
 Style/Documentation:
   Enabled: false
@@ -60,7 +60,6 @@ Metrics/MethodLength:
     - 'app/lib/pullers/remotepython.rb'
     - 'app/lib/pullers/stackoverflow.rb'
     - 'app/lib/pullers/weworkremotely.rb'
-    - 'bin/bundle'
     - 'db/migrate/20210815003805_create_job_postings.rb'
 
 Metrics/AbcSize:
@@ -77,14 +76,6 @@ Metrics/BlockLength:
     - 'config/environments/production.rb'
     - 'exe/job_postings'
     - 'lib/tasks/auto_annotate_models.rake'
-
-Metrics/CyclomaticComplexity:
-  Exclude:
-    - 'bin/bundle'
-
-Metrics/PerceivedComplexity:
-  Exclude:
-    - 'bin/bundle'
 
 Naming/InclusiveLanguage:
   Enabled: false
