@@ -297,7 +297,7 @@ GEM
       ffi (~> 1.0)
     redis (4.5.1)
     regexp_parser (2.1.1)
-    retest (1.4.0)
+    retest (1.5.0)
       listen (~> 3.2)
       string-similarity (~> 2.1)
       tty-option (~> 0.1)
