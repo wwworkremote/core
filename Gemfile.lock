@@ -482,7 +482,7 @@ DEPENDENCIES
   public_suffix
   puma (~> 5.5.2)
   puma_worker_killer
-  rails (~> 6.1.4, >= 6.1.4)
+  rails (~> 6.1.4.1)
   rails-erd
   rails-html-sanitizer
   redis
