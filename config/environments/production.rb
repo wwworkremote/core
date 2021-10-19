@@ -21,11 +21,11 @@ Rails.application.configure do
 
   config.cache_store = :redis_cache_store, {
     driver: :hiredis,
-    namespace: 'wwwr::core',
-    url: 'redis://localhost:6379'
+    namespace: 'wwwr:core',
+    url: 'redis://localhost:6379/0'
   }
 
-  # prog_name = 'wwwr::core'
+  # prog_name = 'wwwr:core'
   # device = WwworkRemote::SyslogDevice.new(prog_name)
   # logger = WwworkRemote::Logger.new(device)
   # logger.default_message = 'N/A'
