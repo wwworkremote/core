@@ -1,6 +1,5 @@
 {
-  "dependencies": {
-    "pino": "^7.0.0-rc.5",
-    "prettier": "^2.4.1"
-  }
+  "name": "wwwr-core",
+  "private": true,
+  "version": "0.1.0"
 }
