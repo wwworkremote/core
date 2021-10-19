@@ -29,5 +29,5 @@ append :linked_files, 'config/database.yml', 'config/puma.rb', 'config/master.ke
 #     end
 #   end
 # end
-# 
+#
 # after 'deploy:published', 'deploy:sidekiq:restart'
