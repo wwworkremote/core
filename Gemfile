@@ -57,11 +57,9 @@ gem 'whenever', require: false
 gem 'whois'
 gem 'whois-parser'
 
-group :production do
-  gem 'newrelic_rpm'
-  gem 'sentry-rails'
-  gem 'sentry-ruby'
-end
+gem 'newrelic_rpm'
+gem 'sentry-rails'
+gem 'sentry-ruby'
 
 group :development do
   gem 'annotate'

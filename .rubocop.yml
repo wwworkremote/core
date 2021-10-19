@@ -37,7 +37,7 @@ AllCops:
     - '**/tmp/**/*'
     - '**/vendor/**/*'
     - 'exe/**/*'
-    - 'sbin/**/*'
+    - 'bin/**/*'
     - 'vendor/**/*'
 
 Style/Documentation:
