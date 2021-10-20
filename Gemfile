@@ -61,28 +61,28 @@ gem 'typhoeus'
 gem 'whenever', require: false
 
 group :development do
- # gem 'annotate'
- # gem 'brakeman', require: false
- # gem 'bundler-audit', require: false
- # gem 'erb_lint', require: false
- # gem 'rails-erd'
- # gem 'retest'
- # gem 'webrick', require: false
- # gem 'rubocop-rspec', require: false
- gem 'capistrano'
- gem 'capistrano-asdf'
- gem 'capistrano-bundler'
- gem 'capistrano-rails'
- gem 'listen', '~> 3.3', require: false
- gem 'rubocop', require: false
- gem 'rubocop-performance', require: false
- gem 'rubocop-rails', require: false
- gem 'rubocop-rake', require: false
- gem 'rubocop-require_tools', require: false
- gem 'rubocop-rubycw', require: false
- gem 'rubocop-thread_safety', require: false
- gem 'sshkit', require: false
- gem 'sshkit-sudo', require: false
+  # gem 'annotate'
+  # gem 'brakeman', require: false
+  # gem 'bundler-audit', require: false
+  # gem 'erb_lint', require: false
+  # gem 'rails-erd'
+  # gem 'retest'
+  # gem 'webrick', require: false
+  # gem 'rubocop-rspec', require: false
+  gem 'capistrano'
+  gem 'capistrano-asdf'
+  gem 'capistrano-bundler'
+  gem 'capistrano-rails'
+  gem 'listen', '~> 3.3', require: false
+  gem 'rubocop', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rake', require: false
+  gem 'rubocop-require_tools', require: false
+  gem 'rubocop-rubycw', require: false
+  gem 'rubocop-thread_safety', require: false
+  gem 'sshkit', require: false
+  gem 'sshkit-sudo', require: false
 end
 
 # group :development, :test do
