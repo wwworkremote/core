@@ -16,8 +16,8 @@ set :whenever_roles, :cron
 set :pty, true
 set :ssh_options, { forward_agent: true }
 
-append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
-append :linked_files, 'config/database.yml', 'config/puma.rb', 'config/master.key', 'config/credentials.yml.enc'
+append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system', 'config/credentials'
+append :linked_files, 'config/database.yml', 'config/puma.rb'
 
 # namespace :deploy do
 #   namespace :sidekiq do

@@ -36,3 +36,5 @@ config/master.key
 config/credentials.yml.enc
 config/database.yml
 config/puma.rb
+
+/config/credentials/production.key
