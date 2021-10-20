@@ -60,35 +60,34 @@ gem 'sidekiq'
 gem 'typhoeus'
 
 group :development do
-#   gem 'annotate'
-#   gem 'brakeman', require: false
-#   gem 'bundler-audit', require: false
-# 
-   gem 'sshkit', require: false
-   gem 'sshkit-sudo', require: false
-# 
-   gem 'capistrano'
-   gem 'capistrano-asdf'
-   gem 'capistrano-bundler'
-   gem 'capistrano-rails'
-# 
-#   gem 'erb_lint', require: false
-   gem 'listen', '~> 3.3', require: false
-#   gem 'rails-erd'
-#   gem 'retest'
-# 
-#   gem 'rubocop', require: false
-#   gem 'rubocop-performance', require: false
-#   gem 'rubocop-rails', require: false
-#   gem 'rubocop-rake', require: false
-#   gem 'rubocop-require_tools', require: false
-#   gem 'rubocop-rspec', require: false
-#   gem 'rubocop-rubycw', require: false
-#   gem 'rubocop-thread_safety', require: false
-# 
-#   gem 'webrick', require: false
+  #   gem 'annotate'
+  #   gem 'brakeman', require: false
+  #   gem 'bundler-audit', require: false
+  #
+  gem 'capistrano'
+  gem 'capistrano-asdf'
+  gem 'capistrano-bundler'
+  gem 'capistrano-rails'
+  gem 'sshkit', require: false
+  gem 'sshkit-sudo', require: false
+  #
+  #   gem 'erb_lint', require: false
+  gem 'listen', '~> 3.3', require: false
+  #   gem 'rails-erd'
+  #   gem 'retest'
+  #
+  gem 'rubocop', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rake', require: false
+  gem 'rubocop-require_tools', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-rubycw', require: false
+  gem 'rubocop-thread_safety', require: false
+  #
+  #   gem 'webrick', require: false
 end
-# 
+#
 # group :development, :test do
 #   gem 'byebug'
 #   gem 'faker', require: false
@@ -98,7 +97,7 @@ end
 #   gem 'rspec-rails', require: false
 #   gem 'webmock', require: false
 # end
-# 
+#
 # group :test do
 #   gem 'vcr', require: false
 # end
