@@ -115,6 +115,7 @@ GEM
     hiredis (0.6.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    jemalloc (1.0.1)
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -269,6 +270,7 @@ DEPENDENCIES
   faraday_middleware
   friendly_id
   hiredis
+  jemalloc
   listen (~> 3.3)
   pg (~> 1.1)
   rails (~> 6.1.4.1)
