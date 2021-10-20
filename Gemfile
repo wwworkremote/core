@@ -64,8 +64,8 @@ group :development do
 #   gem 'brakeman', require: false
 #   gem 'bundler-audit', require: false
 # 
-#   gem 'sshkit', require: false
-#   gem 'sshkit-sudo', require: false
+   gem 'sshkit', require: false
+   gem 'sshkit-sudo', require: false
 # 
    gem 'capistrano'
    gem 'capistrano-asdf'
