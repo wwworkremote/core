@@ -2,9 +2,6 @@
 
 require 'active_support/core_ext/integer/time'
 
-require 'wwworkremote/logger'
-require 'wwworkremote/syslog_device'
-
 Rails.application.configure do
   # config.require_master_key = true
   config.action_controller.perform_caching = true
