@@ -25,20 +25,6 @@ Rails.application.configure do
     url: 'redis://localhost:6379/0'
   }
 
-  # prog_name = 'wwwr:core'
-  # device = WwworkRemote::SyslogDevice.new(prog_name)
-  # logger = WwworkRemote::Logger.new(device)
-  # logger.default_message = 'N/A'
-  # logger.before_log = ->(data) { data[:thread_id] = Thread.current.object_id.to_s(36) }
-  # logger.with_fields = {
-  #   name: prog_name,
-  #   hostname: Socket.gethostname,
-  #   instance_id: Druuid.gen.to_s.freeze,
-  #   pid: Process.pid
-  # }.freeze
-  # config.log_level = :debug
-  # config.logger = logger
-
   config.log_formatter = ::Logger::Formatter.new
   config.log_level = :debug
   if ENV['RAILS_LOG_TO_STDOUT'].present?

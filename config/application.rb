@@ -19,11 +19,11 @@ module WwworkRemote
     config.generators.system_tests = nil
     config.time_zone = 'UTC'
 
-    config.autoload_paths << Rails.root.join('app/actions').to_s
-    config.autoload_paths << Rails.root.join('app/lib').to_s
+    # config.autoload_paths << Rails.root.join('app/actions').to_s
+    # config.autoload_paths << Rails.root.join('app/lib').to_s
 
-    config.eager_load_paths << Rails.root.join('app/actions').to_s
-    config.eager_load_paths << Rails.root.join('app/lib').to_s
+    # config.eager_load_paths << Rails.root.join('app/actions').to_s
+    # config.eager_load_paths << Rails.root.join('app/lib').to_s
 
     # config.paths.add 'lib', eager_load: true
     # config.paths.add 'actions', eager_load: true
