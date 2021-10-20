@@ -31,7 +31,7 @@ module Pullers
         f.response :xml, content_type: /\bxml$/
         f.response :encoding
 
-        f.adapter :typhoeus
+        # f.adapter :typhoeus
       end
     end
   end
