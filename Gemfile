@@ -49,6 +49,7 @@ gem 'faraday'
 gem 'faraday_middleware'
 gem 'friendly_id'
 gem 'hiredis'
+gem 'jemalloc'
 gem 'pg', '~> 1.1'
 gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'rubypants'
