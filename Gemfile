@@ -48,7 +48,7 @@ gem 'sentry-ruby'
 # gem 'stopwords-filter', require: 'stopwords'
 # gem 'twitter-text'
 # gem 'twitter_cldr', '~> 6.7'
-# gem 'whenever', require: false
+gem 'whenever', require: false
 # gem 'whois'
 # gem 'whois-parser'
 gem 'faraday'
