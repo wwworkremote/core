@@ -11,12 +11,12 @@ gem 'rails', '~> 6.1.4.1'
 # gem 'addressable'
 # gem 'amazing_print'
 # gem 'babosa'
-# gem 'bcrypt_pbkdf', require: false
+gem 'bcrypt_pbkdf'
 # gem 'brotli'
 # gem 'deepsort'
 # gem 'domain_name'
 # gem 'druuid'
-# gem 'ed25519', require: false
+gem 'ed25519'
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'faraday-encoding'
 # gem 'faraday-http-cache'
