@@ -56,7 +56,7 @@ gem 'sanitize'
 gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'sidekiq'
-gem 'typhoeus'
+# gem 'typhoeus'
 gem 'whenever', require: false
 
 group :development do
