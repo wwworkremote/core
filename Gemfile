@@ -81,7 +81,7 @@ group :development do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rake', require: false
   gem 'rubocop-require_tools', require: false
-  gem 'rubocop-rspec', require: false
+  # gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
   #
