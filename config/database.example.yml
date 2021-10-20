@@ -6,13 +6,12 @@ default: &default
 
 development:
   <<: *default
-  # database: wwworkremote_development
-  url: <%= ENV.fetch('WWWORKREMOTE_DATABASE_URL', 'postgres://wwworkremote:window.snow@malina108/wwworkremote_production') %>
+  url: <%= Rails.application.credentials.database[:url] %>
 
 test:
   <<: *default
-  database: wwworkremote_test
+  url: <%= Rails.application.credentials.database[:url] %>
 
 production:
   <<: *default
-  url: <%= ENV.fetch('WWWORKREMOTE_DATABASE_URL', 'postgres://wwworkremote:window.snow@malina108/wwworkremote_production') %>
+  url: <%= Rails.application.credentials.database[:url] %>
