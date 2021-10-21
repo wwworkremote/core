@@ -43,10 +43,8 @@ gem 'rails', '~> 6.1.4.1'
 # gem 'twitter_cldr', '~> 6.7'
 # gem 'whois'
 # gem 'whois-parser'
-gem 'bcrypt_pbkdf'
-gem 'ed25519'
 gem 'faraday'
-gem 'faraday_middleware'
+# gem 'faraday_middleware'
 gem 'friendly_id'
 gem 'hiredis'
 gem 'pg', '~> 1.1'
@@ -60,6 +58,8 @@ gem 'sidekiq'
 gem 'whenever', require: false
 
 group :development do
+  gem 'bcrypt_pbkdf', require: false
+  gem 'ed25519', require: false
   # gem 'annotate'
   # gem 'brakeman', require: false
   # gem 'bundler-audit', require: false

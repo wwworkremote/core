@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'faraday'
-require 'faraday_middleware'
+# require 'faraday'
+# require 'faraday_middleware'
 
 # require 'typhoeus/adapters/faraday'
 # require 'typhoeus/cache/redis'
