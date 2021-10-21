@@ -53,25 +53,25 @@ def scheduler(start_at:, slots:)
   end
 end
 
-# scheduler(
-#   start_at: Date.today.to_datetime.to_time.utc,
-#   slots: planner(slots: TASKS.shuffle, duration: 1.day)
-# )
+scheduler(
+  start_at: Date.today.to_datetime.to_time.utc,
+  slots: planner(slots: TASKS.shuffle, duration: 1.day)
+)
 
-# every('10 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_postings' }
-# every('10 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_postings' }
-#
-# every('43 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_posting_tags' }
-# every('43 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_posting_tags' }
-#
-# every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner './exe/domain_hierarchy_refresh' }
+every('10 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_postings' }
+every('10 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_postings' }
 
-# every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/job_posting_body_domains' }
-# every('25 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/source_domains' }
-# every('5 2,5,8,11,14,17,20,23 * * *',  roles: [:cron1]) { runner 'exe/job_posting_body_emails' }
-# every('40 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/target_domains' }
-# every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/domains' }
-# every('50 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/email_domains' }
-#
-# every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
-# every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
+every('43 0,3,6,9,12,15,18,21 * * *', roles: [:cron1]) { runner './exe/job_posting_tags' }
+every('43 1,4,7,10,13,16,19,22 * * *', roles: [:cron2]) { runner './exe/job_posting_tags' }
+
+every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner './exe/domain_hierarchy_refresh' }
+
+every('10 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/job_posting_body_domains' }
+every('25 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/source_domains' }
+every('5 2,5,8,11,14,17,20,23 * * *',  roles: [:cron1]) { runner 'exe/job_posting_body_emails' }
+every('40 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/target_domains' }
+every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/domains' }
+every('50 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/email_domains' }
+
+every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
+every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }

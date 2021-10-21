@@ -6,4 +6,4 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-Runners::Monster.async(term: term)
+Runners::Monster.run(term: term)
