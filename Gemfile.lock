@@ -82,8 +82,12 @@ GEM
     concurrent-ruby (1.1.9)
     connection_pool (2.2.5)
     crass (1.0.6)
+    deepsort (0.4.5)
+    druuid (1.0.2)
     ed25519 (1.2.4)
     erubi (1.10.0)
+    ethon (0.15.0)
+      ffi (>= 1.15.0)
     faraday (1.8.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -97,12 +101,18 @@ GEM
       ruby2_keywords (>= 0.0.4)
     faraday-em_http (1.0.0)
     faraday-em_synchrony (1.0.0)
+    faraday-encoding (0.0.5)
+      faraday
     faraday-excon (1.1.0)
+    faraday-http-cache (2.2.0)
+      faraday (>= 0.8)
     faraday-httpclient (1.0.1)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
+    faraday_middleware (1.2.0)
+      faraday (~> 1.0)
     ffi (1.15.4)
     friendly_id (5.4.2)
       activerecord (>= 4.0.0)
@@ -124,6 +134,7 @@ GEM
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
+    multi_xml (0.6.0)
     multipart-post (2.1.1)
     net-scp (3.0.0)
       net-ssh (>= 2.6.5, < 7.0.0)
@@ -237,6 +248,8 @@ GEM
     sshkit-sudo (0.1.0)
       sshkit (~> 1.8)
     thor (1.1.0)
+    typhoeus (1.4.0)
+      ethon (>= 0.9.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
@@ -258,11 +271,17 @@ DEPENDENCIES
   capistrano-asdf
   capistrano-bundler
   capistrano-rails
+  deepsort
+  druuid
   ed25519
   faraday
+  faraday-encoding
+  faraday-http-cache
+  faraday_middleware
   friendly_id
   hiredis
   listen (~> 3.3)
+  multi_xml
   pg (~> 1.1)
   rails (~> 6.1.4.1)
   redis
@@ -280,6 +299,7 @@ DEPENDENCIES
   sidekiq
   sshkit
   sshkit-sudo
+  typhoeus
   whenever
 
 RUBY VERSION
