@@ -24,9 +24,11 @@ Rails.application.configure do
 
   config.log_formatter = ::Logger::Formatter.new
   config.log_level = :debug
-  if ENV['RAILS_LOG_TO_STDOUT'].present?
-    logger           = ActiveSupport::Logger.new($stdout)
-    logger.formatter = config.log_formatter
-    config.logger    = ActiveSupport::TaggedLogging.new(logger)
-  end
+  logger = ActiveSupport::Logger.new($stdout)
+  logger.formatter = config.log_formatter
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+  # config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+
+  # /home/deploy/projects/wwworkremote/core/shared/log/cron_production.log
 end
