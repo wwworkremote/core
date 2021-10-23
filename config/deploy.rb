@@ -4,7 +4,7 @@ lock '~> 3.16.0'
 
 set :application, 'core'
 set :repo_url, 'git@github.com:wwworkremote/core.git'
-set :asdf_tools, %w[ruby nodejs yarn]
+set :asdf_tools, %w[ruby]
 set :branch, 'main'
 set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 
