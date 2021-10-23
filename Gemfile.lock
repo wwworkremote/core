@@ -150,6 +150,7 @@ GEM
     parallel (1.21.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
+    pathname (0.1.0)
     pg (1.2.3)
     racc (1.6.0)
     rack (2.2.3)
@@ -189,7 +190,7 @@ GEM
     redis (4.5.1)
     regexp_parser (2.1.1)
     rexml (3.2.5)
-    rubocop (1.22.1)
+    rubocop (1.22.2)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -282,6 +283,7 @@ DEPENDENCIES
   hiredis
   listen (~> 3.3)
   multi_xml
+  pathname (= 0.1.0)
   pg (~> 1.1)
   rails (~> 6.1.4.1)
   redis
