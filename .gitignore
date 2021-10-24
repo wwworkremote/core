@@ -23,3 +23,5 @@ config/master.key
 config/puma.rb
 spec/examples.txt
 yarn-debug.log*
+
+/config/master.key
