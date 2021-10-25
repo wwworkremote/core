@@ -6,4 +6,4 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-Runners::RemotePython.run(term: term)
+Runners::Indeed.async(term: term)

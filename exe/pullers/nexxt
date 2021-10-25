@@ -6,4 +6,4 @@ require 'shellwords'
 
 term = Shellwords.escape(ARGV.first || 'programming')
 
-Runners::HackerNews.run(term: term)
+Runners::Nexxt.async(term: term)
