@@ -9,55 +9,55 @@ gem 'pathname', '= 0.1.0'
 
 gem 'rails', '~> 6.1.4.1'
 
-# gem 'active_median'
-# gem 'addressable'
-# gem 'amazing_print'
-# gem 'babosa'
-# gem 'brotli'
-gem 'deepsort'
-# gem 'domain_name'
-gem 'druuid'
 # gem 'eps' # https://github.com/ankane/eps
-gem 'faraday-encoding'
-gem 'faraday-http-cache'
-# gem 'groupdate'
-# gem 'hightop'
-# gem 'jsonb_accessor'
-# gem 'loofah'
-gem 'multi_xml'
 # gem 'newrelic_rpm'
-# gem 'nokogiri'
-# gem 'nori'
-# gem 'pg_query', '>= 0.9.0'
 # gem 'pg_search'
 # gem 'pgdexter'
-# gem 'pghero'
 # gem 'pgslice'
 # gem 'pgsync'
-# gem 'public_suffix'
 # gem 'puma', '~> 5.5.2'
 # gem 'puma_worker_killer'
-# gem 'rails-html-sanitizer'
-# gem 'scenic'
-# gem 'sd_notify'
-# gem 'stopwords-filter', require: 'stopwords'
-# gem 'twitter-text'
-# gem 'twitter_cldr', '~> 6.7'
-# gem 'whois'
-# gem 'whois-parser'
+gem 'active_median'
+gem 'addressable'
+gem 'amazing_print'
+gem 'babosa'
+gem 'brotli'
+gem 'deepsort'
+gem 'domain_name'
+gem 'druuid'
 gem 'faraday'
+gem 'faraday-encoding'
+gem 'faraday-http-cache'
 gem 'faraday_middleware'
 gem 'friendly_id'
+gem 'groupdate'
+gem 'hightop'
 gem 'hiredis'
+gem 'jsonb_accessor'
+gem 'loofah'
+gem 'multi_xml'
+gem 'nokogiri'
+gem 'nori'
 gem 'pg', '~> 1.1'
+gem 'pg_query', '>= 0.9.0'
+gem 'pghero'
+gem 'public_suffix'
+gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'rubypants'
 gem 'sanitize'
+gem 'scenic'
+gem 'sd_notify'
 gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'sidekiq', require: false
+gem 'stopwords-filter', require: 'stopwords'
+gem 'twitter-text'
+gem 'twitter_cldr', '~> 6.7'
 gem 'typhoeus'
 gem 'whenever', require: false
+gem 'whois'
+gem 'whois-parser'
 
 group :development do
   gem 'bcrypt_pbkdf', require: false
@@ -86,19 +86,19 @@ group :development do
   gem 'sshkit-sudo', require: false
 end
 
-# group :development, :test do
-# gem 'byebug'
-# gem 'faker', require: false
-# gem 'fuubar', require: false
-# gem 'pry-byebug'
-# gem 'pry-rails'
-# gem 'rspec-rails', require: false
-# gem 'webmock', require: false
-# end
-#
-# group :test do
-# gem 'vcr', require: false
-# end
+group :development, :test do
+  gem 'byebug'
+  gem 'faker', require: false
+  gem 'fuubar', require: false
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'rspec-rails', require: false
+  gem 'webmock', require: false
+end
+
+group :test do
+  gem 'vcr', require: false
+end
 
 # gem 'ancestry'
 # gem 'blingfire' # https://github.com/ankane/blingfire
@@ -115,6 +115,6 @@ end
 # gem 'rollups' # https://github.com/ankane/rollup
 # gem 'safe_yaml'
 # gem 'safely_block' # https://github.com/ankane/safely
-# gem 'sidekiq-throttled'
+gem 'sidekiq-throttled'
 # gem 'slack-notifier'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
