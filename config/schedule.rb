@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 TASKS = %w[
-  ./exe/hackernews
-  ./exe/indeed
-  ./exe/monster
-  ./exe/nexxt
-  ./exe/remoteok
-  ./exe/remotepython
-  ./exe/stackoverflow
-  ./exe/weworkremotely
+  ./exe/pullers/hackernews
+  ./exe/pullers/indeed
+  ./exe/pullers/monster
+  ./exe/pullers/nexxt
+  ./exe/pullers/remoteok
+  ./exe/pullers/remotepython
+  ./exe/pullers/stackoverflow
+  ./exe/pullers/weworkremotely
 ].freeze
 
 require 'whenever'
@@ -22,7 +22,6 @@ JOB_PREFIX = ' cd :path && :environment_variable=:environment nice -n 20 '
 
 job_type :rails, " #{JOB_PREFIX} bundle exec rails :task --silent :output "
 job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
-# job_type :bin_runner, " #{JOB_PREFIX} bin/rails runner :task :output "
 job_type :runner, " #{JOB_PREFIX} bundle exec rails runner :task :output "
 job_type :command, " #{JOB_PREFIX} :task :output "
 
@@ -74,5 +73,5 @@ every('40 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/target_dom
 every('55 2,5,8,11,14,17,20,23 * * *', roles: [:cron1]) { runner 'exe/domains' }
 every('50 2,5,8,11,14,17,20,23 * * *', roles: [:cron2]) { runner 'exe/email_domains' }
 
-every(8.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
+every(3.hours, roles: [:cron1]) { rake 'pghero:capture_space_stats' }
 every(15.minutes, roles: [:cron2]) { rake 'pghero:capture_query_stats' }
