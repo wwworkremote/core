@@ -18,7 +18,7 @@ module Pullers
 
         f.headers[:user_agent] = 'WwworkRemote::StackOverflow/1.0'
 
-        f.url_prefix = 'https://stackoverflow.com/'
+        f.url_prefix = 'https://stackoverflow.com'
         f.path_prefix = 'jobs'
 
         f.headers[:accept] = 'application/rss+xml;charset=utf-8'

@@ -18,7 +18,7 @@ module Pullers
 
         f.headers[:user_agent] = 'WwworkRemote::WeWorkRemotely/1.0'
 
-        f.url_prefix = 'https://weworkremotely.com/'
+        f.url_prefix = 'https://weworkremotely.com'
         f.path_prefix = 'categories'
 
         f.headers[:accept] = 'application/rss+xml;charset=utf-8'

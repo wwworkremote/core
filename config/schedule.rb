@@ -9,6 +9,7 @@ TASKS = %w[
   ./exe/pullers/remotepython
   ./exe/pullers/stackoverflow
   ./exe/pullers/weworkremotely
+  ./exe/pullers/remotive
 ].freeze
 
 require 'whenever'

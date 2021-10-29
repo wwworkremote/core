@@ -11,6 +11,7 @@ TERMS = Rails.application.config_for(:search)[:terms].freeze
   Runners::Nexxt,
   Runners::RemoteOK,
   Runners::RemotePython,
+  Runners::Remotive,
   Runners::StackOverflow,
   Runners::WeWorkRemotely
 ].each do |runner|

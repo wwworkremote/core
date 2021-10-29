@@ -18,7 +18,7 @@ module Pullers
 
         f.headers[:user_agent] = 'WwworkRemote::Nexxt/1.0'
 
-        f.url_prefix = 'https://www.nexxt.com/'
+        f.url_prefix = 'https://www.nexxt.com'
         f.path_prefix = 'jobs/search/rss'
 
         f.headers[:accept] = 'text/xml;charset=utf-8'

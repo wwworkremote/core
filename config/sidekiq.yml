@@ -9,6 +9,7 @@ queues:
   - nexxt_runners
   - remoteok_runners
   - remotepython_runners
+  - remotive_runners
   - stackoverflow_runners
   - weworkremotely_runners
   - default

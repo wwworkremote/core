@@ -39,8 +39,8 @@ gem 'multi_xml'
 gem 'nokogiri'
 gem 'nori'
 gem 'pg', '~> 1.1'
-gem 'pg_query', '>= 0.9.0'
 gem 'pghero'
+gem 'pg_query', '>= 0.9.0'
 gem 'public_suffix'
 gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
@@ -52,8 +52,8 @@ gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'sidekiq', require: false
 gem 'stopwords-filter', require: 'stopwords'
-gem 'twitter-text'
 gem 'twitter_cldr', '~> 6.7'
+gem 'twitter-text'
 gem 'typhoeus'
 gem 'whenever', require: false
 gem 'whois'
@@ -80,6 +80,7 @@ group :development do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rake', require: false
   gem 'rubocop-require_tools', require: false
+  gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
   gem 'sshkit', require: false
