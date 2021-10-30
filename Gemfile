@@ -119,3 +119,6 @@ end
 gem 'sidekiq-throttled'
 # gem 'slack-notifier'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+
+gem 'influxdb-client'
+# gem 'influxdb-rails'
