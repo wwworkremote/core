@@ -1,4 +1,4 @@
-#!/usr/bin/env rails runner
+#!/usr/bin/env rails runnerrun
 # vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
 # frozen_string_literal: true
 
@@ -16,7 +16,7 @@ TERMS = Rails.application.config_for(:search)[:terms].freeze
   Runners::StackOverflow,
   Runners::WeWorkRemotely
 ].each do |runner|
-  TERMS.each { |term| runner.run(term: term) }
+  TERMS.each { |term| runner.async(term: term) }
 rescue StandardError => e
   Sentry.capture_exception(e)
   puts [e.class, e.message, e.backtrace.take(10)].inspect
