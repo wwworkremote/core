@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 TASKS = %w[
+  ./exe/pullers/authenticjobs
   ./exe/pullers/hackernews
   ./exe/pullers/indeed
   ./exe/pullers/monster
   ./exe/pullers/nexxt
   ./exe/pullers/remoteok
   ./exe/pullers/remotepython
+  ./exe/pullers/remotive
   ./exe/pullers/stackoverflow
   ./exe/pullers/weworkremotely
-  ./exe/pullers/remotive
 ].freeze
 
 require 'whenever'

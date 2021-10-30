@@ -7,7 +7,7 @@ module Pullers
 
       def initialize(client: nil, params: nil, path: nil, term: nil)
         @client = client || Nexxt.client
-        @params = params || { k: term.presence || 'ruby' }
+        @params = (params || { k: term.presence || 'ruby' }).compact_blank
         @path = path.to_s.strip
       end
 

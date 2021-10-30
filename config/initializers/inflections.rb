@@ -3,6 +3,7 @@
 DOMAIN_WORDS = %w[
   API
   AngelList
+  AuthenticJobs
   BigDataJobs
   BuiltIn
   CareerBuilder
