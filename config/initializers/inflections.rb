@@ -2,6 +2,7 @@
 
 DOMAIN_WORDS = %w[
   API
+  Adzuna
   AngelList
   AuthenticJobs
   BigDataJobs
@@ -13,11 +14,14 @@ DOMAIN_WORDS = %w[
   FullstackJobs
   GitHub
   GitLab
+  GraphQLJobs
   HackerNews
   Indeed
+  Jooble
   MeerkAds
   Monster
   Nexxt
+  ReedCoUK
   Remote4Me
   RemoteIO
   RemoteInTech
@@ -27,6 +31,7 @@ DOMAIN_WORDS = %w[
   Remotive
   RubyOnRemote
   StackOverflow
+  TheMuse
   USAJobs
   Uncubed
   WeWorkRemotely
