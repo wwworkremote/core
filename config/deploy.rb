@@ -21,10 +21,23 @@ append :linked_files, 'config/database.yml', 'config/puma.rb', 'config/master.ke
 
 namespace :deploy do
   namespace :sidekiq do
+    desc 'Stop Sidekiq'
+    task :stop do
+      on roles(:sidekiq) do
+        execute :sudo, :systemctl, :stop, :sidekiq
+      end
+    end
+
+    desc 'Start Sidekiq'
+    task :start do
+      on roles(:sidekiq) do
+        execute :sudo, :systemctl, :start, :sidekiq
+      end
+    end
+
     desc 'Restart Sidekiq'
     task :restart do
       on roles(:sidekiq) do
-        execute :sudo, :systemctl, :stop, :sidekiq
         execute :sudo, :systemctl, :restart, :sidekiq
       end
     end
