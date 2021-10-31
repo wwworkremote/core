@@ -309,6 +309,8 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
+    sidekiq-failures (1.0.1)
+      sidekiq (>= 4.0.0)
     sidekiq-throttled (0.13.0)
       concurrent-ruby
       redis-prescription
@@ -422,6 +424,7 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   sidekiq
+  sidekiq-failures
   sidekiq-throttled
   sshkit
   sshkit-sudo

@@ -2,11 +2,11 @@
 
 require 'sidekiq'
 require 'sidekiq/api'
-# require 'sidekiq/throttled'
+require 'sidekiq/throttled'
 
 Sidekiq.default_worker_options = {
   backtrace: true,
-  retry: false # No retries, just dead. Use `false` to skip dead queue.
+  retry: 1 # No retries, just dead. Use `false` to skip dead queue.
 }
 
 sidekiq_redis_url = 'redis://localhost:6379'
@@ -21,6 +21,7 @@ Sidekiq.configure_client do |config|
 end
 
 Sidekiq.configure_server do |config|
+  config.failures_max_count = 5000
   config.redis = {
     url: sidekiq_redis_url,
     driver: :hiredis,
@@ -28,4 +29,4 @@ Sidekiq.configure_server do |config|
   }
 end
 
-# Sidekiq::Throttled.setup!
+Sidekiq::Throttled.setup!
