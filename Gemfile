@@ -117,6 +117,9 @@ end
 # gem 'safe_yaml'
 # gem 'safely_block' # https://github.com/ankane/safely
 gem 'sidekiq-throttled'
+
+gem 'sidekiq-failures'
+
 # gem 'slack-notifier'
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
 
