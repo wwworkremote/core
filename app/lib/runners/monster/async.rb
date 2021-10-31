@@ -5,6 +5,7 @@ module Runners
     class Async
       include Sidekiq::Worker
       include Sidekiq::Throttled::Worker
+
       sidekiq_options queue: :monster_runners
       sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 

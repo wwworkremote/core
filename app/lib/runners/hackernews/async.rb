@@ -7,7 +7,6 @@ module Runners
       include Sidekiq::Throttled::Worker
 
       sidekiq_options queue: :hackernews_runners
-
       sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 
       def perform(term)
