@@ -121,6 +121,20 @@ CREATE EXTENSION IF NOT EXISTS sslinfo WITH SCHEMA public;
 COMMENT ON EXTENSION sslinfo IS 'information about SSL certificates';
 
 
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -369,37 +383,29 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: sources; Type: TABLE; Schema: public; Owner: -
+-- Name: source_hashes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.sources (
-    id bigint NOT NULL,
-    signature character varying NOT NULL,
-    event jsonb DEFAULT '{}'::jsonb NOT NULL,
-    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+CREATE TABLE public.source_hashes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    source_id uuid,
+    value text NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    origin_id bigint
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
 --
--- Name: sources_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: sources; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.sources_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: sources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.sources_id_seq OWNED BY public.sources.id;
+CREATE TABLE public.sources (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+)
+PARTITION BY RANGE (created_at);
 
 
 --
@@ -510,13 +516,6 @@ ALTER TABLE ONLY public.pghero_space_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: sources id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sources ALTER COLUMN id SET DEFAULT nextval('public.sources_id_seq'::regclass);
-
-
---
 -- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -595,11 +594,19 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: source_hashes source_hashes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.source_hashes
+    ADD CONSTRAINT source_hashes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: sources sources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sources
-    ADD CONSTRAINT sources_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT sources_pkey PRIMARY KEY (id, created_at);
 
 
 --
@@ -647,6 +654,13 @@ CREATE INDEX index_job_postings_on_source_id ON public.job_postings USING btree 
 
 
 --
+-- Name: index_job_postings_on_tags_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_job_postings_on_tags_and_id ON public.job_postings USING btree (tags, id);
+
+
+--
 -- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -661,17 +675,10 @@ CREATE INDEX index_pghero_space_stats_on_database_and_captured_at ON public.pghe
 
 
 --
--- Name: index_sources_on_origin_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_source_hashes_on_source_id_and_value; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_sources_on_origin_id ON public.sources USING btree (origin_id);
-
-
---
--- Name: index_sources_on_signature; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_sources_on_signature ON public.sources USING btree (signature);
+CREATE UNIQUE INDEX index_source_hashes_on_source_id_and_value ON public.source_hashes USING btree (source_id, value);
 
 
 --
@@ -719,14 +726,6 @@ ALTER TABLE ONLY public.target_domains
 
 
 --
--- Name: sources fk_rails_cbbe8839f4; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sources
-    ADD CONSTRAINT fk_rails_cbbe8839f4 FOREIGN KEY (origin_id) REFERENCES public.origins(id);
-
-
---
 -- PostgreSQL database dump complete
 --
 
@@ -739,14 +738,14 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210712021013'),
 ('20210815003805'),
 ('20210905163739'),
-('20210905171239'),
 ('20210926193251'),
 ('20210930221729'),
 ('20211001125635'),
 ('20211003201634'),
 ('20211004134953'),
-('20211006115849'),
 ('20211006120147'),
-('20211011133311');
+('20211011133311'),
+('20211011135906'),
+('20211031220334');
 
 

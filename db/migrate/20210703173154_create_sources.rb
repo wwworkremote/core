@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
 class CreateSources < ActiveRecord::Migration[6.1]
-  def change
-    create_table :sources do |t|
-      t.string :signature, unique: true, null: false
-      t.jsonb :event, default: {}, null: false
-      t.jsonb :payload, default: {}, null: false
+  def up
+    execute <<-SQL.squish
+      create table public.sources (
+        id uuid not null default gen_random_uuid(),
+        "event" jsonb not null default '{}'::jsonb,
+        payload jsonb not null default '{}'::jsonb,
+        created_at timestamp(6) without time zone not null default CURRENT_TIMESTAMP,
+        primary key (id, created_at)
+      ) partition by range (created_at);
+    SQL
+  end
 
-      t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
-      t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
-    end
-
-    add_index :sources, :signature, unique: true
+  def down
+    raise ActiveRecord::IrreversibleMigration
   end
 end
