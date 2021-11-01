@@ -20,4 +20,10 @@ Rails.application.configure do
     driver: :hiredis,
     namespace: 'wwwr:dash'
   }
+
+  config.log_formatter = ::Logger::Formatter.new
+  config.log_level = :debug
+  logger = ActiveSupport::Logger.new($stdout)
+  logger.formatter = config.log_formatter
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
 end

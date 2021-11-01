@@ -8,17 +8,17 @@ ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
   payload = event_json.delete('payload')
 
   # deep_sort breaks?
+  payload = payload.deep_sort if payload.is_a?(Hash) || payload.is_a?(Array)
   signature = Digest::SHA2.hexdigest(payload.to_json)
 
   context = Rails.configuration.x.context.merge(signature: signature)
 
   begin
-    next if SourceHash.exists?(value: signature)
+    next if Source.exists?(signature: signature)
 
-    source = Source.create(payload: payload, event: event_json)
+    Source.create(signature: signature, payload: payload, event: event_json)
 
-    SourceHash.create(source_id: source.id, value: signature)
-
+    # SourceHash.create(source_id: source.id.first, value: signature)
   rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation => e
     Sentry.capture_exception(e)
     Rails.logger.debug { ['Duplicate signature', context] }

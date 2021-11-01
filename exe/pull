@@ -5,9 +5,8 @@
 # TERMS = Rails.application.config_for(:search)[:terms].freeze
 
 TERMS = %w[ruby].freeze 
-
+# Runners::AuthenticJobs,
 [
-  Runners::AuthenticJobs,
   Runners::HackerNews,
   Runners::Indeed,
   Runners::Monster,

@@ -4,7 +4,7 @@ class Source < ApplicationRecord
   range_partition_by { '(created_at::date)' }
 
   self.primary_key = :id, :created_at
-  self.implicit_order_column = 'created_at'
+  self.implicit_order_column = :created_at
 
   has_many :job_postings, dependent: :nullify
 

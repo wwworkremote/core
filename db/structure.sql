@@ -401,6 +401,7 @@ CREATE TABLE public.source_hashes (
 
 CREATE TABLE public.sources (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
     event jsonb DEFAULT '{}'::jsonb NOT NULL,
     payload jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -679,6 +680,13 @@ CREATE INDEX index_pghero_space_stats_on_database_and_captured_at ON public.pghe
 --
 
 CREATE UNIQUE INDEX index_source_hashes_on_source_id_and_value ON public.source_hashes USING btree (source_id, value);
+
+
+--
+-- Name: index_sources_on_id_and_created_at_and_signature; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_sources_on_id_and_created_at_and_signature ON ONLY public.sources USING btree (id, created_at, signature);
 
 
 --
