@@ -5,12 +5,15 @@ class CreateSources < ActiveRecord::Migration[6.1]
     execute <<-SQL.squish
       create table public.sources (
         id uuid not null default gen_random_uuid(),
+        signature text not null,
         "event" jsonb not null default '{}'::jsonb,
         payload jsonb not null default '{}'::jsonb,
         created_at timestamp(6) without time zone not null default CURRENT_TIMESTAMP,
         primary key (id, created_at)
       ) partition by range (created_at);
     SQL
+
+    add_index :sources, %i[id created_at signature], unique: true
   end
 
   def down
