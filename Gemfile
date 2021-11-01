@@ -5,9 +5,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.0.2'
 
-gem 'pathname', '= 0.1.0'
+gem 'pathname', '=0.1.0'
 
-gem 'rails', '~> 6.1.4.1'
+gem 'rails', '~>6.1.4.1'
 
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'newrelic_rpm'
@@ -15,7 +15,7 @@ gem 'rails', '~> 6.1.4.1'
 # gem 'pgdexter'
 # gem 'pgslice'
 # gem 'pgsync'
-# gem 'puma', '~> 5.5.2'
+# gem 'puma', '~>5.5.2'
 # gem 'puma_worker_killer'
 gem 'active_median'
 gem 'addressable'
@@ -38,9 +38,9 @@ gem 'loofah'
 gem 'multi_xml'
 gem 'nokogiri'
 gem 'nori'
-gem 'pg', '~> 1.1'
+gem 'pg', '~>1.1'
 gem 'pghero'
-gem 'pg_query', '>= 0.9.0'
+gem 'pg_query', '>=0.9.0'
 gem 'public_suffix'
 gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
@@ -52,7 +52,7 @@ gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'sidekiq', require: false
 gem 'stopwords-filter', require: 'stopwords'
-gem 'twitter_cldr', '~> 6.7'
+gem 'twitter_cldr', '~>6.7'
 gem 'twitter-text'
 gem 'typhoeus'
 gem 'whenever', require: false
@@ -74,7 +74,7 @@ group :development do
   gem 'capistrano-asdf'
   gem 'capistrano-bundler'
   gem 'capistrano-rails'
-  gem 'listen', '~> 3.3', require: false
+  gem 'listen', '~>3.3', require: false
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
@@ -89,7 +89,7 @@ end
 
 group :development, :test do
   gem 'byebug'
-  gem 'faker', require: false
+  gem 'faker'
   gem 'fuubar', require: false
   gem 'pry-byebug'
   gem 'pry-rails'
@@ -125,3 +125,7 @@ gem 'sidekiq-failures'
 
 gem 'influxdb-client'
 # gem 'influxdb-rails'
+#
+gem 'pg_party'
+
+gem 'composite_primary_keys', '=13.0.0'

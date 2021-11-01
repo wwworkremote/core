@@ -3,6 +3,7 @@
 class Init < ActiveRecord::Migration[6.1]
   def up
     enable_extension 'citext'
+    enable_extension 'fuzzystrmatch'
     enable_extension 'hstore'
     enable_extension 'ltree'
     enable_extension 'pg_stat_statements'
@@ -10,7 +11,7 @@ class Init < ActiveRecord::Migration[6.1]
     enable_extension 'pgcrypto'
     enable_extension 'plpgsql'
     enable_extension 'sslinfo'
-    enable_extension 'fuzzystrmatch'
+    enable_extension 'uuid-ossp'
   end
 
   def down

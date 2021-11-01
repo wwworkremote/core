@@ -18,7 +18,8 @@ TERMS = %w[ruby].freeze
   Runners::StackOverflow,
   Runners::WeWorkRemotely
 ].each do |runner|
-  TERMS.each { |term| runner.async(term: term) }
+  # TERMS.each { |term| runner.async(term: term) }
+  TERMS.each { |term| runner.run(term: term) }
 rescue StandardError => e
   Sentry.capture_exception(e)
   puts [e.class, e.message, e.backtrace.take(10)].inspect

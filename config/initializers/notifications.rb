@@ -13,11 +13,12 @@ ActiveSupport::Notifications.monotonic_subscribe('request.faraday') do |event|
   context = Rails.configuration.x.context.merge(signature: signature)
 
   begin
-    Source.create(
-      signature: signature,
-      payload: payload,
-      event: event_json
-    )
+    next if SourceHash.exists?(value: signature)
+
+    source = Source.create(payload: payload, event: event_json)
+
+    SourceHash.create(source_id: source.id, value: signature)
+
   rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation => e
     Sentry.capture_exception(e)
     Rails.logger.debug { ['Duplicate signature', context] }
