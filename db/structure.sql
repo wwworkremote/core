@@ -383,19 +383,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: source_hashes; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.source_hashes (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    source_id uuid,
-    value text NOT NULL,
-    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
 -- Name: sources; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -595,14 +582,6 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: source_hashes source_hashes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.source_hashes
-    ADD CONSTRAINT source_hashes_pkey PRIMARY KEY (id);
-
-
---
 -- Name: sources sources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -676,13 +655,6 @@ CREATE INDEX index_pghero_space_stats_on_database_and_captured_at ON public.pghe
 
 
 --
--- Name: index_source_hashes_on_source_id_and_value; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_source_hashes_on_source_id_and_value ON public.source_hashes USING btree (source_id, value);
-
-
---
 -- Name: index_sources_on_id_and_created_at_and_signature; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -741,7 +713,6 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210626222927'),
-('20210703173154'),
 ('20210712020439'),
 ('20210712021013'),
 ('20210815003805'),
