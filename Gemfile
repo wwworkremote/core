@@ -9,19 +9,12 @@ gem 'pathname', '=0.1.0'
 
 gem 'rails', '~>6.1.4.1'
 
-# gem 'eps' # https://github.com/ankane/eps
-# gem 'newrelic_rpm'
-# gem 'pg_search'
-# gem 'pgdexter'
-# gem 'pgslice'
-# gem 'pgsync'
-# gem 'puma', '~>5.5.2'
-# gem 'puma_worker_killer'
 gem 'active_median'
 gem 'addressable'
 gem 'amazing_print'
 gem 'babosa'
 gem 'brotli'
+gem 'composite_primary_keys', '=13.0.0'
 gem 'deepsort'
 gem 'domain_name'
 gem 'druuid'
@@ -33,6 +26,7 @@ gem 'friendly_id'
 gem 'groupdate'
 gem 'hightop'
 gem 'hiredis'
+gem 'influxdb-client'
 gem 'jsonb_accessor'
 gem 'loofah'
 gem 'multi_xml'
@@ -40,6 +34,7 @@ gem 'nokogiri'
 gem 'nori'
 gem 'pg', '~>1.1'
 gem 'pghero'
+gem 'pg_party'
 gem 'pg_query', '>=0.9.0'
 gem 'public_suffix'
 gem 'rails-html-sanitizer'
@@ -51,6 +46,8 @@ gem 'sd_notify'
 gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'sidekiq', require: false
+gem 'sidekiq-failures'
+gem 'sidekiq-throttled'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~>6.7'
 gem 'twitter-text'
@@ -61,19 +58,11 @@ gem 'whois-parser'
 
 group :development do
   gem 'bcrypt_pbkdf', require: false
-  gem 'ed25519', require: false
-  # gem 'annotate'
-  # gem 'brakeman', require: false
-  # gem 'bundler-audit', require: false
-  # gem 'erb_lint', require: false
-  # gem 'rails-erd'
-  # gem 'retest'
-  # gem 'webrick', require: false
-  # gem 'rubocop-rspec', require: false
   gem 'capistrano'
   gem 'capistrano-asdf'
   gem 'capistrano-bundler'
   gem 'capistrano-rails'
+  gem 'ed25519', require: false
   gem 'listen', '~>3.3', require: false
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
@@ -102,30 +91,36 @@ group :test do
 end
 
 # gem 'ancestry'
+# gem 'annotate'
 # gem 'blingfire' # https://github.com/ankane/blingfire
+# gem 'brakeman', require: false
+# gem 'bundler-audit', require: false
 # gem 'cld'
 # gem 'connection_pool'
+# gem 'eps' # https://github.com/ankane/eps
+# gem 'erb_lint', require: false
 # gem 'fugit'
 # gem 'hashie'
+# gem 'influxdb-rails'
 # gem 'lol_dba', require: false
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
+# gem 'newrelic_rpm'
 # gem 'notable' # https://github.com/ankane/notable
+# gem 'pg_search'
+# gem 'pgdexter'
+# gem 'pgslice'
+# gem 'pgsync'
+# gem 'puma', '~>5.5.2'
+# gem 'puma_worker_killer'
+# gem 'rails-erd'
 # gem 'rainbow'
 # gem 'rash_alt'
+# gem 'retest'
 # gem 'rollups' # https://github.com/ankane/rollup
+# gem 'rubocop-rspec', require: false
 # gem 'safe_yaml'
 # gem 'safely_block' # https://github.com/ankane/safely
-gem 'sidekiq-throttled'
-
-gem 'sidekiq-failures'
-
 # gem 'slack-notifier'
+# gem 'webrick', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
-
-gem 'influxdb-client'
-# gem 'influxdb-rails'
-#
-gem 'pg_party'
-
-gem 'composite_primary_keys', '=13.0.0'
