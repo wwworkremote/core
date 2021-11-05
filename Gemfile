@@ -30,6 +30,7 @@ gem 'influxdb-client'
 gem 'jsonb_accessor'
 gem 'loofah'
 gem 'multi_xml'
+gem 'newrelic_rpm'
 gem 'nokogiri'
 gem 'nori'
 gem 'pg', '~>1.1'
@@ -105,7 +106,6 @@ end
 # gem 'lol_dba', require: false
 # gem 'memo_wise'
 # gem 'mitie' # https://github.com/ankane/mitie
-# gem 'newrelic_rpm'
 # gem 'notable' # https://github.com/ankane/notable
 # gem 'pg_search'
 # gem 'pgdexter'
