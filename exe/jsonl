@@ -7,15 +7,25 @@ require 'json'
 require 'pathname'
 require 'sorted_set'
 
+module App
+  def self.normalize(line)
+    line = line.to_s
+    Iconv.conv('ASCII//IGNORE', 'UTF8', line)
+    line.gsub(/[[:space:]]+/, ' ').strip
+  end
+end
+
+# Source.pluck(:payload)
+
 jsonl = File.readlines(Pathname.new(Dir.home).join('sources_old.jsonl'), chomp: true).map do |line|
-  line = Iconv.conv('ASCII//IGNORE', 'UTF8', line)
-  line.gsub!(/[[:space:]]+/, ' ')
-  line.strip!
-  JSON.parse(line, symbolize_names: true).compact_blank.tap do |json|
+  # line = Iconv.conv('ASCII//IGNORE', 'UTF8', line)
+  # line.gsub!(/[[:space:]]+/, ' ')
+  # line.strip!
+  JSON.parse(App.normalize(line), symbolize_names: true).compact_blank.tap do |json|
     json.each do |k, _|
       json[k].deep_symbolize_keys! if json[k].is_a?(Hash)
       json[k].compact_blank! if json[k].is_a?(Enumerable)
-      json.delete(k) if json[k].is_a?(Hash) && json[k].empty?
+      json.delete(k) if json[k].is_a?(Enumerable) && json[k].empty?
       json[k].deep_sort! if json[k].is_a?(Enumerable)
     end
   end
