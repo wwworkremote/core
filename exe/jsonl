@@ -1,0 +1,40 @@
+#!/usr/bin/env rails runner
+# vim:ft=ruby ts=2 sw=2 sts=2 et fenc=utf-8
+# frozen_string_literal: true
+
+require 'iconv'
+require 'json'
+require 'pathname'
+require 'sorted_set'
+
+jsonl = File.readlines(Pathname.new(Dir.home).join('sources_old.jsonl'), chomp: true).map do |line|
+  line = Iconv.conv('ASCII//IGNORE', 'UTF8', line)
+  line.gsub!(/[[:space:]]+/, ' ')
+  line.strip!
+  JSON.parse(line, symbolize_names: true).compact_blank.tap do |json|
+    json.each do |k, _|
+      json[k].deep_symbolize_keys! if json[k].is_a?(Hash)
+      json[k].compact_blank! if json[k].is_a?(Enumerable)
+      json.delete(k) if json[k].is_a?(Hash) && json[k].empty?
+      json[k].deep_sort! if json[k].is_a?(Enumerable)
+    end
+  end
+end
+
+items = jsonl.flat_map do |payload|
+  response_bodies = SortedSet.new
+  response_bodies.add(payload.dig(:response, :body))
+  response_bodies.add(payload[:response_body])
+
+  rss = payload.dig(:response, :body, :rss, :channel, :item)
+  response_bodies = SortedSet.new(rss) if rss
+
+  response_bodies.to_a
+end
+
+# schemas = SortedSet.new(items.map(&:keys)).to_a
+
+dataset = items.each_with_object({}) { |json, h| h[Digest::SHA2.hexdigest(json.to_json)] = json  }
+
+binding.pry
+puts
