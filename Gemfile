@@ -126,3 +126,6 @@ end
 # gem 'slack-notifier'
 # gem 'webrick', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
+
+gem 'bson', '~>4.12.1', platforms: %i[mri]
+gem 'mongoid', '>=7.3.3'

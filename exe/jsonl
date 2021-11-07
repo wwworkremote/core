@@ -44,7 +44,8 @@ end
 
 # schemas = SortedSet.new(items.map(&:keys)).to_a
 
-dataset = items.each_with_object({}) { |json, h| h[Digest::SHA2.hexdigest(json.to_json)] = json  }
+# dataset = items.each_with_object({}) { |json, h| h[Digest::SHA2.hexdigest(json.to_json)] = json  }
 
-binding.pry
-puts
+collection = MONGODB_CLIENT[:raw_job_postings]
+
+items.each { |json| collection.insert_one(json.merge(_wwwr_sig: Digest::SHA2.hexdigest(json.to_json))) rescue nil }
