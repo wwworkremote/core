@@ -15,37 +15,59 @@ module App
   end
 end
 
-# Source.pluck(:payload)
+# DB = Sequel.postgres('wwworkremote_development', host: 'localhost', max_connections: 10)
+DB = Sequel.connect('postgres://wwworkremote:window.snow@malina108/wwworkremote_production')
 
-jsonl = File.readlines(Pathname.new(Dir.home).join('sources_old.jsonl'), chomp: true).map do |line|
-  # line = Iconv.conv('ASCII//IGNORE', 'UTF8', line)
-  # line.gsub!(/[[:space:]]+/, ' ')
-  # line.strip!
-  JSON.parse(App.normalize(line), symbolize_names: true).compact_blank.tap do |json|
-    json.each do |k, _|
-      json[k].deep_symbolize_keys! if json[k].is_a?(Hash)
-      json[k].compact_blank! if json[k].is_a?(Enumerable)
-      json.delete(k) if json[k].is_a?(Enumerable) && json[k].empty?
-      json[k].deep_sort! if json[k].is_a?(Enumerable)
+jsonl = []
+
+STEP = 1000
+
+0.upto(100_000) do |offset|
+  offset = offset * STEP
+  payloads = DB[:sources_old].order(:id).select(:payload).limit(STEP).offset(offset).map { |row| row[:payload] }
+  break if payloads.empty?
+  payloads.each do |line|
+    JSON.parse(App.normalize(line), symbolize_names: true).compact_blank.tap do |json|
+      next unless json[:status] == 200
+      next if json[:response_body].blank?
+
+      json.each do |k, _|
+        json[k].deep_symbolize_keys! if json[k].is_a?(Hash)
+        json[k].compact_blank! if json[k].is_a?(Hash)
+        json.delete(k) if json[k].is_a?(Hash) && json[k].empty?
+        json[k].deep_sort! if json[k].is_a?(Hash)
+      end
+
+      next unless json[:response_body].is_a?(Hash)
+      next if json[:"job-count"].present? && json[:"job-count"]&.zero?
+
+      jsonl << json[:response_body]
     end
   end
 end
 
-items = jsonl.flat_map do |payload|
-  response_bodies = SortedSet.new
-  response_bodies.add(payload.dig(:response, :body))
-  response_bodies.add(payload[:response_body])
+items = [] 
 
-  rss = payload.dig(:response, :body, :rss, :channel, :item)
-  response_bodies = SortedSet.new(rss) if rss
+jsonl.each_with_index do |response_body, i|
+  next if response_body.is_a?(String)
+  next if response_body.is_a?(Array)
 
-  response_bodies.to_a
+  rss = response_body.dig(:rss, :channel, :item)
+  next unless rss.is_a?(Array)
+
+  if rss
+    items += SortedSet.new(rss).to_a
+    next
+  end
+
+  items << response_body
 end
-
-# schemas = SortedSet.new(items.map(&:keys)).to_a
-
-# dataset = items.each_with_object({}) { |json, h| h[Digest::SHA2.hexdigest(json.to_json)] = json  }
 
 collection = MONGODB_CLIENT[:raw_job_postings]
 
-items.each { |json| collection.insert_one(json.merge(_wwwr_sig: Digest::SHA2.hexdigest(json.to_json))) rescue nil }
+items.compact_blank.each do |json| 
+  next if json.blank?
+
+  json.merge!(_wwwr: { sig: Digest::SHA2.hexdigest(json.to_json) })
+  collection.insert_one(json) rescue nil
+end
