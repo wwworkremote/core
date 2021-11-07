@@ -74,6 +74,7 @@ group :development do
   gem 'rubocop-require_tools', require: false
   gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
+  gem 'rubocop-sequel', require: false
   gem 'rubocop-thread_safety', require: false
   gem 'sshkit', require: false
   gem 'sshkit-sudo', require: false
@@ -129,3 +130,4 @@ end
 
 gem 'bson', '~>4.12.1', platforms: %i[mri]
 gem 'mongoid', '>=7.3.3'
+gem 'sequel'

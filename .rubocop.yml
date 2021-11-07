@@ -5,6 +5,7 @@ require:
   - rubocop-rake
   - rubocop-rspec
   - rubocop-rubycw
+  - rubocop-sequel
   - rubocop-thread_safety
 
 AllCops:

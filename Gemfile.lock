@@ -299,6 +299,8 @@ GEM
       rubocop (~> 1.19)
     rubocop-rubycw (0.1.6)
       rubocop (~> 1.0)
+    rubocop-sequel (0.3.3)
+      rubocop (~> 1.0)
     rubocop-thread_safety (0.4.4)
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
@@ -321,6 +323,7 @@ GEM
     sentry-ruby-core (4.7.3)
       concurrent-ruby
       faraday
+    sequel (5.50.0)
     set (1.0.2)
     sidekiq (6.3.0)
       connection_pool (>= 2.2.2)
@@ -442,6 +445,7 @@ DEPENDENCIES
   rubocop-require_tools
   rubocop-rspec
   rubocop-rubycw
+  rubocop-sequel
   rubocop-thread_safety
   rubypants
   sanitize
@@ -449,6 +453,7 @@ DEPENDENCIES
   sd_notify
   sentry-rails
   sentry-ruby
+  sequel
   sidekiq
   sidekiq-failures
   sidekiq-throttled
