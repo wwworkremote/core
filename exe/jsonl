@@ -7,67 +7,83 @@ require 'json'
 require 'pathname'
 require 'sorted_set'
 
+COLLECTION = MONGODB_CLIENT[:raw_job_postings]
+
 module App
   def self.normalize(line)
     line = line.to_s
     Iconv.conv('ASCII//IGNORE', 'UTF8', line)
     line.gsub(/[[:space:]]+/, ' ').strip
   end
+
+  def self.jsonl_items(response_body)
+    return [] if response_body.is_a?(String)
+    return [] if response_body.is_a?(Array)
+
+    rss = response_body.dig(:rss, :channel, :item)
+    return [] unless rss.is_a?(Array)
+
+    return SortedSet.new(rss).to_a if rss
+
+    [response_body]
+  end
 end
 
 # DB = Sequel.postgres('wwworkremote_development', host: 'localhost', max_connections: 10)
 DB = Sequel.connect('postgres://wwworkremote:window.snow@malina108/wwworkremote_production')
 
-jsonl = []
+STEP = 10
 
-STEP = 1000
+lbound = 0 
+ubound = 999
 
-0.upto(100_000) do |offset|
-  offset = offset * STEP
-  payloads = DB[:sources_old].order(:id).select(:payload).limit(STEP).offset(offset).map { |row| row[:payload] }
-  break if payloads.empty?
-  payloads.each do |line|
-    JSON.parse(App.normalize(line), symbolize_names: true).compact_blank.tap do |json|
-      next unless json[:status] == 200
-      next if json[:response_body].blank?
+(lbound..ubound).each_slice(STEP).map(&:minmax).map { |rng| puts rng.inspect; Range.new(*rng) }.each do |range|
+  puts
+  puts "---- range=#{range} ----"
+  puts
+  range.each do |offset|
+    puts
+    offset = offset * STEP
+    puts "-------- offset=#{offset} ---------"
+    puts
 
-      json.each do |k, _|
-        json[k].deep_symbolize_keys! if json[k].is_a?(Hash)
-        json[k].compact_blank! if json[k].is_a?(Hash)
-        json.delete(k) if json[k].is_a?(Hash) && json[k].empty?
-        json[k].deep_sort! if json[k].is_a?(Hash)
+    payloads = DB[:sources_old].order(:id).select(:payload).limit(STEP).offset(offset).map { |row| row[:payload] }
+
+    next if payloads.empty?
+    print 'D'
+
+    payloads.each do |line|
+      JSON.parse(App.normalize(line), symbolize_names: true).compact_blank.tap do |json|
+        next unless json[:status] == 200
+        print '1'
+        next if json[:"job-count"].present? && json[:"job-count"]&.zero?
+        print '2'
+        next if json[:response_body].blank?
+        print '3'
+        next unless json[:response_body].is_a?(Hash)
+        print '4'
+
+        response_body = json[:response_body]
+        print '|'
+
+        response_body.each do |k, _|
+          response_body[k].deep_symbolize_keys! if response_body[k].is_a?(Hash)
+          response_body[k].compact_blank! if response_body[k].is_a?(Hash)
+          response_body.delete(k) if response_body[k].is_a?(Hash) && response_body[k].empty?
+          response_body[k].deep_sort! if response_body[k].is_a?(Hash)
+        end
+
+        App.jsonl_items(response_body).compact_blank.each do |raw_job_posting|
+          next if raw_job_posting.blank?
+          print ')'
+
+          COLLECTION.insert_one(raw_job_posting.merge(_wwwr: { sig: Digest::SHA2.hexdigest(raw_job_posting.to_json) })) rescue nil
+        end
+        print ']'
       end
-
-      next unless json[:response_body].is_a?(Hash)
-      next if json[:"job-count"].present? && json[:"job-count"]&.zero?
-
-      jsonl << json[:response_body]
+      print '>'
     end
+    puts '^'
   end
-end
-
-items = [] 
-
-jsonl.each_with_index do |response_body, i|
-  next if response_body.is_a?(String)
-  next if response_body.is_a?(Array)
-
-  rss = response_body.dig(:rss, :channel, :item)
-  next unless rss.is_a?(Array)
-
-  if rss
-    items += SortedSet.new(rss).to_a
-    next
-  end
-
-  items << response_body
-end
-
-collection = MONGODB_CLIENT[:raw_job_postings]
-
-items.compact_blank.each do |json| 
-  next if json.blank?
-
-  json.merge!(_wwwr: { sig: Digest::SHA2.hexdigest(json.to_json) })
-  collection.insert_one(json) rescue nil
+  puts 
 end
