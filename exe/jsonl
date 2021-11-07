@@ -32,12 +32,14 @@ end
 # DB = Sequel.postgres('wwworkremote_development', host: 'localhost', max_connections: 10)
 DB = Sequel.connect('postgres://wwworkremote:window.snow@malina108/wwworkremote_production')
 
-STEP = 10
+STEP = 20
 
 lbound = 0 
-ubound = 999
+ubound = 1400 
 
-(lbound..ubound).each_slice(STEP).map(&:minmax).map { |rng| puts rng.inspect; Range.new(*rng) }.each do |range|
+# 1460..1479
+
+(lbound..ubound).each_slice(STEP).map(&:minmax).map { |rng| puts rng.inspect; Range.new(*rng) }.reverse.each do |range|
   puts
   puts "---- range=#{range} ----"
   puts
@@ -66,11 +68,17 @@ ubound = 999
         response_body = json[:response_body]
         print '|'
 
-        response_body.each do |k, _|
-          response_body[k].deep_symbolize_keys! if response_body[k].is_a?(Hash)
-          response_body[k].compact_blank! if response_body[k].is_a?(Hash)
-          response_body.delete(k) if response_body[k].is_a?(Hash) && response_body[k].empty?
-          response_body[k].deep_sort! if response_body[k].is_a?(Hash)
+        begin
+          response_body.each do |k, _|
+            response_body[k].deep_symbolize_keys! if response_body[k].is_a?(Hash)
+            response_body[k].compact_blank! if response_body[k].is_a?(Hash)
+            response_body.delete(k) if response_body[k].is_a?(Hash) && response_body[k].empty?
+            response_body[k].deep_sort! if response_body[k].is_a?(Hash)
+          end
+        rescue StandardError => e
+          ap e
+          binding.pry
+          puts
         end
 
         App.jsonl_items(response_body).compact_blank.each do |raw_job_posting|
