@@ -34,7 +34,10 @@ DB = Sequel.connect('postgres://wwworkremote:window.snow@malina108/wwworkremote_
 
 STEP = 50
 
-lbound = 0 
+# payloads = DB[:sources].order(:id).select(:payload)
+# get minmax to setup range
+
+lbound = 0
 ubound = 2000
 
 (lbound..ubound).each_slice(STEP).map(&:minmax).map { |rng| puts rng.inspect; Range.new(*rng) }.reverse.each do |range|
@@ -47,24 +50,31 @@ ubound = 2000
     puts "-------- offset=#{offset} ---------"
     puts
 
-    payloads = DB[:sources_old].order(:id).select(:payload).limit(STEP).offset(offset).map { |row| row[:payload] }
+    payloads = DB[:sources]
+      .order(:id)
+      .select(:payload)
+      .limit(STEP)
+      .offset(offset)
+      .map { |row| row[:payload] }
 
     next if payloads.empty?
     print 'D'
 
     payloads.each do |line|
+      puts
+      print '['
       JSON.parse(App.normalize(line), symbolize_names: true).compact_blank.tap do |json|
         next unless json[:status] == 200
-        print '1'
+        print '#'
         next if json[:"job-count"].present? && json[:"job-count"]&.zero?
-        print '2'
+        print '#'
         next if json[:response_body].blank?
-        print '3'
+        print '#'
         next unless json[:response_body].is_a?(Hash)
-        print '4'
+        print '#'
 
         response_body = json[:response_body]
-        print '|'
+        print '*'
 
         begin
           response_body.each do |k, _|
@@ -79,15 +89,15 @@ ubound = 2000
 
         App.jsonl_items(response_body).compact_blank.each do |raw_job_posting|
           next if raw_job_posting.blank?
-          print ')'
+          print ':'
 
           COLLECTION.insert_one(raw_job_posting.merge(_wwwr: { sig: Digest::SHA2.hexdigest(raw_job_posting.to_json) })) rescue nil
         end
-        print ']'
+        print ';'
       end
-      print '>'
+      print ','
     end
-    puts '^'
+    puts ']'
   end
-  puts 
+  puts
 end
