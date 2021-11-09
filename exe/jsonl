@@ -32,12 +32,10 @@ end
 # DB = Sequel.postgres('wwworkremote_development', host: 'localhost', max_connections: 10)
 DB = Sequel.connect('postgres://wwworkremote:window.snow@malina108/wwworkremote_production')
 
-STEP = 20
+STEP = 50
 
 lbound = 0 
-ubound = 1400 
-
-# 1460..1479
+ubound = 2000
 
 (lbound..ubound).each_slice(STEP).map(&:minmax).map { |rng| puts rng.inspect; Range.new(*rng) }.reverse.each do |range|
   puts
@@ -77,8 +75,6 @@ ubound = 1400
           end
         rescue StandardError => e
           ap e
-          binding.pry
-          puts
         end
 
         App.jsonl_items(response_body).compact_blank.each do |raw_job_posting|
