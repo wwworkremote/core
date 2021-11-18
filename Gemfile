@@ -131,3 +131,5 @@ end
 gem 'bson', '~>4.12.1', platforms: %i[mri]
 gem 'mongoid', '>=7.3.3'
 gem 'sequel'
+
+gem 'ffi'
