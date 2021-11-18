@@ -411,6 +411,7 @@ DEPENDENCIES
   faraday-encoding
   faraday-http-cache
   faraday_middleware
+  ffi
   friendly_id
   fuubar
   groupdate
