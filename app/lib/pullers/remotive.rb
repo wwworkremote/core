@@ -29,7 +29,6 @@ module Pullers
         f.response :json, content_type: /\bjson$/
         f.response :encoding
 
-        # f.adapter :typhoeus
       end
     end
   end

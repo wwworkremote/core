@@ -105,8 +105,6 @@ GEM
     druuid (1.0.2)
     ed25519 (1.2.4)
     erubi (1.10.0)
-    ethon (0.15.0)
-      ffi (>= 1.15.0)
     faker (2.19.0)
       i18n (>= 1.6, < 2)
     faraday (1.8.0)
@@ -359,8 +357,6 @@ GEM
       camertron-eprun
       cldr-plurals-runtime-rb (~> 1.1)
       tzinfo
-    typhoeus (1.4.0)
-      ethon (>= 0.9.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -411,7 +407,6 @@ DEPENDENCIES
   faraday-encoding
   faraday-http-cache
   faraday_middleware
-  ffi
   friendly_id
   fuubar
   groupdate
@@ -464,7 +459,6 @@ DEPENDENCIES
   stopwords-filter
   twitter-text
   twitter_cldr (~> 6.7)
-  typhoeus
   vcr
   webmock
   whenever
