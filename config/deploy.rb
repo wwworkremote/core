@@ -44,4 +44,4 @@ namespace :deploy do
   end
 end
 
-after 'deploy:published', 'deploy:sidekiq:restart'
+# after 'deploy:published', 'deploy:sidekiq:restart'
