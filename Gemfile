@@ -54,7 +54,6 @@ gem 'sorted_set'
 gem 'stopwords-filter', require: 'stopwords'
 gem 'twitter_cldr', '~>6.7'
 gem 'twitter-text'
-gem 'typhoeus'
 gem 'whenever', require: false
 gem 'whois'
 gem 'whois-parser'
@@ -132,4 +131,4 @@ gem 'bson', '~>4.12.1', platforms: %i[mri]
 gem 'mongoid', '>=7.3.3'
 gem 'sequel'
 
-gem 'ffi'
+# gem 'ffi'
