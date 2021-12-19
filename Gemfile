@@ -78,8 +78,10 @@ group :development do
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-sequel', require: false
   gem 'rubocop-thread_safety', require: false
+  gem 'solargraph'
   gem 'sshkit', require: false
   gem 'sshkit-sudo', require: false
+  gem 'yard'
 end
 
 group :development, :test do
@@ -130,6 +132,3 @@ end
 # gem 'slack-notifier'
 # gem 'webrick', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
-
-gem 'solargraph'
-gem 'yard'
