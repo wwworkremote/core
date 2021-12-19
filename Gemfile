@@ -3,9 +3,9 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.2'
+ruby '2.7.4'
 
-gem 'pathname', '=0.1.0'
+# gem 'pathname', '=0.1.0'
 
 gem 'rails', '~>6.1.4.1'
 
@@ -14,6 +14,7 @@ gem 'addressable'
 gem 'amazing_print'
 gem 'babosa'
 gem 'brotli'
+gem 'bson', '~>4.12.1', platforms: %i[mri]
 gem 'composite_primary_keys', '=13.0.0'
 gem 'deepsort'
 gem 'domain_name'
@@ -30,6 +31,7 @@ gem 'iconv'
 gem 'influxdb-client'
 gem 'jsonb_accessor'
 gem 'loofah'
+gem 'mongoid', '>=7.3.3'
 gem 'multi_xml'
 gem 'newrelic_rpm'
 gem 'nokogiri'
@@ -47,6 +49,7 @@ gem 'scenic'
 gem 'sd_notify'
 gem 'sentry-rails'
 gem 'sentry-ruby'
+gem 'sequel'
 gem 'sidekiq', require: false
 gem 'sidekiq-failures'
 gem 'sidekiq-throttled'
@@ -102,6 +105,7 @@ end
 # gem 'connection_pool'
 # gem 'eps' # https://github.com/ankane/eps
 # gem 'erb_lint', require: false
+# gem 'ffi'
 # gem 'fugit'
 # gem 'hashie'
 # gem 'influxdb-rails'
@@ -127,8 +131,5 @@ end
 # gem 'webrick', require: false
 # gem 'youtokentome' # https://github.com/ankane/youtokentome
 
-gem 'bson', '~>4.12.1', platforms: %i[mri]
-gem 'mongoid', '>=7.3.3'
-gem 'sequel'
-
-# gem 'ffi'
+gem 'solargraph'
+gem 'yard'
