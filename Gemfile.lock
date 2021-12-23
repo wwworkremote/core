@@ -372,7 +372,7 @@ GEM
       net-ssh (>= 2.8.0)
     sshkit-sudo (0.1.0)
       sshkit (~> 1.8)
-    stopwords-filter (0.6.0)
+    stopwords-filter (0.7.0)
     thor (1.1.0)
     tilt (2.0.10)
     twitter-text (3.1.0)
@@ -499,4 +499,4 @@ RUBY VERSION
    ruby 2.7.4p191
 
 BUNDLED WITH
-   2.2.33
+   2.3.1

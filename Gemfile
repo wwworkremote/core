@@ -5,8 +5,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.4'
 
-# gem 'pathname', '=0.1.0'
-
 gem 'rails', '~>6.1.4.1'
 
 gem 'active_median'
