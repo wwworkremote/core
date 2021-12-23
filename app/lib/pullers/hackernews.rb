@@ -31,7 +31,6 @@ module Pullers
         f.use :instrumentation
         f.response :json, content_type: /\bjson$/
         f.response :encoding
-
       end
     end
   end

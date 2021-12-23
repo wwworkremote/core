@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.4'
+ruby '2.7.5'
 
 gem 'rails', '~>6.1.4.1'
 
@@ -39,6 +39,7 @@ gem 'pghero'
 gem 'pg_party'
 gem 'pg_query', '>=0.9.0'
 gem 'public_suffix'
+gem 'rails_event_store'
 gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
 gem 'rubypants'

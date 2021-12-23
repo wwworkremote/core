@@ -49,6 +49,8 @@ GEM
     activerecord (6.1.4.4)
       activemodel (= 6.1.4.4)
       activesupport (= 6.1.4.4)
+    activerecord-import (1.3.0)
+      activerecord (>= 4.2)
     activestorage (6.1.4.4)
       actionpack (= 6.1.4.4)
       activejob (= 6.1.4.4)
@@ -64,9 +66,14 @@ GEM
       zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
+    aggregate_root (2.3.0)
+      ruby2_keywords
+      ruby_event_store (= 2.3.0)
     airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
     amazing_print (1.4.0)
+    arkency-command_bus (0.4.0)
+      thread_safe
     ast (2.4.2)
     babosa (2.0.0)
     backport (1.2.0)
@@ -187,6 +194,8 @@ GEM
       ruby2_keywords (~> 0.0.5)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
     net-scp (3.0.0)
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
@@ -223,6 +232,8 @@ GEM
     public_suffix (4.0.6)
     racc (1.6.0)
     rack (2.2.3)
+    rack-protection (2.1.0)
+      rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (6.1.4.4)
@@ -245,6 +256,19 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.4.2)
       loofah (~> 2.3)
+    rails_event_store (2.3.0)
+      activejob (>= 3.0)
+      activemodel (>= 3.0)
+      activesupport (>= 3.0)
+      aggregate_root (= 2.3.0)
+      arkency-command_bus (>= 0.4)
+      rails_event_store_active_record (= 2.3.0)
+      ruby_event_store (= 2.3.0)
+      ruby_event_store-browser (= 2.3.0)
+    rails_event_store_active_record (2.3.0)
+      activerecord (>= 5.0)
+      activerecord-import (>= 1.0.2)
+      ruby_event_store (= 2.3.0)
     railties (6.1.4.4)
       actionpack (= 6.1.4.4)
       activesupport (= 6.1.4.4)
@@ -312,6 +336,12 @@ GEM
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
+    ruby_event_store (2.3.0)
+      concurrent-ruby (~> 1.0, >= 1.1.6)
+      ruby2_keywords
+    ruby_event_store-browser (2.3.0)
+      ruby_event_store (= 2.3.0)
+      sinatra
     rubypants (0.7.1)
     sanitize (6.0.0)
       crass (~> 1.0.2)
@@ -342,6 +372,11 @@ GEM
       concurrent-ruby
       redis-prescription
       sidekiq
+    sinatra (2.1.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
+      tilt (~> 2.0)
     solargraph (0.44.2)
       backport (~> 1.2)
       benchmark
@@ -374,6 +409,7 @@ GEM
       sshkit (~> 1.8)
     stopwords-filter (0.7.0)
     thor (1.1.0)
+    thread_safe (0.3.6)
     tilt (2.0.10)
     twitter-text (3.1.0)
       idn-ruby
@@ -460,6 +496,7 @@ DEPENDENCIES
   public_suffix
   rails (~> 6.1.4.1)
   rails-html-sanitizer
+  rails_event_store
   redis
   rspec-rails
   rubocop
@@ -496,7 +533,7 @@ DEPENDENCIES
   yard
 
 RUBY VERSION
-   ruby 2.7.4p191
+   ruby 2.7.5p203
 
 BUNDLED WITH
    2.3.1
