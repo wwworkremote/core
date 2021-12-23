@@ -232,6 +232,72 @@ ALTER SEQUENCE public.emails_id_seq OWNED BY public.emails.id;
 
 
 --
+-- Name: event_store_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.event_store_events (
+    id bigint NOT NULL,
+    event_id uuid NOT NULL,
+    event_type character varying NOT NULL,
+    metadata bytea,
+    data bytea NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    valid_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: event_store_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.event_store_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: event_store_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.event_store_events_id_seq OWNED BY public.event_store_events.id;
+
+
+--
+-- Name: event_store_events_in_streams; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.event_store_events_in_streams (
+    id bigint NOT NULL,
+    stream character varying NOT NULL,
+    "position" integer,
+    event_id uuid NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: event_store_events_in_streams_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.event_store_events_in_streams_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: event_store_events_in_streams_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.event_store_events_in_streams_id_seq OWNED BY public.event_store_events_in_streams.id;
+
+
+--
 -- Name: job_postings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -397,6 +463,214 @@ PARTITION BY RANGE (created_at);
 
 
 --
+-- Name: sources_y2020_m11; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2020_m11 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2020_m12; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2020_m12 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m01; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m01 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m02; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m02 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m03; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m03 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m04; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m04 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m05; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m05 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m06; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m06 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m07; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m07 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m08; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m08 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m09; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m09 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m10; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m10 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m11; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m11 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2021_m12; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2021_m12 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2022_m01; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2022_m01 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: sources_y2022_m02; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources_y2022_m02 (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    signature text NOT NULL,
+    event jsonb DEFAULT '{}'::jsonb NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -462,6 +736,118 @@ ALTER SEQUENCE public.target_domains_id_seq OWNED BY public.target_domains.id;
 
 
 --
+-- Name: sources_y2020_m11; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2020_m11 FOR VALUES FROM ('2020-11-01 00:00:00') TO ('2020-12-01 00:00:00');
+
+
+--
+-- Name: sources_y2020_m12; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2020_m12 FOR VALUES FROM ('2020-12-01 00:00:00') TO ('2021-01-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m01; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m01 FOR VALUES FROM ('2021-01-01 00:00:00') TO ('2021-02-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m02; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m02 FOR VALUES FROM ('2021-02-01 00:00:00') TO ('2021-03-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m03; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m03 FOR VALUES FROM ('2021-03-01 00:00:00') TO ('2021-04-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m04; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m04 FOR VALUES FROM ('2021-04-01 00:00:00') TO ('2021-05-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m05; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m05 FOR VALUES FROM ('2021-05-01 00:00:00') TO ('2021-06-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m06; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m06 FOR VALUES FROM ('2021-06-01 00:00:00') TO ('2021-07-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m07; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m07 FOR VALUES FROM ('2021-07-01 00:00:00') TO ('2021-08-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m08; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m08 FOR VALUES FROM ('2021-08-01 00:00:00') TO ('2021-09-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m09; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m09 FOR VALUES FROM ('2021-09-01 00:00:00') TO ('2021-10-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m10; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m10 FOR VALUES FROM ('2021-10-01 00:00:00') TO ('2021-11-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m11; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m11 FOR VALUES FROM ('2021-11-01 00:00:00') TO ('2021-12-01 00:00:00');
+
+
+--
+-- Name: sources_y2021_m12; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2021_m12 FOR VALUES FROM ('2021-12-01 00:00:00') TO ('2022-01-01 00:00:00');
+
+
+--
+-- Name: sources_y2022_m01; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2022_m01 FOR VALUES FROM ('2022-01-01 00:00:00') TO ('2022-02-01 00:00:00');
+
+
+--
+-- Name: sources_y2022_m02; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources ATTACH PARTITION public.sources_y2022_m02 FOR VALUES FROM ('2022-02-01 00:00:00') TO ('2022-03-01 00:00:00');
+
+
+--
 -- Name: domains id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -473,6 +859,20 @@ ALTER TABLE ONLY public.domains ALTER COLUMN id SET DEFAULT nextval('public.doma
 --
 
 ALTER TABLE ONLY public.emails ALTER COLUMN id SET DEFAULT nextval('public.emails_id_seq'::regclass);
+
+
+--
+-- Name: event_store_events id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.event_store_events ALTER COLUMN id SET DEFAULT nextval('public.event_store_events_id_seq'::regclass);
+
+
+--
+-- Name: event_store_events_in_streams id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.event_store_events_in_streams ALTER COLUMN id SET DEFAULT nextval('public.event_store_events_in_streams_id_seq'::regclass);
 
 
 --
@@ -542,6 +942,22 @@ ALTER TABLE ONLY public.emails
 
 
 --
+-- Name: event_store_events_in_streams event_store_events_in_streams_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.event_store_events_in_streams
+    ADD CONSTRAINT event_store_events_in_streams_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: event_store_events event_store_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.event_store_events
+    ADD CONSTRAINT event_store_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: job_postings job_postings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -590,6 +1006,134 @@ ALTER TABLE ONLY public.sources
 
 
 --
+-- Name: sources_y2020_m11 sources_y2020_m11_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2020_m11
+    ADD CONSTRAINT sources_y2020_m11_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2020_m12 sources_y2020_m12_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2020_m12
+    ADD CONSTRAINT sources_y2020_m12_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m01 sources_y2021_m01_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m01
+    ADD CONSTRAINT sources_y2021_m01_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m02 sources_y2021_m02_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m02
+    ADD CONSTRAINT sources_y2021_m02_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m03 sources_y2021_m03_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m03
+    ADD CONSTRAINT sources_y2021_m03_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m04 sources_y2021_m04_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m04
+    ADD CONSTRAINT sources_y2021_m04_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m05 sources_y2021_m05_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m05
+    ADD CONSTRAINT sources_y2021_m05_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m06 sources_y2021_m06_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m06
+    ADD CONSTRAINT sources_y2021_m06_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m07 sources_y2021_m07_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m07
+    ADD CONSTRAINT sources_y2021_m07_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m08 sources_y2021_m08_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m08
+    ADD CONSTRAINT sources_y2021_m08_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m09 sources_y2021_m09_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m09
+    ADD CONSTRAINT sources_y2021_m09_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m10 sources_y2021_m10_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m10
+    ADD CONSTRAINT sources_y2021_m10_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m11 sources_y2021_m11_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m11
+    ADD CONSTRAINT sources_y2021_m11_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2021_m12 sources_y2021_m12_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2021_m12
+    ADD CONSTRAINT sources_y2021_m12_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2022_m01 sources_y2022_m01_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2022_m01
+    ADD CONSTRAINT sources_y2022_m01_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: sources_y2022_m02 sources_y2022_m02_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sources_y2022_m02
+    ADD CONSTRAINT sources_y2022_m02_pkey PRIMARY KEY (id, created_at);
+
+
+--
 -- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -624,6 +1168,55 @@ CREATE UNIQUE INDEX index_domains_on_name ON public.domains USING btree (name);
 --
 
 CREATE UNIQUE INDEX index_emails_on_address ON public.emails USING btree (address);
+
+
+--
+-- Name: index_event_store_events_in_streams_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_event_store_events_in_streams_on_created_at ON public.event_store_events_in_streams USING btree (created_at);
+
+
+--
+-- Name: index_event_store_events_in_streams_on_stream_and_event_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_event_store_events_in_streams_on_stream_and_event_id ON public.event_store_events_in_streams USING btree (stream, event_id);
+
+
+--
+-- Name: index_event_store_events_in_streams_on_stream_and_position; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_event_store_events_in_streams_on_stream_and_position ON public.event_store_events_in_streams USING btree (stream, "position");
+
+
+--
+-- Name: index_event_store_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_event_store_events_on_created_at ON public.event_store_events USING btree (created_at);
+
+
+--
+-- Name: index_event_store_events_on_event_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_event_store_events_on_event_id ON public.event_store_events USING btree (event_id);
+
+
+--
+-- Name: index_event_store_events_on_event_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_event_store_events_on_event_type ON public.event_store_events USING btree (event_type);
+
+
+--
+-- Name: index_event_store_events_on_valid_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_event_store_events_on_valid_at ON public.event_store_events USING btree (valid_at);
 
 
 --
@@ -690,6 +1283,342 @@ CREATE UNIQUE INDEX index_target_domains_on_job_posting_id_and_domain_id ON publ
 
 
 --
+-- Name: sources_y2020_m11_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2020_m11_id_created_at_signature_idx ON public.sources_y2020_m11 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2020_m12_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2020_m12_id_created_at_signature_idx ON public.sources_y2020_m12 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m01_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m01_id_created_at_signature_idx ON public.sources_y2021_m01 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m02_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m02_id_created_at_signature_idx ON public.sources_y2021_m02 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m03_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m03_id_created_at_signature_idx ON public.sources_y2021_m03 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m04_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m04_id_created_at_signature_idx ON public.sources_y2021_m04 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m05_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m05_id_created_at_signature_idx ON public.sources_y2021_m05 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m06_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m06_id_created_at_signature_idx ON public.sources_y2021_m06 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m07_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m07_id_created_at_signature_idx ON public.sources_y2021_m07 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m08_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m08_id_created_at_signature_idx ON public.sources_y2021_m08 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m09_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m09_id_created_at_signature_idx ON public.sources_y2021_m09 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m10_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m10_id_created_at_signature_idx ON public.sources_y2021_m10 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m11_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m11_id_created_at_signature_idx ON public.sources_y2021_m11 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2021_m12_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2021_m12_id_created_at_signature_idx ON public.sources_y2021_m12 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2022_m01_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2022_m01_id_created_at_signature_idx ON public.sources_y2022_m01 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2022_m02_id_created_at_signature_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sources_y2022_m02_id_created_at_signature_idx ON public.sources_y2022_m02 USING btree (id, created_at, signature);
+
+
+--
+-- Name: sources_y2020_m11_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2020_m11_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2020_m11_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2020_m11_pkey;
+
+
+--
+-- Name: sources_y2020_m12_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2020_m12_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2020_m12_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2020_m12_pkey;
+
+
+--
+-- Name: sources_y2021_m01_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m01_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m01_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m01_pkey;
+
+
+--
+-- Name: sources_y2021_m02_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m02_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m02_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m02_pkey;
+
+
+--
+-- Name: sources_y2021_m03_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m03_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m03_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m03_pkey;
+
+
+--
+-- Name: sources_y2021_m04_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m04_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m04_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m04_pkey;
+
+
+--
+-- Name: sources_y2021_m05_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m05_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m05_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m05_pkey;
+
+
+--
+-- Name: sources_y2021_m06_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m06_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m06_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m06_pkey;
+
+
+--
+-- Name: sources_y2021_m07_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m07_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m07_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m07_pkey;
+
+
+--
+-- Name: sources_y2021_m08_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m08_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m08_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m08_pkey;
+
+
+--
+-- Name: sources_y2021_m09_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m09_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m09_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m09_pkey;
+
+
+--
+-- Name: sources_y2021_m10_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m10_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m10_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m10_pkey;
+
+
+--
+-- Name: sources_y2021_m11_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m11_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m11_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m11_pkey;
+
+
+--
+-- Name: sources_y2021_m12_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2021_m12_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2021_m12_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2021_m12_pkey;
+
+
+--
+-- Name: sources_y2022_m01_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2022_m01_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2022_m01_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2022_m01_pkey;
+
+
+--
+-- Name: sources_y2022_m02_id_created_at_signature_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.index_sources_on_id_and_created_at_and_signature ATTACH PARTITION public.sources_y2022_m02_id_created_at_signature_idx;
+
+
+--
+-- Name: sources_y2022_m02_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.sources_pkey ATTACH PARTITION public.sources_y2022_m02_pkey;
+
+
+--
 -- Name: target_domains fk_rails_94b9410c80; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -725,6 +1654,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211006120147'),
 ('20211011133311'),
 ('20211011135906'),
-('20211031220334');
+('20211031220334'),
+('20211223161128');
 
 
