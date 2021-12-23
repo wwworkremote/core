@@ -31,7 +31,6 @@ module Pullers
         f.use :instrumentation
         f.response :xml, content_type: /\bxml$/
         f.response :encoding
-
       end
     end
   end

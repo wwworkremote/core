@@ -30,7 +30,6 @@ module Pullers
 
         f.response :xml, content_type: /\bxml$/
         f.response :encoding
-
       end
     end
   end
