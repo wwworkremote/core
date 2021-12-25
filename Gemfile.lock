@@ -107,11 +107,83 @@ GEM
     crack (0.4.5)
       rexml
     crass (1.0.6)
+    debug (1.4.0)
+      irb (>= 1.3.6)
+      reline (>= 0.2.7)
     deepsort (0.4.5)
     diff-lcs (1.5.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     druuid (1.0.2)
+    dry-auto_inject (0.8.0)
+      dry-container (>= 0.3.4)
+    dry-cli (0.7.0)
+    dry-configurable (0.13.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.6)
+    dry-container (0.9.0)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 0.13, >= 0.13.0)
+    dry-core (0.7.1)
+      concurrent-ruby (~> 1.0)
+    dry-effects (0.2.0)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.7, >= 0.7.2)
+      dry-core (~> 0.5, >= 0.5)
+      dry-inflector (~> 0.1, >= 0.1.2)
+      dry-initializer (~> 3.0)
+    dry-equalizer (0.3.0)
+    dry-events (0.3.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.5, >= 0.5)
+    dry-files (0.1.0)
+    dry-inflector (0.2.1)
+    dry-initializer (3.0.4)
+    dry-logic (1.2.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.5, >= 0.5)
+    dry-matcher (0.9.0)
+      dry-core (~> 0.4, >= 0.4.8)
+    dry-monads (1.4.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.7)
+    dry-schema (1.8.0)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 0.13, >= 0.13.0)
+      dry-core (~> 0.5, >= 0.5)
+      dry-initializer (~> 3.0)
+      dry-logic (~> 1.0)
+      dry-types (~> 1.5)
+    dry-struct (1.4.0)
+      dry-core (~> 0.5, >= 0.5)
+      dry-types (~> 1.5)
+      ice_nine (~> 0.11)
+    dry-system (0.21.0)
+      concurrent-ruby (~> 1.0)
+      dry-auto_inject (>= 0.4.0)
+      dry-configurable (~> 0.13, >= 0.13.0)
+      dry-container (~> 0.9, >= 0.9.0)
+      dry-core (~> 0.5, >= 0.5)
+      dry-inflector (~> 0.1, >= 0.1.2)
+      dry-struct (~> 1.0)
+    dry-transaction (0.13.3)
+      dry-container (>= 0.2.8)
+      dry-events (>= 0.1.0)
+      dry-matcher (>= 0.7.0)
+      dry-monads (>= 0.4.0)
+    dry-transformer (0.1.1)
+    dry-types (1.5.1)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.3)
+      dry-core (~> 0.5, >= 0.5)
+      dry-inflector (~> 0.1, >= 0.1.2)
+      dry-logic (~> 1.0, >= 1.0.2)
+    dry-validation (1.7.0)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.7, >= 0.7.1)
+      dry-core (~> 0.5, >= 0.5)
+      dry-initializer (~> 3.0)
+      dry-schema (~> 1.8, >= 1.8.0)
     e2mmap (0.1.0)
     ed25519 (1.2.4)
     erubi (1.10.0)
@@ -159,9 +231,13 @@ GEM
     hiredis (0.6.3)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
+    ice_nine (0.11.2)
     iconv (1.0.8)
     idn-ruby (0.1.4)
     influxdb-client (2.1.0)
+    io-console (0.5.10)
+    irb (1.4.1)
+      reline (>= 0.3.0)
     jaro_winkler (1.5.4)
     jsonb_accessor (1.3.2)
       activerecord (>= 5.0)
@@ -184,12 +260,13 @@ GEM
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
     minitest (5.15.0)
-    mongo (2.17.0)
+    mongo (2.16.1)
       bson (>= 4.8.2, < 5.0.0)
     mongoid (7.3.3)
       activemodel (>= 5.1, < 6.2)
       mongo (>= 2.10.5, < 3.0.0)
       ruby2_keywords (~> 0.0.5)
+    multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     mustermann (1.1.1)
@@ -203,6 +280,7 @@ GEM
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nori (2.6.0)
+    oj (3.13.10)
     parallel (1.21.0)
     parser (3.0.3.2)
       ast (~> 2.4.1)
@@ -278,6 +356,8 @@ GEM
     redis (4.5.1)
     redis-prescription (1.0.0)
     regexp_parser (2.2.0)
+    reline (0.3.0)
+      io-console (~> 0.5)
     reverse_markdown (2.1.1)
       nokogiri
     rexml (3.2.5)
@@ -355,6 +435,9 @@ GEM
       concurrent-ruby
       faraday
     sequel (5.51.0)
+    sequel_pg (1.14.0)
+      pg (>= 0.18.0, != 1.2.0)
+      sequel (>= 4.38.0)
     set (1.0.2)
     sidekiq (6.3.1)
       connection_pool (>= 2.2.2)
@@ -457,9 +540,32 @@ DEPENDENCIES
   capistrano-bundler
   capistrano-rails
   composite_primary_keys (= 13.0.0)
+  concurrent-ruby
+  debug
   deepsort
   domain_name
   druuid
+  dry-auto_inject
+  dry-cli
+  dry-configurable
+  dry-container
+  dry-core
+  dry-effects
+  dry-equalizer
+  dry-events
+  dry-files
+  dry-inflector
+  dry-initializer
+  dry-logic
+  dry-matcher
+  dry-monads
+  dry-schema
+  dry-struct
+  dry-system
+  dry-transaction
+  dry-transformer
+  dry-types
+  dry-validation
   ed25519
   faker
   faraday
@@ -476,12 +582,15 @@ DEPENDENCIES
   jsonb_accessor
   listen (~> 3.3)
   loofah
+  mongo (~> 2.16.0)
   mongoid (>= 7.3.3)
+  multi_json
   multi_xml
   newrelic_rpm
   nokogiri
   nori
-  pg (~> 1.1)
+  oj
+  pg (~> 1.2)
   pg_party
   pg_query (>= 0.9.0)
   pghero
@@ -509,6 +618,7 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   sequel
+  sequel_pg
   sidekiq
   sidekiq-failures
   sidekiq-throttled

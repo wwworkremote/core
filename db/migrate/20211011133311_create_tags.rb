@@ -12,7 +12,7 @@ class CreateTags < ActiveRecord::Migration[6.1]
       t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
     end
 
-    add_index :tags, :name, unique: true
-    add_index :tags, :slug, unique: true
+    add_index :tags, :name, unique: true, algorithm: :concurrently
+    add_index :tags, :slug, unique: true, algorithm: :concurrently
   end
 end

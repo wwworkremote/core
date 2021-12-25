@@ -13,7 +13,7 @@ class CreateSources < ActiveRecord::Migration[6.1]
       ) partition by range (created_at);
     SQL
 
-    add_index :sources, %i[id created_at signature], unique: true
+    add_index :sources, %i[id created_at signature], unique: true, algorithm: :concurrently
   end
 
   def down

@@ -8,6 +8,7 @@ class CreateEmails < ActiveRecord::Migration[6.1]
       t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
       t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
     end
-    add_index :emails, :address, unique: true
+
+    add_index :emails, :address, unique: true, algorithm: :concurrently
   end
 end
