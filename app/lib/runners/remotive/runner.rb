@@ -12,7 +12,7 @@ module Runners
       def call
         Rails.logger.info('Begin')
 
-        Pullers::Remotive.pull(term: term)
+        Pullers::Remotive.pull(term:)
 
         Rails.logger.info('Complete')
       rescue StandardError => e

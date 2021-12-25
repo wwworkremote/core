@@ -19,7 +19,7 @@ module Pullers
 
           def request
             @request ||= job_ids.map do |job_id|
-              Job.new(job_id: job_id, client: client).call.data
+              Job.new(job_id:, client:).call.data
             end
           end
 

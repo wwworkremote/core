@@ -5,7 +5,7 @@ module Runners
     module_function
 
     def run(term:)
-      Runners::Remotive::Runner.new(term: term).call
+      Runners::Remotive::Runner.new(term:).call
     end
 
     def async(term:)
