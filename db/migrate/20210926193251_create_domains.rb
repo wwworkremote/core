@@ -9,6 +9,7 @@ class CreateDomains < ActiveRecord::Migration[6.1]
       t.datetime :created_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
       t.datetime :updated_at, precision: 6, default: -> { 'CURRENT_TIMESTAMP' }, null: false
     end
-    add_index :domains, :name, unique: true
+
+    add_index :domains, :name, unique: true, algorithm: :concurrently
   end
 end

@@ -11,9 +11,9 @@ class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
         t.references  :event,       null: false, type: :uuid
         t.datetime    :created_at,  null: false
       end
-      add_index :event_store_events_in_streams, %i[stream position], unique: true
-      add_index :event_store_events_in_streams, [:created_at]
-      add_index :event_store_events_in_streams, %i[stream event_id], unique: true
+      add_index :event_store_events_in_streams, %i[stream position], unique: true, algorithm: :concurrently
+      add_index :event_store_events_in_streams, [:created_at], algorithm: :concurrently
+      add_index :event_store_events_in_streams, %i[stream event_id], unique: true, algorithm: :concurrently
 
       create_table(:event_store_events, id: :bigserial, force: false) do |t|
         t.references  :event,       null: false, type: :uuid
@@ -30,9 +30,9 @@ class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
         t.references  :event,       null: false, type: :string, limit: 36
         t.datetime    :created_at,  null: false, precision: 6
       end
-      add_index :event_store_events_in_streams, %i[stream position], unique: true
-      add_index :event_store_events_in_streams, [:created_at]
-      add_index :event_store_events_in_streams, %i[stream event_id], unique: true
+      add_index :event_store_events_in_streams, %i[stream position], unique: true, algorithm: :concurrently
+      add_index :event_store_events_in_streams, [:created_at], algorithm: :concurrently
+      add_index :event_store_events_in_streams, %i[stream event_id], unique: true, algorithm: :concurrently
 
       create_table(:event_store_events, force: false) do |t|
         t.references  :event,       null: false, type: :string, limit: 36
@@ -43,9 +43,9 @@ class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
         t.datetime    :valid_at,    null: true,  precision: 6
       end
     end
-    add_index :event_store_events, :event_id, unique: true
-    add_index :event_store_events, :created_at
-    add_index :event_store_events, :valid_at
-    add_index :event_store_events, :event_type
+    add_index :event_store_events, :event_id, unique: true, algorithm: :concurrently
+    add_index :event_store_events, :created_at, algorithm: :concurrently
+    add_index :event_store_events, :valid_at, algorithm: :concurrently
+    add_index :event_store_events, :event_type, algorithm: :concurrently
   end
 end

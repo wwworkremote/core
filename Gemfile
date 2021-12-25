@@ -5,18 +5,45 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.1.0'
 
-gem 'rails', '~>6.1.4'
+gem 'bson', '~>4.12.1'
+gem 'mongo', '~>2.16.0'
+gem 'mongoid', '>=7.3.3'
+
+gem 'sequel'
+gem 'sequel_pg', require: 'sequel'
 
 gem 'active_median'
 gem 'addressable'
 gem 'amazing_print'
 gem 'babosa'
 gem 'brotli'
-gem 'bson', '~>4.12.1', platforms: %i[mri]
 gem 'composite_primary_keys', '=13.0.0'
+gem 'concurrent-ruby'
+gem 'debug'
 gem 'deepsort'
 gem 'domain_name'
 gem 'druuid'
+gem 'dry-auto_inject'
+gem 'dry-cli'
+gem 'dry-configurable'
+gem 'dry-container'
+gem 'dry-core'
+gem 'dry-effects'
+gem 'dry-equalizer'
+gem 'dry-events'
+gem 'dry-files'
+gem 'dry-inflector'
+gem 'dry-initializer'
+gem 'dry-logic'
+gem 'dry-matcher'
+gem 'dry-monads'
+gem 'dry-schema'
+gem 'dry-struct'
+gem 'dry-system'
+gem 'dry-transaction'
+gem 'dry-transformer'
+gem 'dry-types'
+gem 'dry-validation'
 gem 'faraday'
 gem 'faraday-encoding'
 gem 'faraday-http-cache'
@@ -29,16 +56,18 @@ gem 'iconv'
 gem 'influxdb-client'
 gem 'jsonb_accessor'
 gem 'loofah'
-gem 'mongoid', '>=7.3.3'
+gem 'multi_json'
 gem 'multi_xml'
 gem 'newrelic_rpm'
 gem 'nokogiri'
 gem 'nori'
-gem 'pg', '~>1.1'
+gem 'oj'
+gem 'pg', '~>1.2' # https://github.com/jeremyevans/sequel_pg/issues/34
 gem 'pghero'
 gem 'pg_party'
 gem 'pg_query', '>=0.9.0'
 gem 'public_suffix'
+gem 'rails', '~>6.1.4'
 gem 'rails_event_store'
 gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
@@ -48,7 +77,6 @@ gem 'scenic'
 gem 'sd_notify'
 gem 'sentry-rails'
 gem 'sentry-ruby'
-gem 'sequel'
 gem 'sidekiq', require: false
 gem 'sidekiq-failures'
 gem 'sidekiq-throttled'
@@ -97,37 +125,58 @@ group :test do
   gem 'vcr', require: false
 end
 
-# gem 'ancestry'
-# gem 'annotate'
-# gem 'blingfire' # https://github.com/ankane/blingfire
-# gem 'brakeman', require: false
-# gem 'bundler-audit', require: false
-# gem 'cld'
-# gem 'connection_pool'
-# gem 'eps' # https://github.com/ankane/eps
-# gem 'erb_lint', require: false
-# gem 'ffi'
-# gem 'fugit'
-# gem 'hashie'
-# gem 'influxdb-rails'
-# gem 'lol_dba', require: false
-# gem 'memo_wise'
-# gem 'mitie' # https://github.com/ankane/mitie
-# gem 'notable' # https://github.com/ankane/notable
-# gem 'pg_search'
-# gem 'pgdexter'
-# gem 'pgslice'
-# gem 'pgsync'
-# gem 'puma', '~>5.5.2'
-# gem 'puma_worker_killer'
-# gem 'rails-erd'
-# gem 'rainbow'
-# gem 'rash_alt'
-# gem 'retest'
-# gem 'rollups' # https://github.com/ankane/rollup
-# gem 'rubocop-rspec', require: false
-# gem 'safe_yaml'
-# gem 'safely_block' # https://github.com/ankane/safely
-# gem 'slack-notifier'
-# gem 'webrick', require: false
-# gem 'youtokentome' # https://github.com/ankane/youtokentome
+__END__
+
+gem 'ancestry'
+gem 'annotate'
+gem 'blingfire' # https://github.com/ankane/blingfire
+gem 'brakeman', require: false
+gem 'bundler-audit', require: false
+gem 'byebug'
+gem 'cld'
+gem 'concurrent-ruby-ext'
+gem 'connection_pool'
+gem 'druuid'
+gem 'eps' # https://github.com/ankane/eps
+gem 'erb_lint', require: false
+gem 'ffi'
+gem 'fileutils'
+gem 'fugit'
+gem 'globalid'
+gem 'hamster'
+gem 'hashie'
+gem 'influxdb-rails'
+gem 'lol_dba', require: false
+gem 'memo_wise'
+gem 'mitie' # https://github.com/ankane/mitie
+gem 'notable' # https://github.com/ankane/notable
+gem 'paint'
+gem 'pathname', '=0.1.0'
+gem 'pg_search'
+gem 'pgdexter'
+gem 'pgslice'
+gem 'pgsync'
+gem 'pry-byebug'
+gem 'pry-doc'
+gem 'pry-rails'
+gem 'puma', '~>5.5.2'
+gem 'puma_worker_killer'
+gem 'rails-erd'
+gem 'rails_event_store'
+gem 'rainbow'
+gem 'rash_alt'
+gem 'require_all'
+gem 'retest'
+gem 'rollups' # https://github.com/ankane/rollup
+gem 'rom'
+gem 'rom-http'
+gem 'rom-sql'
+gem 'rubocop-rspec', require: false
+gem 'safe_yaml'
+gem 'safely_block' # https://github.com/ankane/safely
+gem 'slack-notifier'
+gem 'solargraph'
+gem 'sorted_set'
+gem 'webrick', require: false
+gem 'yard'
+gem 'youtokentome' # https://github.com/ankane/youtokentome
