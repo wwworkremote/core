@@ -5,7 +5,7 @@ module Runners
     module_function
 
     def run(term:)
-      Runners::RemotePython::Runner.new(term: term).call
+      Runners::RemotePython::Runner.new(term:).call
     end
 
     def async(term:)

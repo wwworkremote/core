@@ -5,7 +5,7 @@ module Runners
     module_function
 
     def run(term:)
-      Runners::AuthenticJobs::Runner.new(term: term).call
+      Runners::AuthenticJobs::Runner.new(term:).call
     end
 
     def async(term:)

@@ -11,7 +11,7 @@ module Runners
       sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 
       def perform(term)
-        Runners::Remotive.run(term: term)
+        Runners::Remotive.run(term:)
       end
     end
   end

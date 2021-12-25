@@ -10,7 +10,7 @@ module Runners
       sidekiq_throttle(concurrency: { limit: 1 }, threshold: { limit: 1, period: 15.minutes })
 
       def perform(term)
-        Runners::HackerNews.run(term: term)
+        Runners::HackerNews.run(term:)
       end
     end
   end

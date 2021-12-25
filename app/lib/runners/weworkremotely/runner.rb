@@ -12,7 +12,7 @@ module Runners
       def call
         Rails.logger.info('Begin')
 
-        Pullers::WeWorkRemotely.pull(term: term)
+        Pullers::WeWorkRemotely.pull(term:)
 
         Rails.logger.info('Complete')
       rescue StandardError => e

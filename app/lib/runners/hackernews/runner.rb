@@ -12,7 +12,7 @@ module Runners
       def call
         Rails.logger.info('Begin')
 
-        Pullers::HackerNews.pull(term: term)
+        Pullers::HackerNews.pull(term:)
 
         Rails.logger.info('Complete')
       rescue StandardError => e

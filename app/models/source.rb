@@ -33,7 +33,7 @@ class Source < ApplicationRecord
       next if ActiveRecord::Base.connection.table_exists?(name)
 
       Source.create_partition(
-        name: name,
+        name:,
         start_range: day.beginning_of_month,
         end_range: day.next_month.beginning_of_month
       )
