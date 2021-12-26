@@ -3,7 +3,9 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.1.0'
+ruby '3.1'
+
+gem 'rails', '~>6.1'
 
 gem 'sequel'
 gem 'sequel_pg', require: 'sequel'
@@ -63,7 +65,6 @@ gem 'pghero'
 gem 'pg_party'
 gem 'pg_query', '>=0.9.0'
 gem 'public_suffix'
-gem 'rails', '~>6.1.4'
 gem 'rails_event_store'
 gem 'rails-html-sanitizer'
 gem 'redis', require: %w[redis redis/connection/hiredis]
