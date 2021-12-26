@@ -96,6 +96,7 @@ group :development do
   gem 'capistrano-rails'
   gem 'ed25519', require: false
   gem 'listen', '~>3.3', require: false
+  gem 'retest'
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
@@ -166,7 +167,6 @@ gem 'rails_event_store'
 gem 'rainbow'
 gem 'rash_alt'
 gem 'require_all'
-gem 'retest'
 gem 'rollups' # https://github.com/ankane/rollup
 gem 'rom'
 gem 'rom-http'
