@@ -30,5 +30,4 @@ query = PGDATABASE[:sources].where(id: SOURCE_ID)
 
 records = query.stream.each_with_object([]) { |record, a| a << record }
 
-ap query
-ap records
+payload = records.first[:payload]

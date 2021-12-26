@@ -593,7 +593,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   public_suffix
-  rails (~> 6.1.4)
+  rails (~> 6.1)
   rails-html-sanitizer
   rails_event_store
   redis
