@@ -80,7 +80,6 @@ GEM
     bcrypt_pbkdf (1.1.0)
     benchmark (0.2.0)
     brotli (0.4.0)
-    bson (4.12.1)
     builder (3.2.4)
     byebug (11.1.3)
     camertron-eprun (1.1.1)
@@ -260,12 +259,6 @@ GEM
     mini_mime (1.1.2)
     mini_portile2 (2.6.1)
     minitest (5.15.0)
-    mongo (2.16.1)
-      bson (>= 4.8.2, < 5.0.0)
-    mongoid (7.3.3)
-      activemodel (>= 5.1, < 6.2)
-      mongo (>= 2.10.5, < 3.0.0)
-      ruby2_keywords (~> 0.0.5)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -539,7 +532,6 @@ DEPENDENCIES
   babosa
   bcrypt_pbkdf
   brotli
-  bson (~> 4.12.1)
   byebug
   capistrano
   capistrano-asdf
@@ -588,8 +580,6 @@ DEPENDENCIES
   jsonb_accessor
   listen (~> 3.3)
   loofah
-  mongo (~> 2.16.0)
-  mongoid (>= 7.3.3)
   multi_json
   multi_xml
   newrelic_rpm

@@ -5,10 +5,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.1.0'
 
-gem 'bson', '~>4.12.1'
-gem 'mongo', '~>2.16.0'
-gem 'mongoid', '>=7.3.3'
-
 gem 'sequel'
 gem 'sequel_pg', require: 'sequel'
 

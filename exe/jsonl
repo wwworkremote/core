@@ -7,7 +7,19 @@ require 'json'
 require 'pathname'
 require 'sorted_set'
 
-COLLECTION = MONGODB_CLIENT[:raw_job_postings]
+class Foobar
+  attr_reader :data
+
+  def initialize
+    @data = SortedSet.new
+  end
+
+  def insert_one(params = {})
+    data.add(params)
+  end
+end
+
+COLLECTION = Foobar.new
 
 module App
   def self.normalize(line)
@@ -91,7 +103,9 @@ ubound = 2000
           next if raw_job_posting.blank?
           print ':'
 
-          COLLECTION.insert_one(raw_job_posting.merge(_wwwr: { sig: Digest::SHA2.hexdigest(raw_job_posting.to_json) })) rescue nil
+          COLLECTION.insert_one(
+            raw_job_posting.merge(_wwwr: { sig: Digest::SHA2.hexdigest(raw_job_posting.to_json) })
+          ) rescue nil
         end
         print ';'
       end
