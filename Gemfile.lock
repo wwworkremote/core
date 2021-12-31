@@ -234,7 +234,7 @@ GEM
     iconv (1.0.8)
     idn-ruby (0.1.4)
     influxdb-client (2.1.0)
-    io-console (0.5.10)
+    io-console (0.5.11)
     irb (1.4.1)
       reline (>= 0.3.0)
     jaro_winkler (1.5.4)
@@ -375,16 +375,16 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.3)
-    rubocop (1.24.0)
+    rubocop (1.24.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.15.0, < 2.0)
+      rubocop-ast (>= 1.15.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.15.0)
+    rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
     rubocop-performance (1.13.0)
       rubocop (>= 1.7.0, < 2.0)
@@ -490,7 +490,7 @@ GEM
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
-    twitter_cldr (6.10.0)
+    twitter_cldr (6.11.0)
       camertron-eprun
       cldr-plurals-runtime-rb (~> 1.1)
       tzinfo
@@ -517,7 +517,7 @@ GEM
       whois (>= 4.0.7)
     yard (0.9.27)
       webrick (~> 1.7.0)
-    zeitwerk (2.5.1)
+    zeitwerk (2.5.3)
 
 PLATFORMS
   aarch64-linux
