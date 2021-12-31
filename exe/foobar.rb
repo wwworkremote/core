@@ -16,7 +16,7 @@ module Functions
   extend Dry::Transformer::Registry
 
   def self.load_json(str)
-    MultiJson.load(str)
+    MultiJson.load(str, symbolize_keys: true)
   end
 
   def self.dump_json(val)
@@ -30,4 +30,8 @@ query = PGDATABASE[:sources].where(id: SOURCE_ID)
 
 records = query.stream.each_with_object([]) { |record, a| a << record }
 
-payload = records.first[:payload]
+payload = Functions.load_json(records.first[:payload]).each { |_, v| v.compact_blank! if v.is_a?(Enumerable) }.compact_blank.deep_symbolize_keys
+ap payload
+
+binding.pry
+puts
