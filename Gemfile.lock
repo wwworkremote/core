@@ -221,7 +221,7 @@ GEM
       ruby-progressbar (~> 1.4)
     globalid (1.0.0)
       activesupport (>= 5.0)
-    google-protobuf (3.19.1)
+    google-protobuf (3.19.2)
     groupdate (5.2.4)
       activesupport (>= 5)
     hashdiff (1.0.1)
