@@ -1,3 +1,4 @@
+.DS_Store
 !/log/.keep
 !/tmp/.keep
 !/tmp/pids/
