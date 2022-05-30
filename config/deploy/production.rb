@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
-role :web, %w[jagodka105]
+# role :web, %w[jagodka105]
+#
+NODES = %w[node01 node02 node03 node04 node05].freeze
 
-role :app, %w[malina101 malina102 malina103 jagodka105]
+role :app, NODES
 
-role :cron, %w[malina101 malina102]
+role :cron, NODES
 
-role :cron1, %w[malina101]
-role :cron2, %w[malina102]
+# role :cron1, %w[node101]
+# role :cron2, %w[node102]
 
-role :sidekiq, %w[jagodka105]
+role :sidekiq, NODES
 
-role :redis, %w[jagodka105 malina101 malina102 malina103]
+role :redis, NODES
 
-role :db, %w[malina108], primary: true
+role :db, NODES
