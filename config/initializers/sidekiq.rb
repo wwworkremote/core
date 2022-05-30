@@ -10,7 +10,7 @@ Sidekiq.default_worker_options = {
 }
 
 sidekiq_redis_url = 'redis://localhost:6379'
-sidekiq_redis_url = 'redis://malina103:6379' if Rails.env.production?
+sidekiq_redis_url = 'redis://node103:6379' if Rails.env.production?
 
 Sidekiq.configure_client do |config|
   config.redis = {

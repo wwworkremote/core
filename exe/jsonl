@@ -42,7 +42,7 @@ module App
 end
 
 # DB = Sequel.postgres('wwworkremote_development', host: 'localhost', max_connections: 10)
-DB = Sequel.connect('postgres://wwworkremote:window.snow@malina108/wwworkremote_production')
+DB = Sequel.connect('postgres://wwworkremote:window.snow@node108/wwworkremote_production')
 
 STEP = 50
 
