@@ -19,7 +19,7 @@
 /tmp/pids/*
 /yarn-error.log
 config/credentials.yml.enc
-config/database.yml
+# config/database.yml
 config/master.key
 config/puma.rb
 spec/examples.txt
