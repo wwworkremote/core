@@ -7,9 +7,12 @@ default: &default
 
 development:
   <<: *default
+  database: wwworkremote_development
 
 test:
   <<: *default
+  database: wwworkremote_test
 
 production:
   <<: *default
+  database: wwworkremote_production
