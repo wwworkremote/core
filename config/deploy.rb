@@ -18,30 +18,3 @@ set :ssh_options, { forward_agent: true }
 
 append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
 # append :linked_files, 'config/database.yml', 'config/puma.rb', 'config/master.key', 'config/credentials/production.key'
-
-# namespace :deploy do
-#   namespace :sidekiq do
-#     desc 'Stop Sidekiq'
-#     task :stop do
-#       on roles(:sidekiq) do
-#         execute :sudo, :systemctl, :stop, :sidekiq
-#       end
-#     end
-#
-#     desc 'Start Sidekiq'
-#     task :start do
-#       on roles(:sidekiq) do
-#         execute :sudo, :systemctl, :start, :sidekiq
-#       end
-#     end
-#
-#     desc 'Restart Sidekiq'
-#     task :restart do
-#       on roles(:sidekiq) do
-#         execute :sudo, :systemctl, :restart, :sidekiq
-#       end
-#     end
-#   end
-# end
-
-# after 'deploy:published', 'deploy:sidekiq:restart'
