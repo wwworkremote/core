@@ -5,7 +5,6 @@ require:
   - rubocop-rake
   - rubocop-rspec
   - rubocop-rubycw
-  - rubocop-sequel
   - rubocop-thread_safety
 
 AllCops:
@@ -75,18 +74,9 @@ Metrics/BlockLength:
     - 'exe/job_postings'
     - 'lib/tasks/auto_annotate_models.rake'
 
-Naming/InclusiveLanguage:
-  Enabled: false
-
 Rails/Date:
   Exclude:
     - 'config/schedule.rb'
-
-Rails/Output:
-  Enabled: false
-
-Lint/SuppressedException:
-  Enabled: false
 
 Lint/DuplicateBranch:
   Exclude:
@@ -97,17 +87,12 @@ Rails/CreateTableWithTimestamps:
     - 'db/migrate/20210712020439_create_pghero_query_stats.rb'
     - 'db/migrate/20210712021013_create_pghero_space_stats.rb'
 
-Style/RescueModifier:
-  Enabled: false
-
-Style/BlockDelimiters:
-  Enabled: false
-
-Rails/SkipsModelValidations:
-  Enabled: false
-
-Style/MultilineBlockChain:
-  Enabled: false
-
-Style/RescueStandardError:
-  Enabled: false
+Lint/EmptyBlock: {Enabled: false}
+Lint/SuppressedException: {Enabled: false}
+Naming/InclusiveLanguage: {Enabled: false}
+Rails/Output: {Enabled: false}
+Rails/SkipsModelValidations: {Enabled: false}
+Style/BlockDelimiters: {Enabled: false}
+Style/MultilineBlockChain: {Enabled: false}
+Style/RescueModifier: {Enabled: false}
+Style/RescueStandardError: {Enabled: false}
