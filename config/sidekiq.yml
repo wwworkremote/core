@@ -3,14 +3,4 @@ verbose: true
 backtrace: true
 concurrency: 2
 queues:
-  - authenticjobs_runners
-  - hackernews_runners
-  - indeed_runners
-  - monster_runners
-  - nexxt_runners
-  - remoteok_runners
-  - remotepython_runners
-  - remotive_runners
-  - stackoverflow_runners
-  - weworkremotely_runners
   - default
