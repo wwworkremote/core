@@ -5,18 +5,24 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.1.2'
 
-gem 'rails', '~>6.1'
+gem 'pg', '~> 1.1'
+gem 'rails', '~> 7.0.3'
+
+gem 'puma', '~> 5.0'
 
 gem 'hiredis'
+gem 'kredis'
 gem 'redis', require: %w[redis redis/connection/hiredis]
 
 gem 'whenever', require: false
 
+gem 'druuid'
+
 group :development do
-  gem 'capistrano'
-  gem 'capistrano-asdf'
-  gem 'capistrano-bundler'
-  gem 'capistrano-rails'
+  gem 'capistrano', require: false
+  gem 'capistrano-asdf', require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-rails', require: false
 
   gem 'bcrypt_pbkdf', require: false
   gem 'ed25519', require: false
@@ -36,9 +42,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'byebug'
-  gem 'pry-byebug'
-  gem 'pry-rails'
+  gem 'debug'
 end
 
 # group :test do
@@ -55,7 +59,6 @@ end
 # gem 'debug'
 # gem 'deepsort'
 # gem 'domain_name'
-# gem 'druuid'
 # gem 'faker'
 # gem 'faraday'
 # gem 'faraday-encoding'

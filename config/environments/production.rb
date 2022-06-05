@@ -11,6 +11,7 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation = :log
   config.active_support.disallowed_deprecation_warnings = []
   config.cache_classes = true
+  config.active_support.report_deprecations = false
   config.consider_all_requests_local = false
   config.eager_load = true
   config.i18n.fallbacks = true
