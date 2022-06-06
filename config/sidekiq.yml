@@ -1,6 +1,0 @@
----
-verbose: true
-backtrace: true
-concurrency: 2
-queues:
-  - default
