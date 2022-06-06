@@ -10,11 +10,7 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation = :raise
   config.active_support.disallowed_deprecation_warnings = []
   config.cache_classes = true
+  config.cache_store = :null_store
   config.consider_all_requests_local = true
   config.eager_load = false
-  config.cache_store = :redis_cache_store, {
-    url: 'redis://localhost:6379/0',
-    driver: :hiredis,
-    namespace: 'wwwr::test'
-  }
 end

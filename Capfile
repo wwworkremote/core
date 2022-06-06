@@ -11,7 +11,6 @@ install_plugin Capistrano::SCM::Git
 
 require 'capistrano/asdf'
 require 'capistrano/bundler'
-require 'capistrano/rails/migrations'
 
 require 'whenever/capistrano'
 
