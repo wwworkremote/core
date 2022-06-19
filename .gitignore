@@ -21,4 +21,4 @@ yarn-debug.log*
 !/tmp/pids/
 !/tmp/pids/.keep
 
-/config/master.key
+# /config/master.key
