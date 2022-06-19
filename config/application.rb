@@ -12,6 +12,7 @@ Bundler.require(*Rails.groups)
 
 require 'socket'
 HOSTNAME = Socket.gethostname.split('.').first.freeze
+puts "HOSTNAME=#{HOSTNAME}"
 
 module WwworkRemote
   class Application < Rails::Application
@@ -20,9 +21,9 @@ module WwworkRemote
     config.generators.system_tests = nil
     config.time_zone = 'UTC'
 
-    config.hosts << "#{HOSTNAME}.wwworkremote.com"
-    config.hosts << HOSTNAME.to_s
+    config.hosts << '.wwworkremote.com'
     config.hosts << 'localhost'
+    config.hosts << HOSTNAME.to_s
 
     config.api_only = true
   end
