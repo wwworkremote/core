@@ -45,3 +45,6 @@ group :development, :test do
 end
 
 gem 'rails_event_store', '~> 2.4.1'
+
+# gem 'health_check'
+gem 'health_bit'

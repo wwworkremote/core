@@ -4,8 +4,7 @@ WwworkRemote
 
 Oh. HI!
 
-
-## Example source queries 
+## Example source queries
 
 ```
 where
@@ -33,4 +32,8 @@ where
 where
   payload->>'url' = 'https://hacker-news.firebaseio.com/v0/jobstories.json'
 ;
+```
+
+```
+config.lograge.ignore_actions = %w[HealthCheck::HealthCheckController#index]
 ```
