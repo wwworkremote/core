@@ -1,9 +1,7 @@
 ---
 require:
   - rubocop-performance
-  - rubocop-rails
   - rubocop-rake
-  - rubocop-rspec
   - rubocop-rubycw
   - rubocop-thread_safety
 
@@ -21,24 +19,10 @@ AllCops:
   Include:
     - 'Capfile'
     - 'Gemfile'
-    - 'Guardfile'
-    - 'Rakefile'
-    - 'app/**/*.rb'
     - 'config.ru'
     - 'config/**/*.rb'
-    - 'db/**/*.rb'
-    - 'lib/**/*.rb'
-    - 'lib/tasks/**.rake'
-    - 'spec/**/*.rb'
   Exclude:
     - '**/.DS_Store'
-    - '**/node_modules/**/*'
-    - '**/templates/**/*'
-    - '**/tmp/**/*'
-    - '**/vendor/**/*'
-    - 'exe/**/*'
-    - 'bin/**/*'
-    - 'vendor/**/*'
 
 Style/Documentation:
   Enabled: false
@@ -46,52 +30,9 @@ Style/Documentation:
 Layout/LineLength:
   Enabled: false
 
-Metrics/MethodLength:
-  Enabled: false
-  Exclude:
-    - 'app/lib/pullers/hackernews.rb'
-    - 'app/lib/pullers/indeed.rb'
-    - 'app/lib/pullers/monster.rb'
-    - 'app/lib/pullers/nexxt.rb'
-    - 'app/lib/pullers/remoteok.rb'
-    - 'app/lib/pullers/remotepython.rb'
-    - 'app/lib/pullers/stackoverflow.rb'
-    - 'app/lib/pullers/weworkremotely.rb'
-    - 'db/migrate/20210815003805_create_job_postings.rb'
-
-Metrics/AbcSize:
-  Enabled: false
-  Exclude:
-    - 'app/services/pullers/monster.rb'
-    - 'db/migrate/20210815003805_create_job_postings.rb'
-
-Metrics/BlockLength:
-  Exclude:
-    - 'Guardfile'
-    - 'config/environments/development.rb'
-    - 'config/environments/test.rb'
-    - 'config/environments/production.rb'
-    - 'exe/job_postings'
-    - 'lib/tasks/auto_annotate_models.rake'
-
-Rails/Date:
-  Exclude:
-    - 'config/schedule.rb'
-
-Lint/DuplicateBranch:
-  Exclude:
-    - 'exe/job_postings'
-
-Rails/CreateTableWithTimestamps:
-  Exclude:
-    - 'db/migrate/20210712020439_create_pghero_query_stats.rb'
-    - 'db/migrate/20210712021013_create_pghero_space_stats.rb'
-
 Lint/EmptyBlock: {Enabled: false}
 Lint/SuppressedException: {Enabled: false}
 Naming/InclusiveLanguage: {Enabled: false}
-Rails/Output: {Enabled: false}
-Rails/SkipsModelValidations: {Enabled: false}
 Style/BlockDelimiters: {Enabled: false}
 Style/MultilineBlockChain: {Enabled: false}
 Style/RescueModifier: {Enabled: false}
