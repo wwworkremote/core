@@ -5,13 +5,15 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.1.2'
 
-gem 'roda'
+gem 'roda', require: false
 
-gem 'health_bit'
+gem 'webrick', require: false
+
+# gem 'health_bit'
 
 gem 'whenever', require: false
 
-gem 'druuid'
+# gem 'druuid'
 
 group :development do
   gem 'capistrano', require: false
