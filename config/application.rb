@@ -21,6 +21,7 @@ module WwworkRemote
     config.time_zone = 'UTC'
 
     config.hosts << "#{HOSTNAME}.wwworkremote.com"
+    config.hosts << HOSTNAME.to_s
     config.hosts << 'localhost'
 
     config.api_only = true
