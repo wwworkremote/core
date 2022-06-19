@@ -15,8 +15,8 @@ Rails.application.configure do
   config.eager_load = true
   config.i18n.fallbacks = true
   config.public_file_server.enabled = false
-  config.read_encrypted_secrets = false
-  config.require_master_key = false
+  # config.read_encrypted_secrets = false
+  # config.require_master_key = false
 
   config.log_formatter = ::Logger::Formatter.new
   config.log_level = :debug
