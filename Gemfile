@@ -7,7 +7,8 @@ ruby '3.1.2'
 
 gem 'roda', require: false
 
-gem 'webrick', require: false
+# gem 'webrick', require: false
+gem 'puma', require: false
 
 # gem 'health_bit'
 
