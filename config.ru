@@ -1,39 +1,12 @@
 # frozen_string_literal: true
 
-require 'roda'
+# require 'rack/unreloader'
+#
+# Unreloader = Rack::Unreloader.new(subclasses: %w[Roda]) { App }
+# # Unreloader = Rack::Unreloader.new { App }
+# Unreloader.require './app.rb'
+#
+# run Unreloader
 
-class App < Roda
-  route do |r|
-    # GET / request
-    r.root do
-      r.redirect '/hello'
-    end
-
-    # /hello branch
-    r.on 'hello' do
-      # Set variable for all routes in /hello branch
-      @greeting = 'Hello'
-
-      # GET /hello/world request
-      r.get 'world' do
-        "#{@greeting} world!"
-      end
-
-      # /hello request
-      r.is do
-        # GET /hello request
-        r.get do
-          "#{@greeting}!"
-        end
-
-        # POST /hello request
-        r.post do
-          puts "Someone said #{@greeting}!"
-          r.redirect
-        end
-      end
-    end
-  end
-end
-
-run App.freeze.app
+require './app'
+run Sinatra::Application

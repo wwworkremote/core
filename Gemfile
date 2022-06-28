@@ -5,16 +5,18 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.1.2'
 
-gem 'roda', require: false
-
-# gem 'webrick', require: false
+gem 'base64', require: false
+gem 'druuid', require: false
+gem 'json', require: false
+gem 'moneta', require: false
 gem 'puma', require: false
-
-# gem 'health_bit'
-
+gem 'rack', require: false
+gem 'rack-cache', require: false
+gem 'rack-unreloader', require: false
+gem 'sinatra', require: false
+gem 'sinatra-contrib', require: false
+gem 'webrick', require: false
 gem 'whenever', require: false
-
-# gem 'druuid'
 
 group :development do
   gem 'capistrano', require: false
@@ -33,3 +35,9 @@ group :development do
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
 end
+
+group :test do
+  gem 'rack-test', require: false
+end
+
+# gem 'health_bit'
