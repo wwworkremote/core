@@ -1,0 +1,3 @@
+---
+BUNDLE_WITHOUT: "mysql:oracle:sqlite:sqlserver"
+BUNDLE_BIN: "./sbin"
