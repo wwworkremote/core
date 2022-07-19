@@ -17,4 +17,5 @@ set :ssh_options, { forward_agent: true }
 # append :linked_files, 'config/database.yml', 'config/puma.rb', 'config/master.key', 'config/credentials/production.key'
 
 append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', '.bundle', 'public/system', 'public/uploads'
-append :linked_files, 'config/database.yml', 'config/secrets.yml'
+
+# append :linked_files, 'config/database.yml', 'config/secrets.yml'
