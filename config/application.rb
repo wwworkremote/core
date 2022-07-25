@@ -20,7 +20,7 @@ require 'rails/test_unit/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-HOSTS_MAP = {
+NODES_MAP ||= {
   'node01' => 'node05',
   'node02' => 'node01',
   'node03' => 'node02',
@@ -29,15 +29,17 @@ HOSTS_MAP = {
   'zalewhol' => 'zalewhol'
 }.freeze
 
+NODES_INVERSE_MAP ||= NODES_MAP.invert.freeze
+
 module Nodes # :nodoc:
   HOSTNAME ||= `hostname`.strip.split('.').first.freeze
 
   def self.upstream
-    HOSTS_MAP[HOSTNAME]
+    NODES_MAP[HOSTNAME]
   end
 
   def self.downstream
-    HOSTS_MAP.invert[HOSTNAME]
+    NODES_MAP.invert[HOSTNAME]
   end
 end
 
