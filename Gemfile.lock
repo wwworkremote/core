@@ -71,6 +71,7 @@ GEM
     airbrussh (1.4.1)
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.2)
+    bcrypt (3.1.18)
     bcrypt_pbkdf (1.1.0)
     builder (3.2.4)
     capistrano (3.17.0)
@@ -233,6 +234,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm
+  bcrypt (~> 3.1.7)
   bcrypt_pbkdf
   capistrano
   capistrano-asdf
