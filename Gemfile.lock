@@ -202,6 +202,10 @@ GEM
     rubocop-performance (1.14.3)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
+    rubocop-rails (2.15.2)
+      activesupport (>= 4.2.0)
+      rack (>= 1.1)
+      rubocop (>= 1.7.0, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     rubocop-require_tools (0.1.2)
@@ -255,6 +259,7 @@ DEPENDENCIES
   rails (~> 7.0.3, >= 7.0.3.1)
   rubocop
   rubocop-performance
+  rubocop-rails
   rubocop-rake
   rubocop-require_tools
   rubocop-rubycw
