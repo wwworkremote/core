@@ -26,17 +26,17 @@ class Nodes # :nodoc:
   HEAD = 1
   TAIL = 5
 
-  ACTUALLY ||= `hostname`.strip.split('.').first.freeze
+  ACTUALLY = `hostname`.strip.split('.').first.freeze
 
-  HOSTNAME ||= if ACTUALLY == 'zalewhol'
-                 'node01'
-               else
-                 ACTUALLY
-               end
+  HOSTNAME = if ACTUALLY == 'zalewhol'
+               'node01'
+             else
+               ACTUALLY
+             end
 
-  CURRENT ||= HOSTNAME[/\d+$/].to_i
+  CURRENT = HOSTNAME[/\d+$/].to_i
 
-  UPSTREAM_MAP ||= {
+  UPSTREAM_MAP = {
     HEAD => TAIL,
     2 => HEAD,
     3 => 2,
@@ -44,9 +44,9 @@ class Nodes # :nodoc:
     TAIL => 4
   }.freeze
 
-  DOWNSTREAM_MAP ||= UPSTREAM_MAP.invert.freeze
+  DOWNSTREAM_MAP = UPSTREAM_MAP.invert.freeze
 
-  UPSTREAM_NAME_MAP ||= {
+  UPSTREAM_NAME_MAP = {
     "node#{HEAD.to_s.ljust(2, '0')}" => TAIL,
     'node02' => HEAD,
     'node03' => 2,
@@ -54,7 +54,7 @@ class Nodes # :nodoc:
     "node#{TAIL.to_s.ljust(2, '0')}" => 4
   }.freeze
 
-  DOWNSTREAM_NAME_MAP ||= {
+  DOWNSTREAM_NAME_MAP = {
     "node#{HEAD.to_s.ljust(2, '0')}" => 2,
     'node02' => 3,
     'node03' => 4,
@@ -62,8 +62,8 @@ class Nodes # :nodoc:
     "node#{TAIL.to_s.ljust(2, '0')}" => HEAD
   }.freeze
 
-  DOWNSTREAM ||= DOWNSTREAM_MAP[CURRENT]
-  UPSTREAM ||= UPSTREAM_MAP[CURRENT]
+  DOWNSTREAM = DOWNSTREAM_MAP[CURRENT]
+  UPSTREAM = UPSTREAM_MAP[CURRENT]
 
   def self.current
     CURRENT

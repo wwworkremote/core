@@ -2,6 +2,7 @@
 require:
   - rubocop-performance
   - rubocop-rake
+  - rubocop-rails
   - rubocop-rubycw
   - rubocop-thread_safety
 
