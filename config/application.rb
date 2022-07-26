@@ -20,26 +20,51 @@ require 'rails/test_unit/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-NODES_MAP ||= {
-  'node01' => 'node05',
-  'node02' => 'node01',
-  'node03' => 'node02',
-  'node04' => 'node03',
-  'node05' => 'node04',
-  'zalewhol' => 'zalewhol'
-}.freeze
-
-NODES_INVERSE_MAP ||= NODES_MAP.invert.freeze
+require 'sorted_set'
 
 module Nodes # :nodoc:
-  HOSTNAME ||= `hostname`.strip.split('.').first.freeze
+  ACTUALLY ||= `hostname`.strip.split('.').first.freeze
+
+  HOSTNAME ||= if ACTUALLY == 'zalewhol'
+                 'node01'
+               else
+                 ACTUALLY
+               end
+
+  CURRENT ||= HOSTNAME[/\d+$/].to_i
+
+  MAP ||= { 1 => 5, 2 => 1, 3 => 2, 4 => 3, 5 => 4 }.freeze
+  UPSTREAM_MAP ||= MAP.invert.freeze
+
+  DOWNSTREAM_NAME_MAP ||= {
+    'node01' => 2,
+    'node02' => 3,
+    'node03' => 4,
+    'node04' => 5,
+    'node05' => 1
+  }.freeze
+
+  UPSTREAM_NAME_MAP ||= {
+    'node01' => 5,
+    'node02' => 1,
+    'node03' => 2,
+    'node04' => 3,
+    'node05' => 4
+  }.freeze
+
+  UPSTREAM ||= MAP[CURRENT]
+  DOWNSTREAM ||= UPSTREAM_MAP[CURRENT]
+
+  def self.current
+    CURRENT
+  end
 
   def self.upstream
-    NODES_MAP[HOSTNAME]
+    UPSTREAM
   end
 
   def self.downstream
-    NODES_MAP.invert[HOSTNAME]
+    DOWNSTREAM
   end
 end
 

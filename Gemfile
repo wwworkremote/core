@@ -57,3 +57,5 @@ gem 'aasm'
 gem 'druuid', require: false
 gem 'paper_trail'
 gem 'whenever', require: false
+
+gem 'sorted_set'
