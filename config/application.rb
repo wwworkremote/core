@@ -36,21 +36,8 @@ module Nodes # :nodoc:
   MAP ||= { 1 => 5, 2 => 1, 3 => 2, 4 => 3, 5 => 4 }.freeze
   UPSTREAM_MAP ||= MAP.invert.freeze
 
-  DOWNSTREAM_NAME_MAP ||= {
-    'node01' => 2,
-    'node02' => 3,
-    'node03' => 4,
-    'node04' => 5,
-    'node05' => 1
-  }.freeze
-
-  UPSTREAM_NAME_MAP ||= {
-    'node01' => 5,
-    'node02' => 1,
-    'node03' => 2,
-    'node04' => 3,
-    'node05' => 4
-  }.freeze
+  DOWNSTREAM_NAME_MAP ||= { 'node01' => 2, 'node02' => 3, 'node03' => 4, 'node04' => 5, 'node05' => 1 }.freeze
+  UPSTREAM_NAME_MAP ||= { 'node01' => 5, 'node02' => 1, 'node03' => 2, 'node04' => 3, 'node05' => 4 }.freeze
 
   UPSTREAM ||= MAP[CURRENT]
   DOWNSTREAM ||= UPSTREAM_MAP[CURRENT]
@@ -65,6 +52,15 @@ module Nodes # :nodoc:
 
   def self.downstream
     DOWNSTREAM
+  end
+
+  def self.from(node_id)
+    return :current if node_id == CURRENT
+    return :upstream if node_id == 5 && CURRENT == 1
+    return :upstream if node_id < CURRENT
+    return :downstream if node_id == 1 && CURRENT == 5
+
+    :downstream
   end
 end
 
