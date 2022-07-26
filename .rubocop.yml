@@ -25,6 +25,7 @@ AllCops:
   Exclude:
     - '**/.DS_Store'
     - 'bin/**/*'
+    - 'sbin/**/*'
 
 Style/Documentation:
   Enabled: false
