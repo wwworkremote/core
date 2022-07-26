@@ -23,6 +23,9 @@ Bundler.require(*Rails.groups)
 require 'sorted_set'
 
 class Nodes # :nodoc:
+  HEAD = 1
+  TAIL = 5
+
   ACTUALLY ||= `hostname`.strip.split('.').first.freeze
 
   HOSTNAME ||= if ACTUALLY == 'zalewhol'
@@ -33,21 +36,41 @@ class Nodes # :nodoc:
 
   CURRENT ||= HOSTNAME[/\d+$/].to_i
 
-  MAP ||= { 1 => 5, 2 => 1, 3 => 2, 4 => 3, 5 => 4 }.freeze
-  UPSTREAM_MAP ||= MAP.invert.freeze
+  UPSTREAM_MAP ||= {
+    HEAD => TAIL,
+    2 => HEAD,
+    3 => 2,
+    4 => 3,
+    TAIL => 4
+  }.freeze
 
-  DOWNSTREAM_NAME_MAP ||= { 'node01' => 2, 'node02' => 3, 'node03' => 4, 'node04' => 5, 'node05' => 1 }.freeze
-  UPSTREAM_NAME_MAP ||= { 'node01' => 5, 'node02' => 1, 'node03' => 2, 'node04' => 3, 'node05' => 4 }.freeze
+  DOWNSTREAM_MAP ||= UPSTREAM_MAP.invert.freeze
 
-  UPSTREAM ||= MAP[CURRENT]
-  DOWNSTREAM ||= UPSTREAM_MAP[CURRENT]
+  UPSTREAM_NAME_MAP ||= {
+    "node#{HEAD.to_s.ljust(2, '0')}" => TAIL,
+    'node02' => HEAD,
+    'node03' => 2,
+    'node04' => 3,
+    "node#{TAIL.to_s.ljust(2, '0')}" => 4
+  }.freeze
+
+  DOWNSTREAM_NAME_MAP ||= {
+    "node#{HEAD.to_s.ljust(2, '0')}" => 2,
+    'node02' => 3,
+    'node03' => 4,
+    'node04' => TAIL,
+    "node#{TAIL.to_s.ljust(2, '0')}" => HEAD
+  }.freeze
+
+  DOWNSTREAM ||= DOWNSTREAM_MAP[CURRENT]
+  UPSTREAM ||= UPSTREAM_MAP[CURRENT]
 
   def self.current
     CURRENT
   end
 
   def self.siblings
-    SortedSet.new(MAP.flatten).to_a - [current]
+    SortedSet.new(UPSTREAM_MAP.flatten).to_a - [current]
   end
 
   def self.upstream
@@ -68,9 +91,9 @@ class Nodes # :nodoc:
 
   def self.from(node_id)
     return :current if node_id == CURRENT
-    return :upstream if node_id == 5 && CURRENT == 1
+    return :upstream if node_id == TAIL && CURRENT == HEAD
     return :upstream if node_id < CURRENT
-    return :downstream if node_id == 1 && CURRENT == 5
+    return :downstream if node_id == HEAD && CURRENT == TAIL
 
     :downstream
   end
