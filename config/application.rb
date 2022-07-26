@@ -22,7 +22,7 @@ Bundler.require(*Rails.groups)
 
 require 'sorted_set'
 
-module Nodes # :nodoc:
+class Nodes # :nodoc:
   ACTUALLY ||= `hostname`.strip.split('.').first.freeze
 
   HOSTNAME ||= if ACTUALLY == 'zalewhol'
@@ -46,11 +46,23 @@ module Nodes # :nodoc:
     CURRENT
   end
 
+  def self.siblings
+    SortedSet.new(MAP.flatten).to_a - [current]
+  end
+
   def self.upstream
     UPSTREAM
   end
 
   def self.downstream
+    DOWNSTREAM
+  end
+
+  def self.previous
+    UPSTREAM
+  end
+
+  def self.next
     DOWNSTREAM
   end
 
@@ -61,6 +73,10 @@ module Nodes # :nodoc:
     return :downstream if node_id == 1 && CURRENT == 5
 
     :downstream
+  end
+
+  def self.representation
+    [upstream, current, downstream]
   end
 end
 
