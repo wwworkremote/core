@@ -180,6 +180,7 @@ GEM
       zeitwerk (~> 2.5)
     rainbow (3.1.1)
     rake (13.0.6)
+    rbtree (0.4.5)
     regexp_parser (2.5.0)
     reline (0.3.1)
       io-console (~> 0.5)
@@ -210,6 +211,10 @@ GEM
     rubocop-thread_safety (0.4.4)
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
+    set (1.0.2)
+    sorted_set (1.0.3)
+      rbtree
+      set (~> 1.0)
     sshkit (1.21.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
@@ -254,6 +259,7 @@ DEPENDENCIES
   rubocop-require_tools
   rubocop-rubycw
   rubocop-thread_safety
+  sorted_set
   sshkit
   sshkit-sudo
   tzinfo-data
