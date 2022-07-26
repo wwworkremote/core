@@ -1,0 +1,8 @@
+---
+verbose: true
+backtrace: true
+concurrency: 12
+queues:
+  - heartbeat
+  - default
+
