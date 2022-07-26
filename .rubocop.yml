@@ -26,6 +26,7 @@ AllCops:
     - '**/.DS_Store'
     - 'bin/**/*'
     - 'sbin/**/*'
+    - '_backup/**/*'
 
 Style/Documentation:
   Enabled: false
