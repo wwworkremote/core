@@ -24,6 +24,7 @@ AllCops:
     - 'config/**/*.rb'
   Exclude:
     - '**/.DS_Store'
+    - 'bin/**/*'
 
 Style/Documentation:
   Enabled: false
