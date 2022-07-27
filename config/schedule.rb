@@ -5,10 +5,8 @@ require 'whenever'
 env :PATH, ENV.fetch('PATH', nil)
 
 set :job_template, "/usr/bin/env bash -l -c ':job' "
-# set :job_template, nil
 set :output, '/home/deploy/projects/wwworkremote/core/shared/log/cron_production.log'
 
-# JOB_PREFIX = ' cd :path && :environment_variable=:environment nice -n 20 '
 JOB_PREFIX = ' cd :path && :environment_variable=:environment '
 
 job_type :command, " #{JOB_PREFIX} :task :output "
