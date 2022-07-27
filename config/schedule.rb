@@ -1,22 +1,15 @@
 # frozen_string_literal: true
 
-# Use this file to easily define all of your cron jobs.
-#
-# It's helpful, but not entirely necessary to understand cron before proceeding.
-# http://en.wikipedia.org/wiki/Cron
+require 'whenever'
 
-# Example:
-#
-# set :output, "/path/to/my/cron_log.log"
-#
-# every 2.hours do
-#   command "/usr/bin/some_great_command"
-#   runner "MyModel.some_method"
-#   rake "some:great:rake:task"
-# end
-#
-# every 4.days do
-#   runner "AnotherModel.prune_old_records"
-# end
+set :job_template, "/usr/bin/env bash -l -c ':job' "
+set :output, '/home/deploy/projects/wwworkremote/core/shared/log/cron_production.log'
 
-# Learn more: http://github.com/javan/whenever
+JOB_PREFIX = ' cd :path && :environment_variable=:environment nice -n 20 '
+
+job_type :command, " #{JOB_PREFIX} :task :output "
+job_type :rails, " #{JOB_PREFIX} bundle exec rails :task --silent :output "
+job_type :runner, " #{JOB_PREFIX} bundle exec rails runner :task :output "
+job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
+
+every(5.minutes) { runner('HeartbeatWorker.perform_async') }
