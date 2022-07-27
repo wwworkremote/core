@@ -33,3 +33,25 @@ namespace :puma do
 
   before 'deploy:starting', 'puma:make_dirs'
 end
+
+namespace :deploy do
+  namespace :sidekiq do
+    desc 'Restart sidekiq service'
+    task :restart do
+      on roles(:app) do
+        execute :sudo, :systemctl, :stop, :sidekiq
+        execute :sudo, :systemctl, :restart, :sidekiq
+      end
+    end
+  end
+
+  namespace :nginx do
+    desc 'Restart nginx'
+    task :restart do
+      on roles(:web) do
+        execute :sudo, :systemctl, :stop, :nginx
+        execute :sudo, :systemctl, :restart, :nginx
+      end
+    end
+  end
+end
