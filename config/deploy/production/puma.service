@@ -10,8 +10,7 @@ WorkingDirectory=/home/deploy/projects/wwworkremote/core/current
 
 # Environment=PUMA_DEBUG=1
 
-ExecStart=/home/deploy/apps/outlierjobs-api/current/sbin/puma -C /home/deploy/projects/wwworkremote/core/current/config/environments/production/puma.rb
-ExecStart=/bin/bash -c 'PATH=/home/deploy/.asdf/shims:$PATH exec /home/deploy/projects/wwworkremote/core/current/sbin/puma -e production'
+ExecStart=/bin/bash -c 'PATH=/home/deploy/.asdf/shims:$PATH exec /home/deploy/projects/wwworkremote/core/current/sbin/puma -C /home/deploy/projects/wwworkremote/core/current/config/environments/production/puma.rb'
 
 ExecReload=/bin/kill -TSTP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
