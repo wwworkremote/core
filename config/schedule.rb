@@ -16,5 +16,4 @@ job_type :rails, " #{JOB_PREFIX} sbin/rails :task --silent :output "
 job_type :runner, " #{JOB_PREFIX} sbin/rails runner :task :output "
 job_type :script, " #{JOB_PREFIX} bin/:task :output "
 
-every(1.minute) { runner('Rails.logger.info("Hi | #{Time.zone.now}")') }
-every(1.minute) { runner('HeartbeatWorker.perform_async') }
+every(15.minutes) { runner('HeartbeatWorker.perform_async') }
