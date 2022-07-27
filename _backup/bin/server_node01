@@ -1,1 +1,0 @@
-INSTANCE_NAME=node01 bundle exec rackup -O Threads=1:1 --port=3000 --host=0.0.0.0
