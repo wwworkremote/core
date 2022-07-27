@@ -11,7 +11,7 @@ set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 set :whenever_roles, :cron
 
 set :keep_releases, 3
-set :pty, false
+set :pty, true
 set :ssh_options, { forward_agent: true }
 set :use_sudo, false
 
