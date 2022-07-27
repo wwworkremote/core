@@ -10,8 +10,10 @@ set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 
 set :whenever_roles, :cron
 
-set :pty, true
+set :keep_releases, 3
+set :pty, false
 set :ssh_options, { forward_agent: true }
+set :use_sudo, false
 
 # append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', '.bundle', 'public/system', 'public/uploads'
 LINKED_DIRS = %w[.bundle log public/system public/uploads tmp/cache tmp/pids tmp/sockets vendor/bundle].freeze
