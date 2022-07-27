@@ -12,9 +12,9 @@ set :output, '/home/deploy/projects/wwworkremote/core/shared/log/cron_production
 JOB_PREFIX = ' cd :path && :environment_variable=:environment '
 
 job_type :command, " #{JOB_PREFIX} :task :output "
-job_type :rails, " #{JOB_PREFIX} bundle exec rails :task --silent :output "
-job_type :runner, " #{JOB_PREFIX} bundle exec rails runner :task :output "
-job_type :script, " #{JOB_PREFIX} bundle exec bin/:task :output "
+job_type :rails, " #{JOB_PREFIX} sbin/rails :task --silent :output "
+job_type :runner, " #{JOB_PREFIX} sbin/rails runner :task :output "
+job_type :script, " #{JOB_PREFIX} bin/:task :output "
 
 every(1.minute) { runner('Rails.logger.info("Hi | #{Time.zone.now}")') }
 every(1.minute) { runner('HeartbeatWorker.perform_async') }
