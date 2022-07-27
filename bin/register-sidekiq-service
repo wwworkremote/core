@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -x
 
 sudo systemctl stop sidekiq.service 2> /dev/null
 sudo systemctl disable sidekiq.service 2> /dev/null
