@@ -11,7 +11,7 @@ set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 set :whenever_roles, :cron
 
 set :keep_releases, 3
-set :pty, true
+set :pty, false
 set :ssh_options, { forward_agent: true }
 set :use_sudo, false
 
@@ -38,21 +38,51 @@ end
 
 namespace :deploy do
   namespace :sidekiq do
-    desc 'Restart sidekiq service'
+    desc 'Restart Sidekiq'
     task :restart do
       on roles(:app) do
         execute :sudo, :systemctl, :stop, :sidekiq
-        execute :sudo, :systemctl, :restart, :sidekiq
+        execute :sudo, :systemctl, :start, :sidekiq
+      end
+    end
+
+    desc 'Stop Sidekiq'
+    task :restart do
+      on roles(:app) do
+        execute :sudo, :systemctl, :stop, :sidekiq
+      end
+    end
+
+    desc 'Start Sidekiq'
+    task :start do
+      on roles(:app) do
+        execute :sudo, :systemctl, :start, :sidekiq
       end
     end
   end
+end
 
+namespace :deploy do
   namespace :nginx do
-    desc 'Restart nginx'
+    desc 'Restart Nginx'
     task :restart do
       on roles(:web) do
         execute :sudo, :systemctl, :stop, :nginx
-        execute :sudo, :systemctl, :restart, :nginx
+        execute :sudo, :systemctl, :start, :nginx
+      end
+    end
+
+    desc 'Stop Nginx'
+    task :start do
+      on roles(:web) do
+        execute :sudo, :systemctl, :stop, :nginx
+      end
+    end
+
+    desc 'Start Nginx'
+    task :start do
+      on roles(:web) do
+        execute :sudo, :systemctl, :start, :nginx
       end
     end
   end
