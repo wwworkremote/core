@@ -87,3 +87,29 @@ namespace :deploy do
     end
   end
 end
+
+namespace :deploy do
+  namespace :puma do
+    desc 'Restart Puma'
+    task :restart do
+      on roles(:app) do
+        execute :sudo, :systemctl, :stop, :puma
+        execute :sudo, :systemctl, :start, :puma
+      end
+    end
+
+    desc 'Stop Puma'
+    task :restart do
+      on roles(:app) do
+        execute :sudo, :systemctl, :stop, :puma
+      end
+    end
+
+    desc 'Start Puma'
+    task :start do
+      on roles(:app) do
+        execute :sudo, :systemctl, :start, :puma
+      end
+    end
+  end
+end
