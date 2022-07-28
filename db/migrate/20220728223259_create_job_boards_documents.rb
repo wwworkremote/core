@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateJobBoardsDocuments < ActiveRecord::Migration[7.0]
   def change
     create_table(:job_boards_documents, id: :uuid) do |t|
