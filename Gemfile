@@ -57,10 +57,10 @@ group :development do
 end
 
 gem 'aasm'
-gem 'druuid', require: false
+gem 'after_commit_everywhere', '~> 1.0'
+gem 'druuid'
 gem 'paper_trail'
+gem 'rails_event_store', '~> 2.5.1'
 gem 'sidekiq'
 gem 'sorted_set'
 gem 'whenever', require: false
-
-gem 'rails_event_store', '~> 2.5.1'

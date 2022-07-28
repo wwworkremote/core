@@ -68,6 +68,9 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    after_commit_everywhere (1.2.2)
+      activerecord (>= 4.2)
+      activesupport
     aggregate_root (2.5.1)
       ruby_event_store (= 2.5.1)
     airbrussh (1.4.1)
@@ -277,6 +280,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm
+  after_commit_everywhere (~> 1.0)
   bcrypt (~> 3.1.7)
   bcrypt_pbkdf
   capistrano
