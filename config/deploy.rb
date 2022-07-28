@@ -36,80 +36,78 @@ namespace :puma do
   before 'deploy:starting', 'puma:make_dirs'
 end
 
-namespace :deploy do
-  namespace :sidekiq do
-    desc 'Restart Sidekiq'
-    task :restart do
-      on roles(:app) do
-        execute :sudo, :systemctl, :stop, :sidekiq
-        execute :sudo, :systemctl, :start, :sidekiq
-      end
+namespace :sidekiq do
+  desc 'Restart Sidekiq'
+  task :restart do
+    on roles(:app) do
+      execute :sudo, :systemctl, :stop, :sidekiq
+      execute :sudo, :systemctl, :start, :sidekiq
     end
+  end
 
-    desc 'Stop Sidekiq'
-    task :restart do
-      on roles(:app) do
-        execute :sudo, :systemctl, :stop, :sidekiq
-      end
+  desc 'Stop Sidekiq'
+  task :restart do
+    on roles(:app) do
+      execute :sudo, :systemctl, :stop, :sidekiq
     end
+  end
 
-    desc 'Start Sidekiq'
-    task :start do
-      on roles(:app) do
-        execute :sudo, :systemctl, :start, :sidekiq
-      end
+  desc 'Start Sidekiq'
+  task :start do
+    on roles(:app) do
+      execute :sudo, :systemctl, :start, :sidekiq
     end
   end
 end
 
-namespace :deploy do
-  namespace :nginx do
-    desc 'Restart Nginx'
-    task :restart do
-      on roles(:web) do
-        execute :sudo, :systemctl, :stop, :nginx
-        execute :sudo, :systemctl, :start, :nginx
-      end
+namespace :nginx do
+  desc 'Restart Nginx'
+  task :restart do
+    on roles(:web) do
+      execute :sudo, :systemctl, :stop, :nginx
+      execute :sudo, :systemctl, :start, :nginx
     end
+  end
 
-    desc 'Stop Nginx'
-    task :start do
-      on roles(:web) do
-        execute :sudo, :systemctl, :stop, :nginx
-      end
+  desc 'Stop Nginx'
+  task :start do
+    on roles(:web) do
+      execute :sudo, :systemctl, :stop, :nginx
     end
+  end
 
-    desc 'Start Nginx'
-    task :start do
-      on roles(:web) do
-        execute :sudo, :systemctl, :start, :nginx
-      end
+  desc 'Start Nginx'
+  task :start do
+    on roles(:web) do
+      execute :sudo, :systemctl, :start, :nginx
     end
   end
 end
 
-namespace :deploy do
-  namespace :puma do
-    desc 'Restart Puma'
-    task :restart do
-      on roles(:app) do
-        execute :sudo, :systemctl, :stop, :puma
-        execute :sudo, :systemctl, :start, :puma
-      end
+namespace :puma do
+  desc 'Restart Puma'
+  task :restart do
+    on roles(:app) do
+      execute :sudo, :systemctl, :stop, :puma
+      execute :sudo, :systemctl, :start, :puma
     end
+  end
 
-    desc 'Stop Puma'
-    task :restart do
-      on roles(:app) do
-        execute :sudo, :systemctl, :stop, :puma
-      end
+  desc 'Stop Puma'
+  task :restart do
+    on roles(:app) do
+      execute :sudo, :systemctl, :stop, :puma
     end
+  end
 
-    desc 'Start Puma'
-    task :start do
-      on roles(:app) do
-        execute :sudo, :systemctl, :start, :puma
-      end
+  desc 'Start Puma'
+  task :start do
+    on roles(:app) do
+      execute :sudo, :systemctl, :start, :puma
     end
   end
 end
+
+after 'deploy:published', 'sidekiq:restart'
+after 'deploy:published', 'puma:restart'
+after 'deploy:published', 'nginx:restart'
