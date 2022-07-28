@@ -109,5 +109,5 @@ namespace :puma do
 end
 
 after 'deploy:published', 'sidekiq:restart'
-after 'deploy:published', 'puma:restart'
 after 'deploy:published', 'nginx:restart'
+# after 'deploy:published', 'puma:restart'
