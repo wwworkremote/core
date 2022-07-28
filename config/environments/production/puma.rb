@@ -13,9 +13,9 @@ directory "#{app_dir}/"
 
 stdout_redirect "#{shared_dir}/log/puma.access.log", "#{shared_dir}/log/puma.error.log", true
 
-workers 2
-threads 1, 2
+workers 0
+threads 0, 16
 
 activate_control_app "unix://#{app_dir}/pumactl.sock"
 
-# prune_bundler
+prune_bundler
