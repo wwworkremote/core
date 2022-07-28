@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateJobBoardsSources < ActiveRecord::Migration[7.0]
   def change
     create_table(:job_boards_sources) do |t|
