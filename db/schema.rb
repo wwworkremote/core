@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_27_171437) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_28_223839) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
+  enable_extension "fuzzystrmatch"
+  enable_extension "hstore"
+  enable_extension "ltree"
+  enable_extension "pg_stat_statements"
+  enable_extension "pg_trgm"
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
+  enable_extension "sslinfo"
 
   create_table "event_store_events", force: :cascade do |t|
     t.uuid "event_id", null: false
@@ -35,6 +43,34 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_27_171437) do
     t.index ["created_at"], name: "index_event_store_events_in_streams_on_created_at"
     t.index ["stream", "event_id"], name: "index_event_store_events_in_streams_on_stream_and_event_id", unique: true
     t.index ["stream", "position"], name: "index_event_store_events_in_streams_on_stream_and_position", unique: true
+  end
+
+  create_table "job_boards_documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.integer "source_id", null: false
+    t.integer "job_boards_query_id", null: false
+    t.text "document", default: "", null: false
+    t.string "signature"
+    t.string "aasm_state"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+  end
+
+  create_table "job_boards_queries", force: :cascade do |t|
+    t.integer "source_id", null: false
+    t.jsonb "data", default: {}, null: false
+    t.string "aasm_state"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+  end
+
+  create_table "job_boards_sources", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug"
+    t.jsonb "data", default: {}, null: false
+    t.string "aasm_state"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["slug"], name: "index_job_boards_sources_on_slug", unique: true
   end
 
 end
