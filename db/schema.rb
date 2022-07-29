@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -12,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_28_223839) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_29_224818) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -55,6 +53,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_28_223839) do
     t.string "aasm_state"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["signature"], name: "index_job_boards_documents_on_signature", unique: true
   end
 
   create_table "job_boards_queries", force: :cascade do |t|
