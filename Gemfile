@@ -64,3 +64,12 @@ gem 'rails_event_store', '~> 2.5.1'
 gem 'sidekiq'
 gem 'sorted_set'
 gem 'whenever', require: false
+
+gem 'faraday', require: false
+gem 'faraday-net_http_persistent', require: false
+gem 'faraday-retry', require: false
+
+gem 'byebug'
+gem 'pry-rails'
+
+gem 'amazing_print'
