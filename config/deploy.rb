@@ -36,29 +36,29 @@ namespace :puma do
   before 'deploy:starting', 'puma:make_dirs'
 end
 
-namespace :sidekiq do
-  desc 'Restart Sidekiq'
-  task :restart do
-    on roles(:app) do
-      execute :sudo, :systemctl, :stop, :sidekiq
-      execute :sudo, :systemctl, :start, :sidekiq
-    end
-  end
-
-  desc 'Stop Sidekiq'
-  task :restart do
-    on roles(:app) do
-      execute :sudo, :systemctl, :stop, :sidekiq
-    end
-  end
-
-  desc 'Start Sidekiq'
-  task :start do
-    on roles(:app) do
-      execute :sudo, :systemctl, :start, :sidekiq
-    end
-  end
-end
+# namespace :sidekiq do
+#   desc 'Restart Sidekiq'
+#   task :restart do
+#     on roles(:app) do
+#       execute :sudo, :systemctl, :stop, :sidekiq
+#       execute :sudo, :systemctl, :start, :sidekiq
+#     end
+#   end
+#
+#   desc 'Stop Sidekiq'
+#   task :restart do
+#     on roles(:app) do
+#       execute :sudo, :systemctl, :stop, :sidekiq
+#     end
+#   end
+#
+#   desc 'Start Sidekiq'
+#   task :start do
+#     on roles(:app) do
+#       execute :sudo, :systemctl, :start, :sidekiq
+#     end
+#   end
+# end
 
 namespace :nginx do
   desc 'Restart Nginx'
@@ -108,6 +108,6 @@ namespace :puma do
   end
 end
 
-after 'deploy:published', 'sidekiq:restart'
+# after 'deploy:published', 'sidekiq:restart'
 after 'deploy:published', 'nginx:restart'
 # after 'deploy:published', 'puma:restart'
