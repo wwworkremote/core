@@ -114,11 +114,11 @@ after 'deploy:published', 'nginx:restart'
 
 namespace :custom do
   desc 'run some rake task with params'
-  task :run_task, :param do
+  task :run_task do
     on roles(:app) do
       within current_path.to_s do
         with rails_env: fetch(:stage).to_s do
-          execute :rake, args[:param]
+          execute :rake, 'hello'
         end
       end
     end
