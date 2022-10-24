@@ -113,9 +113,18 @@ after 'deploy:published', 'nginx:restart'
 # after 'deploy:published', 'puma:restart'
 
 namespace :custom do
-  desc 'run some rake task with params'
+  desc 'Report uptime'
+  task :uptime do
+    on roles(:app), in: :parallel do |host|
+      uptime = capture(:uptime)
+
+      puts "#{host.hostname} reports: #{uptime}"
+    end
+  end
+
+  desc 'Say hello'
   task :run_task do
-    on roles(:app) do
+    on roles(:app), in: :parallel do |_host|
       within current_path.to_s do
         with rails_env: fetch(:stage).to_s do
           execute :rake, 'hello'
