@@ -16,3 +16,5 @@ require 'capistrano/rails/assets'
 require 'capistrano/rails/migrations'
 
 require 'whenever/capistrano'
+
+require 'capistrano/ssh_doctor'
