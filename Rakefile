@@ -6,3 +6,10 @@
 require_relative 'config/application'
 
 Rails.application.load_tasks
+
+require 'socket'
+
+desc 'Hello'
+task hello: :environment do
+  puts "hello: #{Socket.gethostname}"
+end

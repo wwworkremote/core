@@ -111,3 +111,16 @@ end
 # after 'deploy:published', 'sidekiq:restart'
 after 'deploy:published', 'nginx:restart'
 # after 'deploy:published', 'puma:restart'
+
+namespace :custom do
+  desc 'run some rake task with params'
+  task :run_task, :param do
+    on roles(:app) do
+      within current_path.to_s do
+        with rails_env: fetch(:stage).to_s do
+          execute :rake, args[:param]
+        end
+      end
+    end
+  end
+end
