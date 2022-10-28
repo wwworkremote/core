@@ -46,7 +46,7 @@ namespace :sidekiq do
   end
 
   desc 'Stop Sidekiq'
-  task :restart do
+  task :stop do
     on roles(:app) do
       execute :sudo, :systemctl, :stop, :sidekiq
     end
@@ -70,7 +70,7 @@ namespace :nginx do
   end
 
   desc 'Stop Nginx'
-  task :start do
+  task :stop do
     on roles(:web) do
       execute :sudo, :systemctl, :stop, :nginx
     end
@@ -94,7 +94,7 @@ namespace :puma do
   end
 
   desc 'Stop Puma'
-  task :restart do
+  task :stop do
     on roles(:app) do
       execute :sudo, :systemctl, :stop, :puma
     end
@@ -108,9 +108,9 @@ namespace :puma do
   end
 end
 
-# after 'deploy:published', 'sidekiq:restart'
 after 'deploy:published', 'nginx:restart'
-# after 'deploy:published', 'puma:restart'
+after 'deploy:published', 'puma:restart'
+after 'deploy:published', 'sidekiq:restart'
 
 namespace :custom do
   desc 'Report uptime'
