@@ -17,4 +17,3 @@ production:
   <<: *default
   database: wwworkremote_production
   username: deploy
-  password: <%= ENV["WWWORKREMOTE_DATABASE_PASSWORD"] %>
