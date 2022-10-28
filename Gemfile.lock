@@ -220,8 +220,7 @@ GEM
     rainbow (3.1.1)
     rake (13.0.6)
     rbtree (0.4.5)
-    redis-client (0.10.0)
-      connection_pool
+    redis (4.8.0)
     regexp_parser (2.6.0)
     reline (0.3.1)
       io-console (~> 0.5)
@@ -263,11 +262,10 @@ GEM
       rack
       ruby_event_store (= 2.5.1)
     set (1.0.3)
-    sidekiq (7.0.0)
-      concurrent-ruby (< 2)
-      connection_pool (>= 2.3.0)
-      rack (>= 2.2.4)
-      redis-client (>= 0.9.0)
+    sidekiq (6.5.7)
+      connection_pool (>= 2.2.5)
+      rack (~> 2.0)
+      redis (>= 4.5.0, < 5)
     sorted_set (1.0.3)
       rbtree
       set (~> 1.0)
@@ -331,7 +329,7 @@ DEPENDENCIES
   rubocop-require_tools
   rubocop-rubycw
   rubocop-thread_safety
-  sidekiq
+  sidekiq (< 7)
   sorted_set
   sprockets-rails
   sshkit
