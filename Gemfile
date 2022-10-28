@@ -62,7 +62,7 @@ gem 'after_commit_everywhere', '~> 1.0'
 gem 'druuid'
 gem 'paper_trail'
 gem 'rails_event_store', '~> 2.5.1'
-gem 'sidekiq'
+gem 'sidekiq', '<7'
 gem 'sorted_set'
 gem 'whenever', require: false
 
