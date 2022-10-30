@@ -8,7 +8,7 @@ set :asdf_tools, %w[ruby nodejs golang python]
 set :branch, 'main'
 set :deploy_to, '/home/deploy/projects/wwworkremote/core'
 
-set :whenever_roles, :cron
+set :whenever_roles, :app
 
 set :keep_releases, 3
 set :pty, false
@@ -63,7 +63,7 @@ end
 namespace :nginx do
   desc 'Restart Nginx'
   task :restart do
-    on roles(:web) do
+    on roles(:app) do
       execute :sudo, :systemctl, :stop, :nginx
       execute :sudo, :systemctl, :start, :nginx
     end
@@ -71,14 +71,14 @@ namespace :nginx do
 
   desc 'Stop Nginx'
   task :stop do
-    on roles(:web) do
+    on roles(:app) do
       execute :sudo, :systemctl, :stop, :nginx
     end
   end
 
   desc 'Start Nginx'
   task :start do
-    on roles(:web) do
+    on roles(:app) do
       execute :sudo, :systemctl, :start, :nginx
     end
   end
