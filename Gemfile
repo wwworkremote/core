@@ -77,3 +77,5 @@ gem 'amazing_print'
 
 gem 'pghero'
 gem 'pg_query', '>= 2'
+
+gem 'ahoy_matey'
