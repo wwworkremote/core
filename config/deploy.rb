@@ -132,4 +132,15 @@ namespace :custom do
       end
     end
   end
+
+  desc 'Create User'
+  task :create_user do
+    on roles(:app), in: :parallel do |_host|
+      within current_path.to_s do
+        with rails_env: fetch(:stage).to_s do
+          execute :rake, 'create_user'
+        end
+      end
+    end
+  end
 end
