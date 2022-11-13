@@ -13,3 +13,10 @@ desc 'Hello'
 task hello: :environment do
   puts "hello: #{Socket.gethostname}"
 end
+
+desc 'Create User'
+task create_user: :environment do
+  User
+    .create_with(name: 'Mike Hall', email: 'mike@just3ws.com')
+    .find_or_create_by(slug: 'mike.hall')
+end
