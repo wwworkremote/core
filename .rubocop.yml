@@ -33,6 +33,7 @@ AllCops:
 # Layout/LineLength: {Enabled: false}
 Lint/EmptyBlock: {Enabled: false}
 Lint/SuppressedException: {Enabled: false}
+Metrics/BlockLength: {Enabled: false}
 Naming/InclusiveLanguage: {Enabled: false}
 Style/BlockDelimiters: {Enabled: false}
 Style/Documentation: {Enabled: false}
