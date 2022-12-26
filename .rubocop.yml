@@ -17,7 +17,7 @@ AllCops:
   ExtraDetails: true
   MaxFilesInCache: 65536
   NewCops: enable
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   UseCache: true
   Include:
     - 'Capfile'
