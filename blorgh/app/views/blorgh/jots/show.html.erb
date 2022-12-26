@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @jot %>
+
+<div>
+  <%= link_to "Edit this jot", edit_jot_path(@jot) %> |
+  <%= link_to "Back to jots", jots_path %>
+
+  <%= button_to "Destroy this jot", @jot, method: :delete %>
+</div>
