@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_12_26_223406) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_13_220352) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -62,12 +62,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_26_223406) do
     t.datetime "started_at"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
-  end
-
-  create_table "blorgh_jots", force: :cascade do |t|
-    t.jsonb "data"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "event_store_events", force: :cascade do |t|
