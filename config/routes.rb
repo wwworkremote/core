@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   mount RailsEventStore::Browser => '/res' # if Rails.env.development?
   mount Sidekiq::Web => '/sidekiq'
   mount PgHero::Engine, at: 'pghero'
+  mount Blorgh::Engine, at: '/x'
 
   resources :nodes, only: [:index]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
