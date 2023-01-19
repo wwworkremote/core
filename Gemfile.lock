@@ -136,7 +136,7 @@ GEM
       net-http-persistent (~> 4.0)
     faraday-retry (2.0.0)
       faraday (~> 2.0)
-    globalid (1.0.0)
+    globalid (1.0.1)
       activesupport (>= 5.0)
     google-protobuf (3.21.12)
     i18n (1.12.0)
@@ -327,6 +327,7 @@ PLATFORMS
   aarch64-linux
   x86_64-darwin-21
   x86_64-darwin-22
+  x86_64-linux
 
 DEPENDENCIES
   aasm
