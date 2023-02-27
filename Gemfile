@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.2.0'
+ruby '~> 3.2'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem 'rails', '~> 7.0.3', '>= 7.0.3.1'
@@ -53,6 +53,7 @@ group :development do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rake', require: false
   gem 'rubocop-require_tools', require: false
+  gem 'rubocop-rspec', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
 end
@@ -62,7 +63,7 @@ gem 'after_commit_everywhere', '~> 1.0'
 gem 'druuid'
 gem 'paper_trail'
 gem 'rails_event_store', '~> 2.5.1'
-gem 'sidekiq', '<7'
+gem 'sidekiq', '~> 6.0', '<7.0'
 gem 'sorted_set'
 gem 'whenever', require: false
 
