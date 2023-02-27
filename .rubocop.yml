@@ -26,6 +26,7 @@ AllCops:
     - 'config.ru'
     - 'config/**/*.rb'
     - 'db/**/*.rb'
+    - 'blorgh/**/*.rb'
   Exclude:
     - '**/.DS_Store'
     - 'bin/**/*'
@@ -53,6 +54,10 @@ RSpec/MultipleDescribes: {Enabled: false}
 RSpec/MultipleExpectations: {Enabled: false}
 RSpec/NoExpectationExample: {Enabled: false}
 RSpec/RepeatedExampleGroupBody: {Enabled: false}
+Rails/BulkChangeTable: {Enabled: false}
+Rails/CreateTableWithTimestamps: {Enabled: false}
+Rails/I18nLocaleTexts: {Enabled: false}
+Rails/ReversibleMigration: {Enabled: false}
 Style/AccessorGrouping: {Enabled: false}
 Style/BlockDelimiters: {Enabled: false}
 Style/Documentation: {Enabled: false}

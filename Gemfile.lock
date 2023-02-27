@@ -8,7 +8,7 @@ GIT
 PATH
   remote: blorgh
   specs:
-    blorgh (0.1.0)
+    blorgh (0.1.1)
       rails (>= 7.0.4)
 
 GEM

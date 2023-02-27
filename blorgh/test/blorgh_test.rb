@@ -1,7 +1,9 @@
-require "test_helper"
+# frozen_string_literal: true
+
+require 'test_helper'
 
 class BlorghTest < ActiveSupport::TestCase
-  test "it has a version number" do
+  test 'it has a version number' do
     assert Blorgh::VERSION
   end
 end
