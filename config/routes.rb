@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   mount PgHero::Engine, at: 'pghero'
   mount Blorgh::Engine, at: '/x'
 
+  get '/pages/:page' => 'pages#show'
+
   resources :nodes, only: [:index]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
