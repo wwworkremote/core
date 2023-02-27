@@ -14,7 +14,6 @@ Rails.application.routes.draw do
   get '/pages/:page' => 'pages#show'
 
   resources :nodes, only: [:index]
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   root 'pages#show', page: 'home'
 end
