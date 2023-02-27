@@ -84,3 +84,5 @@ gem 'ahoy_matey'
 gem 'blorgh', path: 'blorgh'
 
 gem 'annotate', '~> 3.2'
+
+gem 'devise', '~> 4.9'
