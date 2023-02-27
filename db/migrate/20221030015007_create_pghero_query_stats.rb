@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreatePgheroQueryStats < ActiveRecord::Migration[7.0]
   def change
     create_table :pghero_query_stats do |t|
@@ -10,6 +12,6 @@ class CreatePgheroQueryStats < ActiveRecord::Migration[7.0]
       t.timestamp :captured_at
     end
 
-    add_index :pghero_query_stats, [:database, :captured_at]
+    add_index :pghero_query_stats, %i[database captured_at]
   end
 end

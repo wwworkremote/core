@@ -25,11 +25,11 @@ AllCops:
     - 'Gemfile'
     - 'config.ru'
     - 'config/**/*.rb'
+    - 'db/**/*.rb'
   Exclude:
     - '**/.DS_Store'
     - 'bin/**/*'
     - 'sbin/**/*'
-    - '_backup/**/*'
 
 Layout/EmptyLineAfterGuardClause: {Enabled: false}
 Layout/EmptyLines: {Enabled: false}
