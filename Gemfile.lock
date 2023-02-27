@@ -93,6 +93,9 @@ GEM
     airbrussh (1.4.1)
       sshkit (>= 1.6.1, != 1.7.0)
     amazing_print (1.4.0)
+    annotate (3.2.0)
+      activerecord (>= 3.2, < 8.0)
+      rake (>= 10.4, < 14.0)
     arkency-command_bus (0.4.1)
       concurrent-ruby
     ast (2.4.2)
@@ -339,6 +342,7 @@ DEPENDENCIES
   after_commit_everywhere (~> 1.0)
   ahoy_matey
   amazing_print
+  annotate (~> 3.2)
   bcrypt (~> 3.1.7)
   bcrypt_pbkdf
   blorgh!

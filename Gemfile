@@ -82,3 +82,5 @@ gem 'pg_query', '>= 2'
 gem 'ahoy_matey'
 
 gem 'blorgh', path: 'blorgh'
+
+gem 'annotate', '~> 3.2'
