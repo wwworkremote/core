@@ -61,3 +61,6 @@ group :development do
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
 end
+
+gem 'rails_admin', '~> 3.1'
+gem 'sassc-rails'
