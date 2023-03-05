@@ -22,6 +22,7 @@ gem 'faraday-net_http_persistent', require: false
 gem 'faraday-retry', require: false
 gem 'jbuilder'
 gem 'kredis'
+gem 'oj'
 gem 'paper_trail'
 gem 'pg', '~> 1.1'
 gem 'pghero'

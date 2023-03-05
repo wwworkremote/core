@@ -210,6 +210,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.14.2-x86_64-darwin)
       racc (~> 1.4)
+    oj (3.14.2)
     orm_adapter (0.5.0)
     paper_trail (14.0.0)
       activerecord (>= 6.0)
@@ -412,6 +413,7 @@ DEPENDENCIES
   faraday-retry
   jbuilder
   kredis
+  oj
   paper_trail
   pg (~> 1.1)
   pg_query (>= 2)
