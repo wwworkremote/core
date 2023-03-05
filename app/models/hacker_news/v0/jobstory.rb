@@ -4,10 +4,11 @@
 #
 # Table name: hacker_news_v0_jobstories
 #
-#  id         :integer          not null
+#  id         :integer          not null, primary key
 #  by         :string
 #  data       :jsonb            not null
 #  score      :integer
+#  text       :text
 #  time       :integer
 #  title      :string
 #  url        :string

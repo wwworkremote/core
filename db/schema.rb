@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 20_230_305_185_804) do
+ActiveRecord::Schema[7.0].define(version: 20_230_305_201_556) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'citext'
   enable_extension 'fuzzystrmatch'
@@ -99,6 +99,7 @@ ActiveRecord::Schema[7.0].define(version: 20_230_305_185_804) do
     t.jsonb 'data', default: {}, null: false
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false
+    t.text 'text'
     t.index ['id'], name: 'index_hacker_news_v0_jobstories_on_id', unique: true
   end
 

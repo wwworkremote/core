@@ -22,7 +22,7 @@ module HackerNews
 
         jobstory = Oj.load(pull_jobstory(conn, id:).body, symbolize_names: true)
 
-        attrs = jobstory.slice(:by, :score, :time, :title, :url).merge(data: jobstory)
+        attrs = jobstory.slice(:by, :score, :time, :title, :url, :text).merge(data: jobstory)
 
         HackerNews::V0::Jobstory.create_with(**attrs).find_or_create_by(id:)
 

@@ -9,6 +9,7 @@ class CreateHackerNewsV0Jobstories < ActiveRecord::Migration[7.0]
       t.integer :time
       t.string :title
       t.string :url
+      t.text :text
       t.jsonb :data, default: {}, null: false
 
       t.timestamps
