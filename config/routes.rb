@@ -3,19 +3,19 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
+  mount Blorgh::Engine, at: '/x'
+  mount PgHero::Engine, at: 'pghero'
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
-  devise_for :users
-  resources :users
-  resources :messages
-
   mount RailsEventStore::Browser => '/res' # if Rails.env.development?
   mount Sidekiq::Web => '/sidekiq'
-  mount PgHero::Engine, at: 'pghero'
-  mount Blorgh::Engine, at: '/x'
+
+  devise_for :users
+
+  # resources :users
+  resources :messages
+  resources :nodes, only: [:index]
 
   get '/pages/*page' => 'pages#show'
-
-  resources :nodes, only: [:index]
 
   root 'pages#show', page: 'home'
 end
