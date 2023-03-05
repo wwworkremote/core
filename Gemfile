@@ -17,9 +17,9 @@ gem 'blorgh', path: 'blorgh'
 gem 'byebug'
 gem 'devise', '~> 4.9'
 gem 'druuid'
-gem 'faraday', require: false
-gem 'faraday-net_http_persistent', require: false
-gem 'faraday-retry', require: false
+gem 'faraday'
+gem 'faraday-net_http_persistent'
+gem 'faraday-retry'
 gem 'jbuilder'
 gem 'kredis'
 gem 'oj'
