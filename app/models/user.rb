@@ -37,7 +37,15 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable,
+         :confirmable
+
+  before_save :set_defaults
+
+  def set_defaults
+    self.name = 'Default' if name.blank?
+    self.slug = "user##{rand(0..1000)}"
+  end
 
   has_many :messages
 end
