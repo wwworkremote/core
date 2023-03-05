@@ -16,4 +16,4 @@ job_type :script, " #{JOB_PREFIX} bin/:task :output "
 
 every(15.minutes) { runner('HeartbeatWorker.perform_async') }
 
-every(rand(90..120).minutes) { rails('hacker_news:fetch_latest_jobstories') }
+every(3.hours) { rails('hacker_news:fetch_latest_jobstories') }
