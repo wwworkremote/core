@@ -4,7 +4,7 @@ require 'amazing_print'
 require 'faraday'
 require 'oj'
 
-module HackerNews
+module HackerNewsPuller
   module_function
 
   def pull_jobstories(conn)
@@ -20,12 +20,14 @@ module HackerNews
 
     conn = Faraday.new(url:, headers: { 'Content-Type' => 'application/json' })
 
-    jobstory_ids = Oj.load(pull_jobstories(conn).body)
+    jobstory_ids = Oj.load(pull_jobstories(conn).body, symbolize_names: true)
 
     jobstory_ids.map do |id|
-      jobstory = Oj.load(pull_jobstory(conn, id:).body)
+      jobstory = Oj.load(pull_jobstory(conn, id:).body, symbolize_names: true)
 
-      ap jobstory
+      attrs = jobstory.slice(:by, :score, :time, :title, :url).merge(data: jobstory)
+
+      HackerNews::V0::Jobstory.create_with(**attrs).find_or_create_by(id:)
 
       sleep 1
     end

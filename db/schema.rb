@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 20_230_301_233_240) do
+ActiveRecord::Schema[7.0].define(version: 20_230_305_185_804) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'citext'
   enable_extension 'fuzzystrmatch'
@@ -87,6 +87,19 @@ ActiveRecord::Schema[7.0].define(version: 20_230_301_233_240) do
     t.index ['created_at'], name: 'index_event_store_events_in_streams_on_created_at'
     t.index %w[stream event_id], name: 'index_event_store_events_in_streams_on_stream_and_event_id', unique: true
     t.index %w[stream position], name: 'index_event_store_events_in_streams_on_stream_and_position', unique: true
+  end
+
+  create_table 'hacker_news_v0_jobstories', id: false, force: :cascade do |t|
+    t.integer 'id', null: false
+    t.string 'by'
+    t.integer 'score'
+    t.integer 'time'
+    t.string 'title'
+    t.string 'url'
+    t.jsonb 'data', default: {}, null: false
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
+    t.index ['id'], name: 'index_hacker_news_v0_jobstories_on_id', unique: true
   end
 
   create_table 'job_boards_documents', id: :uuid, default: -> { 'gen_random_uuid()' }, force: :cascade do |t|
