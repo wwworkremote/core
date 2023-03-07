@@ -65,3 +65,5 @@ end
 
 gem 'rails_admin', '~> 3.1'
 gem 'sassc-rails'
+
+gem 'pg_search', '~> 2.3'
