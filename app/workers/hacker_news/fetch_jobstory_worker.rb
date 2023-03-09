@@ -14,7 +14,7 @@ module HackerNews
         headers: { 'Content-Type' => 'application/json' }
       )
 
-      jobstory = Oj.load(conn.get("/v0/item/#{id}.json").body, symbolize_names: true)
+      jobstory = Oj.load(conn.get("/v0/item/#{jobstory_id}.json").body, symbolize_names: true)
 
       return unless jobstory[:type] == 'job'
 
