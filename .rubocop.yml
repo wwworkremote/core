@@ -66,3 +66,4 @@ Style/MultilineBlockChain: {Enabled: false}
 Style/RescueModifier: {Enabled: false}
 Style/RescueStandardError: {Enabled: false}
 Style/Semicolon: {Enabled: false}
+Rails/Output: {Enabled: false}

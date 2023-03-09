@@ -10,7 +10,7 @@ module HackerNews
 
       jobstory_ids = Oj.load(get_jobstories(conn:).body, symbolize_names: true)
 
-      FetchJobstories.new(jobstory_ids:).call(conn:)
+      FetchJobstories.new(jobstory_ids:).call
     end
 
     def get_jobstories(conn:)

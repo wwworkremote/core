@@ -10,11 +10,6 @@ module HackerNews
     end
 
     def call
-      conn ||= Faraday.new(
-        url: 'https://hacker-news.firebaseio.com',
-        headers: { 'Content-Type' => 'application/json' }
-      )
-
       maxitemid = HackerNews::V0::Jobstory.minimum(:id)
       minitemid = maxitemid - limit
 
@@ -22,12 +17,7 @@ module HackerNews
 
       ap jobstory_ids.minmax
 
-      FetchJobstories.new(jobstory_ids:).call(conn:)
-    end
-
-    def get_jobstories(conn:)
-      conn.get('/v0/jobstories.json')
+      FetchJobstories.new(jobstory_ids:).call
     end
   end
 end
-

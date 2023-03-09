@@ -10,32 +10,10 @@ module HackerNews
       @jobstory_ids = jobstory_ids
     end
 
-    def call(conn: nil)
-      conn ||= Faraday.new(
-        url: 'https://hacker-news.firebaseio.com',
-        headers: { 'Content-Type' => 'application/json' }
-      )
-
-      jobstory_ids.map do |id|
-        ap id
-
-        jobstory = Oj.load(get_jobstory(conn:, id:).body, symbolize_names: true)
-
-        next unless jobstory[:type] == 'job'
-
-        attrs = jobstory.slice(:by, :score, :time, :title, :url, :text).merge(data: jobstory)
-
-        HackerNews::V0::Jobstory.create_with(**attrs).find_or_create_by(id:)
-
-        sleep 1
+    def call
+      jobstory_ids.each do |jobstory_id|
+        HackerNews::FetchJobstoryWorker.new.perform(jobstory_id)
       end
-
-      true
-    end
-
-    def get_jobstory(conn:, id:)
-      conn.get("/v0/item/#{id}.json")
     end
   end
 end
-

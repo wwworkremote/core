@@ -1,8 +1,9 @@
 ---
 verbose: true
 backtrace: true
-concurrency: 12
+concurrency: 3
 queues:
+  - hacker_news
   - heartbeat
   - default
 
