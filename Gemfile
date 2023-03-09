@@ -22,15 +22,22 @@ gem 'faraday-net_http_persistent'
 gem 'faraday-retry'
 gem 'jbuilder'
 gem 'kredis'
+gem 'nokogiri', '~> 1.14'
+gem 'nori', '~> 2.6'
 gem 'oj'
+gem 'ox', '~> 2.14'
 gem 'paper_trail'
 gem 'pg', '~> 1.1'
 gem 'pghero'
 gem 'pg_query', '>= 2'
+gem 'pg_search', '~> 2.3'
 gem 'pry-rails'
 gem 'puma', '~> 5.0'
 gem 'rack-cors'
+gem 'rails_admin', '~> 3.1'
 gem 'rails_event_store', '~> 2.5.1'
+gem 'rollbar', '~> 3.4'
+gem 'sassc-rails'
 gem 'sidekiq', '~> 6.0', '<7.0'
 gem 'sorted_set'
 gem 'sprockets-rails'
@@ -62,16 +69,3 @@ group :development do
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
 end
-
-gem 'rails_admin', '~> 3.1'
-gem 'sassc-rails'
-
-gem 'pg_search', '~> 2.3'
-
-gem 'ox', '~> 2.14'
-
-gem 'nori', '~> 2.6'
-
-gem 'nokogiri', '~> 1.14'
-
-gem "rollbar", "~> 3.4"
