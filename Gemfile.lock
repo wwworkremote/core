@@ -301,6 +301,7 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.2.5)
+    rollbar (3.4.0)
     rubocop (1.48.0)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -433,6 +434,7 @@ DEPENDENCIES
   rails (~> 7.0.3, >= 7.0.3.1)
   rails_admin (~> 3.1)
   rails_event_store (~> 2.5.1)
+  rollbar (~> 3.4)
   rubocop
   rubocop-performance
   rubocop-rails

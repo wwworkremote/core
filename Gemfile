@@ -73,3 +73,5 @@ gem 'ox', '~> 2.14'
 gem 'nori', '~> 2.6'
 
 gem 'nokogiri', '~> 1.14'
+
+gem "rollbar", "~> 3.4"
