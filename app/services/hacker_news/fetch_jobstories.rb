@@ -12,6 +12,7 @@ module HackerNews
 
     def call
       jobstory_ids.each do |jobstory_id|
+        Rails.logger.info { "#{self.class.name}##{__method__} ==>> jobstory_id:#{jobstory_id}" }
         HackerNews::FetchJobstoryWorker.new.perform(jobstory_id)
       end
     end
