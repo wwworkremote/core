@@ -110,7 +110,7 @@ end
 
 after 'deploy:published', 'nginx:restart'
 after 'deploy:published', 'puma:restart'
-# after 'deploy:published', 'sidekiq:restart'
+after 'deploy:published', 'sidekiq:restart'
 
 namespace :custom do
   desc 'Report uptime'
