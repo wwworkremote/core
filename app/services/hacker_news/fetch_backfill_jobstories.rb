@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'lib/hacker_news'
+
 module HackerNews
   class FetchBackfillJobstories
     attr_reader :offset, :limit
@@ -10,9 +12,12 @@ module HackerNews
     end
 
     def call
-      conn ||= HackerNews.client
+      conn ||= Faraday.new(
+        url: 'https://hacker-news.firebaseio.com',
+        headers: { 'Content-Type' => 'application/json' }
+      )
 
-      maxitemid = HackerNews.min_jobstory_id - offset
+      maxitemid = HackerNews::V0::Jobstory.minimum(:id)
       minitemid = maxitemid - limit
 
       jobstory_ids = (minitemid..maxitemid).to_a

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'hacker_news'
+
 module HackerNews
   class FetchJobstories
     attr_reader :jobstory_ids
@@ -9,7 +11,10 @@ module HackerNews
     end
 
     def call(conn: nil)
-      conn ||= HackerNews.client
+      conn ||= Faraday.new(
+        url: 'https://hacker-news.firebaseio.com',
+        headers: { 'Content-Type' => 'application/json' }
+      )
 
       jobstory_ids.map do |id|
         ap id

@@ -68,8 +68,8 @@ gem 'sassc-rails'
 
 gem 'pg_search', '~> 2.3'
 
-gem "ox", "~> 2.14"
+gem 'ox', '~> 2.14'
 
-gem "nori", "~> 2.6"
+gem 'nori', '~> 2.6'
 
-gem "nokogiri", "~> 1.14"
+gem 'nokogiri', '~> 1.14'

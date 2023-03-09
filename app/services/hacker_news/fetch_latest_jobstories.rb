@@ -3,7 +3,10 @@
 module HackerNews
   class FetchLatestJobstories
     def call
-      conn ||= HackerNews.client
+      conn ||= Faraday.new(
+        url: 'https://hacker-news.firebaseio.com',
+        headers: { 'Content-Type' => 'application/json' }
+      )
 
       jobstory_ids = Oj.load(get_jobstories(conn:).body, symbolize_names: true)
 
