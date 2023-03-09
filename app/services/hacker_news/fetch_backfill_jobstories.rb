@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'lib/hacker_news'
-
 module HackerNews
   class FetchBackfillJobstories
     attr_reader :offset, :limit
