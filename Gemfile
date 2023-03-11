@@ -39,6 +39,7 @@ gem 'rails_event_store', '~> 2.5.1'
 gem 'rollbar', '~> 3.4'
 gem 'sassc-rails'
 gem 'sidekiq', '~> 6.0', '<7.0'
+gem 'sidekiq-throttled', '~> 0.17.0'
 gem 'sorted_set'
 gem 'sprockets-rails'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
