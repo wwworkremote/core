@@ -5,7 +5,7 @@ module HackerNews
     include Sidekiq::Worker
     include Sidekiq::Throttled::Worker
 
-    sidekiq_throttle(concurrency: { limit: 3 }, threshold: { limit: 1, period: 3.seconds })
+    sidekiq_throttle(concurrency: { limit: 3 }, threshold: { limit: 3, period: 3.seconds })
 
     sidekiq_options(queue: :hacker_news)
 
