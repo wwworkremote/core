@@ -5,6 +5,7 @@
 # Table name: hacker_news_items
 #
 #  id         :integer          not null, primary key
+#  data       :jsonb
 #  schema     :integer          default("unknown"), not null
 #  state      :integer          default("pending"), not null
 #  created_at :datetime         not null

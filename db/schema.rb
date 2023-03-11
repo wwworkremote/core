@@ -12,7 +12,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 20_230_307_224_348) do
+ActiveRecord::Schema[7.0].define(version: 20_230_311_001_348) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'citext'
   enable_extension 'fuzzystrmatch'
@@ -95,6 +95,7 @@ ActiveRecord::Schema[7.0].define(version: 20_230_307_224_348) do
     t.integer 'state', default: 0, null: false
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false
+    t.jsonb 'data', default: {}
     t.index ['id'], name: 'index_hacker_news_items_on_id', unique: true
     t.index ['schema'], name: 'index_hacker_news_items_on_schema'
     t.index ['state'], name: 'index_hacker_news_items_on_state'
