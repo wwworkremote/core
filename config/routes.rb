@@ -1,17 +1,22 @@
 # frozen_string_literal: true
 
 require 'sidekiq/web'
+require 'sidekiq/throttled/web'
 
 Rails.application.routes.draw do
-  mount Blorgh::Engine, at: '/x'
   mount PgHero::Engine, at: 'pghero'
+
+  mount Blorgh::Engine, at: '/x'
+
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+
   mount RailsEventStore::Browser => '/res' # if Rails.env.development?
+
+  Sidekiq::Throttled::Web.enhance_queues_tab!
   mount Sidekiq::Web => '/sidekiq'
 
   devise_for :users
 
-  # resources :users
   resources :messages
   resources :nodes, only: [:index]
 
