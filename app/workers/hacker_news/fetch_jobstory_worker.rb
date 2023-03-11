@@ -10,7 +10,12 @@ module HackerNews
     sidekiq_options(queue: :hacker_news)
 
     def perform(jobstory_id)
-      Rails.logger.info { "jobstory_id: #{jobstory_id} | #{Nodes.current} | #{Time.zone.now}" }
+      if HackerNews::V0::Jobstory.exists?(id: jobstory_id)
+        Rails.logger.info { "jobstory_id: #{jobstory_id} | skip | #{Nodes.current} | #{Time.zone.now}" }
+        return
+      end
+
+      Rails.logger.info { "jobstory_id: #{jobstory_id} | fetch | #{Nodes.current} | #{Time.zone.now}" }
 
       conn ||= Faraday.new(
         url: 'https://hacker-news.firebaseio.com',
