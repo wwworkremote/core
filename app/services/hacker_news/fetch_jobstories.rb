@@ -43,12 +43,7 @@ module HackerNews
         req.body = request_json
       end
 
-      if response.success?
-        response_data = Oj.load(response.body)
-        puts "Request was successful. Response data: #{response_data}"
-      else
-        puts "Request failed with status code #{response.status}"
-      end
+      ap response.body
     end
   end
 end
