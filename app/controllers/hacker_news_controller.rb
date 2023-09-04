@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'socket'
+
 class HackerNewsController < ApplicationController
   protect_from_forgery with: :null_session
 
@@ -16,6 +18,7 @@ class HackerNewsController < ApplicationController
                  .set(wait_until:)
                  .perform_async(jobstory_id)
 
-    render json: { sidekiq_id:, jobstory_id:, wait_for:, wait_until: }
+    node = Socket.gethostname
+    render json: { sidekiq_id:, jobstory_id:, wait_for:, wait_until:, node: }
   end
 end

@@ -15,7 +15,7 @@ module HackerNews
 
       jobstory_ids.each_with_index do |jobstory_id, wait_for|
         node_id += 1
-        node_id = 1 if node_id > 5
+        node_id = 0 if node_id > 5
         node = "node0#{node_id}"
 
         remote_fetch_jobstory(node, jobstory_id:, wait_for:)
