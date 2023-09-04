@@ -13,7 +13,7 @@ module HackerNews
     def call
       jobstory_ids.each_with_index do |jobstory_id, i|
         Rails.logger.info { "#{self.class.name}##{__method__} ==>> jobstory_id:#{jobstory_id}" }
-        HackerNews::FetchJobstoryWorker.set(wait_until: i.minutes).perform_async(jobstory_id)
+        HackerNews::FetchJobstoryWorker.set(wait_until: i.seconds).perform_async(jobstory_id)
       end
     end
   end
