@@ -14,8 +14,6 @@ module HackerNews
       node_id = 0
 
       jobstory_ids.each_with_index do |jobstory_id, i|
-        Rails.logger.info { "#{self.class.name}##{__method__} ==>> jobstory_id:#{jobstory_id}" }
-
         node_id += 1
         node_id = 1 if node_id > 5
         node = "node0#{node_id}"
@@ -27,17 +25,27 @@ module HackerNews
     end
 
     def remote_fetch_jobstory(node, jobstory_id:, wait_until:)
-      api_endpoint = "http://#{node}"
-      conn = Faraday.new(url: api_endpoint)
+      Rails.logger.info { "#{self.class.name}##{__method__} ==>> node:#{node}, jobstory_id:#{jobstory_id}, wait_until:#{wait_until}" }
 
-      response = conn.get do |req|
+      api_endpoint = "http://#{node}/hacker_news/fetch_jobstory"
+
+      conn = Faraday.new(url: api_endpoint) do |faraday|
+        faraday.request(:json)
+        faraday.response(:json, content_type: /\bjson$/)
+        faraday.adapter(Faraday.default_adapter)
+      end
+
+      request_json = Oj.dump({ jobstory_id:, wait_until: })
+
+      response = conn.put do |req|
         req.url(api_endpoint)
-        req.params['jobstory_id'] = jobstory_id
-        req.params['wait_until'] = wait_until
+        req.headers['Content-Type'] = 'application/json'
+        req.body = request_json
       end
 
       if response.success?
-        puts "Request was successful. Response body: #{response.body}"
+        response_data = Oj.load(response.body)
+        puts "Request was successful. Response data: #{response_data}"
       else
         puts "Request failed with status code #{response.status}"
       end

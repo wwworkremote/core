@@ -4,7 +4,8 @@ require 'sidekiq/web'
 require 'sidekiq/throttled/web'
 
 Rails.application.routes.draw do
-  get 'hacker_news/fetch_jobstory'
+  put 'hacker_news/fetch_jobstory'
+
   mount PgHero::Engine, at: 'pghero'
 
   mount Blorgh::Engine, at: '/x'
