@@ -7,14 +7,15 @@ class HackerNewsController < ApplicationController
     Rails.logger.debug { params.ai }
 
     jobstory_id = params[:jobstory_id]
-    wait_until = params[:wait_until]
+    wait_for = params[:wait_for]
+    wait_until = wait_for.seconds
 
-    Rails.logger.info { "#{self.class.name}##{__method__} ==>> jobstory_id:#{jobstory_id}, wait_until:#{wait_until}" }
+    Rails.logger.info { "#{self.class.name}##{__method__} ==>> jobstory_id:#{jobstory_id}, wait_for:#{wait_for}, wait_until:#{wait_until}" }
 
-    HackerNews::FetchJobstoryWorker
-      .set(wait_until:)
-      .perform_async(jobstory_id)
+    sidekiq_id = HackerNews::FetchJobstoryWorker
+                 .set(wait_until:)
+                 .perform_async(jobstory_id)
 
-    render json: { jobstory_id:, wait_until: }
+    render json: { sidekiq_id:, jobstory_id:, wait_for:, wait_until: }
   end
 end

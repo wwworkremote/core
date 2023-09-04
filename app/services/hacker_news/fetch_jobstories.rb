@@ -13,19 +13,17 @@ module HackerNews
     def call
       node_id = 0
 
-      jobstory_ids.each_with_index do |jobstory_id, i|
+      jobstory_ids.each_with_index do |jobstory_id, wait_for|
         node_id += 1
         node_id = 1 if node_id > 5
         node = "node0#{node_id}"
 
-        wait_until = i.seconds
-
-        remote_fetch_jobstory(node, jobstory_id:, wait_until:)
+        remote_fetch_jobstory(node, jobstory_id:, wait_for:)
       end
     end
 
-    def remote_fetch_jobstory(node, jobstory_id:, wait_until:)
-      Rails.logger.info { "#{self.class.name}##{__method__} ==>> node:#{node}, jobstory_id:#{jobstory_id}, wait_until:#{wait_until}" }
+    def remote_fetch_jobstory(node, jobstory_id:, wait_for:)
+      Rails.logger.info { "#{self.class.name}##{__method__} ==>> node:#{node}, jobstory_id:#{jobstory_id}, wait_for:#{wait_for}" }
 
       api_endpoint = "http://#{node}/hacker_news/fetch_jobstory"
 
@@ -35,7 +33,12 @@ module HackerNews
         faraday.adapter(Faraday.default_adapter)
       end
 
-      request_json = Oj.dump({ jobstory_id:, wait_until: })
+      request_body = {
+        'jobstory_id' => jobstory_id,
+        'wait_for' => wait_for
+      }
+
+      request_json = Oj.dump(request_body)
 
       response = conn.put do |req|
         req.url(api_endpoint)
