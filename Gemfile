@@ -73,4 +73,4 @@ group :development do
   gem 'ruby-lsp'
 end
 
-gem "newrelic_rpm", "~> 9.0"
+gem 'newrelic_rpm', '~> 9.0'
