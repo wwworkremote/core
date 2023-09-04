@@ -378,10 +378,10 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.5.0)
-    sidekiq-throttled (0.17.0)
+    sidekiq-throttled (0.18.0)
       concurrent-ruby
-      redis-prescription
-      sidekiq (>= 6.4)
+      redis-prescription (~> 2.2)
+      sidekiq (~> 6.4)
     sorbet-runtime (0.5.11001)
     sorted_set (1.0.3)
       rbtree
@@ -478,7 +478,7 @@ DEPENDENCIES
   ruby-lsp
   sassc-rails
   sidekiq (~> 6.0, < 7.0)
-  sidekiq-throttled (~> 0.17.0)
+  sidekiq-throttled
   sorted_set
   sprockets-rails
   sshkit
