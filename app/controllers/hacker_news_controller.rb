@@ -4,6 +4,8 @@ class HackerNewsController < ApplicationController
   protect_from_forgery with: :null_session
 
   def fetch_jobstory
+    Rails.logger.debug { params.ai }
+
     jobstory_id = params[:jobstory_id]
     wait_until = params[:wait_until]
 
