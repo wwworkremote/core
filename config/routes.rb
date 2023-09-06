@@ -4,6 +4,7 @@ require 'sidekiq/web'
 require 'sidekiq/throttled/web'
 
 Rails.application.routes.draw do
+  get 'dice/roll'
   put 'hacker_news/fetch_jobstory'
 
   mount PgHero::Engine, at: 'pghero'

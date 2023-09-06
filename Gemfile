@@ -50,6 +50,8 @@ group :development, :test do
 end
 
 group :development do
+  gem 'webrick', '~> 1.8'
+
   gem 'capistrano', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-bundler', require: false
@@ -74,3 +76,4 @@ group :development do
 end
 
 gem 'newrelic_rpm', '~> 9.0'
+
