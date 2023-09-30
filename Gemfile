@@ -77,6 +77,6 @@ end
 
 gem 'newrelic_rpm', '~> 9.0'
 
-
-gem 'opentelemetry-instrumentation-all', '~> 0.40.0'
-gem 'opentelemetry-sdk', '~> 1.3'
+gem 'opentelemetry-exporter-otlp'
+gem 'opentelemetry-instrumentation-all'
+gem 'opentelemetry-sdk'
