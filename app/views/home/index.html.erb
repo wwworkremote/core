@@ -1,0 +1,78 @@
+<h2>Sources</h2>
+
+<div class="row gx-5">
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-header display-2">
+        <%= Source.where(created_at: 1.hour.ago..).count %> 
+      </div>
+      <div class="card-body">
+        <div class="card-title">past hour</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-header display-2">
+        <%= Source.where(created_at: 1.day.ago..).count %> 
+      </div>
+      <div class="card-body">
+        <div class="card-title">past day</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-header display-2">
+        <%= Source.where(created_at: 1.week.ago..).count %> 
+      </div>
+      <div class="card-body">
+        <div class="card-title">past week</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <%= line_chart(charts_data_sources_path(days: 21), discrete: true, label: 'Created At', format: '%Y-%m-%d', time_zone: false) %>
+</div>
+
+<hr>
+<h2>Job Postings</h2>
+
+<div class="row gx-5">
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-header display-2">
+        <%= JobPosting.where(published_at: 1.hour.ago..).count %> 
+      </div>
+      <div class="card-body">
+        <div class="card-title">past hour</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-header display-2">
+        <%= JobPosting.where(published_at: 1.day.ago..).count %> 
+      </div>
+      <div class="card-body">
+        <div class="card-title">past day</div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-header display-2">
+        <%= JobPosting.where(published_at: 1.week.ago..).count %> 
+      </div>
+      <div class="card-body">
+        <div class="card-title">past week</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <%= line_chart(charts_data_job_postings_path(days: 21), discrete: true, label: 'Published At', format: '%Y-%m-%d', time_zone: false) %>
+</div>

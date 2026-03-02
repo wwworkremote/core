@@ -32,6 +32,11 @@ Rails.application.configure do
   # Raise exceptions instead of rendering exception templates.
   config.action_dispatch.show_exceptions = false
 
+  config.logger = Logger.new(STDOUT)
+  config.log_level = :debug
+
+  config.hosts = nil
+
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 

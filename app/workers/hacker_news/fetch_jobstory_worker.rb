@@ -3,9 +3,6 @@
 module HackerNews
   class FetchJobstoryWorker
     include Sidekiq::Worker
-    include Sidekiq::Throttled::Worker
-
-    sidekiq_throttle(concurrency: { limit: 5 }, threshold: { limit: 8, period: 3.seconds })
 
     sidekiq_options(queue: :hacker_news)
 

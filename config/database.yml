@@ -1,13 +1,11 @@
----
 default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  host: localhost
+  url: <%= ENV.fetch("DATABASE_URL") { "postgres://localhost/wwworkremote_development" } %>
 
 development:
   <<: *default
-  database: wwworkremote_development
 
 test:
   <<: *default
@@ -15,5 +13,4 @@ test:
 
 production:
   <<: *default
-  database: wwworkremote_production
-  username: deploy
+  url: <%= ENV.fetch("DATABASE_URL") { "postgres://deploy@localhost/wwworkremote_production" } %>

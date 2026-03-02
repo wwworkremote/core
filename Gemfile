@@ -3,10 +3,11 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~> 3.2'
+ruby '3.3.4'
 
-gem 'rails', '~> 7.0.3', '>= 7.0.3.1'
+gem 'rails', '~> 7.2.0'
 
+# Core / Data Acquisition
 gem 'aasm'
 gem 'after_commit_everywhere', '~> 1.0'
 gem 'ahoy_matey'
@@ -14,7 +15,6 @@ gem 'amazing_print'
 gem 'annotate', '~> 3.2'
 gem 'bcrypt', '~> 3.1.7'
 gem 'blorgh', path: 'blorgh'
-gem 'byebug'
 gem 'devise', '~> 4.9'
 gem 'druuid'
 gem 'faraday'
@@ -22,61 +22,57 @@ gem 'faraday-net_http_persistent'
 gem 'faraday-retry'
 gem 'jbuilder'
 gem 'kredis'
-gem 'nokogiri', '~> 1.14'
+gem 'nokogiri', '>= 1.16'
 gem 'nori', '~> 2.6'
 gem 'oj'
 gem 'ox', '~> 2.14'
 gem 'paper_trail'
-gem 'pg', '~> 1.1'
+gem 'pg', '~> 1.5'
 gem 'pghero'
 gem 'pg_query', '>= 2'
 gem 'pg_search', '~> 2.3'
-gem 'pry-rails'
-gem 'puma', '~> 5.0'
+gem 'puma', '>= 6.0'
 gem 'rack-cors'
 gem 'rails_admin', '~> 3.1'
-gem 'rails_event_store', '~> 2.5.1'
-gem 'rollbar', '~> 3.4'
-gem 'sassc-rails'
-gem 'sidekiq', '~> 6.0', '<7.0'
-gem 'sidekiq-throttled'
-gem 'sorted_set'
+gem 'sprockets'
 gem 'sprockets-rails'
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+gem 'sassc-rails'
+gem 'rails_event_store', '~> 2.15'
+# gem 'rollbar', '~> 3.5'
+gem 'sidekiq', '>= 7.0'
 gem 'whenever', require: false
+
+# Dashboard / Visualization
+gem 'active_median'
+gem 'chartkick'
+gem 'groupdate'
+gem 'jsonb_accessor'
+gem 'kaminari'
+
+# Assets / UI
+# gem 'propshaft'
+gem 'importmap-rails'
+gem 'stimulus-rails'
+gem 'turbo-rails'
 
 group :development, :test do
   gem 'debug'
+  gem 'rspec-rails'
+  gem 'shoulda-matchers'
+  gem 'faker'
+  gem 'factory_bot_rails'
 end
 
 group :development do
-  gem 'webrick', '~> 1.8'
-
-  gem 'capistrano', require: false
-  gem 'capistrano-asdf', require: false
-  gem 'capistrano-bundler', require: false
-  gem 'capistrano-rails', require: false
-  gem 'capistrano-ssh-doctor', require: false, github: 'capistrano-plugins/capistrano-ssh-doctor'
-
-  gem 'bcrypt_pbkdf', require: false
-  gem 'ed25519', require: false
-  gem 'sshkit', require: false
-  gem 'sshkit-sudo', require: false
-
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rake', require: false
-  gem 'rubocop-require_tools', require: false
   gem 'rubocop-rspec', require: false
-  gem 'rubocop-rubycw', require: false
-  gem 'rubocop-thread_safety', require: false
-
   gem 'ruby-lsp'
 end
 
-gem 'newrelic_rpm', '~> 9.0'
-
-gem 'opentelemetry-exporter-otlp'
-gem 'opentelemetry-instrumentation-all'
-gem 'opentelemetry-sdk'
+# gem 'newrelic_rpm'
+# gem 'opentelemetry-exporter-otlp'
+# gem 'opentelemetry-instrumentation-all'
+# gem 'opentelemetry-sdk'

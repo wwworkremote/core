@@ -20,87 +20,16 @@ require 'action_view/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-require 'sorted_set'
-
 class Nodes # :nodoc:
-  HEAD = 1
-  TAIL = 5
-
-  ACTUALLY = `hostname`.strip.split('.').first.freeze
-
-  HOSTNAME = if ACTUALLY == 'zalewhol'
-               'node01'
-             else
-               ACTUALLY
-             end
-
-  CURRENT = HOSTNAME[/\d+$/].to_i
-
-  UPSTREAM_MAP = {
-    HEAD => TAIL,
-    2 => HEAD,
-    3 => 2,
-    4 => 3,
-    TAIL => 4
-  }.freeze
-
-  DOWNSTREAM_MAP = UPSTREAM_MAP.invert.freeze
-
-  UPSTREAM_NAME_MAP = {
-    "node#{HEAD.to_s.ljust(2, '0')}" => TAIL,
-    'node02' => HEAD,
-    'node03' => 2,
-    'node04' => 3,
-    "node#{TAIL.to_s.ljust(2, '0')}" => 4
-  }.freeze
-
-  DOWNSTREAM_NAME_MAP = {
-    "node#{HEAD.to_s.ljust(2, '0')}" => 2,
-    'node02' => 3,
-    'node03' => 4,
-    'node04' => TAIL,
-    "node#{TAIL.to_s.ljust(2, '0')}" => HEAD
-  }.freeze
-
-  DOWNSTREAM = DOWNSTREAM_MAP[CURRENT]
-  UPSTREAM = UPSTREAM_MAP[CURRENT]
-
-  def self.current
-    CURRENT
-  end
-
-  def self.siblings
-    SortedSet.new(UPSTREAM_MAP.flatten).to_a - [current]
-  end
-
-  def self.upstream
-    UPSTREAM
-  end
-
-  def self.downstream
-    DOWNSTREAM
-  end
-
-  def self.previous
-    UPSTREAM
-  end
-
-  def self.next
-    DOWNSTREAM
-  end
-
-  def self.from(node_id)
-    return :current if node_id == CURRENT
-    return :upstream if node_id == TAIL && CURRENT == HEAD
-    return :upstream if node_id < CURRENT
-    return :downstream if node_id == HEAD && CURRENT == TAIL
-
-    :downstream
-  end
-
-  def self.representation
-    [upstream, current, downstream]
-  end
+  CURRENT = 1
+  def self.current; CURRENT; end
+  def self.siblings; []; end
+  def self.upstream; nil; end
+  def self.downstream; nil; end
+  def self.previous; nil; end
+  def self.next; nil; end
+  def self.from(node_id); :current; end
+  def self.representation; [1]; end
 end
 
 module Core
