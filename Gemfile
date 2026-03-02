@@ -38,6 +38,7 @@ gem 'sassc-rails'
 gem 'rails_event_store', '~> 2.15'
 # gem 'rollbar', '~> 3.5'
 gem 'sidekiq', '>= 7.0'
+gem 'sidekiq-cron'
 gem 'whenever', require: false
 
 # Dashboard / Visualization
@@ -74,7 +75,7 @@ group :development do
   gem 'ruby-lsp'
 end
 
-# gem 'newrelic_rpm'
-# gem 'opentelemetry-exporter-otlp'
-# gem 'opentelemetry-instrumentation-all'
-# gem 'opentelemetry-sdk'
+gem 'newrelic_rpm'
+gem 'opentelemetry-exporter-otlp'
+gem 'opentelemetry-instrumentation-all'
+gem 'opentelemetry-sdk'

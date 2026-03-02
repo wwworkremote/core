@@ -30,10 +30,14 @@ services:
       REDIS_URL: redis://redis:6379/1
       ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
       ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      OTEL_SERVICE_NAME: wwworkremote-web
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_started
+      jaeger:
         condition: service_started
 
   worker:
@@ -47,11 +51,21 @@ services:
       REDIS_URL: redis://redis:6379/1
       ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
       ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      OTEL_SERVICE_NAME: wwworkremote-worker
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
+      jaeger:
+        condition: service_started
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # UI
+      - "4318:4318"   # OTLP HTTP
 
 volumes:
   db_data:

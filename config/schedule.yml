@@ -1,0 +1,29 @@
+fetch_hackernews:
+  cron: "*/30 * * * *"
+  class: "HackerNews::FetchLatestWorker"
+  queue: default
+
+fetch_remotive:
+  cron: "0 */6 * * *"
+  class: "Remotive::FetchWorker"
+  queue: default
+
+fetch_wwr:
+  cron: "15 */6 * * *"
+  class: "Wwr::FetchWorker"
+  queue: default
+
+fetch_arbeitnow:
+  cron: "30 */6 * * *"
+  class: "Arbeitnow::FetchWorker"
+  queue: default
+
+fetch_adzuna:
+  cron: "0 0 * * *"
+  class: "Adzuna::FetchWorker"
+  queue: default
+
+sync_to_dashboard:
+  cron: "45 * * * *"
+  class: "SyncJob" # I'll create this simple worker
+  queue: default
