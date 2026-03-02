@@ -1,0 +1,8 @@
+#!/bin/bash
+cd "$(dirname "$0")/.."
+echo "--- Starting Adzuna Job Fetch ---"
+docker-compose exec -T web bin/rails runner - <<'EOF'
+  Adzuna::Fetcher.new.call
+  JobBoards::Syncer.new.call
+EOF
+echo "--- Done ---"
