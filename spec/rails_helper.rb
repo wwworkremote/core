@@ -56,6 +56,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.start
+    Kredis.clear_all
   end
 
   config.after(:each) do

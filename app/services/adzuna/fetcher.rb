@@ -17,27 +17,28 @@ module Adzuna
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         conn = Faraday.new(url: BASE_URL) do |f|
-        f.params['app_id'] = app_id
-        f.params['app_key'] = app_key
-        f.params['what'] = 'remote'
-        f.params['content-type'] = 'application/json'
-      end
+          f.params['app_id'] = app_id
+          f.params['app_key'] = app_key
+          f.params['what'] = 'remote'
+          f.params['content-type'] = 'application/json'
+        end
 
-      response = conn.get
-      data = JSON.parse(response.body)
+        response = conn.get
+        data = JSON.parse(response.body)
 
-      unless data['results']
-        puts "Adzuna API Error: #{response.body}"
-        return
-      end
+        unless data['results']
+          puts "Adzuna API Error: #{response.body}"
+          return
+        end
 
-      data['results'].each do |job|
-        signature = Digest::SHA256.hexdigest("adzuna-#{job['id']}")
-        
-        JobBoards::Document.find_or_create_by!(signature:) do |doc|
-          doc.source_id = source.id
-          doc.job_boards_query_id = query.id
-          doc.document = job.to_json
+        data['results'].each do |job|
+          signature = Digest::SHA256.hexdigest("adzuna-#{job['id']}")
+          
+          JobBoards::Document.find_or_create_by!(signature:) do |doc|
+            doc.source_id = source.id
+            doc.job_boards_query_id = query.id
+            doc.document = job.to_json
+          end
         end
       end
     end

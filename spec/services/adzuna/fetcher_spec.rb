@@ -11,6 +11,7 @@ RSpec.describe Adzuna::Fetcher, type: :service do
     before do
       source
       query
+      allow(ENV).to receive(:fetch).and_call_original
       allow(ENV).to receive(:fetch).with('ADZUNA_APPLICATION_ID', nil).and_return('test_id')
       allow(ENV).to receive(:fetch).with('ADZUNA_APPLICATION_KEY', nil).and_return('test_key')
 
