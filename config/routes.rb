@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   root to: 'home#index'
   get 'home/index'
 
+  resources :job_postings, only: [:index, :show]
+
   namespace :api, defaults: { format: :json }, constraints: { format: :json } do
     namespace :v0 do
       resources :sources, only: %i[index show]

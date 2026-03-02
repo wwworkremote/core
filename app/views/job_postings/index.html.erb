@@ -1,0 +1,47 @@
+<div class="row mb-4">
+  <div class="col-md-8">
+    <h1>Remote Job Postings</h1>
+    <p class="text-muted">Discover and browse aggregated listings.</p>
+  </div>
+  <div class="col-md-4">
+    <%= form_with url: job_postings_path, method: :get, class: "d-flex" do |f| %>
+      <%= f.text_field :q, value: @query, placeholder: "Search jobs...", class: "form-control me-2" %>
+      <%= f.submit "Search", class: "btn btn-outline-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <% if @job_postings.any? %>
+      <div class="list-group">
+        <% @job_postings.each do |job| %>
+          <%= link_to job_posting_path(job), class: "list-group-item list-group-item-action mb-3 rounded shadow-sm border-0 p-4" do %>
+            <div class="d-flex w-100 justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-1 text-primary"><%= job.title %></h5>
+                <p class="mb-1"><strong><%= job.company %></strong></p>
+                <% if job.location.present? %>
+                  <small class="text-muted"><i class="bi bi-geo-alt"></i> <%= job.location %></small>
+                <% end %>
+              </div>
+              <small class="text-muted text-end">
+                <%= time_ago_in_words(job.published_at) if job.published_at %> ago<br>
+                <span class="badge bg-light text-dark border mt-2"><%= job.source&.origin&.name %></span>
+              </small>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="mt-4 d-flex justify-content-center">
+        <%= paginate @job_postings %>
+      </div>
+    <% else %>
+      <div class="alert alert-info py-5 text-center shadow-sm">
+        <h3>No jobs found</h3>
+        <p class="mb-0">Try adjusting your search criteria or running a new fetch.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

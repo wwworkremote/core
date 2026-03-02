@@ -5,14 +5,15 @@ require 'feedjira'
 
 module Wwr
   class Fetcher
+    include ApiGuard
     RSS_URL = 'https://weworkremotely.com/remote-jobs.rss'
 
     def call
-      source = JobBoards::Source.find_or_create_by!(slug: 'wwr', name: 'We Work Remotely')
-      query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+      with_api_guard('wwr', cooldown: 30.minutes) do |source|
+        query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-      xml = Faraday.get(RSS_URL).body
-      feed = Feedjira.parse(xml)
+        xml = Faraday.get(RSS_URL).body
+        feed = Feedjira.parse(xml)
 
       feed.entries.each do |entry|
         signature = Digest::SHA256.hexdigest("wwr-#{entry.entry_id}")

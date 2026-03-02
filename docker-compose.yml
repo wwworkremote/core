@@ -28,6 +28,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/wwworkremote_development
       REDIS_URL: redis://redis:6379/1
+      ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
+      ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -43,6 +45,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/wwworkremote_development
       REDIS_URL: redis://redis:6379/1
+      ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
+      ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
     depends_on:
       db:
         condition: service_healthy

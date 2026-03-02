@@ -11,8 +11,8 @@ RSpec.describe Adzuna::Fetcher, type: :service do
     before do
       source
       query
-      allow(ENV).to receive(:fetch).with('ADZUNA_APP_ID', nil).and_return('test_id')
-      allow(ENV).to receive(:fetch).with('ADZUNA_APP_KEY', nil).and_return('test_key')
+      allow(ENV).to receive(:fetch).with('ADZUNA_APPLICATION_ID', nil).and_return('test_id')
+      allow(ENV).to receive(:fetch).with('ADZUNA_APPLICATION_KEY', nil).and_return('test_key')
 
       stub_request(:get, /api.adzuna.com/)
         .to_return(status: 200, body: {

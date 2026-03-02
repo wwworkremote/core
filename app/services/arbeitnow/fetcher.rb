@@ -4,13 +4,14 @@ require 'digest'
 
 module Arbeitnow
   class Fetcher
+    include ApiGuard
     API_URL = 'https://www.arbeitnow.com/api/job-board-api'
 
     def call
-      source = JobBoards::Source.find_or_create_by!(slug: 'arbeitnow', name: 'Arbeitnow')
-      query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+      with_api_guard('arbeitnow', cooldown: 1.hour) do |source|
+        query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-      response = Faraday.get(API_URL)
+        response = Faraday.get(API_URL)
       data = JSON.parse(response.body)
 
       data['data'].each do |job|

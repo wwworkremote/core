@@ -1,0 +1,71 @@
+<div class="row mb-4">
+  <div class="col">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><%= link_to "Jobs", job_postings_path %></li>
+        <li class="breadcrumb-item active" aria-current="page text-truncate"><%= @job_posting.title %></li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card shadow border-0 p-4 p-md-5 mb-4 rounded-4">
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <h1 class="h2 mb-1 text-primary"><%= @job_posting.title %></h1>
+          <p class="h4 text-muted mb-3"><%= @job_posting.company %></p>
+          <% if @job_posting.location.present? %>
+            <div class="text-muted mb-2">
+              <i class="bi bi-geo-alt-fill me-1"></i> <%= @job_posting.location %>
+            </div>
+          <% end %>
+          <div class="text-muted small">
+            <i class="bi bi-calendar-event me-1"></i> Published <%= @job_posting.published_at.strftime("%B %d, %Y") if @job_posting.published_at %>
+          </div>
+        </div>
+        <span class="badge bg-primary px-3 py-2"><%= @job_posting.source&.origin&.name %></span>
+      </div>
+
+      <hr class="my-4 opacity-10">
+
+      <div class="job-body lead-sm text-dark overflow-hidden">
+        <%= simple_format(@job_posting.body) %>
+      </div>
+
+      <% if @job_posting.target_url.present? %>
+        <div class="mt-5 d-grid gap-2 d-md-flex">
+          <%= link_to "Apply Now", @job_posting.target_url, target: "_blank", class: "btn btn-primary btn-lg px-5 shadow-sm" %>
+          <%= link_to "View Original", @job_posting.target_url, target: "_blank", class: "btn btn-outline-secondary btn-lg shadow-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm p-4 rounded-4 sticky-top" style="top: 120px;">
+      <h5>Quick Info</h5>
+      <ul class="list-unstyled mb-0 mt-3">
+        <li class="mb-3">
+          <div class="text-muted small uppercase fw-bold mb-1">Source</div>
+          <div><%= @job_posting.source&.origin&.name %></div>
+        </li>
+        <% if @job_posting.tags.present? %>
+          <li class="mb-3">
+            <div class="text-muted small uppercase fw-bold mb-1">Tags</div>
+            <div class="d-flex flex-wrap gap-1">
+              <% @job_posting.tags.each do |tag| %>
+                <span class="badge bg-light text-primary border"><%= tag %></span>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+        <li class="mb-0">
+          <div class="text-muted small uppercase fw-bold mb-1">Status</div>
+          <div class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Active Listing</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -11,42 +11,12 @@ module HackerNews
     end
 
     def call
-      node_id = 0
-
-      jobstory_ids.each_with_index do |jobstory_id, wait_for|
-        node_id += 1
-        node_id = 0 if node_id > 5
-        node = "node0#{node_id}"
-
-        remote_fetch_jobstory(node, jobstory_id:, wait_for:)
+      jobstory_ids.each do |jobstory_id|
+        # Spread the load over 5 minutes to be a good API citizen
+        HackerNews::FetchJobstoryWorker.perform_in(rand(1..300).seconds, jobstory_id)
       end
-    end
-
-    def remote_fetch_jobstory(node, jobstory_id:, wait_for:)
-      Rails.logger.info { "#{self.class.name}##{__method__} ==>> node:#{node}, jobstory_id:#{jobstory_id}, wait_for:#{wait_for}" }
-
-      api_endpoint = "http://#{node}/hacker_news/fetch_jobstory"
-
-      conn = Faraday.new(url: api_endpoint) do |faraday|
-        faraday.request(:json)
-        faraday.response(:json, content_type: /\bjson$/)
-        faraday.adapter(Faraday.default_adapter)
-      end
-
-      request_body = {
-        'jobstory_id' => jobstory_id,
-        'wait_for' => wait_for
-      }
-
-      request_json = Oj.dump(request_body)
-
-      response = conn.put do |req|
-        req.url(api_endpoint)
-        req.headers['Content-Type'] = 'application/json'
-        req.body = request_json
-      end
-
-      ap response.body
+      
+      Rails.logger.info "Enqueued #{jobstory_ids.count} jobstories for fetching with randomized delays."
     end
   end
 end

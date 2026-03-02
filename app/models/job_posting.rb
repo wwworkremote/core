@@ -3,7 +3,7 @@
 class JobPosting < ApplicationRecord
   belongs_to :source, optional: true
 
-  has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_postings
+  has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
 
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source

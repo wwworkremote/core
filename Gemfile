@@ -58,6 +58,7 @@ group :development, :test do
   gem 'debug'
   gem 'rspec-rails'
   gem 'shoulda-matchers'
+  gem 'database_cleaner-active_record'
   gem 'webmock'
   gem 'vcr'
   gem 'faker'
