@@ -17,9 +17,10 @@ module JobBoards
       origin = Origin.find_or_create_by!(name: source.name)
       dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
 
-      JobPosting.find_or_create_by!(signature: doc.signature) do |jp|
+      JobPosting.find_or_initialize_by(signature: doc.signature) do |jp|
         jp.source_id = dashboard_source.id
         map_attributes(jp, data, source.slug)
+        jp.save!
       end
     end
 

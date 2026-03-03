@@ -8,8 +8,8 @@ module Wwr
     include ApiGuard
     RSS_URL = 'https://weworkremotely.com/remote-jobs.rss'
 
-    def call
-      with_api_guard('wwr', cooldown: 30.minutes) do |source|
+    def call(force: false)
+      with_api_guard('wwr', cooldown: 30.minutes, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         xml = Faraday.get(RSS_URL).body

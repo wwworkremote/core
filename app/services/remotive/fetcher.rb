@@ -7,8 +7,8 @@ module Remotive
     include ApiGuard
     API_URL = 'https://remotive.com/api/remote-jobs'
 
-    def call
-      with_api_guard('remotive', cooldown: 1.hour) do |source|
+    def call(force: false)
+      with_api_guard('remotive', cooldown: 1.hour, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         response = Faraday.get(API_URL)

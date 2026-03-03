@@ -1,0 +1,54 @@
+<h2>Data Fetchers</h2>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Last Fetched</th>
+        <th>Cooldown</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @fetchers.each do |fetcher| %>
+        <tr>
+          <td><strong><%= fetcher[:name] %></strong></td>
+          <td>
+            <% if fetcher[:last_fetched_at] %>
+              <%= time_ago_in_words(fetcher[:last_fetched_at]) %> ago
+            <% else %>
+              Never
+            <% end %>
+          </td>
+          <td><%= distance_of_time_in_words(fetcher[:cooldown]) %></td>
+          <td>
+            <% if fetcher[:can_fetch] %>
+              <span class="badge bg-success">Ready</span>
+            <% else %>
+              <span class="badge bg-warning text-dark">
+                Cooling down (<%= distance_of_time_in_words(fetcher[:time_until_reset]) %> left)
+              </span>
+            <% end %>
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              <%= button_to "Run", run_data_fetchers_path(slug: fetcher[:slug]), 
+                  method: :post, 
+                  class: "btn btn-sm #{fetcher[:can_fetch] ? 'btn-primary' : 'btn-secondary'}",
+                  disabled: !fetcher[:can_fetch] %>
+              
+              <%= button_to "Force", run_data_fetchers_path(slug: fetcher[:slug], force: true), 
+                  method: :post, 
+                  class: "btn btn-sm btn-outline-danger",
+                  data: { turbo_confirm: "Are you sure you want to force a fetch for #{fetcher[:name]}?" } %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= link_to "Back to Dashboard", root_path, class: "btn btn-secondary mt-3" %>

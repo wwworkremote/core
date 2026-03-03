@@ -7,8 +7,8 @@ module Arbeitnow
     include ApiGuard
     API_URL = 'https://www.arbeitnow.com/api/job-board-api'
 
-    def call
-      with_api_guard('arbeitnow', cooldown: 1.hour) do |source|
+    def call(force: false)
+      with_api_guard('arbeitnow', cooldown: 1.hour, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         response = Faraday.get(API_URL)

@@ -9,6 +9,12 @@ Rails.application.routes.draw do
 
   resources :job_postings, only: [:index, :show]
 
+  resources :data_fetchers, only: [:index] do
+    collection do
+      post :run
+    end
+  end
+
   namespace :api, defaults: { format: :json }, constraints: { format: :json } do
     namespace :v0 do
       resources :sources, only: %i[index show]
