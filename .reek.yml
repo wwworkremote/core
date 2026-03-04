@@ -1,13 +1,14 @@
+---
 # .reek.yml
 # See: https://github.com/troessner/reek
 
 directories:
   "db/migrate":
-    IrresponsibleModule: { enabled: false }
-    TooManyStatements: { max_statements: 50 }
-    FeatureEnvy: { enabled: false }
-    DuplicateMethodCall: { enabled: false }
-    UncommunicativeVariableName: { enabled: false }
+    IrresponsibleModule: {enabled: false}
+    TooManyStatements: {max_statements: 50}
+    FeatureEnvy: {enabled: false}
+    DuplicateMethodCall: {enabled: false}
+    UncommunicativeVariableName: {enabled: false}
 
 exclude_paths:
   - blorgh
@@ -25,17 +26,17 @@ detectors:
   FeatureEnvy:
     enabled: false
   InstanceVariableAssumption:
-    enabled: false # Standard Rails controllers trigger this
+    enabled: false  # Standard Rails controllers trigger this
   UncommunicativeVariableName:
-    enabled: false # Too strict
+    enabled: false  # Too strict
   UncommunicativeModuleName:
-    enabled: false # V0 is fine
+    enabled: false  # V0 is fine
   TooManyStatements:
-    enabled: false # Legacy methods
+    enabled: false  # Legacy methods
   DuplicateMethodCall:
-    enabled: false # Too noisy
+    enabled: false  # Too noisy
   BooleanParameter:
-    enabled: false # force: true is standard pattern
+    enabled: false  # force: true is standard pattern
   NestedIterators:
     enabled: false
   ControlParameter:

@@ -58,9 +58,13 @@ PreCommit:
 
   YamlLint:
     enabled: true
+    command: ['yamllint', '.']
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
+      - 'spec/cassettes/**/*'
+      - 'config/locales/**/*'
+      - '.rubocop_todo.yml'
 
   JsonSyntax:
     enabled: true
