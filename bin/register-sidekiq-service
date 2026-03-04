@@ -5,7 +5,7 @@ sudo systemctl disable sidekiq.service 2> /dev/null
 
 sudo cp -f /home/deploy/projects/wwworkremote/core/current/config/deploy/production/sidekiq.service /etc/systemd/system/sidekiq.service
 
-cd /etc/systemd/system
+cd /etc/systemd/system || exit
 sudo systemctl enable sidekiq.service
 sudo systemctl daemon-reload
 sudo systemctl start sidekiq.service

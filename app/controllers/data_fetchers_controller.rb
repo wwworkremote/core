@@ -10,15 +10,15 @@ class DataFetchersController < ApplicationController
   def run
     slug = params[:slug]
     force = params[:force] == 'true'
-    
+
     result = DataAcquisitionManager.run(slug, force:)
-    
+
     if result[:success]
       flash[:notice] = "Fetcher #{slug} started successfully."
     else
       flash[:alert] = "Error starting fetcher #{slug}: #{result[:error]}"
     end
-    
+
     redirect_to data_fetchers_path
   end
 end

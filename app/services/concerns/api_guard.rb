@@ -34,7 +34,7 @@ module ApiGuard
   def time_until_reset(source_slug, cooldown: 15.minutes)
     last_fetched = last_fetched_at(source_slug)
     return 0 if !last_fetched || last_fetched <= cooldown.ago
-    
+
     (last_fetched + cooldown) - Time.zone.now
   end
 

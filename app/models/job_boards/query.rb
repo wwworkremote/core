@@ -9,5 +9,9 @@
 #  updated_at :datetime         not null
 #  source_id  :integer          not null
 #
+# Indexes
+#
+#  index_job_boards_queries_on_source_id  (source_id)
+#
 class JobBoards::Query < ApplicationRecord
 end

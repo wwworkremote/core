@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-puts "== Seeding Data Sources =="
+puts '== Seeding Data Sources =='
 [
   { name: 'Adzuna', slug: 'adzuna' },
   { name: 'Arbeitnow', slug: 'arbeitnow' },
@@ -15,7 +15,7 @@ puts "== Seeding Data Sources =="
   puts " - #{source_attrs[:name]} (slug: #{source_attrs[:slug]})"
 end
 
-puts "== Seeding Admin User =="
+puts '== Seeding Admin User =='
 name = slug = ENV.fetch('ADMIN_NAME', 'admin')
 email = ENV.fetch('ADMIN_EMAIL', 'admin@just3ws.com')
 password = password_confirmation = ENV.fetch('ADMIN_PASSWORD', 'password')

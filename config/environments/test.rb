@@ -32,7 +32,7 @@ Rails.application.configure do
   # Raise exceptions instead of rendering exception templates.
   config.action_dispatch.show_exceptions = false
 
-  config.logger = Logger.new(STDOUT)
+  config.logger = Logger.new($stdout)
   config.log_level = :debug
 
   config.hosts = nil

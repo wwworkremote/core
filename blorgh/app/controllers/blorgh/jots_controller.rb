@@ -27,7 +27,7 @@ module Blorgh
       if @jot.save
         redirect_to @jot, notice: 'Jot was successfully created.'
       else
-        render :new, status: :unprocessable_entity
+        render :new, status: :unprocessable_content
       end
     end
 
@@ -36,7 +36,7 @@ module Blorgh
       if @jot.update(jot_params)
         redirect_to @jot, notice: 'Jot was successfully updated.'
       else
-        render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_content
       end
     end
 

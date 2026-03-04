@@ -22,14 +22,14 @@ Bundler.require(*Rails.groups)
 
 class Nodes # :nodoc:
   CURRENT = 1
-  def self.current; CURRENT; end
-  def self.siblings; []; end
-  def self.upstream; nil; end
-  def self.downstream; nil; end
-  def self.previous; nil; end
-  def self.next; nil; end
-  def self.from(node_id); :current; end
-  def self.representation; [1]; end
+  def self.current = CURRENT
+  def self.siblings = []
+  def self.upstream = nil
+  def self.downstream = nil
+  def self.previous = nil
+  def self.next = nil
+  def self.from(_node_id) = :current
+  def self.representation = [1]
 end
 
 module Core

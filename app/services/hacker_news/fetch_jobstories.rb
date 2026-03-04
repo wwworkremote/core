@@ -15,7 +15,7 @@ module HackerNews
         # Spread the load over 5 minutes to be a good API citizen
         HackerNews::FetchJobstoryWorker.perform_in(rand(1..300).seconds, jobstory_id)
       end
-      
+
       Rails.logger.info "Enqueued #{jobstory_ids.count} jobstories for fetching with randomized delays."
     end
   end

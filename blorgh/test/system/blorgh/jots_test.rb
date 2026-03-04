@@ -10,6 +10,7 @@ module Blorgh
 
     test 'visiting the index' do
       visit jots_url
+
       assert_selector 'h1', text: 'Jots'
     end
 

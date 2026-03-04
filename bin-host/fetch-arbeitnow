@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit
 echo "--- Starting Arbeitnow Job Fetch ---"
 docker-compose exec -T web bin/rails runner - <<'EOF'
   Arbeitnow::Fetcher.new.call

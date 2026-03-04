@@ -13,7 +13,7 @@ module JobBoards
     def sync_document(doc)
       source = JobBoards::Source.find(doc.source_id)
       data = JSON.parse(doc.document)
-      
+
       origin = Origin.find_or_create_by!(name: source.name)
       dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
 

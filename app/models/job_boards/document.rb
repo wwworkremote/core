@@ -13,7 +13,9 @@
 #
 # Indexes
 #
-#  index_job_boards_documents_on_signature  (signature) UNIQUE
+#  index_job_boards_documents_on_job_boards_query_id  (job_boards_query_id)
+#  index_job_boards_documents_on_signature            (signature) UNIQUE
+#  index_job_boards_documents_on_source_id            (source_id)
 #
 class JobBoards::Document < ApplicationRecord
 end

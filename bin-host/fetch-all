@@ -1,6 +1,6 @@
 #!/bin/bash
 # Ensure we are in the project root
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit
 
 echo "🚀 Starting Full Job Fetch Pipeline..."
 

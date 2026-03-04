@@ -7,10 +7,6 @@ class Source < ApplicationRecord
   jsonb_accessor :event, name: :string
   jsonb_accessor :payload, url: :string
 
-  def formatted_payload
-    @formatted_payload ||= payload.to_s.downcase
-  end
-
   # rails_admin do
   #   list do
   #     field :event

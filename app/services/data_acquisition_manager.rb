@@ -73,7 +73,7 @@ class DataAcquisitionManager
     # Many of our fetchers don't yet accept 'force' or any arguments.
     # We should update them to support it.
     fetcher = config[:class].new
-    
+
     result = if fetcher.method(:call).arity.abs > 0 || fetcher.method(:call).parameters.any? { |p| p[0] == :key || p[0] == :keyreq }
                 fetcher.call(force: force)
               else

@@ -13,6 +13,7 @@ ENV RAILS_ENV="production" \
 # 2. Build stage for gems and assets
 FROM base AS build
 
+# hadolint ignore=DL3008
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev nodejs yarn pkg-config curl
 
@@ -29,6 +30,7 @@ RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 # 3. Final stage for a lean image
 FROM base
 
+# hadolint ignore=DL3008
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libpq5 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives

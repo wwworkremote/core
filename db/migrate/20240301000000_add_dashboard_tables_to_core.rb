@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddDashboardTablesToCore < ActiveRecord::Migration[7.1]
   def change
     # Extensions (already mostly enabled in core/db/migrate/20220728223111_enable_extensions.rb)
@@ -47,8 +49,8 @@ class AddDashboardTablesToCore < ActiveRecord::Migration[7.1]
       t.references :domain, null: false, foreign_key: true
       t.timestamps
     end
-    add_index :target_domains, [:domain_id, :job_posting_id], unique: true
-    add_index :target_domains, [:job_posting_id, :domain_id], unique: true
+    add_index :target_domains, %i[domain_id job_posting_id], unique: true
+    add_index :target_domains, %i[job_posting_id domain_id], unique: true
 
     create_table :emails do |t|
       t.citext :address, null: false

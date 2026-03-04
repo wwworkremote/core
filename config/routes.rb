@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   root to: 'home#index'
   get 'home/index'
 
-  resources :job_postings, only: [:index, :show]
+  resources :job_postings, only: %i[index show]
 
   resources :data_fetchers, only: [:index] do
     collection do

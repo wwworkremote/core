@@ -34,13 +34,13 @@
           </td>
           <td>
             <div class="btn-group" role="group">
-              <%= button_to "Run", run_data_fetchers_path(slug: fetcher[:slug]), 
-                  method: :post, 
+              <%= button_to "Run", run_data_fetchers_path(slug: fetcher[:slug]),
+                  method: :post,
                   class: "btn btn-sm #{fetcher[:can_fetch] ? 'btn-primary' : 'btn-secondary'}",
                   disabled: !fetcher[:can_fetch] %>
-              
-              <%= button_to "Force", run_data_fetchers_path(slug: fetcher[:slug], force: true), 
-                  method: :post, 
+
+              <%= button_to "Force", run_data_fetchers_path(slug: fetcher[:slug], force: true),
+                  method: :post,
                   class: "btn btn-sm btn-outline-danger",
                   data: { turbo_confirm: "Are you sure you want to force a fetch for #{fetcher[:name]}?" } %>
             </div>

@@ -36,7 +36,7 @@ module Adzuna
 
         data['results'].each do |job|
           signature = Digest::SHA256.hexdigest("adzuna-#{job['id']}")
-          
+
           JobBoards::Document.find_or_create_by!(signature:) do |doc|
             doc.source_id = source.id
             doc.job_boards_query_id = query.id

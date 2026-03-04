@@ -6,6 +6,9 @@ class JobPosting < ApplicationRecord
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
 
+  scope :recent, -> { order(published_at: :desc) }
+  scope :search, ->(query) { where('title ILIKE :q OR company ILIKE :q OR body ILIKE :q', q: "%#{query}%") }
+
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source
 
   # rails_admin do
@@ -50,4 +53,8 @@ end
 # Indexes
 #
 #  index_job_postings_on_source_id  (source_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (source_id => sources.id)
 #

@@ -1,13 +1,17 @@
 ---
 inherit_from: .rubocop_todo.yml
 
-require:
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rake
   - rubocop-rspec
   - rubocop-rubycw
   - rubocop-thread_safety
+  - rubocop-md
+  - rubocop-capybara
+  - rubocop-factory_bot
+  - rubocop-minitest
 
 AllCops:
   CacheRootDirectory: 'tmp/'
@@ -18,9 +22,10 @@ AllCops:
   ExtraDetails: true
   MaxFilesInCache: 65536
   NewCops: enable
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.3
   UseCache: true
   Include:
+    - '**/*.md'
     - 'Capfile'
     - 'Gemfile'
     - 'config.ru'
@@ -28,6 +33,7 @@ AllCops:
     - 'db/**/*.rb'
     - 'blorgh/**/*.rb'
   Exclude:
+    - 'db/schema.rb'
     - '**/.DS_Store'
     - 'bin/**/*'
     - 'sbin/**/*'
@@ -49,7 +55,8 @@ Naming/InclusiveLanguage: {Enabled: false}
 RSpec/ContextWording: {Enabled: false}
 RSpec/EmptyExampleGroup: {Enabled: false}
 RSpec/ExampleLength: {Enabled: false}
-RSpec/FilePath: {Enabled: false}
+RSpec/SpecFilePathFormat: {Enabled: false}
+RSpec/SpecFilePathSuffix: {Enabled: false}
 RSpec/MultipleDescribes: {Enabled: false}
 RSpec/MultipleExpectations: {Enabled: false}
 RSpec/NoExpectationExample: {Enabled: false}
@@ -67,3 +74,24 @@ Style/RescueModifier: {Enabled: false}
 Style/RescueStandardError: {Enabled: false}
 Style/Semicolon: {Enabled: false}
 Rails/Output: {Enabled: false}
+
+Rubycw/Rubycw:
+  Exclude:
+    - '**/*.md'
+
+Naming/FileName:
+  Exclude:
+    - '**/CHANGELOG.md'
+    - '**/README.md'
+    - 'blorgh/Gemfile'
+
+ThreadSafety/DirChdir:
+  Exclude:
+    - 'blorgh/test/dummy/bin/setup'
+
+Rails/DangerousColumnNames:
+  Enabled: false # Many legacy migrations use :id explicitly for external IDs
+
+Style/OneClassPerFile:
+  Exclude:
+    - 'config/application.rb'

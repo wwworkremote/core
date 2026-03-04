@@ -8,7 +8,7 @@ How to use my plugin.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "blorgh"
+gem 'blorgh'
 ```
 
 And then execute:

@@ -1,5 +1,33 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: job_postings
+#
+#  id                 :bigint           not null, primary key
+#  body               :string
+#  company            :string
+#  data               :jsonb            not null
+#  location           :string
+#  published_at       :datetime
+#  signature          :string           not null
+#  tags               :string           is an Array
+#  target_url         :string
+#  title              :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  external_author_id :string
+#  external_id        :string
+#  source_id          :bigint
+#
+# Indexes
+#
+#  index_job_postings_on_source_id  (source_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (source_id => sources.id)
+#
 require 'rails_helper'
 
 RSpec.describe JobPosting, type: :model do

@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class Domain < ApplicationRecord
-  def root?
-    id == root_domain_id
-  end
-
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :domains
   has_many :job_postings, -> { readonly }, through: :target_domains
 
@@ -18,7 +14,7 @@ class Domain < ApplicationRecord
   #     end
   #     field :root do
   #       label 'Root?'
-  #       formatted_value { bindings[:object].root? ? 'T' : 'F' }
+  #       formatted_value { bindings[:object].id == bindings[:object].root_domain_id ? 'T' : 'F' }
   #     end
   #   end
   # end

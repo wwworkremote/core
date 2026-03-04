@@ -1,0 +1,175 @@
+# Overcommit configuration
+# See: https://github.com/sds/overcommit
+
+# Verify that overcommit is installed
+verify_signatures: false
+
+PreCommit:
+  ALL:
+    on_warn: fail # Failure is required
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'blorgh/**/*'
+      - 'spec/**/*'
+
+  # Basic Info
+  AuthorName:
+    enabled: true
+
+  AuthorEmail:
+    enabled: true
+
+  # Git stuff
+  MergeConflicts:
+    enabled: true
+
+  BrokenSymlinks:
+    enabled: true
+
+  # Linting/Formatting
+  HardTabs:
+    enabled: true
+    exclude:
+      - '**/Makefile'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  TrailingWhitespace:
+    enabled: true
+    exclude:
+      - '**/db/schema.rb'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'blorgh/**/*'
+      - 'spec/**/*'
+
+  EndOfLine:
+    enabled: true
+
+  FixMe:
+    enabled: true
+    keywords: ['FIXME', 'TODO', 'HACK']
+    exclude:
+      - '.overcommit.yml'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  YamlLint:
+    enabled: true
+    command: ['yamllint', '.']
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  JsonSyntax:
+    enabled: true
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  # Ruby specific
+  RuboCop:
+    enabled: true
+    command: ['bundle', 'exec', 'rubocop']
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'blorgh/**/*'
+
+  Brakeman:
+    enabled: true
+    command: ['bundle', 'exec', 'brakeman', '--quiet', '--format', 'tabs']
+
+  BundleAudit:
+    enabled: true
+    command: ['bundle', 'exec', 'bundle-audit', 'check', '--update']
+
+  RailsBestPractices:
+    enabled: true
+    command: ['bundle', 'exec', 'rails_best_practices', '.']
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'blorgh/**/*'
+
+  Reek:
+    enabled: true
+    command: ['bundle', 'exec', 'reek']
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'blorgh/**/*'
+
+  Fasterer:
+    enabled: true
+    command: ['bundle', 'exec', 'fasterer']
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'blorgh/**/*'
+
+  RSpec:
+    enabled: true
+    command: ['bundle', 'exec', 'rspec']
+
+  # Shell scripts
+  ShellCheck:
+    enabled: true
+    command: ['shellcheck', '-x']
+    include:
+      - 'bin-host/**/*'
+      - '**/*.sh'
+    exclude:
+      - 'bin/**/*'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  # Docker
+  Hadolint:
+    enabled: true
+    command: ['hadolint']
+    include:
+      - 'Dockerfile*'
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+CommitMsg:
+  ALL:
+    on_warn: fail
+
+  CapitalizedSubject:
+    enabled: true
+
+  SingleLineSubject:
+    enabled: true
+
+  TextWidth:
+    enabled: true
+    max_subject_width: 72
+    max_body_width: 72
+
+  TrailingPeriod:
+    enabled: true
+
+PostCheckout:
+  BundleInstall:
+    enabled: true
+
+PostMerge:
+  BundleInstall:
+    enabled: true
+
+PrePush:
+  ForbiddenBranches:
+    enabled: true
+    branch_patterns: ['main', 'master', 'develop']
+
+  Brakeman:
+    enabled: true
+    command: ['bundle', 'exec', 'brakeman', '--quiet', '--format', 'tabs']
+
+  RuboCop:
+    enabled: true
+    command: ['bundle', 'exec', 'rubocop']

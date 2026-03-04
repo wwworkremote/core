@@ -11,9 +11,17 @@ ENV RAILS_ENV="development" \
     BUNDLE_PATH="/usr/local/bundle"
 
 # Install packages needed to build gems
+# hadolint ignore=DL3008
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev nodejs yarn pkg-config curl && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    git \
+    libpq-dev \
+    nodejs \
+    yarn \
+    pkg-config \
+    curl \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
 # We copy Gemfile only first to allow regeneration of lockfile if missing

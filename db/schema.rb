@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_03_01_000000) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_03_214844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -136,7 +136,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_03_01_000000) do
     t.string "aasm_state"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["job_boards_query_id"], name: "index_job_boards_documents_on_job_boards_query_id"
     t.index ["signature"], name: "index_job_boards_documents_on_signature", unique: true
+    t.index ["source_id"], name: "index_job_boards_documents_on_source_id"
   end
 
   create_table "job_boards_queries", force: :cascade do |t|
@@ -145,6 +147,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_03_01_000000) do
     t.string "aasm_state"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["source_id"], name: "index_job_boards_queries_on_source_id"
   end
 
   create_table "job_boards_sources", force: :cascade do |t|

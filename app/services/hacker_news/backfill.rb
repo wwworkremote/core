@@ -21,7 +21,7 @@ module HackerNews
 
       data['hits'].each do |hit|
         signature = Digest::SHA256.hexdigest("hn-#{hit['objectID']}")
-        
+
         JobBoards::Document.find_or_create_by!(signature:) do |doc|
           doc.source_id = source.id
           doc.job_boards_query_id = query.id

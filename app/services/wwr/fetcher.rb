@@ -17,7 +17,7 @@ module Wwr
 
         feed.entries.each do |entry|
           signature = Digest::SHA256.hexdigest("wwr-#{entry.entry_id}")
-          
+
           JobBoards::Document.find_or_create_by!(signature:) do |doc|
             doc.source_id = source.id
             doc.job_boards_query_id = query.id

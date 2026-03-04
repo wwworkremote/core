@@ -4,7 +4,7 @@ module API
   module V0
     class JobPostingsController < APIController
       def index
-        page = params.fetch('page', 1)
+        page = params.fetch('page') { 1 }
 
         render json: JobPosting.order(id: :desc).page(page).without_count
       end

@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit
 BEFORE=${1:-$(date +%s)}
 echo "--- Starting Hacker News Backfill (Before $BEFORE) ---"
 docker-compose exec -T web bin/rails runner - <<EOF
