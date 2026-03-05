@@ -21,7 +21,7 @@ module HackerNews
   class Item < ApplicationRecord
     self.primary_key = :id
 
-    enum schema: { unknown: 0, job: 1, story: 2, comment: 3, poll: 4, pollopt: 5 }
-    enum state: { pending: 0, ignore: 1 }
+    enum :schema, { unknown: 0, job: 1, story: 2, comment: 3, poll: 4, pollopt: 5 }
+    enum :state, { pending: 0, ignore: 1 }
   end
 end
