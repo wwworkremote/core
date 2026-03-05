@@ -15,7 +15,7 @@
 #  thinking_tokens       :integer
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  llm_chat_id           :bigint           not null
+#  llm_chat_id           :bigint
 #  model_id              :bigint
 #  tool_call_id          :bigint
 #

@@ -8,7 +8,7 @@
 #  thought_signature :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  llm_message_id    :bigint           not null
+#  llm_message_id    :bigint
 #  tool_call_id      :string           not null
 #
 # Indexes

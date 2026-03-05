@@ -92,11 +92,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
   end
 
-  create_table "chats", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "domains", force: :cascade do |t|
     t.citext "name", null: false
     t.bigint "root_domain_id"
@@ -233,7 +228,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
     t.integer "cache_creation_tokens"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "llm_chat_id", null: false
+    t.bigint "llm_chat_id"
     t.bigint "model_id"
     t.bigint "tool_call_id"
     t.index ["llm_chat_id"], name: "index_llm_messages_on_llm_chat_id"
@@ -330,7 +325,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
     t.jsonb "arguments", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "llm_message_id", null: false
+    t.bigint "llm_message_id"
     t.index ["llm_message_id"], name: "index_tool_calls_on_llm_message_id"
     t.index ["name"], name: "index_tool_calls_on_name"
     t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
