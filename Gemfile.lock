@@ -52,6 +52,9 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
+    active_link_to (1.0.5)
+      actionpack
+      addressable
     active_median (0.6.0)
       activesupport (>= 7.1)
     activejob (8.0.4)
@@ -59,10 +62,6 @@ GEM
       globalid (>= 0.3.6)
     activemodel (8.0.4)
       activesupport (= 8.0.4)
-    activemodel-serializers-xml (1.0.3)
-      activemodel (>= 5.0.0.a)
-      activesupport (>= 5.0.0.a)
-      builder (~> 3.1)
     activerecord (8.0.4)
       activemodel (= 8.0.4)
       activesupport (= 8.0.4)
@@ -104,6 +103,23 @@ GEM
     arkency-command_bus (0.4.1)
       concurrent-ruby
     ast (2.4.3)
+    avo (3.30.0)
+      actionview (>= 6.1)
+      active_link_to
+      activerecord (>= 6.1)
+      activesupport (>= 6.1)
+      addressable
+      avo-icons (>= 0.1.1)
+      docile
+      meta-tags
+      pagy (>= 7.0.0, < 43)
+      prop_initializer (>= 0.2.0)
+      turbo-rails (>= 2.0.0)
+      turbo_power (>= 0.6.0)
+      view_component (>= 3.7.0)
+      zeitwerk (>= 2.6.12)
+    avo-icons (0.1.1)
+      inline_svg
     base64 (0.3.0)
     bcrypt (3.1.21)
     benchmark (0.5.0)
@@ -129,7 +145,6 @@ GEM
     cronex (0.15.0)
       tzinfo
       unicode (>= 0.4.4.5)
-    csv (3.3.5)
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
       sass-embedded (~> 1.63)
@@ -149,6 +164,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
+    docile (1.4.1)
     drb (2.2.3)
     druuid (1.0.2)
     dry-configurable (1.3.0)
@@ -232,6 +248,9 @@ GEM
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
     iniparse (1.5.0)
+    inline_svg (1.10.0)
+      activesupport (>= 3.0)
+      nokogiri (>= 1.6)
     io-console (0.8.2)
     irb (1.17.0)
       pp (>= 0.6.0)
@@ -280,11 +299,12 @@ GEM
     marcel (1.1.0)
     mcp (0.8.0)
       json-schema (>= 4.1)
+    meta-tags (2.22.3)
+      actionpack (>= 6.0.0)
     mini_mime (1.1.5)
     minitest (6.0.2)
       drb (~> 2.0)
       prism (~> 1.5)
-    nested_form (0.3.2)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-http-persistent (4.0.8)
@@ -487,6 +507,7 @@ GEM
       childprocess (>= 0.6.3, < 6)
       iniparse (~> 1.4)
       rexml (>= 3.3.9)
+    pagy (9.4.0)
     paper_trail (17.0.0)
       activerecord (>= 7.1)
       request_store (~> 1.4)
@@ -507,6 +528,8 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
+    prop_initializer (0.2.0)
+      zeitwerk (>= 2.6.18)
     propshaft (1.3.1)
       actionpack (>= 7.0.0)
       activesupport (>= 7.0.0)
@@ -551,13 +574,6 @@ GEM
     rails-html-sanitizer (1.7.0)
       loofah (~> 2.25)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
-    rails_admin (3.3.0)
-      activemodel-serializers-xml (>= 1.0)
-      csv
-      kaminari (>= 0.14, < 2.0)
-      nested_form (~> 0.3)
-      rails (>= 6.0, < 9)
-      turbo-rails (>= 1.0, < 3)
     rails_best_practices (1.23.3)
       activesupport
       code_analyzer (~> 0.5.5)
@@ -588,6 +604,10 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
+    ransack (4.4.1)
+      activerecord (>= 7.2)
+      activesupport (>= 7.2)
+      i18n
     rbs (3.10.3)
       logger
       tsort
@@ -727,6 +747,11 @@ GEM
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.2.0)
+    tailwindcss-rails (4.4.0)
+      railties (>= 7.0.0)
+      tailwindcss-ruby (~> 4.0)
+    tailwindcss-ruby (4.2.0-aarch64-linux-gnu)
+    tailwindcss-ruby (4.2.0-arm64-darwin)
     thor (1.5.0)
     thruster (0.1.18-aarch64-linux)
     thruster (0.1.18-arm64-darwin)
@@ -735,6 +760,8 @@ GEM
     turbo-rails (2.0.23)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
+    turbo_power (0.7.0)
+      turbo-rails (>= 1.3.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode (0.4.4.5)
@@ -744,6 +771,10 @@ GEM
     uri (1.1.1)
     useragent (0.16.11)
     vcr (6.4.0)
+    view_component (4.5.0)
+      actionview (>= 7.1.0)
+      activesupport (>= 7.1.0)
+      concurrent-ruby (~> 1)
     warden (1.2.9)
       rack (>= 2.0.9)
     webmock (3.26.1)
@@ -769,6 +800,7 @@ DEPENDENCIES
   ahoy_matey
   amazing_print
   annotaterb (~> 4.10)
+  avo
   bcrypt (~> 3.1.7)
   blorgh!
   brakeman
@@ -808,9 +840,9 @@ DEPENDENCIES
   puma (>= 6.0)
   rack-cors
   rails (~> 8.0.0)
-  rails_admin (~> 3.1)
   rails_best_practices
   rails_event_store (~> 2.15)
+  ransack
   reek
   rspec-rails
   rubocop
@@ -830,6 +862,7 @@ DEPENDENCIES
   sidekiq-cron
   solid_cache
   stimulus-rails
+  tailwindcss-rails
   thruster
   turbo-rails
   vcr

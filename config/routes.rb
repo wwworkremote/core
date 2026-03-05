@@ -3,6 +3,7 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
+  mount_avo
   # Dashboard Routes
   root to: 'home#index'
   get 'home/index'
@@ -36,7 +37,6 @@ Rails.application.routes.draw do
 
   mount PgHero::Engine, at: 'pghero'
   mount Blorgh::Engine, at: '/x'
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   mount RailsEventStore::Browser => '/res' # if Rails.env.development?
 
   mount Sidekiq::Web => '/sidekiq'

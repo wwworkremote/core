@@ -7,6 +7,14 @@ class Source < ApplicationRecord
   jsonb_accessor :event, name: :string
   jsonb_accessor :payload, url: :string
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[id name signature created_at updated_at origin_id]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[origin job_postings]
+  end
+
   # rails_admin do
   #   list do
   #     field :event

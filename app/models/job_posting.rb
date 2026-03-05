@@ -9,6 +9,14 @@ class JobPosting < ApplicationRecord
   scope :recent, -> { order(published_at: :desc) }
   scope :search, ->(query) { where('title ILIKE :q OR company ILIKE :q OR body ILIKE :q', q: "%#{query}%") }
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[id title company location published_at target_url source_id created_at updated_at]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[source domains target_domains]
+  end
+
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source
 
   # rails_admin do
