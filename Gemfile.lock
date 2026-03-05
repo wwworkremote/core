@@ -724,14 +724,6 @@ GEM
       activejob (>= 7.2)
       activerecord (>= 7.2)
       railties (>= 7.2)
-    sprockets (4.2.2)
-      concurrent-ruby (~> 1.0)
-      logger
-      rack (>= 2.2.4, < 4)
-    sprockets-rails (3.5.2)
-      actionpack (>= 6.1)
-      activesupport (>= 6.1)
-      sprockets (>= 3.0.0)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.2.0)
@@ -837,7 +829,6 @@ DEPENDENCIES
   sidekiq (>= 7.0)
   sidekiq-cron
   solid_cache
-  sprockets-rails
   stimulus-rails
   thruster
   turbo-rails

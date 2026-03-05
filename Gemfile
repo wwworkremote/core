@@ -36,7 +36,6 @@ gem 'rack-cors'
 gem 'rails_admin', '~> 3.1'
 gem 'rails_event_store', '~> 2.15'
 gem 'solid_cache'
-gem 'sprockets-rails'
 gem 'thruster', group: :production
 # gem 'rollbar', '~> 3.5'
 gem 'sidekiq', '>= 7.0'
