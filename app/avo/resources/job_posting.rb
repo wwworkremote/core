@@ -7,6 +7,10 @@ class Avo::Resources::JobPosting < Avo::BaseResource
     query: -> { query.ransack(title_cont: params[:q], company_cont: params[:q], m: 'or').result(distinct: false) }
   }
 
+  def filters
+    filter Avo::Filters::SourceFilter
+  end
+
   def fields
     field :id, as: :id
     field :title, as: :text, link_to_record: true
