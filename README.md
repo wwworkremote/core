@@ -13,6 +13,7 @@ The project runs in a containerized environment using Docker and Docker Compose.
 
 - **Web:** Rails 7.2 application (Unified dashboard + ingestion logic).
 - **Worker:** Sidekiq for background processing.
+- **AI/LLM:** RubyLLM integrated with Ollama (local) and cloud providers. See [RUBY_LLM.md](./RUBY_LLM.md) for details.
 - **Database:** PostgreSQL 15.
 - **Cache/Queue:** Redis 7.
 
