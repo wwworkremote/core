@@ -9,6 +9,7 @@ gem 'rails', '~> 8.0.0'
 
 # Core / Data Acquisition
 gem 'aasm'
+gem 'active_median'
 gem 'after_commit_everywhere', '~> 1.0'
 gem 'ahoy_matey'
 gem 'amazing_print'
@@ -16,14 +17,20 @@ gem 'annotaterb', '~> 4.10'
 gem 'avo'
 gem 'bcrypt', '~> 3.1.7'
 gem 'blorgh', path: 'blorgh'
+gem 'chartkick'
 gem 'dartsass-rails'
 gem 'devise', '~> 4.9'
 gem 'druuid'
 gem 'faraday'
 gem 'faraday-net_http_persistent'
 gem 'faraday-retry'
+gem 'feedjira'
 gem 'geocoder'
+gem 'groupdate'
+gem 'importmap-rails'
 gem 'jbuilder'
+gem 'jsonb_accessor'
+gem 'kaminari'
 gem 'kredis'
 gem 'nokogiri', '>= 1.16'
 gem 'oj'
@@ -37,27 +44,16 @@ gem 'puma', '>= 6.0'
 gem 'rack-cors'
 gem 'rails_event_store', '~> 2.15'
 gem 'ransack'
-gem 'solid_cache'
-gem 'thruster', group: :production
-# gem 'rollbar', '~> 3.5'
+gem 'ruby_llm'
 gem 'sidekiq', '>= 7.0'
 gem 'sidekiq-cron'
-gem 'whenever', require: false
-
-# Dashboard / Visualization
-gem 'active_median'
-gem 'chartkick'
-gem 'feedjira'
-gem 'groupdate'
-gem 'jsonb_accessor'
-gem 'kaminari'
-
-# Assets / UI
-# gem 'propshaft'
-gem 'importmap-rails'
+gem 'solid_cache'
 gem 'stimulus-rails'
 gem 'tailwindcss-rails'
+gem 'thruster', group: :production
 gem 'turbo-rails'
+# gem 'rollbar', '~> 3.5'
+gem 'whenever', require: false
 
 group :development, :test do
   gem 'database_cleaner-active_record'

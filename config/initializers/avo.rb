@@ -82,6 +82,12 @@ Avo.configure do |config|
       resource 'job_boards/document'
     end
 
+    section 'AI / LLM', icon: 'heroicons/outline/cpu-chip' do
+      resource :llm_chat
+      resource :llm_message
+      resource :model
+    end
+
     section 'Tools', icon: 'heroicons/outline/wrench' do
       all_tools
     end

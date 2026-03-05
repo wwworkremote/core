@@ -61,4 +61,7 @@ Rails.application.configure do
 
   # Raise error when a before_action's condition is not met.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Store uploaded files on the local file system (see config/storage.yml for options)
+  config.active_storage.service = :local
 end

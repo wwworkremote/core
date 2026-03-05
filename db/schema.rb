@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -21,6 +21,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
   enable_extension "pg_trgm"
   enable_extension "pgcrypto"
   enable_extension "sslinfo"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "ahoy_events", force: :cascade do |t|
     t.bigint "visit_id"
@@ -62,6 +90,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
     t.datetime "started_at"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "chats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "domains", force: :cascade do |t|
@@ -180,6 +213,35 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
     t.index ["source_id"], name: "index_job_postings_on_source_id"
   end
 
+  create_table "llm_chats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "model_id"
+    t.index ["model_id"], name: "index_llm_chats_on_model_id"
+  end
+
+  create_table "llm_messages", force: :cascade do |t|
+    t.string "role", null: false
+    t.text "content"
+    t.json "content_raw"
+    t.text "thinking_text"
+    t.text "thinking_signature"
+    t.integer "thinking_tokens"
+    t.integer "input_tokens"
+    t.integer "output_tokens"
+    t.integer "cached_tokens"
+    t.integer "cache_creation_tokens"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "llm_chat_id", null: false
+    t.bigint "model_id"
+    t.bigint "tool_call_id"
+    t.index ["llm_chat_id"], name: "index_llm_messages_on_llm_chat_id"
+    t.index ["model_id"], name: "index_llm_messages_on_model_id"
+    t.index ["role"], name: "index_llm_messages_on_role"
+    t.index ["tool_call_id"], name: "index_llm_messages_on_tool_call_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.string "subject", null: false
     t.string "body", null: false
@@ -188,6 +250,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
     t.datetime "updated_at", null: false
     t.index ["subject"], name: "index_messages_on_subject"
     t.index ["user_id"], name: "index_messages_on_user_id"
+  end
+
+  create_table "models", force: :cascade do |t|
+    t.string "model_id", null: false
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.string "family"
+    t.datetime "model_created_at"
+    t.integer "context_window"
+    t.integer "max_output_tokens"
+    t.date "knowledge_cutoff"
+    t.jsonb "modalities", default: {}
+    t.jsonb "capabilities", default: []
+    t.jsonb "pricing", default: {}
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["capabilities"], name: "index_models_on_capabilities", using: :gin
+    t.index ["family"], name: "index_models_on_family"
+    t.index ["modalities"], name: "index_models_on_modalities", using: :gin
+    t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
+    t.index ["provider"], name: "index_models_on_provider"
   end
 
   create_table "origins", force: :cascade do |t|
@@ -239,6 +323,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
     t.index ["job_posting_id"], name: "index_target_domains_on_job_posting_id"
   end
 
+  create_table "tool_calls", force: :cascade do |t|
+    t.string "tool_call_id", null: false
+    t.string "name", null: false
+    t.string "thought_signature"
+    t.jsonb "arguments", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "llm_message_id", null: false
+    t.index ["llm_message_id"], name: "index_tool_calls_on_llm_message_id"
+    t.index ["name"], name: "index_tool_calls_on_name"
+    t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -278,8 +375,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "job_postings", "sources"
+  add_foreign_key "llm_chats", "models"
+  add_foreign_key "llm_messages", "llm_chats"
+  add_foreign_key "llm_messages", "models"
+  add_foreign_key "llm_messages", "tool_calls"
   add_foreign_key "sources", "origins"
   add_foreign_key "target_domains", "domains"
   add_foreign_key "target_domains", "job_postings"
+  add_foreign_key "tool_calls", "llm_messages"
 end
