@@ -16,6 +16,6 @@
 #  fk_rails_...  (model_id => models.id)
 #
 class LlmChat < ApplicationRecord
-  include RubyLLM::ActiveRecord::ActsAs
+  include ::RubyLLM::ActiveRecord::ActsAs
   acts_as_chat messages: :llm_messages, messages_foreign_key: :llm_chat_id
 end

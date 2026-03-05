@@ -27,6 +27,6 @@
 #  index_models_on_provider_and_model_id  (provider,model_id) UNIQUE
 #
 class Model < ApplicationRecord
-  include RubyLLM::ActiveRecord::ActsAs
+  include ::RubyLLM::ActiveRecord::ActsAs
   acts_as_model chats: :llm_chats, chats_foreign_key: :model_id
 end
