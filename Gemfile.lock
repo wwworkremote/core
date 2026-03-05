@@ -326,8 +326,6 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    newrelic_rpm (10.2.0)
-      logger
     nio4r (2.7.5)
     nokogiri (1.19.1-aarch64-linux-gnu)
       racc (~> 1.4)
@@ -848,7 +846,6 @@ DEPENDENCIES
   jsonb_accessor
   kaminari
   kredis
-  newrelic_rpm
   nokogiri (>= 1.16)
   oj
   opentelemetry-exporter-otlp

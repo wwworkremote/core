@@ -88,7 +88,6 @@ group :development do
   gem 'ruby-lsp'
 end
 
-gem 'newrelic_rpm'
 gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
 gem 'opentelemetry-sdk'
