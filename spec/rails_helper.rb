@@ -57,6 +57,22 @@ RSpec.configure do |config|
   config.before(:each) do
     DatabaseCleaner.start
     Kredis.clear_all
+    
+    # Stub Geocoder
+    Geocoder.configure(lookup: :test, ip_lookup: :test)
+    Geocoder::Lookup::Test.add_stub(
+      "Worldwide", [
+        {
+          'latitude'     => 0.0,
+          'longitude'    => 0.0,
+          'address'      => 'Worldwide',
+          'state'        => 'Worldwide',
+          'state_code'   => 'WW',
+          'country'      => 'Worldwide',
+          'country_code' => 'WW'
+        }
+      ]
+    )
   end
 
   config.after(:each) do

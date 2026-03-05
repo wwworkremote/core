@@ -10,16 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_03_214844) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_05_034442) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
   enable_extension "hstore"
   enable_extension "ltree"
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
   enable_extension "pgcrypto"
-  enable_extension "plpgsql"
   enable_extension "sslinfo"
 
   create_table "ahoy_events", force: :cascade do |t|
@@ -175,6 +175,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_03_214844) do
     t.jsonb "data", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "latitude"
+    t.float "longitude"
     t.index ["source_id"], name: "index_job_postings_on_source_id"
   end
 

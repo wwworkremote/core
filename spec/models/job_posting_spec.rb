@@ -8,7 +8,9 @@
 #  body               :string
 #  company            :string
 #  data               :jsonb            not null
+#  latitude           :float
 #  location           :string
+#  longitude          :float
 #  published_at       :datetime
 #  signature          :string           not null
 #  tags               :string           is an Array

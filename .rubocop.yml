@@ -6,6 +6,7 @@ plugins:
   - rubocop-rails
   - rubocop-rake
   - rubocop-rspec
+  - rubocop-rspec_rails
   - rubocop-rubycw
   - rubocop-thread_safety
   - rubocop-md

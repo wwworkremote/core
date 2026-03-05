@@ -18,6 +18,8 @@ class Avo::Resources::JobPosting < Avo::BaseResource
     field :location, as: :text
     field :published_at, as: :date_time
     field :target_url, as: :text
+    field :latitude, as: :number
+    field :longitude, as: :number
     field :source, as: :belongs_to
   end
 end

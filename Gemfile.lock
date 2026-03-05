@@ -145,6 +145,7 @@ GEM
     cronex (0.15.0)
       tzinfo
       unicode (>= 0.4.4.5)
+    csv (3.3.5)
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
       sass-embedded (~> 1.63)
@@ -228,6 +229,9 @@ GEM
     fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
+    geocoder (1.8.6)
+      base64 (>= 0.1.0)
+      csv (>= 3.0.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
     google-protobuf (4.34.0-aarch64-linux-gnu)
@@ -696,6 +700,10 @@ GEM
     rubocop-rspec (3.9.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.81)
+    rubocop-rspec_rails (2.32.0)
+      lint_roller (~> 1.1)
+      rubocop (~> 1.72, >= 1.72.1)
+      rubocop-rspec (~> 3.5)
     rubocop-rubycw (0.2.2)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
@@ -818,6 +826,7 @@ DEPENDENCIES
   faraday-retry
   fasterer
   feedjira
+  geocoder
   groupdate
   importmap-rails
   jbuilder
@@ -854,6 +863,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rake
   rubocop-rspec
+  rubocop-rspec_rails
   rubocop-rubycw
   rubocop-thread_safety
   ruby-lsp

@@ -22,6 +22,7 @@ gem 'druuid'
 gem 'faraday'
 gem 'faraday-net_http_persistent'
 gem 'faraday-retry'
+gem 'geocoder'
 gem 'jbuilder'
 gem 'kredis'
 gem 'nokogiri', '>= 1.16'
@@ -85,6 +86,7 @@ group :development do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rake', require: false
   gem 'rubocop-rspec', require: false
+  gem 'rubocop-rspec_rails', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
   gem 'ruby-lsp'

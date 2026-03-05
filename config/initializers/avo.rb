@@ -65,6 +65,10 @@ Avo.configure do |config|
 
   ## == Menus ==
   config.main_menu = lambda {
+    section 'Dashboards', icon: 'heroicons/outline/chart-bar' do
+      dashboard :main
+    end
+
     section 'Core', icon: 'heroicons/outline/cpu-chip' do
       resource :job_posting
       resource :source

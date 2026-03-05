@@ -55,7 +55,7 @@ module Blorgh
 
     # Only allow a list of trusted parameters through.
     def jot_params
-      params.require(:jot).permit(:data)
+      params.expect(jot: [:data])
     end
   end
 end
