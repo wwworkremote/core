@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'hacker_news'
-
 module HackerNews
   class FetchJobstories
     attr_reader :jobstory_ids

@@ -1,1 +1,23 @@
-// Sassy
+/*
+ * Main Application Styles
+ */
+
+body {
+  padding-top: 80px;
+}
+
+.navbar {
+  margin-bottom: 2rem;
+}
+
+.card {
+  transition: transform 0.2s;
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.badge {
+  text-transform: uppercase;
+  font-weight: 600;
+}

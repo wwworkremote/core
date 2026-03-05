@@ -9,7 +9,6 @@ Avo.configure do |config|
   # config.prefix_path = "/internal"
 
   ## == Licensing ==
-  config.license = 'community' # 'pro', 'enterprise', or 'community'
   # config.license_key = ENV['AVO_LICENSE_KEY']
 
   ## == Context ==
