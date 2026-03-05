@@ -64,19 +64,24 @@ Avo.configure do |config|
   # end
 
   ## == Menus ==
-  # config.main_menu = -> {
-  #   section "Dashboards", icon: "dashboards" do
-  #     all_dashboards
-  #   end
+  config.main_menu = lambda {
+    section 'Core', icon: 'heroicons/outline/cpu-chip' do
+      resource :job_posting
+      resource :source
+      resource :origin
+      resource :user
+    end
 
-  #   section "Resources", icon: "resources" do
-  #     all_resources
-  #   end
+    section 'Job Boards (Raw)', icon: 'heroicons/outline/database' do
+      resource 'job_boards/source'
+      resource 'job_boards/query'
+      resource 'job_boards/document'
+    end
 
-  #   section "Tools", icon: "tools" do
-  #     all_tools
-  #   end
-  # }
+    section 'Tools', icon: 'heroicons/outline/wrench' do
+      all_tools
+    end
+  }
   # config.profile_menu = -> {
   #   link "Profile", path: "/avo/profile", icon: "user"
   # }
