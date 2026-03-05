@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # 1. Base stage for common dependencies
-ARG RUBY_VERSION=3.3.10
+ARG RUBY_VERSION=4.0.1
 FROM ruby:${RUBY_VERSION}-slim AS base
 
 WORKDIR /rails
@@ -15,7 +15,7 @@ FROM base AS build
 
 # hadolint ignore=DL3008
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev nodejs yarn pkg-config curl
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev nodejs yarn pkg-config curl
 
 COPY Gemfile Gemfile.lock ./
 COPY blorgh ./blorgh

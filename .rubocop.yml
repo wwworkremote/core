@@ -22,7 +22,7 @@ AllCops:
   ExtraDetails: true
   MaxFilesInCache: 65536
   NewCops: enable
-  TargetRubyVersion: 3.3
+  TargetRubyVersion: 4.0
   UseCache: true
   Include:
     - '**/*.md'
