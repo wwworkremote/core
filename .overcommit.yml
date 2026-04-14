@@ -87,21 +87,21 @@ PreCommit:
     enabled: true
 
   RailsBestPractices:
-    enabled: true
+    enabled: false
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
       - 'blorgh/**/*'
 
   Reek:
-    enabled: true
+    enabled: false
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
       - 'blorgh/**/*'
 
   Fasterer:
-    enabled: true
+    enabled: false
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'

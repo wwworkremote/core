@@ -24,7 +24,7 @@ services:
     volumes:
       - .:/rails
     ports:
-      - "3000:3000"
+      - "3010:3010"
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/wwworkremote_development
       REDIS_URL: redis://redis:6379/1

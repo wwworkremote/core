@@ -36,7 +36,7 @@ Rails.application.routes.draw do
   put 'hacker_news/fetch_jobstory'
 
   mount PgHero::Engine, at: 'pghero'
-  mount Blorgh::Engine, at: '/x'
+  # mount Blorgh::Engine, at: '/x'
   mount RailsEventStore::Browser => '/res' # if Rails.env.development?
 
   mount Sidekiq::Web => '/sidekiq'

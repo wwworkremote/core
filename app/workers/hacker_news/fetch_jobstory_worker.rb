@@ -6,8 +6,9 @@ module HackerNews
 
     sidekiq_options(queue: :hacker_news)
 
-    def perform(jobstory_id)
-      if HackerNews::V0::Jobstory.exists?(id: jobstory_id)
+    def perform(jobstory_id, source_id = nil, query_id = nil)
+      signature = Digest::SHA256.hexdigest("hn-#{jobstory_id}")
+      if JobBoards::Document.exists?(signature: signature)
         Rails.logger.info { "jobstory_id: #{jobstory_id} | skip | #{Nodes.current} | #{Time.zone.now}" }
         return
       end
@@ -19,13 +20,18 @@ module HackerNews
         headers: { 'Content-Type' => 'application/json' }
       )
 
-      jobstory = Oj.load(conn.get("/v0/item/#{jobstory_id}.json").body, symbolize_names: true)
+      response = conn.get("/v0/item/#{jobstory_id}.json")
+      return unless response.success?
+
+      jobstory = Oj.load(response.body, symbolize_names: true)
 
       return unless jobstory[:type] == 'job'
 
-      attrs = jobstory.slice(:by, :score, :time, :title, :url, :text).merge(data: jobstory)
-
-      HackerNews::V0::Jobstory.create_with(**attrs).find_or_create_by(id: jobstory_id)
+      JobBoards::Document.find_or_create_by!(signature: signature) do |doc|
+        doc.source_id = source_id
+        doc.job_boards_query_id = query_id
+        doc.document = jobstory.to_json
+      end
     end
   end
 end

@@ -21,6 +21,8 @@ module JobBoards
         jp.source_id = dashboard_source.id
         map_attributes(jp, data, source.slug)
         jp.save!
+
+        Categorizer.new(jp).call
       end
     end
 

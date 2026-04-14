@@ -29,7 +29,7 @@ RUN apt-get update -qq && \
 # Install application gems
 # We copy Gemfile only first to allow regeneration of lockfile if missing
 COPY Gemfile ./
-COPY blorgh ./blorgh
+# COPY blorgh ./blorgh
 
 # Generate a fresh lockfile if it doesn't exist and install gems
 RUN bundle lock --add-platform aarch64-linux x86_64-linux && \

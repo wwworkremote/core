@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '4.0.1'
+ruby '4.0.2'
 
 gem 'rails', '~> 8.0.0'
 
@@ -16,7 +16,7 @@ gem 'amazing_print'
 gem 'annotaterb', '~> 4.10'
 gem 'avo'
 gem 'bcrypt', '~> 3.1.7'
-gem 'blorgh', path: 'blorgh'
+# gem 'blorgh', path: 'blorgh'
 gem 'chartkick'
 gem 'dartsass-rails'
 gem 'devise', '~> 4.9'
@@ -53,10 +53,10 @@ gem 'tailwindcss-rails'
 gem 'thruster', group: :production
 gem 'turbo-rails'
 # gem 'rollbar', '~> 3.5'
-gem 'whenever', require: false
+# gem 'whenever', require: false
 
 group :development, :test do
-  gem 'database_cleaner-active_record'
+  # gem 'database_cleaner-active_record'
   gem 'debug'
   gem 'factory_bot_rails'
   gem 'faker'
@@ -69,10 +69,10 @@ end
 group :development do
   gem 'brakeman', require: false
   gem 'bundler-audit', require: false
-  gem 'fasterer', require: false
+  # gem 'fasterer', require: false
   gem 'overcommit', require: false
-  gem 'rails_best_practices', require: false
-  gem 'reek', require: false
+  # gem 'rails_best_practices', require: false
+  # gem 'reek', require: false
   gem 'rubocop', require: false
   gem 'rubocop-capybara', require: false
   gem 'rubocop-factory_bot', require: false

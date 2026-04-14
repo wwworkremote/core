@@ -45,19 +45,11 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
-  config.before(:suite) do
-    DatabaseCleaner.allow_remote_database_url = true
-    DatabaseCleaner.clean_with(:truncation)
-  end
+  config.include FactoryBot::Syntax::Methods
 
   config.before(:each) do
-    DatabaseCleaner.strategy = :transaction
-  end
-
-  config.before(:each) do
-    DatabaseCleaner.start
     Kredis.clear_all
-    
+
     # Stub Geocoder
     Geocoder.configure(lookup: :test, ip_lookup: :test)
     Geocoder::Lookup::Test.add_stub(
@@ -75,11 +67,7 @@ RSpec.configure do |config|
     )
   end
 
-  config.after(:each) do
-    DatabaseCleaner.clean
-  end
-
-  # You can uncomment this line to turn off ActiveRecord support entirely.
+  # Filter lines from Rails gems in backtraces.
   # config.use_active_record = false
 
   # RSpec Rails can automatically mix in different behaviours to your tests

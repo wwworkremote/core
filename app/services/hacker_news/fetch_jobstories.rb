@@ -2,16 +2,18 @@
 
 module HackerNews
   class FetchJobstories
-    attr_reader :jobstory_ids
+    attr_reader :jobstory_ids, :source_id, :query_id
 
-    def initialize(jobstory_ids:)
+    def initialize(jobstory_ids:, source_id: nil, query_id: nil)
       @jobstory_ids = jobstory_ids
+      @source_id = source_id
+      @query_id = query_id
     end
 
     def call
       jobstory_ids.each do |jobstory_id|
         # Spread the load over 5 minutes to be a good API citizen
-        HackerNews::FetchJobstoryWorker.perform_in(rand(1..300).seconds, jobstory_id)
+        HackerNews::FetchJobstoryWorker.perform_in(rand(1..300).seconds, jobstory_id, source_id, query_id)
       end
 
       Rails.logger.info "Enqueued #{jobstory_ids.count} jobstories for fetching with randomized delays."

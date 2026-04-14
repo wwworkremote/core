@@ -1,5 +1,5 @@
 fetch_hackernews:
-  cron: "*/30 * * * *"
+  cron: "*/15 * * * *"
   class: "HackerNews::FetchLatestWorker"
   queue: default
 
@@ -25,5 +25,5 @@ fetch_adzuna:
 
 sync_to_dashboard:
   cron: "45 * * * *"
-  class: "SyncJob" # I'll create this simple worker
+  class: "SyncJob"
   queue: default
