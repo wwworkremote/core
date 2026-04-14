@@ -32,7 +32,6 @@ AllCops:
     - 'config.ru'
     - 'config/**/*.rb'
     - 'db/**/*.rb'
-    - 'blorgh/**/*.rb'
   Exclude:
     - 'db/schema.rb'
     - 'db/cache_schema.rb'
