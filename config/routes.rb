@@ -32,16 +32,8 @@ Rails.application.routes.draw do
   end
 
   # Core / Data Acquisition Routes
-  get 'dice/roll'
   put 'hacker_news/fetch_jobstory'
 
   mount PgHero::Engine, at: 'pghero'
-  # mount Blorgh::Engine, at: '/x'
-
-  mount Sidekiq::Web => '/sidekiq'
-
-  devise_for :users
-  resources :messages
-  resources :nodes, only: [:index]
   get '/pages/*page' => 'pages#show'
 end
