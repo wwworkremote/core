@@ -10,7 +10,7 @@
 
 ## Priority Backlog (Dependency-Ordered)
 
-### 1. Establish External Feed Contract Tests
+### 1. Establish External Feed Contract Tests (DONE)
 - **Description**: Current tests use VCR cassettes which can become stale. We need "Live" contract tests that run on a separate CI schedule to detect when Adzuna, Remotive, or WWR change their API formats.
 - **Acceptance Criteria**:
   - `spec/contracts/` directory created.

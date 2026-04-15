@@ -32,7 +32,9 @@ services:
       ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
       OTEL_SERVICE_NAME: wwworkremote-web
-      OLLAMA_API_BASE: http://ollama:11434
+      OLLAMA_API_BASE: http://ollama:11434/v1
+      OLLAMA_NUM_PARALLEL: 1
+      OLLAMA_NUM_THREAD: 1
     depends_on:
       db:
         condition: service_healthy
@@ -54,7 +56,9 @@ services:
       ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
       OTEL_SERVICE_NAME: wwworkremote-worker
-      OLLAMA_API_BASE: http://ollama:11434
+      OLLAMA_API_BASE: http://ollama:11434/v1
+      OLLAMA_NUM_PARALLEL: 1
+      OLLAMA_NUM_THREAD: 1
     depends_on:
       db:
         condition: service_healthy

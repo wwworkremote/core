@@ -19,35 +19,37 @@ module JobBoards
     end
 
     def call
+      model_id = 'Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf'
+      model = Model.find_by(model_id: model_id, provider: 'ollama')
+      return unless model
+
       tracer = OpenTelemetry.tracer_provider.tracer('categorizer')
       tracer.in_span('categorize_job', attributes: { 'app.job_posting.id' => @job_posting.id }) do |span|
-        model = Model.find_by(model_id: 'llama3.2:1b', provider: 'ollama')
-        unless model
-          span.add_event('model_not_found')
-          return
-        end
-
         chat = LlmChat.create!(model: model)
 
         prompt = <<~PROMPT
-          Analyze the following job posting and categorize it.
-          Title: #{@job_posting.title}
+          Task: Categorize the following job posting.
+
+          Rules:
+          1. The "category" MUST be exactly one of: #{CATEGORIES.join(', ')}.
+          2. If unsure, use "Other".
+          3. The "tags" should be 1-5 technical keywords.
+          4. Return ONLY valid JSON. No preamble, no explanation.
+
+          Job Title: #{@job_posting.title}
           Company: #{@job_posting.company}
           Description: #{@job_posting.body&.truncate(2000)}
 
-          Return a JSON object with:
-          1. "category": Must be one of: #{CATEGORIES.join(', ')}
-          2. "tags": An array of up to 5 technical keywords or skills mentioned.
-
-          Example: {"category": "Software Engineering", "tags": ["ruby", "rails", "postgresql"]}
-          Return ONLY the JSON.
+          Expected JSON Format:
+          {"category": "Software Engineering", "tags": ["ruby", "rails"]}
         PROMPT
 
         span.add_event('sending_llm_request')
         response = chat.ask(prompt)
         span.add_event('received_llm_response')
 
-        parsed = parse_response(response)
+        text = response.content.is_a?(String) ? response.content : response.content.text
+        parsed = parse_response(text)
 
         if parsed
           span.set_attribute('app.job_posting.category', parsed['category'])
@@ -55,6 +57,7 @@ module JobBoards
             tags: parsed['tags'],
             data: @job_posting.data.merge('ai_category' => parsed['category'])
           )
+          span.add_event('categorized', attributes: { 'app.job_posting.category' => parsed['category'] })
         else
           span.add_event('parse_failed')
         end

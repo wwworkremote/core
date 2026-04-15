@@ -37,7 +37,6 @@ Rails.application.routes.draw do
 
   mount PgHero::Engine, at: 'pghero'
   # mount Blorgh::Engine, at: '/x'
-  mount RailsEventStore::Browser => '/res' # if Rails.env.development?
 
   mount Sidekiq::Web => '/sidekiq'
 

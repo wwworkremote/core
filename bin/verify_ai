@@ -1,0 +1,39 @@
+# frozen_string_literal: true
+
+require_relative '../config/environment'
+
+puts "--- AI Categorization Verification ---"
+
+source = JobBoards::Source.find_or_create_by!(slug: 'hackernews') do |s|
+  s.name = 'HackerNews'
+end
+query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+
+conn = Faraday.new(url: 'https://hacker-news.firebaseio.com')
+jobstory_ids = Oj.load(conn.get('/v0/jobstories.json').body, symbolize_names: true).first(10)
+
+puts "Cleaning previous HackerNews data..."
+JobBoards::Document.where(source_id: source.id).delete_all
+JobPosting.where(source_id: ::Source.where(signature: "#{source.slug}-default").pluck(:id)).delete_all
+
+puts "Fetching and categorizing #{jobstory_ids.count} jobs..."
+
+jobstory_ids.each do |id|
+  # Run worker logic synchronously for immediate feedback
+  HackerNews::FetchJobstoryWorker.new.perform(id, source.id, query.id)
+end
+
+# Now sync them to JobPosting (Syncer handles categorization of NEW records)
+puts "Syncing documents to JobPosting..."
+JobBoards::Syncer.new.call
+
+puts "\n--- Results ---"
+JobPosting.last(10).each do |jp|
+  category = jp.data['ai_category'] || 'N/A'
+  tags = (jp.tags || []).join(', ')
+  puts "[#{category.ljust(25)}] #{jp.title.truncate(50)}"
+  puts "  Tags: #{tags}"
+end
+
+puts "\nStats:"
+puts JobPosting.pluck(Arel.sql("data->'ai_category'")).compact.tally

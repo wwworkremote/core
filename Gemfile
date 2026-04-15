@@ -23,71 +23,61 @@ gem 'devise', '~> 4.9'
 gem 'druuid'
 gem 'faraday'
 gem 'faraday-net_http_persistent'
-gem 'faraday-retry'
-gem 'feedjira'
-gem 'geocoder'
+gem 'feedjira', '~> 4.0'
 gem 'groupdate'
-gem 'importmap-rails'
+gem 'inline_svg'
 gem 'jbuilder'
-gem 'jsonb_accessor'
-gem 'kaminari'
+gem 'jsonb_accessor', '~> 1.0'
+gem 'kaminari', '~> 1.2'
 gem 'kredis'
-gem 'nokogiri', '>= 1.16'
+gem 'meta-tags'
 gem 'oj'
+gem 'opentelemetry-api'
+gem 'opentelemetry-exporter-otlp'
+gem 'opentelemetry-instrumentation-all'
+gem 'opentelemetry-sdk'
+gem 'pagy'
 gem 'paper_trail'
-gem 'pg', '~> 1.5'
-gem 'pghero'
+gem 'pg', '~> 1.1'
 gem 'pg_query', '>= 2'
 gem 'pg_search', '~> 2.3'
 gem 'propshaft'
 gem 'puma', '>= 6.0'
 gem 'rack-cors'
-gem 'rails_event_store', '~> 2.15'
 gem 'ransack'
 gem 'ruby_llm'
 gem 'sidekiq', '>= 7.0'
 gem 'sidekiq-cron'
 gem 'solid_cache'
 gem 'stimulus-rails'
-gem 'tailwindcss-rails'
-gem 'thruster', group: :production
+gem 'tailwindcss-rails', '~> 4.0'
+gem 'thruster'
+gem 'turbo_power'
 gem 'turbo-rails'
-# gem 'rollbar', '~> 3.5'
-# gem 'whenever', require: false
+gem 'tzinfo-data', platforms: %i[windows jruby]
 
+# Development & Testing
 group :development, :test do
-  # gem 'database_cleaner-active_record'
-  gem 'debug'
+  gem 'brakeman'
+  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'capybara'
+  gem 'debug', platforms: %i[mri mingw x64_mingw]
+  gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'faker'
+  gem 'overcommit'
+  gem 'pghero'
   gem 'rspec-rails'
+  gem 'rubocop', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'vcr'
   gem 'webmock'
 end
 
 group :development do
-  gem 'brakeman', require: false
-  gem 'bundler-audit', require: false
-  # gem 'fasterer', require: false
-  gem 'overcommit', require: false
-  # gem 'rails_best_practices', require: false
-  # gem 'reek', require: false
-  gem 'rubocop', require: false
-  gem 'rubocop-capybara', require: false
-  gem 'rubocop-factory_bot', require: false
-  gem 'rubocop-md', require: false
-  gem 'rubocop-minitest', require: false
-  gem 'rubocop-performance', require: false
-  gem 'rubocop-rails', require: false
-  gem 'rubocop-rake', require: false
-  gem 'rubocop-rspec', require: false
-  gem 'rubocop-rspec_rails', require: false
-  gem 'rubocop-rubycw', require: false
-  gem 'rubocop-thread_safety', require: false
-  gem 'ruby-lsp'
+  gem 'rack-mini-profiler'
 end
-
-gem 'opentelemetry-exporter-otlp'
-gem 'opentelemetry-instrumentation-all'
-gem 'opentelemetry-sdk'
