@@ -37,11 +37,6 @@ class DataAcquisitionManager
       cooldown: 1.hour,
       name: 'Remotive'
     },
-    'rubyonremote' => {
-      class: RubyOnRemote::Fetcher,
-      cooldown: 4.hours,
-      name: 'RubyOnRemote'
-    },
     'wwr' => {
       class: Wwr::Fetcher,
       cooldown: 30.minutes,
