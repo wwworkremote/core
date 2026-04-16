@@ -1,28 +1,10 @@
-fetch_hackernews:
-  cron: "*/15 * * * *"
-  class: "HackerNews::FetchLatestWorker"
-  queue: default
-
-fetch_remotive:
+# Unified Data Acquisition (API, Scrapers, ATS)
+fetch_all_jobs:
   cron: "0 */6 * * *"
-  class: "Remotive::FetchWorker"
+  class: "DataAcquisition::RunAllWorker"
   queue: default
 
-fetch_wwr:
-  cron: "15 */6 * * *"
-  class: "Wwr::FetchWorker"
-  queue: default
-
-fetch_arbeitnow:
-  cron: "30 */6 * * *"
-  class: "Arbeitnow::FetchWorker"
-  queue: default
-
-fetch_adzuna:
-  cron: "0 0 * * *"
-  class: "Adzuna::FetchWorker"
-  queue: default
-
+# Redundant if RunAllWorker succeeds, but kept for safety or manual raw document syncs
 sync_to_dashboard:
   cron: "45 * * * *"
   class: "SyncJob"
