@@ -14,15 +14,23 @@ module JobBoards
       source = JobBoards::Source.find(doc.source_id)
       data = JSON.parse(doc.document)
 
+      puts "[Syncer] Processing Doc #{doc.id} for #{source.slug}"
+      STDOUT.flush
+
       origin = Origin.find_or_create_by!(name: source.name)
       dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
 
       JobPosting.find_or_initialize_by(signature: doc.signature) do |jp|
         jp.source_id = dashboard_source.id
         map_attributes(jp, data, source.slug)
-        jp.save!
 
-        Categorizer.new(jp).call
+        if jp.save
+          puts "[Syncer] SUCCESS: Created JobPosting #{jp.id}"
+          Categorizer.new(jp).call
+        else
+          puts "[Syncer] FAILED: #{jp.errors.full_messages.join(', ')}"
+        end
+        STDOUT.flush
       end
     end
 

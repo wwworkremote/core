@@ -20,7 +20,7 @@
 - **Labels**: testing, dependency
 - **Dependencies**: None
 
-### 2. Verify and Tune AI Categorization
+### 2. Verify and Tune AI Categorization (DONE)
 - **Description**: Integrated Llama 3.2 for job categorization, but we need to verify the accuracy of the prompts and the quality of the tags being generated.
 - **Acceptance Criteria**:
   - Run `HackerNews::FetchLatestWorker` on 50+ items.
@@ -30,7 +30,7 @@
 - **Labels**: llm, refactor
 - **Dependencies**: None
 
-### 3. Verify OpenTelemetry Export
+### 3. Verify OpenTelemetry Export (DONE)
 - **Description**: OpenTelemetry is configured but needs verification that spans (especially the new `categorize_job` span) are reaching the Jaeger backend.
 - **Acceptance Criteria**:
   - Jaeger UI (localhost:16686) shows traces from `core` service.
@@ -40,7 +40,7 @@
 - **Labels**: observability
 - **Dependencies**: None
 
-### 4. Audit Rails Event Store Usage
+### 4. Audit Rails Event Store Usage (DONE)
 - **Description**: Rails Event Store is present but potentially underutilized or overlapping with AASM.
 - **Acceptance Criteria**:
   - Document all events currently being published.

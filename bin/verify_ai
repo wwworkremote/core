@@ -10,7 +10,7 @@ end
 query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
 conn = Faraday.new(url: 'https://hacker-news.firebaseio.com')
-jobstory_ids = Oj.load(conn.get('/v0/jobstories.json').body, symbolize_names: true).first(10)
+jobstory_ids = Oj.load(conn.get('/v0/jobstories.json').body, symbolize_names: true).first(50)
 
 puts "Cleaning previous HackerNews data..."
 JobBoards::Document.where(source_id: source.id).delete_all
