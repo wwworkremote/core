@@ -35,7 +35,11 @@ Rails.application.configure do
   config.logger = Logger.new($stdout)
   config.log_level = :debug
 
-  config.hosts = nil
+  config.hosts = [
+    '.example.com',
+    'localhost',
+    '127.0.0.1'
+  ]
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false

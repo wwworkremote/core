@@ -27,7 +27,7 @@
               </div>
               <small class="text-muted text-end">
                 <%= time_ago_in_words(job.published_at) if job.published_at %> ago<br>
-                <span class="badge bg-light text-dark border mt-2"><%= job.source&.origin&.name %></span>
+                <span class="badge bg-light text-dark border mt-2"><%= job.source.try(:origin)&.name || 'Unknown' %></span>
               </small>
             </div>
           <% end %>

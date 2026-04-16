@@ -1,26 +1,26 @@
 # syntax = docker/dockerfile:1
 
 # 1. Base stage for common dependencies
-ARG RUBY_VERSION=4.0.1
+ARG RUBY_VERSION=4.0.2
 FROM ruby:${RUBY_VERSION}-slim AS base
 
 WORKDIR /rails
 ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development test"
+  BUNDLE_DEPLOYMENT="1" \
+  BUNDLE_PATH="/usr/local/bundle" \
+  BUNDLE_WITHOUT="development test"
 
 # 2. Build stage for gems and assets
 FROM base AS build
 
 # hadolint ignore=DL3008
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev nodejs yarn pkg-config curl
+  apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev nodejs yarn pkg-config curl
 
 COPY Gemfile Gemfile.lock ./
 # COPY blorgh ./blorgh
 RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
+  rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
 COPY . .
 
@@ -32,8 +32,8 @@ FROM base
 
 # hadolint ignore=DL3008
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libpq5 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+  apt-get install --no-install-recommends -y curl libpq5 && \
+  rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Run as non-root user
 RUN useradd rails --create-home --shell /bin/bash

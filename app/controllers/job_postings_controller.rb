@@ -3,7 +3,7 @@
 class JobPostingsController < ApplicationController
   def index
     @query = params[:q]
-    @job_postings = JobPosting.recent
+    @job_postings = JobPosting.recent.includes(source: :origin)
 
     @job_postings = @job_postings.search(@query) if @query.present?
 
