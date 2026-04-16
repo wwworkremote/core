@@ -17,6 +17,11 @@ class DataAcquisitionManager
       cooldown: 15.minutes,
       name: 'HackerNews'
     },
+    'himalayas' => {
+      class: Himalayas::Fetcher,
+      cooldown: 1.hour,
+      name: 'Himalayas'
+    },
     'remotive' => {
       class: Remotive::Fetcher,
       cooldown: 1.hour,
@@ -26,6 +31,11 @@ class DataAcquisitionManager
       class: Wwr::Fetcher,
       cooldown: 30.minutes,
       name: 'Wwr'
+    },
+    'yc' => {
+      class: Yc::Scraper,
+      cooldown: 4.hours,
+      name: 'YC'
     }
   }.freeze
 

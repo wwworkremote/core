@@ -61,6 +61,21 @@ module JobBoards
         jp.published_at = Time.parse(data['created'])
         jp.company      = data.dig('company', 'display_name')
         jp.location     = data.dig('location', 'display_name')
+      when 'himalayas'
+        jp.title        = data['title']
+        jp.body         = data['description']
+        jp.target_url   = data['application_link'] || data['link']
+        jp.published_at = Time.parse(data['published_at'])
+        jp.company      = data.dig('company', 'name')
+        jp.location     = data['location']
+      when 'yc'
+        jp.title        = data['title']
+        jp.body         = data['description']
+        jp.target_url   = data['url']
+        jp.published_at = Time.now
+        jp.company      = data['company']
+        jp.location     = data['location']
+        jp.tags         = Array(data['role_type'])
       end
       jp.data = data
     end
