@@ -10,35 +10,41 @@ module Greenhouse
       with_api_guard('greenhouse', cooldown: 4.hours, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        # List of boards to fetch (tuned via Query data)
+        # List of boards and search terms (tuned via Query data)
         boards = query.data['boards'] || %w[stripe airbnb github]
+        terms = query.data['terms'] || [''] # empty string for "all"
 
         boards.each do |board|
-          url = "#{BASE_URL}/#{board}/jobs?content=true"
-          response = Faraday.get(url)
-          next unless response.success?
+          terms.each do |term|
+            url = "#{BASE_URL}/#{board}/jobs?content=true"
+            response = Faraday.get(url)
+            next unless response.success?
 
-          data = Oj.load(response.body)
-          jobs = data['jobs'] || []
-          keywords = query.data['keywords'] || []
+            data = Oj.load(response.body)
+            jobs = data['jobs'] || []
 
-          jobs.each do |job_data|
-            if keywords.any? && keywords.none? { |k| job_data['title'].downcase.include?(k.downcase) }
-              next
-            end
+            jobs.each do |job_data|
+              # Case-insensitive term filtering
+              next if term.present? && job_data['title'].downcase.exclude?(term.downcase)
 
-            signature = "greenhouse-#{board}-#{job_data['id']}"
+              signature = "greenhouse-#{board}-#{job_data['id']}"
 
-            JobBoards::Document.find_or_create_by!(signature: signature) do |doc|
+              doc = JobBoards::Document.find_or_initialize_by(signature: signature)
               doc.source_id = source.id
               doc.job_boards_query_id = query.id
-              # Inject board name for context
-              job_data['board_slug'] = board
-              doc.document = job_data.to_json
-            end
-          end
 
-          Rails.logger.info "Greenhouse: Fetched #{jobs.count} jobs for #{board}."
+              # Track which terms found this job (intersection analysis)
+              current_payload = doc.document.present? ? JSON.parse(doc.document) : job_data
+              current_payload['found_by_terms'] ||= []
+              current_payload['found_by_terms'] << term if term.present? && current_payload['found_by_terms'].exclude?(term)
+              current_payload['board_slug'] = board
+
+              doc.document = current_payload.to_json
+              doc.save!
+            end
+
+            Rails.logger.info "Greenhouse: Fetched jobs for #{board} with term '#{term}'."
+          end
         end
         true
       end

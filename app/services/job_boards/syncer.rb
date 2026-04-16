@@ -100,7 +100,9 @@ module JobBoards
         jp.location     = data['location']
         jp.tags         = Array(data['role_type'])
       end
-      jp.data = data
+
+      # Preserve intersection data in the JobPosting payload
+      jp.data = data.merge('found_by_terms' => data['found_by_terms'])
     end
 
     def parse_wwr_company(title)
