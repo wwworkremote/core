@@ -91,28 +91,39 @@ class DataAcquisitionManager
     }
   end
 
+  def self.run_all(force: false)
+    results = {}
+    FETCHERS.each_key do |slug|
+      results[slug] = run(slug, force:)
+    end
+    results
+  end
+
   def self.run(slug, force: false)
     config = FETCHERS[slug]
     return { error: 'Fetcher not found' } unless config
 
     fetcher = config[:class].new
+    method = fetcher.method(:call)
 
-    result = if fetcher.method(:call).arity.abs > 0 || fetcher.method(:call).parameters.any? { |p| p[0] == :key || p[0] == :keyreq }
-                fetcher.call(force: force)
-              else
-                fetcher.call
-              end
+    # Correctly detect if the fetcher accepts 'force' as a keyword argument
+    keyword_params = %i[key keyreq]
+    result = if method.parameters.any? { |p| keyword_params.include?(p[0]) }
+               fetcher.call(force:)
+             else
+               fetcher.call
+             end
 
     case result
     when true
       JobBoards::Syncer.new.call
       { success: true }
     when false
-      { success: false, error: "Fetcher reported failure (Check logs)" }
+      { success: false, error: 'Fetcher reported failure (Check logs)' }
     when :cooldown
-      { success: false, error: "Skipped: Cooldown in progress (Force to bypass)" }
+      { success: false, error: 'Skipped: Cooldown in progress (Force to bypass)' }
     when :missing_source
-      { success: false, error: "Internal Error: Data source record missing in database" }
+      { success: false, error: 'Internal Error: Data source record missing in database' }
     else
       { success: false, error: "Unexpected result: #{result.inspect}" }
     end

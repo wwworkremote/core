@@ -2,12 +2,9 @@
 # Ensure we are in the project root
 cd "$(dirname "$0")/.." || exit
 
-echo "🚀 Starting Full Job Fetch Pipeline..."
+echo "🚀 Starting Full Job Fetch Pipeline via DataAcquisitionManager..."
 
-./bin-host/fetch-hackernews
-./bin-host/fetch-remotive
-./bin-host/fetch-wwr
-./bin-host/fetch-arbeitnow
-./bin-host/fetch-adzuna
+# Run all fetchers with force=true to bypass cooldowns
+bin/rails runner "puts DataAcquisitionManager.run_all(force: true).to_yaml"
 
 echo "✨ Full Pipeline Complete!"
