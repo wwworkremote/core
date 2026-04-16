@@ -11,7 +11,7 @@ module Greenhouse
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         # List of boards to fetch (tuned via Query data)
-        boards = query.data['boards'] || ['stripe', 'airbnb', 'github']
+        boards = query.data['boards'] || %w[stripe airbnb github]
 
         boards.each do |board|
           url = "#{BASE_URL}/#{board}/jobs?content=true"
@@ -20,8 +20,13 @@ module Greenhouse
 
           data = Oj.load(response.body)
           jobs = data['jobs'] || []
+          keywords = query.data['keywords'] || []
 
           jobs.each do |job_data|
+            if keywords.any? && keywords.none? { |k| job_data['title'].downcase.include?(k.downcase) }
+              next
+            end
+
             signature = "greenhouse-#{board}-#{job_data['id']}"
 
             JobBoards::Document.find_or_create_by!(signature: signature) do |doc|

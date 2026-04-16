@@ -11,7 +11,7 @@ module Lever
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         # List of sites to fetch (tuned via Query data)
-        sites = query.data['sites'] || ['gitlab', 'netflix', 'palantir']
+        sites = query.data['sites'] || %w[gitlab netflix palantir]
 
         sites.each do |site|
           # Lever pagination: skip/limit
@@ -25,10 +25,14 @@ module Lever
 
             jobs = Oj.load(response.body)
             break if jobs.empty?
+            keywords = query.data['keywords'] || []
 
             jobs.each do |job_data|
-              signature = "lever-#{site}-#{job_data['id']}"
+              if keywords.any? && keywords.none? { |k| job_data['text'].downcase.include?(k.downcase) }
+                next
+              end
 
+              signature = "lever-#{site}-#{job_data['id']}"
               JobBoards::Document.find_or_create_by!(signature: signature) do |doc|
                 doc.source_id = source.id
                 doc.job_boards_query_id = query.id

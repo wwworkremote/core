@@ -22,50 +22,25 @@ class DataAcquisitionManager
       cooldown: 15.minutes,
       name: 'HackerNews'
     },
-    'himalayas' => {
-      class: Himalayas::Fetcher,
-      cooldown: 1.hour,
-      name: 'Himalayas'
-    },
     'jobicy' => {
       class: Jobicy::Fetcher,
       cooldown: 4.hours,
       name: 'Jobicy'
-    },
-    'jobspresso' => {
-      class: Jobspresso::Fetcher,
-      cooldown: 1.hour,
-      name: 'Jobspresso'
     },
     'lever' => {
       class: Lever::Fetcher,
       cooldown: 4.hours,
       name: 'Lever'
     },
-    'remoteok' => {
-      class: Remoteok::Fetcher,
-      cooldown: 2.hours,
-      name: 'RemoteOK'
-    },
     'remotive' => {
       class: Remotive::Fetcher,
       cooldown: 1.hour,
       name: 'Remotive'
     },
-    'rubyonremote' => {
-      class: RubyOnRemote::Scraper,
-      cooldown: 4.hours,
-      name: 'RubyOnRemote'
-    },
     'wwr' => {
       class: Wwr::Fetcher,
       cooldown: 30.minutes,
       name: 'Wwr'
-    },
-    'workingnomads' => {
-      class: WorkingNomads::Scraper,
-      cooldown: 4.hours,
-      name: 'WorkingNomads'
     },
     'yc' => {
       class: Yc::Scraper,
@@ -115,8 +90,6 @@ class DataAcquisitionManager
     config = FETCHERS[slug]
     return { error: 'Fetcher not found' } unless config
 
-    # Many of our fetchers don't yet accept 'force' or any arguments.
-    # We should update them to support it.
     fetcher = config[:class].new
 
     result = if fetcher.method(:call).arity.abs > 0 || fetcher.method(:call).parameters.any? { |p| p[0] == :key || p[0] == :keyreq }
@@ -130,7 +103,7 @@ class DataAcquisitionManager
       JobBoards::Syncer.new.call
       { success: true }
     when false
-      { success: false, error: "Missing API credentials" }
+      { success: false, error: "Fetcher reported failure (Check logs)" }
     when :cooldown
       { success: false, error: "Skipped: Cooldown in progress (Force to bypass)" }
     when :missing_source
