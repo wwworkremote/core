@@ -23,6 +23,7 @@ module JobBoards
         jp.save!
 
         Categorizer.new(jp).call
+        Embedder.new(jp).call
       end
     end
 

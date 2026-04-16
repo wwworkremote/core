@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_16_223718) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
   enable_extension "pg_trgm"
   enable_extension "pgcrypto"
   enable_extension "sslinfo"
+  enable_extension "vector"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -205,7 +206,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_044012) do
     t.datetime "updated_at", null: false
     t.float "latitude"
     t.float "longitude"
+    t.vector "embedding", limit: 1536
+    t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["source_id"], name: "index_job_postings_on_source_id"
+    t.index ["title"], name: "index_job_postings_on_title", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "llm_chats", force: :cascade do |t|

@@ -24,6 +24,13 @@ class JobPosting < ApplicationRecord
                     trgm: { threshold: 0.1 }
                   }
 
+  def self.semantic_search(query_text, limit: 10)
+    embedding = JobBoards::Embedder.embed_text(query_text)
+    return none if embedding.blank?
+
+    nearest_neighbors(:embedding, embedding, distance: 'cosine').limit(limit)
+  end
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[id title company location published_at target_url source_id created_at updated_at latitude longitude]
   end
@@ -69,6 +76,7 @@ end
 #  body               :string
 #  company            :string
 #  data               :jsonb            not null
+#  embedding          :vector(1536)
 #  latitude           :float
 #  location           :string
 #  longitude          :float
@@ -85,7 +93,9 @@ end
 #
 # Indexes
 #
+#  index_job_postings_on_body       (body) USING gin
 #  index_job_postings_on_source_id  (source_id)
+#  index_job_postings_on_title      (title) USING gin
 #
 # Foreign Keys
 #

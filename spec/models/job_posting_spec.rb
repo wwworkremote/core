@@ -8,6 +8,7 @@
 #  body               :string
 #  company            :string
 #  data               :jsonb            not null
+#  embedding          :vector(1536)
 #  latitude           :float
 #  location           :string
 #  longitude          :float
@@ -24,7 +25,9 @@
 #
 # Indexes
 #
+#  index_job_postings_on_body       (body) USING gin
 #  index_job_postings_on_source_id  (source_id)
+#  index_job_postings_on_title      (title) USING gin
 #
 # Foreign Keys
 #
