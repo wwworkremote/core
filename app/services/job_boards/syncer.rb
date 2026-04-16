@@ -14,26 +14,17 @@ module JobBoards
       source = JobBoards::Source.find(doc.source_id)
       data = JSON.parse(doc.document)
 
-      puts "[Syncer] Processing Doc #{doc.id} for #{source.slug}"
-      STDOUT.flush
-
       origin = Origin.find_or_create_by!(name: source.name)
       dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
 
       JobPosting.find_or_initialize_by(signature: doc.signature) do |jp|
         jp.source_id = dashboard_source.id
         map_attributes(jp, data, source.slug)
+        jp.save!
 
-        if jp.save
-          puts "[Syncer] SUCCESS: Created JobPosting #{jp.id}"
-          Categorizer.new(jp).call
-        else
-          puts "[Syncer] FAILED: #{jp.errors.full_messages.join(', ')}"
-        end
-        STDOUT.flush
+        Categorizer.new(jp).call
       end
     end
-
     def map_attributes(jp, data, slug)
       case slug
       when 'hackernews'
@@ -84,6 +75,13 @@ module JobBoards
         jp.company      = data['company']
         jp.location     = data['location']
         jp.tags         = data['tags']
+      when 'jobicy'
+        jp.title        = data['jobTitle']
+        jp.body         = data['jobDescription']
+        jp.target_url   = data['url']
+        jp.published_at = Time.parse(data['pubDate']) rescue Time.now
+        jp.company      = data['companyName']
+        jp.location     = data['jobGeo']
       when 'yc'
         jp.title        = data['title']
         jp.body         = data['description']
