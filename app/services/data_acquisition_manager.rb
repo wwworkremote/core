@@ -9,7 +9,7 @@ class DataAcquisitionManager
     },
     'arbeitnow' => {
       class: Arbeitnow::Fetcher,
-      cooldown: 1.hour,
+      cooldown: 2.hours,
       name: 'Arbeitnow'
     },
     'hackernews' => {
@@ -36,6 +36,11 @@ class DataAcquisitionManager
       class: Remotive::Fetcher,
       cooldown: 1.hour,
       name: 'Remotive'
+    },
+    'rubyonremote' => {
+      class: RubyOnRemote::Scraper,
+      cooldown: 4.hours,
+      name: 'RubyOnRemote'
     },
     'wwr' => {
       class: Wwr::Fetcher,

@@ -1,28 +1,33 @@
 # frozen_string_literal: true
 
-require 'digest'
-
 module Arbeitnow
   class Fetcher
     include ApiGuard
+
     API_URL = 'https://www.arbeitnow.com/api/job-board-api'
 
     def call(force: false)
-      with_api_guard('arbeitnow', cooldown: 1.hour, force:) do |source|
+      with_api_guard('arbeitnow', cooldown: 2.hours, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         response = Faraday.get(API_URL)
-        data = JSON.parse(response.body)
+        return false unless response.success?
 
-        data['data'].each do |job|
-          signature = Digest::SHA256.hexdigest("arbeitnow-#{job['slug']}")
+        data = Oj.load(response.body)
+        jobs = data['data'] || []
 
-          JobBoards::Document.find_or_create_by!(signature:) do |doc|
+        jobs.each do |job_data|
+          signature = "arbeitnow-#{job_data['slug']}"
+
+          JobBoards::Document.find_or_create_by!(signature: signature) do |doc|
             doc.source_id = source.id
             doc.job_boards_query_id = query.id
-            doc.document = job.to_json
+            doc.document = job_data.to_json
           end
         end
+
+        Rails.logger.info "Arbeitnow: Fetched #{jobs.count} jobs."
+        true
       end
     end
   end

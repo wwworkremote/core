@@ -32,7 +32,15 @@ module JobBoards
         jp.body         = data['text']
         jp.target_url   = data['url']
         jp.published_at = Time.at(data['time'])
-        jp.company      = data['by']
+      when 'arbeitnow'
+        jp.title        = data['title']
+        jp.body         = data['description']
+        jp.target_url   = data['url']
+        jp.published_at = Time.at(data['created_at'])
+        jp.company      = data['company_name']
+        jp.location     = data['location']
+        jp.tags         = data['tags']
+      when 'adzuna'
       when 'remotive'
         jp.title        = data['title']
         jp.body         = data['description']
@@ -82,6 +90,14 @@ module JobBoards
         jp.published_at = Time.parse(data['pubDate']) rescue Time.now
         jp.company      = data['companyName']
         jp.location     = data['jobGeo']
+      when 'rubyonremote'
+        jp.title        = data['title']
+        jp.body         = data['description'] # Might be nil from index
+        jp.target_url   = data['url']
+        jp.published_at = Time.now
+        jp.company      = data['company']
+        jp.location     = data['location']
+        jp.tags         = data['tags']
       when 'yc'
         jp.title        = data['title']
         jp.body         = data['description']
