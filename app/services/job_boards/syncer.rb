@@ -76,6 +76,14 @@ module JobBoards
         jp.published_at = Time.parse(data['published_at'])
         jp.company      = data.dig('company', 'name')
         jp.location     = data['location']
+      when 'remoteok'
+        jp.title        = data['position']
+        jp.body         = data['description']
+        jp.target_url   = data['url']
+        jp.published_at = Time.at(data['date'].to_i)
+        jp.company      = data['company']
+        jp.location     = data['location']
+        jp.tags         = data['tags']
       when 'yc'
         jp.title        = data['title']
         jp.body         = data['description']

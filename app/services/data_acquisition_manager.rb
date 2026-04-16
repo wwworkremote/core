@@ -22,6 +22,11 @@ class DataAcquisitionManager
       cooldown: 1.hour,
       name: 'Himalayas'
     },
+    'remoteok' => {
+      class: Remoteok::Fetcher,
+      cooldown: 2.hours,
+      name: 'RemoteOK'
+    },
     'remotive' => {
       class: Remotive::Fetcher,
       cooldown: 1.hour,
