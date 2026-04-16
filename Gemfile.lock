@@ -284,6 +284,8 @@ GEM
       drb (~> 2.0)
       prism (~> 1.5)
     multipart-post (2.4.1)
+    neighbor (1.0.0)
+      activerecord (>= 7.2)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-http-persistent (4.0.8)
@@ -503,6 +505,7 @@ GEM
       activesupport (>= 6.1)
     pghero (3.8.0)
       activerecord (>= 7.2)
+    pgvector (0.3.3)
     playwright-ruby-client (1.59.0)
       base64
       concurrent-ruby (>= 1.1.6)
@@ -795,6 +798,7 @@ DEPENDENCIES
   kaminari (~> 1.2)
   kredis
   meta-tags
+  neighbor
   oj
   opentelemetry-api
   opentelemetry-exporter-otlp
@@ -807,6 +811,7 @@ DEPENDENCIES
   pg_query (>= 2)
   pg_search (~> 2.3)
   pghero
+  pgvector
   playwright-ruby-client
   propshaft
   puma (>= 6.0)
@@ -943,6 +948,7 @@ CHECKSUMS
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
   minitest (6.0.4) sha256=df1304664589d40f46089247fdc451f866b0ce0d7cae1457a15fc1eb7d48dca1
   multipart-post (2.4.1) sha256=9872d03a8e552020ca096adadbf5e3cb1cd1cdd6acd3c161136b8a5737cdb4a8
+  neighbor (1.0.0) sha256=5c63eed3ccabe0c48b04cfa4d90ed315d4d749242a1000765a8f5574c2825f32
   net-http (0.9.1) sha256=25ba0b67c63e89df626ed8fac771d0ad24ad151a858af2cc8e6a716ca4336996
   net-http-persistent (4.0.8) sha256=ef3de8319d691537b329053fae3a33195f8b070bbbfae8bf1a58c796081960e6
   net-imap (0.6.3) sha256=9bab75f876596d09ee7bf911a291da478e0cd6badc54dfb82874855ccc82f2ad
@@ -1020,6 +1026,7 @@ CHECKSUMS
   pg_query (6.2.2) sha256=316c194160ccfac8af9a7aff55cdc5b2d13bdd8bd8734976c6bddc477e779b6f
   pg_search (2.3.7) sha256=27868941844961e593526b835da20e48995e9b846515e91856084c5bd9ab4f35
   pghero (3.8.0) sha256=f6fda87a095c2bd153954cb895366a3ffc4c8f7785b2b9234a5dbd1cbcabb360
+  pgvector (0.3.3) sha256=9cad4b69487110b2dc26d57e6ba9ff2cbe72421c09e6d17397bb29e1551d1872
   playwright-ruby-client (1.59.0) sha256=b9e66233ed7b83e917980badc27ecd233e244503c74772a3854dbd5d41438c21
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193

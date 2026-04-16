@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class JobPosting < ApplicationRecord
+  include PgSearch::Model
+
+  has_neighbors :embedding # For vector similarity searches
+
   has_paper_trail
   belongs_to :source, optional: true
 
@@ -11,7 +15,14 @@ class JobPosting < ApplicationRecord
   after_validation :geocode, if: ->(obj) { obj.location.present? && obj.location_changed? }
 
   scope :recent, -> { order(published_at: :desc) }
-  scope :search, ->(query) { where('title ILIKE :q OR company ILIKE :q OR body ILIKE :q', q: "%#{query}%") }
+
+  # Advanced full-text search
+  pg_search_scope :search,
+                  against: { title: 'A', body: 'B' },
+                  using: {
+                    tsearch: { prefix: true, dictionary: 'english' },
+                    trgm: { threshold: 0.1 }
+                  }
 
   def self.ransackable_attributes(_auth_object = nil)
     %w[id title company location published_at target_url source_id created_at updated_at latitude longitude]
