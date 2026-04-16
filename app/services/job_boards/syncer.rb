@@ -25,6 +25,7 @@ module JobBoards
         Categorizer.new(jp).call
       end
     end
+
     def map_attributes(jp, data, slug)
       case slug
       when 'hackernews'
@@ -41,6 +42,12 @@ module JobBoards
         jp.location     = data['location']
         jp.tags         = data['tags']
       when 'adzuna'
+        jp.title        = data['title']
+        jp.body         = data['description']
+        jp.target_url   = data['redirect_url']
+        jp.published_at = Time.parse(data['created'])
+        jp.company      = data.dig('company', 'display_name')
+        jp.location     = data.dig('location', 'display_name')
       when 'remotive'
         jp.title        = data['title']
         jp.body         = data['description']
@@ -54,20 +61,13 @@ module JobBoards
         jp.target_url   = data['url']
         jp.published_at = Time.parse(data['published'])
         jp.company      = parse_wwr_company(data['title'])
-      when 'arbeitnow'
+      when 'workingnomads'
         jp.title        = data['title']
-        jp.body         = data['description']
         jp.target_url   = data['url']
-        jp.published_at = Time.at(data['created_at'])
-        jp.company      = data['company_name']
+        jp.published_at = Time.now
+        jp.company      = data['company']
         jp.location     = data['location']
-      when 'adzuna'
-        jp.title        = data['title']
-        jp.body         = data['description']
-        jp.target_url   = data['redirect_url']
-        jp.published_at = Time.parse(data['created'])
-        jp.company      = data.dig('company', 'display_name')
-        jp.location     = data.dig('location', 'display_name')
+        jp.tags         = Array(data['category'])
       when 'himalayas'
         jp.title        = data['title']
         jp.body         = data['description']
@@ -90,9 +90,29 @@ module JobBoards
         jp.published_at = Time.parse(data['pubDate']) rescue Time.now
         jp.company      = data['companyName']
         jp.location     = data['jobGeo']
+      when 'greenhouse'
+        jp.title        = data['title']
+        jp.body         = data['content']
+        jp.target_url   = data['absolute_url']
+        jp.published_at = Time.parse(data['updated_at']) rescue Time.now
+        jp.company      = data['company_name']
+        jp.location     = data.dig('location', 'name')
+      when 'jobspresso'
+        jp.title        = data['title']
+        jp.body         = data['content']
+        jp.target_url   = data['url']
+        jp.published_at = Time.parse(data['published']) rescue Time.now
+      when 'lever'
+        jp.title        = data['text']
+        jp.body         = data['description']
+        jp.target_url   = data['hostedUrl']
+        jp.published_at = Time.at(data['createdAt'] / 1000) rescue Time.now
+        jp.company      = data['site_slug']&.capitalize
+        jp.location     = data.dig('categories', 'location')
+        jp.tags         = Array(data.dig('categories', 'team'))
       when 'rubyonremote'
         jp.title        = data['title']
-        jp.body         = data['description'] # Might be nil from index
+        jp.body         = data['description']
         jp.target_url   = data['url']
         jp.published_at = Time.now
         jp.company      = data['company']

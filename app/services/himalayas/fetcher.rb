@@ -11,7 +11,10 @@ module Himalayas
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
         response = Faraday.get(API_URL)
-        return false unless response.success?
+        unless response.success?
+          puts "Himalayas API Error: #{response.status} - #{response.body}"
+          return false
+        end
 
         data = Oj.load(response.body)
         jobs = data['jobs'] || []

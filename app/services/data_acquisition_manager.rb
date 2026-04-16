@@ -12,6 +12,11 @@ class DataAcquisitionManager
       cooldown: 2.hours,
       name: 'Arbeitnow'
     },
+    'greenhouse' => {
+      class: Greenhouse::Fetcher,
+      cooldown: 4.hours,
+      name: 'Greenhouse'
+    },
     'hackernews' => {
       class: HackerNews::FetchLatestJobstories,
       cooldown: 15.minutes,
@@ -26,6 +31,16 @@ class DataAcquisitionManager
       class: Jobicy::Fetcher,
       cooldown: 4.hours,
       name: 'Jobicy'
+    },
+    'jobspresso' => {
+      class: Jobspresso::Fetcher,
+      cooldown: 1.hour,
+      name: 'Jobspresso'
+    },
+    'lever' => {
+      class: Lever::Fetcher,
+      cooldown: 4.hours,
+      name: 'Lever'
     },
     'remoteok' => {
       class: Remoteok::Fetcher,
@@ -46,6 +61,11 @@ class DataAcquisitionManager
       class: Wwr::Fetcher,
       cooldown: 30.minutes,
       name: 'Wwr'
+    },
+    'workingnomads' => {
+      class: WorkingNomads::Scraper,
+      cooldown: 4.hours,
+      name: 'WorkingNomads'
     },
     'yc' => {
       class: Yc::Scraper,
