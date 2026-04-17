@@ -47,15 +47,22 @@ Avo.configure do |config|
   # }
 
   ## == Customization ==
-  # config.app_name = 'Avocadelic'
+  config.app_name = 'WWWorkRemote'
   # config.timezone = 'UTC'
   # config.currency = 'USD'
   # config.hide_avo_branding = false
-  # config.layout = :unpaged # :boxed or :unpaged
-  # config.set_full_width_layout_wrap = true
-  # config.top_header_layout = :paged # :paged or :full_width
-  # config.sidebar_default_state = :open # :open or :closed
-  # config.force_sidebar_open = false
+  config.layout = :unpaged # :boxed or :unpaged
+  config.set_full_width_layout_wrap = false
+  config.top_header_layout = :full_width # :paged or :full_width
+  config.sidebar_default_state = :closed # :open or :closed
+  config.force_sidebar_open = false
+
+  config.branding = {
+    colors: {
+      primary: '#4f46e5' # Indigo 600
+    },
+    chart_colors: ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444']
+  }
 
   ## == Breadcrumbs ==
   # config.display_breadcrumbs = true

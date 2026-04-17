@@ -15,18 +15,26 @@ module Avo
       end
 
       def fields
-        field :id, as: :id
         field :title, as: :text, link_to_record: true
         field :company, as: :text
         field :location, as: :text
-        field :ai_category, as: :text do |model|
+
+        field :ai_category, as: :badge, options: {
+          success: 'Product Management',
+          warning: 'Design',
+          error: 'Sales',
+          info: 'Software Engineering',
+          neutral: 'Other'
+        } do |model|
           model.data['ai_category']
         end
-        field :found_by_terms, as: :tags do |model|
+
+        field :found_by_terms, as: :tags, hide_on: :index do |model|
           model.data['found_by_terms']
         end
-        field :published_at, as: :date_time
-        field :target_url, as: :text
+
+        field :published_at, as: :date_time, name: 'Posted'
+        field :target_url, as: :text, hide_on: :index
         field :source, as: :belongs_to
       end
     end
