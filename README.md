@@ -5,10 +5,9 @@ Bleeding-edge data acquisition engine and dashboard for remote job listings, pow
 ## 🚀 The Stack
 - **Ruby 4.0.2:** Bleeding-edge performance and features.
 - **Rails 8.2.0.alpha:** Tracking the `main` branch for the latest framework innovations.
-- **Sidekiq 8.1.3:** Robust, high-performance background processing.
-- **Solid Infrastructure:**
+- **Solid Infrastructure (PostgreSQL-backed):**
+  - `solid_queue`: High-performance, database-backed background jobs.
   - `solid_cache`: Database-backed caching.
-  - `solid_queue`: Database-backed background jobs.
   - `solid_cable`: Database-backed Action Cable.
 - **Modern Asset Pipeline:** Propshaft, DartSass, and Importmaps (no-build JS).
 - **Search & AI:**
@@ -40,11 +39,11 @@ Access the dashboard at: `http://localhost:3010`
 The environment is containerized but connects to your **host machine's PostgreSQL** for high-performance search capabilities.
 
 ```bash
-# Start background services (Redis, Jaeger) and application
+# Start background services and application
 docker-compose up -d
 
-# Verify scheduled fetchers
-docker-compose exec web bin/rails runner "puts Sidekiq::Cron::Job.all"
+# Verify scheduled fetchers (Solid Queue)
+docker-compose exec web bin/rails runner "puts SolidQueue::Job.all"
 ```
 
 ## 🛰 Data Acquisition
@@ -68,9 +67,9 @@ To manually trigger a fresh fetch of all jobs across all platforms:
 - **Intersection Analysis:** Jobs track which specific query terms found them (`found_by_terms` metadata).
 
 ## 📊 Observability
-- **OpenTelemetry:** Integrated with Jaeger for distributed tracing.
-- **Sidekiq UI:** Monitor background jobs at `/sidekiq`.
-- **PgHero:** Database performance insights available in development.
+- **OpenTelemetry:** Integrated with your host's OTel Collector and global LGTM stack.
+- **Dashboard:** Performance and job monitoring available via Avo Admin and PgHero.
+- **PgHero:** Database performance insights available at `/pghero`.
 
 ## 📝 Documentation
 - [RUBY_LLM.md](./RUBY_LLM.md): AI integration and local LLM configuration.
