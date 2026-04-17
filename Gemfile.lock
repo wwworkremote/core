@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/amazing-print/amazing_print.git
+  revision: b2bebbd15c7f4452ec7579519f6865f86e5d3e60
+  branch: main
+  specs:
+    amazing_print (2.0.0)
+
+GIT
   remote: https://github.com/hotwired/stimulus-rails.git
   revision: f5c7475abf8701ebb96cecb7e99c6b5bf876452f
   branch: main
@@ -168,7 +175,6 @@ GEM
       cgi
       device_detector (>= 1)
       safely_block (>= 0.4)
-    amazing_print (2.0.0)
     annotaterb (4.22.0)
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -846,7 +852,7 @@ DEPENDENCIES
   active_median
   after_commit_everywhere (~> 1.0)
   ahoy_matey
-  amazing_print
+  amazing_print!
   annotaterb (~> 4.10)
   avo
   bcrypt (~> 3.1.7)
@@ -946,7 +952,7 @@ CHECKSUMS
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
   after_commit_everywhere (1.6.0) sha256=c8b3409a1172e43070d2e57f4b9d7b89dce5a7f057576b748cb9fe0a0dd4d917
   ahoy_matey (5.5.0) sha256=84280579c1e690233bd0bffa2bdde601b3c4cb0e0cc31684238ef37f1e8cdbc6
-  amazing_print (2.0.0) sha256=2e36aba46ac78d37ed27ca0e2056afe3583183bb5c64f157c246b267355e5d6a
+  amazing_print (2.0.0)
   annotaterb (4.22.0) sha256=66fc40e5f48d5b82ae82013da1e5b43aaaad41ee9bd3d0cf803048efc0a70286
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   avo (3.31.0) sha256=8640e5465a6d359cddeeb0fd8ec27801d9379f3e728b3847e233a5a007271f21
