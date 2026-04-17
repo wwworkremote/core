@@ -21,7 +21,7 @@ class JobPosting < ApplicationRecord
                   against: { title: 'A', body: 'B' },
                   using: {
                     tsearch: { prefix: true, dictionary: 'english' },
-                    trgm: { threshold: 0.1 }
+                    trigram: { threshold: 0.1 }
                   }
 
   def self.semantic_search(query_text, limit: 10)
