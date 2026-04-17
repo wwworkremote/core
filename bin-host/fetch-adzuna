@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 cd "$(dirname "$0")/.." || exit
 echo "--- Starting Adzuna Job Fetch ---"
 docker-compose exec -T web bin/rails runner - <<'EOF'

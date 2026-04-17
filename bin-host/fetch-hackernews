@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # Ensure we are in the project root (where docker-compose.yml is)
 cd "$(dirname "$0")/.." || exit
