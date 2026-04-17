@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-class SyncJob
-  include Sidekiq::Worker
-  sidekiq_options queue: :default
+class SyncDashboardJob < ApplicationJob
+  queue_as :default
 
   def perform
     JobBoards::Syncer.new.call

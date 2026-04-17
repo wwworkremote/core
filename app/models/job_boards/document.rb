@@ -18,4 +18,7 @@
 #  index_job_boards_documents_on_source_id            (source_id)
 #
 class JobBoards::Document < ApplicationRecord
+  validates :signature, presence: true, uniqueness: true
+  validates :source_id, presence: true
+  validates :job_boards_query_id, presence: true
 end

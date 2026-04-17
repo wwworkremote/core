@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source < ApplicationRecord
+  validates :signature, presence: true, uniqueness: true
+
   belongs_to :origin, optional: true
   has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source
 

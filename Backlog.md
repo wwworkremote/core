@@ -1,54 +1,53 @@
 # Engineering Backlog: Job Search Automation Platform
 
 ## Backlog Audit
-- **Status**: Newly established from system modernization findings.
-- **Task Distribution**: Focused on safety rails (Phase 1) and ingestion reliability (Phase 2).
-- **Major Gaps**: Live contract tests for external feeds, AI categorization validation, OpenTelemetry verification.
-- **Quality Issues**: Many tests rely on VCR cassettes which mask upstream API drift.
+- **Status**: Updated via ADR 002 (Ultimate Stack Consolidation).
+- **Task Distribution**: Finalizing the "Solid" shift and investigating new sources.
+- **Major Gaps**: Otta investigation, Dynamite Jobs investigation.
+- **Quality Issues**: Transaction safety and migration guardrails.
 
 ---
 
 ## Priority Backlog (Dependency-Ordered)
 
-### 1. Establish External Feed Contract Tests (DONE)
-- **Description**: Current tests use VCR cassettes which can become stale. We need "Live" contract tests that run on a separate CI schedule to detect when Adzuna, Remotive, or WWR change their API formats.
+### 5. Remove Devise and Simplify Auth
+- **Description**: Replace the heavy Devise stack with `has_secure_password` and HTTP Basic Auth for a single-admin local tool.
 - **Acceptance Criteria**:
-  - `spec/contracts/` directory created.
-  - Live HTTP tests implemented for at least 3 major sources.
-  - Tests verify presence of required keys (`title`, `url`, `company`).
-- **Definition of Done**: Tests pass without VCR in a dedicated environment.
-- **Labels**: testing, dependency
-- **Dependencies**: None
+  - `devise` gem removed.
+  - `User` model updated with `password_digest`.
+  - Avo dashboard protected via HTTP Basic Auth.
+- **Labels**: auth, refactor
 
-### 2. Verify and Tune AI Categorization (DONE)
-- **Description**: Integrated Llama 3.2 for job categorization, but we need to verify the accuracy of the prompts and the quality of the tags being generated.
+### 6. Complete Solid Queue & Cache Migration
+- **Description**: Move background jobs and caching to PostgreSQL, dropping Redis entirely.
 - **Acceptance Criteria**:
-  - Run `HackerNews::FetchLatestWorker` on 50+ items.
-  - Audit `JobPosting#tags` and `ai_category` in Avo.
-  - Refine prompt if categorization is "Other" more than 20% of the time.
-- **Definition of Done**: Categorization accuracy manually verified for 20+ records.
-- **Labels**: llm, refactor
-- **Dependencies**: None
+  - `sidekiq` removed.
+  - `solid_queue` and `solid_cache` fully configured.
+  - `docker-compose.yml` and `.env` cleaned of Redis.
+- **Labels**: infrastructure
 
-### 3. Verify OpenTelemetry Export (DONE)
-- **Description**: OpenTelemetry is configured but needs verification that spans (especially the new `categorize_job` span) are reaching the Jaeger backend.
+### 7. Implement Safety Guardrails
+- **Description**: Add gems to catch bad migrations, transaction leaks, and schema inconsistencies.
 - **Acceptance Criteria**:
-  - Jaeger UI (localhost:16686) shows traces from `core` service.
-  - Traces correlate Sidekiq jobs to LLM categorization spans.
-  - `app.job_posting.id` attribute is searchable in Jaeger.
-- **Definition of Done**: Successful trace visualization confirmed.
-- **Labels**: observability
-- **Dependencies**: None
+  - `strong_migrations`, `database_consistency`, and `isolator` added.
+  - Initial run of `database_consistency` passes.
+- **Labels**: safety, dev-tools
 
-### 4. Audit Rails Event Store Usage (DONE)
-- **Description**: Rails Event Store is present but potentially underutilized or overlapping with AASM.
+### 8. Investigate Next Sources: Otta & Dynamite Jobs
+- **Description**: Map out extraction strategies for Otta and Dynamite Jobs.
 - **Acceptance Criteria**:
-  - Document all events currently being published.
-  - Ensure events are published within DB transactions.
-  - Decide if RES is providing enough value over PaperTrail for audit logs.
-- **Definition of Done**: ADR (Architecture Decision Record) created for RES vs PaperTrail.
-- **Labels**: architecture, database
-- **Dependencies**: None
+  - API endpoints or scrape targets identified.
+  - Signal quality (remote, salary, tech stack) evaluated.
+- **Labels**: ingestion
+
+---
+
+## Future Enhancements (Deferred)
+- **Serialization**: Adopt `alba` for `api/v0/` if complexity increases.
+- **Profiling**: Add `test-prof` to optimize slow scraper specs.
+- **Headless Browser**: Move from Selenium to `cuprite` for system tests.
+- **Components**: Evaluate `view_component` if custom UI becomes non-trivial.
+- **SPA**: Evaluate `inertia_rails` only if complex client-side state is required.
 
 ---
 
@@ -61,5 +60,5 @@
 ## Tool Strategy
 - **RuboCop**: Keep (Primary). Hardened with performance and rails plugins.
 - **Brakeman**: Keep. Security gate.
-- **DatabaseCleaner**: Removed. Using native transactional fixtures.
-- **Reek/Fasterer**: Removed. Consolidated into RuboCop.
+- **Strong Migrations**: NEW. Protect production schema.
+- **Isolator**: NEW. Prevent transaction bleed.

@@ -1,0 +1,19 @@
+# Unified Data Acquisition (API, Scrapers, ATS)
+development:
+  fetch_all_jobs:
+    class: DataAcquisition::RunAllJob
+    schedule: every 6 hours
+  sync_to_dashboard:
+    class: SyncDashboardJob
+    schedule: at 45 every hour
+
+production:
+  fetch_all_jobs:
+    class: DataAcquisition::RunAllJob
+    schedule: every 6 hours
+  sync_to_dashboard:
+    class: SyncDashboardJob
+    schedule: at 45 every hour
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12

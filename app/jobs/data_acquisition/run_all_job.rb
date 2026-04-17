@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module DataAcquisition
-  class RunAllWorker
-    include Sidekiq::Worker
+  class RunAllJob < ApplicationJob
+    queue_as :default
 
     def perform
       DataAcquisitionManager.run_all

@@ -47,9 +47,29 @@ module Core
 
     config.generators.system_tests = nil
 
+    # Use Solid Queue for background jobs
+    config.active_job.queue_adapter = :solid_queue
+
+    # Use Solid Cache for caching
+    config.cache_store = :solid_cache_store
+
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     # config.api_only = true
+
+    # Lograge configuration for OTel-friendly structured logs
+    config.lograge.enabled = true
+    config.lograge.formatter = Lograge::Formatters::Json.new
+    config.lograge.custom_options = lambda do |event|
+      {
+        time: event.time,
+        remote_ip: event.payload[:remote_ip],
+        user_agent: event.payload[:user_agent],
+        # Add OTel context if available
+        trace_id: OpenTelemetry::Trace.current_span.context.trace_id.unpack1('H*'),
+        span_id: OpenTelemetry::Trace.current_span.context.span_id.unpack1('H*')
+      }
+    end
   end
 end

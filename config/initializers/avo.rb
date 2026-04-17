@@ -15,7 +15,18 @@ Avo.configure do |config|
   # config.context = {}
 
   ## == Authentication ==
-  # config.current_user_method = {}
+  config.current_user_method = lambda {
+    # Basic HTTP Auth for local personal use
+    authenticate_or_request_with_http_basic('WWWorkRemote') do |username, password|
+      username == ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com') && password == ENV.fetch('ADMIN_PASSWORD', 'password')
+    end
+
+    # Return a dummy user or find the actual record if needed for associations
+    User.find_or_create_by!(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com')) do |u|
+      u.name = ENV.fetch('ADMIN_NAME', 'mike')
+      u.password = ENV.fetch('ADMIN_PASSWORD', 'password')
+    end
+  }
   # config.authenticate_with = {}
 
   ## == Authorization ==
@@ -51,11 +62,11 @@ Avo.configure do |config|
   # config.timezone = 'UTC'
   # config.currency = 'USD'
   # config.hide_avo_branding = false
-  config.layout = :unpaged # :boxed or :unpaged
-  config.set_full_width_layout_wrap = false
-  config.top_header_layout = :full_width # :paged or :full_width
-  config.sidebar_default_state = :closed # :open or :closed
-  config.force_sidebar_open = false
+  # config.layout = :unpaged # :boxed or :unpaged
+  # config.set_full_width_layout_wrap = false
+  # config.top_header_layout = :full_width # :paged or :full_width
+  # config.sidebar_default_state = :closed # :open or :closed
+  # config.force_sidebar_open = false
 
   config.branding = {
     colors: {

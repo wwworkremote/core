@@ -3,6 +3,8 @@
 class JobPosting < ApplicationRecord
   include PgSearch::Model
 
+  validates :signature, presence: true, uniqueness: true
+
   has_neighbors :embedding # For vector similarity searches
 
   has_paper_trail

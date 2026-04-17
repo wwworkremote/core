@@ -15,6 +15,9 @@
 #  index_job_boards_sources_on_slug  (slug) UNIQUE
 #
 class JobBoards::Source < ApplicationRecord
+  validates :name, presence: true
+  validates :slug, presence: true, uniqueness: true
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[id name slug created_at updated_at]
   end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module API
+module Api
   module V0
-    class SourcesController < APIController
+    class SourcesController < ApiController
       def index
         page = params.fetch('page', 1)
 

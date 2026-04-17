@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module API
+module Api
   module V0
-    class JobPostingsController < APIController
+    class JobPostingsController < ApiController
       def index
         page = params.fetch('page') { 1 }
 

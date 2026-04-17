@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'reverse_markdown'
+
 module JobBoards
   class Syncer
     def call

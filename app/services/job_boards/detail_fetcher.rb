@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'ferrum'
+require 'reverse_markdown'
 
 module JobBoards
   class DetailFetcher

@@ -1,51 +1,33 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
 #
-#  id                     :bigint           not null, primary key
-#  confirmation_sent_at   :datetime
-#  confirmation_token     :string
-#  confirmed_at           :datetime
-#  current_sign_in_at     :datetime
-#  current_sign_in_ip     :string
-#  email                  :string           default(""), not null
-#  encrypted_password     :string           default(""), not null
-#  failed_attempts        :integer          default(0), not null
-#  last_sign_in_at        :datetime
-#  last_sign_in_ip        :string
-#  locked_at              :datetime
-#  name                   :string           not null
-#  remember_created_at    :datetime
-#  reset_password_sent_at :datetime
-#  reset_password_token   :string
-#  sign_in_count          :integer          default(0), not null
-#  slug                   :string           not null
-#  unconfirmed_email      :string
-#  unlock_token           :string
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
+#  id              :bigint           not null, primary key
+#  email           :string           default(""), not null
+#  name            :string           not null
+#  password_digest :string
+#  slug            :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
 #
 # Indexes
 #
-#  index_users_on_confirmation_token    (confirmation_token) UNIQUE
-#  index_users_on_email                 (email) UNIQUE
-#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#  index_users_on_slug                  (slug) UNIQUE
-#  index_users_on_unlock_token          (unlock_token) UNIQUE
+#  index_users_on_email  (email) UNIQUE
+#  index_users_on_slug   (slug) UNIQUE
 #
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
-         :confirmable
+  has_secure_password
 
-  before_save :set_defaults
+  validates :email, presence: true, uniqueness: true
+  validates :name, presence: true
+  validates :slug, presence: true, uniqueness: true
+
+  before_validation :set_defaults
 
   def set_defaults
-    self.name = 'Default' if name.blank?
-    self.slug = "user##{rand(0..1000)}"
+    self.name ||= 'Admin'
+    self.slug ||= SecureRandom.hex(8)
   end
-
-  has_many :messages
 end
