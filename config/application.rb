@@ -32,7 +32,7 @@ class Nodes # :nodoc:
   def self.representation = [1]
 end
 
-module Core
+module WwworkRemote
   class Application < Rails::Application # :nodoc:
     # Initialize configuration defaults for Rails 8.0.
     config.load_defaults 8.0

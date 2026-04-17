@@ -87,7 +87,7 @@ Avo.configure do |config|
       dashboard :main
     end
 
-    section 'Core', icon: 'heroicons/outline/cpu-chip' do
+    section 'WwworkRemote', icon: 'heroicons/outline/cpu-chip' do
       resource :job_posting
       resource :source
       resource :origin

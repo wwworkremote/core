@@ -29,7 +29,7 @@ Rails.application.routes.draw do
     end
   end
 
-  # Core / Data Acquisition Routes
+  # WwworkRemote / Data Acquisition Routes
   put 'hacker_news/fetch_jobstory'
 
   mount PgHero::Engine, at: 'pghero'
