@@ -14,12 +14,10 @@ services:
       REDIS_URL: redis://host.docker.internal:6379/1
       ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
       ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      # Point to host machine OTel Collector (LGTM stack)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
       OTEL_SERVICE_NAME: wwworkremote-web
       OLLAMA_API_BASE: http://host.docker.internal:8080/v1
-    depends_on:
-      jaeger:
-        condition: service_started
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -36,17 +34,9 @@ services:
       REDIS_URL: redis://host.docker.internal:6379/1
       ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
       ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      # Point to host machine OTel Collector (LGTM stack)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
       OTEL_SERVICE_NAME: wwworkremote-worker
       OLLAMA_API_BASE: http://host.docker.internal:8080/v1
-    depends_on:
-      jaeger:
-        condition: service_started
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - "16686:16686" # UI
-      - "4318:4318"   # OTLP HTTP
