@@ -104,6 +104,14 @@ module JobBoards
 
       # Preserve intersection data in the JobPosting payload
       jp.data = data.merge('found_by_terms' => data['found_by_terms'])
+      jp.body = normalize_body(jp.body)
+    end
+
+    def normalize_body(html)
+      return nil if html.blank?
+
+      # Convert HTML to Markdown
+      ReverseMarkdown.convert(html, unknown_tags: :bypass, github_flavored: true).strip
     end
 
     def parse_wwr_company(title)

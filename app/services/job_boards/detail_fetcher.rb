@@ -46,7 +46,7 @@ module JobBoards
           }")
 
           if description.present? && description.length > (job.body&.length || 0)
-            job.update!(body: description)
+            job.update!(body: normalize_body(description))
             # Re-categorize after enrichment
             Categorizer.new(job).call
             puts "SUCCESS: Enriched description for #{job.title}"
@@ -58,6 +58,15 @@ module JobBoards
       ensure
         browser.quit
       end
+    end
+
+    private
+
+    def normalize_body(html)
+      return nil if html.blank?
+
+      # Convert HTML to Markdown
+      ReverseMarkdown.convert(html, unknown_tags: :bypass, github_flavored: true).strip
     end
   end
 end
