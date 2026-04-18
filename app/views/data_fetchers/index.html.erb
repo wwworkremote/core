@@ -1,73 +1,74 @@
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-5xl font-black tracking-tight sparkle-ai mb-3">Intelligence Ingestion</h1>
-    <p class="text-slate-400 text-lg">Manage and monitor the data aggregation signals.</p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">INGESTION CONTROL</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Active Data Fetcher Registry</p>
   </div>
   <div>
     <%= button_to audit_data_fetchers_path,
         method: :post,
-        class: "btn-neural inline-flex items-center gap-2",
+        class: "btn-neural !bg-violet-600 !text-white !border-none flex items-center gap-2",
         data: { turbo_confirm: "This will check for missing postings, categories, and embeddings. Proceed?" } do %>
-      <i class="bi bi-shield-check"></i> Audit & Repair System
+      <i class="bi bi-shield-check"></i> RUN SYSTEM AUDIT
     <% end %>
   </div>
 </div>
 
-<div class="card-neural overflow-hidden mb-8">
+<div class="card-neural mb-6">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
-      <thead class="bg-white/5 border-b border-white/5">
+      <thead class="bg-white/5 border-b border-white/10">
         <tr>
-          <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Provider</th>
-          <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Last Signal</th>
-          <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Cycle</th>
-          <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Status</th>
-          <th class="px-8 py-4 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Control</th>
+          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Provider Module</th>
+          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Last Successful Sync</th>
+          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">TTL / Cooldown</th>
+          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Core Status</th>
+          <th class="px-6 py-3 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Manual Overrides</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-white/5">
+      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
         <% @fetchers.each do |fetcher| %>
-          <tr class="group hover:bg-white/[0.02] transition-colors">
-            <td class="px-8 py-6">
-              <span class="text-lg font-bold text-white"><%= fetcher[:name] %></span>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <span class="text-sm font-bold text-white tracking-tight"><%= fetcher[:name].upcase %></span>
             </td>
-            <td class="px-8 py-6">
+            <td class="px-6 py-4">
               <% if fetcher[:last_fetched_at] %>
-                <span class="text-sm font-medium text-slate-300"><%= time_ago_in_words(fetcher[:last_fetched_at]) %> ago</span>
+                <span class="text-slate-300"><%= fetcher[:last_fetched_at].strftime("%Y-%m-%d %H:%M:%S") %></span>
+                <span class="text-slate-600 ml-2">(<%= time_ago_in_words(fetcher[:last_fetched_at]) %> ago)</span>
               <% else %>
-                <span class="text-sm text-slate-600 italic">Inactive</span>
+                <span class="text-rose-500 font-bold italic">NO_DATA</span>
               <% end %>
             </td>
-            <td class="px-8 py-6">
-              <span class="text-xs font-bold text-slate-500"><%= distance_of_time_in_words(fetcher[:cooldown]) %></span>
+            <td class="px-6 py-4 text-slate-500">
+              <%= fetcher[:cooldown] / 60 %>m
             </td>
-            <td class="px-8 py-6">
+            <td class="px-6 py-4">
               <% if fetcher[:can_fetch] %>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ready
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-black">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> READY
                 </span>
               <% else %>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-black uppercase tracking-widest border border-amber-500/20">
-                  <i class="bi bi-clock-history"></i> <%= distance_of_time_in_words(fetcher[:time_until_reset]) %>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 font-black">
+                  <i class="bi bi-hourglass-split"></i> WAIT_<%= (fetcher[:time_until_reset] / 60).to_i %>M
                 </span>
               <% end %>
             </td>
-            <td class="px-8 py-6 text-right">
-              <div class="flex items-center justify-end gap-3">
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2 text-[10px]">
                 <%= button_to run_data_fetchers_path(slug: fetcher[:slug]),
                     method: :post,
-                    class: "text-xs font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all
-                           #{fetcher[:can_fetch] ? 'bg-violet-600 text-white hover:bg-violet-500 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-white/5 text-slate-600 cursor-not-allowed'}",
+                    class: "px-3 py-1 rounded font-black border transition-all
+                           #{fetcher[:can_fetch] ? 'bg-slate-100 text-slate-900 border-white hover:bg-white' : 'bg-white/5 text-slate-700 border-white/5 cursor-not-allowed'}",
                     disabled: !fetcher[:can_fetch] do %>
-                  Run
+                  EXEC
                 <% end %>
 
                 <%= button_to run_data_fetchers_path(slug: fetcher[:slug], force: true),
                     method: :post,
                     form: { class: "inline-block" },
-                    class: "text-xs font-black uppercase tracking-widest px-4 py-2 rounded-lg border border-rose-500/30 text-rose-500 hover:bg-rose-500 hover:text-white transition-all",
-                    data: { turbo_confirm: "Force signal ingestion for #{fetcher[:name]}?" } do %>
-                  Force
+                    class: "px-3 py-1 rounded font-black border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all",
+                    data: { turbo_confirm: "FORCE manual ingestion for #{fetcher[:name]}?" } do %>
+                  FORCE
                 <% end %>
               </div>
             </td>
@@ -78,6 +79,12 @@
   </div>
 </div>
 
-<%= link_to root_path, class: "inline-flex items-center gap-2 text-slate-500 hover:text-white text-sm font-bold transition-colors group" do %>
-  <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i> Return to Dashboard
-<% end %>
+<div class="flex items-center justify-between opacity-50 font-bold text-[10px] uppercase tracking-widest px-2">
+  <%= link_to root_path, class: "hover:text-white transition-colors flex items-center gap-2" do %>
+    <i class="bi bi-chevron-left"></i> ESCAPE_TO_DASHBOARD
+  <% end %>
+  <div class="flex items-center gap-4">
+    <span>SYSTEM_OPERATIONAL: TRUE</span>
+    <span class="text-violet-500">ENCRYPTION: AES-256</span>
+  </div>
+</div>

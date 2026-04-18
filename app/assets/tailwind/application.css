@@ -12,35 +12,34 @@
 
 @layer base {
   body {
-    @apply font-inter bg-gemini-bg text-slate-50 min-h-screen relative overflow-x-hidden pt-24;
+    @apply font-inter bg-gemini-bg text-slate-300 min-h-screen relative overflow-x-hidden pt-20 text-sm;
     -webkit-font-smoothing: antialiased;
   }
 }
 
 @layer components {
   .gemini-mesh {
-    @apply fixed inset-0 -z-10;
+    @apply fixed inset-0 -z-10 opacity-50;
     background: 
-      radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 40%),
       radial-gradient(at 50% 50%, rgba(2, 6, 23, 1) 0px, transparent 100%);
-    filter: contrast(120%);
   }
 
   .glass {
-    @apply bg-gemini-surface backdrop-blur-xl border border-gemini-border shadow-2xl;
+    @apply bg-slate-900/60 backdrop-blur-md border border-white/5 shadow-xl;
   }
 
   .btn-neural {
-    @apply px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 
-           bg-gradient-to-br from-violet-500 to-blue-600 text-white
-           hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:-translate-y-0.5 active:scale-95;
+    @apply px-4 py-1.5 rounded-lg font-bold transition-all duration-150 
+           bg-slate-800 text-slate-200 border border-white/10
+           hover:bg-slate-700 hover:border-violet-500/50 active:scale-95 text-xs uppercase tracking-wider;
   }
 
   .card-neural {
-    @apply glass rounded-3xl transition-all duration-300 overflow-hidden
-           hover:border-violet-500/40 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(139,92,246,0.1)];
+    @apply bg-slate-900/60 backdrop-blur-md shadow-xl rounded-xl border border-white/5 overflow-hidden;
   }
+
 
   .sparkle-ai {
     @apply relative inline-block;
