@@ -1,0 +1,58 @@
+<div class="flex flex-col mt-8">
+  <%= render Avo::PanelComponent.new(name: "Semantic Job Matches (Neural Index)") do |c| %>
+    <% c.with_body do %>
+      <div class="flex flex-col p-6 min-h-24 bg-slate-900 border-t border-indigo-500/30">
+        <% record = @resource.record %>
+        <% if record.embedding.blank? %>
+          <div class="text-center py-10">
+            <i class="heroicons/outline/cpu-chip text-slate-600 w-12 h-12 mb-4 mx-auto"></i>
+            <p class="text-slate-400 font-mono text-sm uppercase tracking-widest">No neural embedding detected for this record yet.</p>
+          </div>
+        <% else %>
+          <div class="space-y-4">
+            <% similar_jobs = record.nearest_neighbors(:embedding, distance: 'cosine').limit(5) %>
+            <% if similar_jobs.any? %>
+              <div class="grid grid-cols-1 gap-3">
+                <% similar_jobs.each do |job| %>
+                  <% match_score = ((1.0 - job.neighbor_distance) * 100).round(1) %>
+                  <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-xl border border-violet-500/20 bg-slate-800/40 hover:bg-slate-800/80 transition-all group">
+                    
+                    <div class="flex flex-col flex-1 mb-4 md:mb-0">
+                      <h4 class="text-white font-bold text-lg group-hover:text-violet-400 transition-colors mb-1"><%= job.title %></h4>
+                      <div class="flex items-center gap-3">
+                        <span class="text-blue-400 font-mono text-sm font-bold"><%= job.company %></span>
+                        <span class="text-slate-600 text-xs">|</span>
+                        <span class="text-slate-400 font-mono text-xs uppercase tracking-widest"><%= job.location || "Remote" %></span>
+                        <span class="text-slate-600 text-xs">|</span>
+                        <span class="text-slate-500 font-mono text-xs"><%= time_ago_in_words(job.published_at) if job.published_at %> ago</span>
+                      </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-6">
+                      <div class="flex flex-col items-end">
+                        <span class="text-[10px] text-slate-500 font-black font-mono uppercase tracking-[0.2em] mb-1.5">Match_Confidence</span>
+                        <div class="flex items-center gap-3">
+                          <div class="w-24 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                            <div class="h-full bg-gradient-to-r from-violet-500 to-blue-500" style="width: <%= match_score %>%"></div>
+                          </div>
+                          <span class="text-violet-400 font-mono font-bold text-sm min-w-[3rem] text-right"><%= match_score %>%</span>
+                        </div>
+                      </div>
+                      
+                      <%= a_link(avo.resources_job_posting_path(job), icon: 'heroicons/outline/arrow-right-circle', color: :primary, style: :outline) do %>
+                        Analyze
+                      <% end %>
+                    </div>
+
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+               <p class="text-slate-400 font-mono text-sm uppercase tracking-widest text-center py-10">No semantic matches found in the current corpus.</p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

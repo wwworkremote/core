@@ -36,6 +36,8 @@ module Avo
         field :published_at, as: :date_time, name: 'Posted'
         field :target_url, as: :text, hide_on: :index
         field :source, as: :belongs_to
+
+        tool Avo::ResourceTools::SimilarJobs
       end
     end
   end
