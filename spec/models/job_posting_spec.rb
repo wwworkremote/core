@@ -25,9 +25,14 @@
 #
 # Indexes
 #
-#  index_job_postings_on_body       (body) USING gin
-#  index_job_postings_on_source_id  (source_id)
-#  index_job_postings_on_title      (title) USING gin
+#  index_job_postings_on_body          (body) USING gin
+#  index_job_postings_on_company       (company)
+#  index_job_postings_on_data          (data) USING gin
+#  index_job_postings_on_external_id   (external_id)
+#  index_job_postings_on_location      (location)
+#  index_job_postings_on_published_at  (published_at)
+#  index_job_postings_on_source_id     (source_id)
+#  index_job_postings_on_title         (title) USING gin
 #
 # Foreign Keys
 #

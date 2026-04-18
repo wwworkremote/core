@@ -14,7 +14,9 @@
 #
 # Indexes
 #
+#  index_sources_on_event      (event) USING gin
 #  index_sources_on_origin_id  (origin_id)
+#  index_sources_on_payload    (payload) USING gin
 #  index_sources_on_signature  (signature) UNIQUE
 #
 # Foreign Keys

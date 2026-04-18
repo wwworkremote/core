@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_18_123910) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_18_135823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -208,6 +208,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_123910) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
+    t.index ["company"], name: "index_job_postings_on_company"
+    t.index ["data"], name: "index_job_postings_on_data", opclass: :jsonb_path_ops, using: :gin
+    t.index ["external_id"], name: "index_job_postings_on_external_id"
+    t.index ["location"], name: "index_job_postings_on_location"
+    t.index ["published_at"], name: "index_job_postings_on_published_at"
     t.index ["source_id"], name: "index_job_postings_on_source_id"
     t.index ["title"], name: "index_job_postings_on_title", opclass: :gin_trgm_ops, using: :gin
   end
@@ -447,7 +452,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_123910) do
     t.jsonb "payload", default: {}, null: false
     t.string "signature", null: false
     t.datetime "updated_at", null: false
+    t.index ["event"], name: "index_sources_on_event", opclass: :jsonb_path_ops, using: :gin
     t.index ["origin_id"], name: "index_sources_on_origin_id"
+    t.index ["payload"], name: "index_sources_on_payload", opclass: :jsonb_path_ops, using: :gin
     t.index ["signature"], name: "index_sources_on_signature", unique: true
   end
 
