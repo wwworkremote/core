@@ -1,2 +1,2 @@
-web: bin/rails server -p 3010
+web: bundle exec falcon serve --bind http://localhost:3010 --threaded --count 1
 css: bin/rails tailwindcss:watch

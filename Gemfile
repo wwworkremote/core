@@ -7,6 +7,9 @@ ruby '4.0.2'
 
 gem 'rails', '~> 8.0.0'
 
+gem 'async-job-adapter-active_job'
+gem 'falcon'
+
 # Core / Data Acquisition
 gem 'aasm'
 gem 'active_median'
