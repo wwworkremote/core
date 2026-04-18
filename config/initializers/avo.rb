@@ -2,7 +2,7 @@
 
 Avo.configure do |config|
   ## == Configuration ==
-  config.home_path = -> { '/avo/dashboards/wwwork_remote_dashboard' }
+  config.home_path = -> { '/avo/resources/job_postings' }
   config.app_name = 'WWWorkRemote'
 
   config.branding = {
@@ -18,10 +18,6 @@ Avo.configure do |config|
   config.current_user_method = :current_user
 
   config.main_menu = lambda {
-    section 'Dashboards', icon: 'heroicons/outline/chart-bar' do
-      dashboard :wwwork_remote_dashboard
-    end
-
     section 'WwworkRemote', icon: 'heroicons/outline/briefcase' do
       resource :job_posting
     end
