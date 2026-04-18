@@ -1,0 +1,10 @@
+Task: Categorize the following job posting.
+
+Rules:
+1. The "category" MUST be exactly one of: <%= JobBoards::Categorizer::CATEGORIES.join(', ') %>.
+2. If unsure, use "Other".
+3. The "tags" should be 1-5 technical keywords.
+4. Return ONLY valid JSON. No preamble, no explanation.
+
+Expected JSON Format:
+{"category": "Software Engineering", "tags": ["ruby", "rails"]}

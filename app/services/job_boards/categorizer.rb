@@ -19,24 +19,8 @@ module JobBoards
     end
 
     def call
-      system_rules = "You are a professional job categorizer. Return ONLY valid JSON."
-      task_instructions = <<~INST
-        Task: Categorize the following job posting.
-        The "category" MUST be exactly one of: #{CATEGORIES.join(', ')}.
-        If unsure, use "Other".
-        The "tags" should be 1-5 technical keywords.
-        Return ONLY valid JSON. No preamble, no explanation.
-
-        Expected JSON Format:
-        {"category": "Software Engineering", "tags": ["ruby", "rails"]}
-      INST
-
-      result = Llm::Orchestrator.call(
-        system_rules: system_rules,
-        task_instructions: task_instructions,
-        untrusted_text: @job_posting.body&.truncate(3000),
-        schema: { 'category' => String, 'tags' => Array }
-      )
+      agent = JobBoards::CategorizerAgent.new
+      result = agent.call(@job_posting)
 
       if result[:success]
         parsed = parse_response(result[:output])
@@ -47,7 +31,7 @@ module JobBoards
           )
         end
       else
-        Rails.logger.error "[Categorizer] Orchestrator failed for Job #{@job_posting.id}: #{result[:error]}"
+        Rails.logger.error "[Categorizer] Agent failed for Job #{@job_posting.id}: #{result[:error]}"
       end
     end
 

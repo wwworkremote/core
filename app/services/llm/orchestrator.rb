@@ -6,17 +6,19 @@ module Llm
       new(...).call
     end
 
-    def initialize(system_rules:, task_instructions:, untrusted_text:, schema: nil, model: nil)
-      @system_rules = system_rules
-      @task_instructions = task_instructions
+    def initialize(untrusted_text:, agent: nil, system_rules: nil, task_instructions: nil, schema: nil, model: nil, metadata: {})
       @untrusted_text = untrusted_text
+      @agent = agent
+      @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : "You are a helpful assistant.")
+      @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
       @schema = schema
-      @model = model || Llm::Registry.default_model
+      @model = model || agent_model || Llm::Registry.default_model
+      @metadata = metadata
     end
 
     def call
       tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
-      tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }) do |span|
+      tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }.merge(@metadata)) do |span|
         # 1. Inbound Guardrails
         guardrail_result = Guardrails::Pipeline.call(@untrusted_text)
         unless guardrail_result.allowed?
@@ -53,6 +55,11 @@ module Llm
     end
 
     private
+
+    def agent_model
+      return nil unless @agent.respond_to?(:model_id)
+      ::Model.find_by(model_id: @agent.model_id)
+    end
 
     def execute_with_model(model, prompt, span)
       span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
