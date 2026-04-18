@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_18_121426) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_18_123910) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -194,7 +194,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_121426) do
     t.string "company"
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
-    t.vector "embedding", limit: 1536
+    t.vector "embedding", limit: 3584
     t.string "external_author_id"
     t.string "external_id"
     t.float "latitude"

@@ -78,7 +78,7 @@ end
 #  body               :string
 #  company            :string
 #  data               :jsonb            not null
-#  embedding          :vector(1536)
+#  embedding          :vector(3584)
 #  latitude           :float
 #  location           :string
 #  longitude          :float
