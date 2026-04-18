@@ -38,5 +38,6 @@ Rails.application.routes.draw do
   end
 
   mount PgHero::Engine, at: 'pghero'
+  mount MissionControl::Jobs::Engine, at: '/jobs'
   get '/pages/*page' => 'pages#show'
 end
