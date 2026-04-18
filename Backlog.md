@@ -10,6 +10,20 @@
 
 ## Priority Backlog (Dependency-Ordered)
 
+### 1. Implement Distributed Circuit Breaker for Rate Limiting
+- **Description**: Add a non-blocking locking mechanism to job fetchers to handle HTTP 429 errors gracefully without thread-blocking sleeps.
+- **Acceptance Criteria**:
+  - `ApiGuard` enhanced with `lock_source!` and `source_locked?` methods using `Rails.cache`.
+  - Shared `JobBoards::Client` wrapper implemented to detect `429` errors and trip the breaker.
+  - High-volume fetchers (Lever/Greenhouse) refactored to check lock state before execution.
+  - No `sleep` calls allowed in any fetcher path.
+- **Definition of Done**:
+  - Circuit trips globally for a source when a 429 is encountered.
+  - Subsequent jobs for that source skip execution gracefully while the lock is active.
+  - Isolation verified: Tripping Foo fetcher does not block Bar fetcher.
+  - Integration test demonstrating skip-on-lock behavior.
+- **Labels**: resilience, performance
+
 ### 5. Remove Devise and Simplify Auth
 - **Description**: Replace the heavy Devise stack with `has_secure_password` and HTTP Basic Auth for a single-admin local tool.
 - **Acceptance Criteria**:
