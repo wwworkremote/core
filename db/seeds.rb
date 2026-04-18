@@ -15,6 +15,10 @@ puts '== Seeding Data Sources =='
   puts " - #{source_attrs[:name]} (slug: #{source_attrs[:slug]})"
 end
 
+puts '== Seeding LLM Models =='
+Llm::Registry.sync
+puts " - Models synced from config/models.yml"
+
 puts '== Seeding Admin User =='
 name = slug = ENV.fetch('ADMIN_NAME', 'admin')
 email = ENV.fetch('ADMIN_EMAIL', 'admin@just3ws.com')

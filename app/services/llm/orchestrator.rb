@@ -1,0 +1,80 @@
+# frozen_string_literal: true
+
+module Llm
+  class Orchestrator
+    def self.call(...)
+      new(...).call
+    end
+
+    def initialize(system_rules:, task_instructions:, untrusted_text:, schema: nil, model: nil)
+      @system_rules = system_rules
+      @task_instructions = task_instructions
+      @untrusted_text = untrusted_text
+      @schema = schema
+      @model = model || Llm::Registry.default_model
+    end
+
+    def call
+      tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
+      tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }) do |span|
+        # 1. Inbound Guardrails
+        guardrail_result = Guardrails::Pipeline.call(@untrusted_text)
+        unless guardrail_result.allowed?
+          span.set_attribute('app.guardrails.disposition', 'blocked')
+          return format_failure("Blocked by guardrails: #{guardrail_result.findings.join(', ')}")
+        end
+
+        # 2. Build Prompt
+        prompt = Guardrails::PromptBuilder.new(
+          @system_rules,
+          @task_instructions,
+          guardrail_result.sanitized_text
+        ).call
+
+        # 3. Execution with Potential Escalation
+        begin
+          execute_with_model(@model, prompt, span)
+        rescue StandardError => e
+          Rails.logger.warn "[Orchestrator] Primary model failed: #{e.message}. Escalating..."
+          span.add_event('primary_model_failed', attributes: { 'error' => e.message })
+          
+          fallback_model_id = YAML.load_file(Llm::Registry::CONFIG_PATH).dig('defaults', 'fallback')
+          fallback_model = ::Model.find_by(model_id: fallback_model_id)
+          
+          if fallback_model && fallback_model != @model
+            span.set_attribute('app.llm.escalated', true)
+            execute_with_model(fallback_model, prompt, span)
+          else
+            span.status = OpenTelemetry::Trace::Status.error(e.message)
+            format_failure("Model execution failed and no fallback available: #{e.message}")
+          end
+        end
+      end
+    end
+
+    private
+
+    def execute_with_model(model, prompt, span)
+      span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
+      chat = LlmChat.create!(model: model)
+      response = chat.ask(prompt)
+      span.add_event('received_llm_response')
+
+      text = response.content.is_a?(String) ? response.content : response.content.text
+
+      # 4. Outbound Validation
+      output_guard = Guardrails::OutputValidator.new(text, schema: @schema).call
+      unless output_guard[:valid]
+        span.set_attribute('app.guardrails.output_valid', false)
+        return format_failure("Output validation failed: #{output_guard[:findings].join(', ')}")
+      end
+
+      span.set_attribute('app.guardrails.output_valid', true)
+      { success: true, output: text, model: model.model_id }
+    end
+
+    def format_failure(reason)
+      { success: false, error: reason }
+    end
+  end
+end

@@ -19,70 +19,36 @@ module JobBoards
     end
 
     def call
-      model_id = 'Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf'
-      model = Model.find_by(model_id: model_id, provider: 'ollama')
-      return unless model
+      system_rules = "You are a professional job categorizer. Return ONLY valid JSON."
+      task_instructions = <<~INST
+        Task: Categorize the following job posting.
+        The "category" MUST be exactly one of: #{CATEGORIES.join(', ')}.
+        If unsure, use "Other".
+        The "tags" should be 1-5 technical keywords.
+        Return ONLY valid JSON. No preamble, no explanation.
 
-      # 1. Guardrail Inbound Text
-      guardrail_result = Guardrails::Pipeline.call(@job_posting.body)
-      unless guardrail_result.allowed?
-        Rails.logger.warn "[Categorizer] Job #{@job_posting.id} blocked by guardrails: #{guardrail_result.findings.join(', ')}"
-        return
-      end
+        Expected JSON Format:
+        {"category": "Software Engineering", "tags": ["ruby", "rails"]}
+      INST
 
-      tracer = OpenTelemetry.tracer_provider.tracer('categorizer')
-      tracer.in_span('categorize_job', attributes: { 'app.job_posting.id' => @job_posting.id }) do |span|
-        chat = LlmChat.create!(model: model)
+      result = Llm::Orchestrator.call(
+        system_rules: system_rules,
+        task_instructions: task_instructions,
+        untrusted_text: @job_posting.body&.truncate(3000),
+        schema: { 'category' => String, 'tags' => Array }
+      )
 
-        system_rules = "You are a professional job categorizer. Return ONLY valid JSON."
-        task_instructions = <<~INST
-          Task: Categorize the following job posting.
-          The "category" MUST be exactly one of: #{CATEGORIES.join(', ')}.
-          If unsure, use "Other".
-          The "tags" should be 1-5 technical keywords.
-          Return ONLY valid JSON. No preamble, no explanation.
-
-          Expected JSON Format:
-          {"category": "Software Engineering", "tags": ["ruby", "rails"]}
-        INST
-
-        # Use PromptBuilder for untrusted content
-        prompt = Guardrails::PromptBuilder.new(
-          system_rules,
-          task_instructions,
-          guardrail_result.sanitized_text.truncate(2000)
-        ).call
-
-        span.add_event('sending_llm_request')
-        response = chat.ask(prompt)
-        span.add_event('received_llm_response')
-
-        text = response.content.is_a?(String) ? response.content : response.content.text
-        
-        # 2. Guardrail Outbound Text
-        output_guard = Guardrails::OutputValidator.new(text, schema: { 'category' => String, 'tags' => Array }).call
-        unless output_guard[:valid]
-          span.add_event('output_validation_failed', attributes: { 'app.guardrails.findings' => output_guard[:findings].join(', ') })
-          return
-        end
-
-        parsed = parse_response(text)
-
+      if result[:success]
+        parsed = parse_response(result[:output])
         if parsed
-          span.set_attribute('app.job_posting.category', parsed['category'])
           @job_posting.update(
             tags: parsed['tags'],
             data: @job_posting.data.merge('ai_category' => parsed['category'])
           )
-          span.add_event('categorized', attributes: { 'app.job_posting.category' => parsed['category'] })
-        else
-          span.add_event('parse_failed')
         end
+      else
+        Rails.logger.error "[Categorizer] Orchestrator failed for Job #{@job_posting.id}: #{result[:error]}"
       end
-    rescue StandardError => e
-      Rails.logger.error "[Categorizer] Error for Job #{@job_posting.id}: #{e.message}"
-      OpenTelemetry::Trace.current_span&.record_exception(e)
-      OpenTelemetry::Trace.current_span&.status = OpenTelemetry::Trace::Status.error(e.message)
     end
 
     private

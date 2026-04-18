@@ -1,0 +1,18 @@
+defaults:
+  primary: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf"
+  fallback: "claude-3-5-sonnet-20241022"
+
+models:
+  Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf:
+    name: "Qwen 2.5 Coder 7B (Local)"
+    provider: "ollama"
+    family: "qwen"
+    context_window: 32768
+    max_output_tokens: 2048
+
+  claude-3-5-sonnet-20241022:
+    name: "Claude 3.5 Sonnet"
+    provider: "anthropic"
+    family: "claude"
+    context_window: 200000
+    max_output_tokens: 8192
