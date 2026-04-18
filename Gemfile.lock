@@ -933,7 +933,7 @@ DEPENDENCIES
   standard (~> 1.35)
   stimulus-rails
   strong_migrations
-  tailwindcss-rails (~> 4.0)
+  tailwindcss-rails (~> 4.4)
   thruster
   turbo-rails
   turbo_power

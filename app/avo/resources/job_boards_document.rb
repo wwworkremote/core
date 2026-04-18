@@ -7,7 +7,7 @@ class Avo::Resources::JobBoardsDocument < Avo::BaseResource
   def fields
     field :id, as: :id
     field :signature, as: :text, link_to_record: true
-    field :document, as: :code, language: 'json'
+    field :document, as: :code, language: 'json', theme: 'dracula'
     field :job_boards_source, as: :belongs_to
     field :job_boards_query, as: :belongs_to
   end

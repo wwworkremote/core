@@ -7,11 +7,11 @@ Avo.configure do |config|
 
   config.branding = {
     colors: {
-      background: '#020617', # Deep Indigo-950
-      surface: '#0f172a',    # Slate-900
-      primary: '#8b5cf6'     # Violet-500
+      background: '34 33 44', # Dracula bg (#22212C)
+      surface: '23 22 29',    # Dracula bg_dark (#17161D)
+      primary: '149 128 255'  # Dracula purple (#9580FF)
     },
-    chart_colors: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+    chart_colors: ['#9580FF', '#80FFEA', '#8AFF80', '#FFCA80', '#FF9580']
   }
 
   ## == Authentication ==

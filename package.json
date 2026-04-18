@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "yarn": "^1.22.19"
+  },
+  "scripts": {
+    "avo:tailwindcss": "tailwindcss -i ./app/assets/stylesheets/avo/avo.tailwind.css -o ./app/assets/builds/avo.tailwind.css -c ./config/avo/tailwind.config.js --minify"
   }
 }

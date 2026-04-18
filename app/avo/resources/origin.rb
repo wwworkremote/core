@@ -6,7 +6,7 @@ class Avo::Resources::Origin < Avo::BaseResource
   def fields
     field :id, as: :id
     field :name, as: :text
-    field :data, as: :code
+    field :data, as: :code, theme: 'dracula'
     field :sources, as: :has_many
   end
 end

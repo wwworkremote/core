@@ -60,7 +60,6 @@ gem 'solid_cable'
 gem 'solid_cache'
 gem 'solid_queue'
 gem 'stimulus-rails'
-gem 'tailwindcss-rails', '~> 4.0'
 gem 'thruster'
 gem 'turbo_power'
 gem 'turbo-rails'
@@ -106,3 +105,5 @@ end
 gem 'guard-rspec', '~> 4.7', group: :development
 
 gem 'standard', '~> 1.35', groups: %i[development test]
+
+gem "tailwindcss-rails", "~> 4.4"

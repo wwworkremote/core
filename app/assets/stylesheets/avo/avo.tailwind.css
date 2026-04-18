@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Have all of Avo's custom and plugins styles available. */
+@import '../../../../tmp/avo/avo.base.css';
+
+@config "../../../../config/avo/tailwind.config.js";
