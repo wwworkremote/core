@@ -13,10 +13,10 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gemini-bg text-slate-400 min-h-screen relative overflow-x-hidden pt-28 font-sans antialiased text-sm">
+  <body class="bg-gemini-bg text-slate-400 min-h-screen relative overflow-x-hidden pt-36 font-sans antialiased text-sm">
     <div class="gemini-mesh"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/5 px-6 py-2 flex items-center justify-between">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/5 px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-10">
         <a href="/" class="text-lg font-black tracking-tighter text-white hover:text-violet-400 transition-colors">
           WWWork<span class="text-violet-500">Remote</span>
@@ -62,7 +62,7 @@
       </div>
     </nav>
 
-    <main class="max-w-[1600px] mx-auto px-6 animate-fade-in pb-10">
+    <main class="max-w-[1600px] mx-auto px-10 animate-fade-in pb-16">
       <% if notice.present? %>
         <div class="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-xs font-bold flex items-center gap-3">
           <%= heroicon "check-circle", variant: :solid, options: { class: "w-4 h-4" } %> <%= notice %>

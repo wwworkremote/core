@@ -46,7 +46,7 @@
 
 @layer base {
   body {
-    @apply font-inter bg-slate-800 text-slate-300 min-h-screen relative overflow-x-hidden pt-28 text-sm;
+    @apply font-inter bg-slate-800 text-slate-300 min-h-screen relative overflow-x-hidden pt-36 text-sm;
     -webkit-font-smoothing: antialiased;
   }
 }
