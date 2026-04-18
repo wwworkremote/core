@@ -1,53 +1,43 @@
-<div class="row mb-5 align-items-center">
-  <div class="col-md-8">
-    <h1 class="display-3 fw-bold sparkle-ai">Intelligence Dashboard</h1>
-    <p class="lead text-muted">Real-time job market aggregation and AI synthesis.</p>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+  <div>
+    <h1 class="text-5xl font-black tracking-tight sparkle-ai mb-3">Intelligence Dashboard</h1>
+    <p class="text-slate-400 text-lg">Real-time job market aggregation and neural synthesis.</p>
   </div>
-  <div class="col-md-4 text-md-end">
-    <%= link_to "System Control", data_fetchers_path, class: "btn btn-primary shadow-lg" %>
-  </div>
-</div>
-
-<h2 class="h4 mb-4 opacity-75">Aggregation Flow</h2>
-<div class="row g-4 mb-5">
-  <div class="col-md-4">
-    <div class="card glass text-center h-100">
-      <div class="card-body p-4">
-        <div class="display-4 fw-extrabold mb-2 text-primary">
-          <%= Source.where(created_at: 1.hour.ago..).count %>
-        </div>
-        <div class="text-muted small text-uppercase tracking-wider">past hour</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card glass text-center h-100">
-      <div class="card-body p-4">
-        <div class="display-4 fw-extrabold mb-2 text-primary">
-          <%= Source.where(created_at: 1.day.ago..).count %>
-        </div>
-        <div class="text-muted small text-uppercase tracking-wider">past day</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card glass text-center h-100">
-      <div class="card-body p-4">
-        <div class="display-4 fw-extrabold mb-2 text-primary">
-          <%= Source.where(created_at: 1.week.ago..).count %>
-        </div>
-        <div class="text-muted small text-uppercase tracking-wider">past week</div>
-      </div>
-    </div>
+  <div>
+    <%= link_to data_fetchers_path, class: "btn-neural inline-flex items-center gap-2" do %>
+      <i class="bi bi-gear-fill"></i> System Control
+    <% end %>
   </div>
 </div>
 
-<div class="card glass border-0 mb-5 overflow-hidden">
-  <div class="card-header border-0 bg-transparent py-4">
-    <h3 class="h5 mb-0 px-2 opacity-75">Source Ingestion Velocity</h3>
+<section class="mb-16">
+  <div class="flex items-center gap-3 mb-6 opacity-60">
+    <div class="h-px flex-1 bg-white/10"></div>
+    <h2 class="text-xs font-bold uppercase tracking-[0.2em]">Aggregation Flow</h2>
+    <div class="h-px flex-1 bg-white/10"></div>
   </div>
-  <div class="card-body p-0">
-    <div class="px-4 pb-4">
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <% [
+      { label: "Past Hour", count: Source.where(created_at: 1.hour.ago..).count },
+      { label: "Past Day", count: Source.where(created_at: 1.day.ago..).count },
+      { label: "Past Week", count: Source.where(created_at: 1.week.ago..).count }
+    ].each do |metric| %>
+      <div class="card-neural p-8 text-center">
+        <div class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 mb-2">
+          <%= metric[:count] %>
+        </div>
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest"><%= metric[:label] %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card-neural mt-8 overflow-hidden">
+    <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-slate-300">Source Ingestion Velocity</h3>
+      <span class="text-[10px] bg-violet-500/10 text-violet-400 px-2 py-1 rounded-md uppercase font-bold">Live Feed</span>
+    </div>
+    <div class="p-6">
       <%= line_chart(charts_data_sources_path(days: 21), 
           discrete: true, 
           label: 'Created', 
@@ -56,55 +46,43 @@
           colors: ["#8b5cf6"],
           library: { 
             scales: { 
-              y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#94a3b8" } },
-              x: { grid: { display: false }, ticks: { color: "#94a3b8" } }
+              y: { grid: { color: "rgba(255,255,255,0.03)" }, ticks: { color: "#475569", font: { size: 10 } } },
+              x: { grid: { display: false }, ticks: { color: "#475569", font: { size: 10 } } }
             },
             plugins: { legend: { display: false } }
           }) %>
     </div>
   </div>
-</div>
+</section>
 
-<h2 class="h4 mb-4 opacity-75">Market Intel</h2>
-<div class="row g-4 mb-5">
-  <div class="col-md-4">
-    <div class="card glass text-center h-100">
-      <div class="card-body p-4">
-        <div class="display-4 fw-extrabold mb-2 text-info">
-          <%= JobPosting.where(published_at: 1.hour.ago..).count %>
-        </div>
-        <div class="text-muted small text-uppercase tracking-wider">past hour</div>
-      </div>
-    </div>
+<section>
+  <div class="flex items-center gap-3 mb-6 opacity-60">
+    <div class="h-px flex-1 bg-white/10"></div>
+    <h2 class="text-xs font-bold uppercase tracking-[0.2em]">Market Intelligence</h2>
+    <div class="h-px flex-1 bg-white/10"></div>
   </div>
-  <div class="col-md-4">
-    <div class="card glass text-center h-100">
-      <div class="card-body p-4">
-        <div class="display-4 fw-extrabold mb-2 text-info">
-          <%= JobPosting.where(published_at: 1.day.ago..).count %>
-        </div>
-        <div class="text-muted small text-uppercase tracking-wider">past day</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card glass text-center h-100">
-      <div class="card-body p-4">
-        <div class="display-4 fw-extrabold mb-2 text-info">
-          <%= JobPosting.where(published_at: 1.week.ago..).count %>
-        </div>
-        <div class="text-muted small text-uppercase tracking-wider">past week</div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="card glass border-0 mb-5 overflow-hidden">
-  <div class="card-header border-0 bg-transparent py-4">
-    <h3 class="h5 mb-0 px-2 opacity-75">Market Publication Volume</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <% [
+      { label: "New Signals", count: JobPosting.where(published_at: 1.hour.ago..).count, color: "from-blue-400 to-blue-600" },
+      { label: "Daily Volume", count: JobPosting.where(published_at: 1.day.ago..).count, color: "from-blue-400 to-blue-600" },
+      { label: "Weekly Growth", count: JobPosting.where(published_at: 1.week.ago..).count, color: "from-blue-400 to-blue-600" }
+    ].each do |metric| %>
+      <div class="card-neural p-8 text-center">
+        <div class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-600 mb-2">
+          <%= metric[:count] %>
+        </div>
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest"><%= metric[:label] %></div>
+      </div>
+    <% end %>
   </div>
-  <div class="card-body p-0">
-    <div class="px-4 pb-4">
+
+  <div class="card-neural mt-8 overflow-hidden">
+    <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-slate-300">Market Publication Volume</h3>
+      <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md uppercase font-bold">Neural Scan</span>
+    </div>
+    <div class="p-6">
       <%= line_chart(charts_data_job_postings_path(days: 21), 
           discrete: true, 
           label: 'Published', 
@@ -113,11 +91,11 @@
           colors: ["#3b82f6"],
           library: { 
             scales: { 
-              y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#94a3b8" } },
-              x: { grid: { display: false }, ticks: { color: "#94a3b8" } }
+              y: { grid: { color: "rgba(255,255,255,0.03)" }, ticks: { color: "#475569", font: { size: 10 } } },
+              x: { grid: { display: false }, ticks: { color: "#475569", font: { size: 10 } } }
             },
             plugins: { legend: { display: false } }
           }) %>
     </div>
   </div>
-</div>
+</section>

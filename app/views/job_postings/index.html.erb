@@ -1,60 +1,64 @@
-<div class="row mb-5 align-items-center">
-  <div class="col-md-7">
-    <h1 class="display-4 fw-bold sparkle-ai">Remote Job Market</h1>
-    <p class="text-muted lead">Aggregated signals from across the ecosystem.</p>
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
+  <div class="max-w-2xl">
+    <h1 class="text-5xl font-black tracking-tight sparkle-ai mb-3 text-white">Remote Job Market</h1>
+    <p class="text-slate-400 text-lg">Real-time signals aggregated from across the global ecosystem.</p>
   </div>
-  <div class="col-md-5">
-    <div class="card glass border-0 p-2 shadow-lg">
-      <%= form_with url: job_postings_path, method: :get, class: "d-flex" do |f| %>
-        <%= f.text_field :q, value: @query, placeholder: "Query intelligence...", class: "form-control bg-transparent border-0 text-white shadow-none ps-3", style: "caret-color: var(--gemini-accent);" %>
-        <%= f.submit "Analyze", class: "btn btn-primary rounded-pill px-4" %>
+  
+  <div class="w-full lg:max-w-md">
+    <div class="glass p-1.5 rounded-2xl shadow-2xl flex items-center group focus-within:ring-2 focus-within:ring-violet-500/50 transition-all">
+      <%= form_with url: job_postings_path, method: :get, class: "flex w-full" do |f| %>
+        <%= f.text_field :q, value: @query, 
+            placeholder: "Filter intelligence...", 
+            class: "flex-1 bg-transparent border-0 text-white placeholder:text-slate-500 px-4 py-2 focus:ring-0 text-sm",
+            style: "caret-color: var(--color-gemini-accent);" %>
+        <%= f.submit "Analyze", class: "btn-neural !px-5 !py-2 !text-sm !rounded-xl" %>
       <% end %>
     </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col">
-    <% if @job_postings.any? %>
-      <div class="list-group list-group-flush gap-3">
-        <% @job_postings.each do |job| %>
-          <%= link_to job_posting_path(job), class: "card glass list-group-item-action border-0 p-4 text-decoration-none transition-all" do %>
-            <div class="row align-items-center">
-              <div class="col-md-8">
-                <h4 class="h5 mb-1 text-white fw-bold"><%= job.title %></h4>
-                <p class="mb-2 text-primary opacity-75 fw-medium"><%= job.company %></p>
-                <% if job.location.present? %>
-                  <div class="d-flex align-items-center text-muted small">
-                    <i class="bi bi-geo-alt me-2 text-accent"></i>
-                    <%= job.location %>
-                  </div>
-                <% end %>
-              </div>
-              <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <div class="mb-2">
-                  <span class="badge gemini-pill"><%= job.source.try(:origin)&.name || 'External' %></span>
+<div class="space-y-4">
+  <% if @job_postings.any? %>
+    <div class="grid gap-4">
+      <% @job_postings.each do |job| %>
+        <%= link_to job_posting_path(job), class: "card-neural p-6 group block no-underline" do %>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex-1">
+              <h4 class="text-xl font-bold text-white group-hover:text-violet-400 transition-colors mb-1"><%= job.title %></h4>
+              <p class="text-blue-400 font-semibold text-sm mb-3 tracking-wide"><%= job.company %></p>
+              
+              <% if job.location.present? %>
+                <div class="flex items-center text-slate-400 text-xs font-medium gap-2">
+                  <i class="bi bi-geo-alt text-violet-500"></i>
+                  <%= job.location %>
                 </div>
-                <div class="text-muted small">
-                  <%= time_ago_in_words(job.published_at) if job.published_at %> ago
-                </div>
+              <% end %>
+            </div>
+
+            <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3">
+              <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300">
+                <%= job.source.try(:origin)&.name || 'Network' %>
+              </span>
+              <div class="text-slate-500 text-[11px] font-medium">
+                <%= time_ago_in_words(job.published_at) if job.published_at %> ago
               </div>
             </div>
-          <% end %>
+          </div>
         <% end %>
-      </div>
+      <% end %>
+    </div>
 
-      <div class="mt-5 d-flex justify-content-center">
-        <%= paginate @job_postings %>
+    <div class="mt-12 py-8 flex justify-center border-t border-white/5">
+      <%= paginate @job_postings, window: 2 %>
+    </div>
+  <% else %>
+    <div class="card-neural py-20 text-center max-w-xl mx-auto">
+      <div class="bg-slate-800/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
+        <i class="bi bi-search text-3xl text-slate-600"></i>
       </div>
-    <% else %>
-      <div class="card glass border-0 py-5 text-center shadow-lg">
-        <div class="card-body">
-          <i class="bi bi-search display-1 text-muted opacity-25 mb-4 d-block"></i>
-          <h3 class="fw-bold">No intelligence found</h3>
-          <p class="text-muted">No signals matching your query were detected in the current corpus.</p>
-          <%= link_to "Clear filters", job_postings_path, class: "btn btn-outline-primary btn-sm mt-3" %>
-        </div>
-      </div>
-    <% end %>
-  </div>
+      <h3 class="text-2xl font-bold text-white mb-2">No signals detected</h3>
+      <p class="text-slate-500 mb-8 px-8">No job intelligence matching your current filters was found in the neural corpus.</p>
+      <%= link_to "Reset All Filters", job_postings_path, class: "text-violet-400 hover:text-violet-300 font-bold text-sm underline underline-offset-8 transition-all" %>
+    </div>
+  <% end %>
 </div>

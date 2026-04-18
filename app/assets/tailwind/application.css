@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gemini-bg: #020617;
+  --color-gemini-surface: rgba(15, 23, 42, 0.7);
+  --color-gemini-accent: #8b5cf6;
+  --color-gemini-glow: #3b82f6;
+  --color-gemini-border: rgba(255, 255, 255, 0.1);
+  
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply font-inter bg-gemini-bg text-slate-50 min-h-screen relative overflow-x-hidden pt-24;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .gemini-mesh {
+    @apply fixed inset-0 -z-10;
+    background: 
+      radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(2, 6, 23, 1) 0px, transparent 100%);
+    filter: contrast(120%);
+  }
+
+  .glass {
+    @apply bg-gemini-surface backdrop-blur-xl border border-gemini-border shadow-2xl;
+  }
+
+  .btn-neural {
+    @apply px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 
+           bg-gradient-to-br from-violet-500 to-blue-600 text-white
+           hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:-translate-y-0.5 active:scale-95;
+  }
+
+  .card-neural {
+    @apply glass rounded-3xl transition-all duration-300 overflow-hidden
+           hover:border-violet-500/40 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(139,92,246,0.1)];
+  }
+
+  .sparkle-ai {
+    @apply relative inline-block;
+  }
+
+  .sparkle-ai::after {
+    content: "✦";
+    @apply absolute -top-2 -right-3 text-violet-400 text-sm animate-pulse;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
