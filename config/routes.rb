@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   resources :data_fetchers, only: [:index] do
     collection do
       post :run
+      post :audit
     end
   end
 

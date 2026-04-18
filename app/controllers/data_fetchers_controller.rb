@@ -21,4 +21,10 @@ class DataFetchersController < ApplicationController
 
     redirect_to data_fetchers_path
   end
+
+  def audit
+    JobBoards::AuditJob.perform_later
+    flash[:notice] = 'Audit and repair job has been enqueued.'
+    redirect_to data_fetchers_path
+  end
 end

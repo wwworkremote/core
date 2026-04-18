@@ -1,5 +1,12 @@
 <h2>Data Fetchers</h2>
 
+<div class="mb-3 d-flex gap-2">
+  <%= button_to "Audit & Repair System", audit_data_fetchers_path,
+      method: :post,
+      class: "btn btn-warning",
+      data: { turbo_confirm: "This will check for missing postings, categories, and embeddings. Proceed?" } %>
+</div>
+
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>
