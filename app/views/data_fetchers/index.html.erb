@@ -1,61 +1,86 @@
-<h2>Data Fetchers</h2>
-
-<div class="mb-3 d-flex gap-2">
-  <%= button_to "Audit & Repair System", audit_data_fetchers_path,
-      method: :post,
-      class: "btn btn-warning",
-      data: { turbo_confirm: "This will check for missing postings, categories, and embeddings. Proceed?" } %>
+<div class="row mb-5 align-items-center">
+  <div class="col-md-7">
+    <h1 class="display-4 fw-bold sparkle-ai">Intelligence Ingestion</h1>
+    <p class="text-muted lead">Manage and monitor the data aggregation signals.</p>
+  </div>
+  <div class="col-md-5 text-md-end">
+    <%= button_to audit_data_fetchers_path,
+        method: :post,
+        class: "btn btn-primary shadow-lg px-4 py-2 rounded-pill",
+        data: { turbo_confirm: "This will check for missing postings, categories, and embeddings. Proceed?" } do %>
+      <i class="bi bi-shield-check me-2"></i> Audit & Repair System
+    <% end %>
+  </div>
 </div>
 
-<div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Last Fetched</th>
-        <th>Cooldown</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @fetchers.each do |fetcher| %>
-        <tr>
-          <td><strong><%= fetcher[:name] %></strong></td>
-          <td>
-            <% if fetcher[:last_fetched_at] %>
-              <%= time_ago_in_words(fetcher[:last_fetched_at]) %> ago
-            <% else %>
-              Never
-            <% end %>
-          </td>
-          <td><%= distance_of_time_in_words(fetcher[:cooldown]) %></td>
-          <td>
-            <% if fetcher[:can_fetch] %>
-              <span class="badge bg-success">Ready</span>
-            <% else %>
-              <span class="badge bg-warning text-dark">
-                Cooling down (<%= distance_of_time_in_words(fetcher[:time_until_reset]) %> left)
-              </span>
-            <% end %>
-          </td>
-          <td>
-            <div class="btn-group" role="group">
-              <%= button_to "Run", run_data_fetchers_path(slug: fetcher[:slug]),
-                  method: :post,
-                  class: "btn btn-sm #{fetcher[:can_fetch] ? 'btn-primary' : 'btn-secondary'}",
-                  disabled: !fetcher[:can_fetch] %>
+<div class="card glass border-0 shadow-lg overflow-hidden mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="bg-white bg-opacity-5">
+          <tr>
+            <th class="px-4 py-3 text-muted small text-uppercase">Provider</th>
+            <th class="px-4 py-3 text-muted small text-uppercase">Last Signal</th>
+            <th class="px-4 py-3 text-muted small text-uppercase">Cooldown Cycle</th>
+            <th class="px-4 py-3 text-muted small text-uppercase">Interface Status</th>
+            <th class="px-4 py-3 text-end text-muted small text-uppercase">Control</th>
+          </tr>
+        </thead>
+        <tbody class="border-top-0">
+          <% @fetchers.each do |fetcher| %>
+            <tr class="border-bottom border-white border-opacity-5">
+              <td class="align-middle px-4 py-4">
+                <strong class="text-white fs-5"><%= fetcher[:name] %></strong>
+              </td>
+              <td class="align-middle px-4 py-4">
+                <% if fetcher[:last_fetched_at] %>
+                  <span class="text-white opacity-75"><%= time_ago_in_words(fetcher[:last_fetched_at]) %> ago</span>
+                <% else %>
+                  <span class="text-muted fst-italic">No signals recorded</span>
+                <% end %>
+              </td>
+              <td class="align-middle px-4 py-4">
+                <span class="text-white opacity-50"><%= distance_of_time_in_words(fetcher[:cooldown]) %></span>
+              </td>
+              <td class="align-middle px-4 py-4">
+                <% if fetcher[:can_fetch] %>
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill">
+                    <i class="bi bi-check2-circle me-1"></i> Ready
+                  </span>
+                <% else %>
+                  <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill">
+                    <i class="bi bi-clock-history me-1"></i> <%= distance_of_time_in_words(fetcher[:time_until_reset]) %> reset
+                  </span>
+                <% end %>
+              </td>
+              <td class="align-middle px-4 py-4 text-end">
+                <div class="d-flex justify-content-end gap-2">
+                  <%= button_to run_data_fetchers_path(slug: fetcher[:slug]),
+                      method: :post,
+                      class: "btn btn-sm #{fetcher[:can_fetch] ? 'btn-primary' : 'btn-outline-secondary opacity-25 px-3'}",
+                      disabled: !fetcher[:can_fetch] do %>
+                    Run
+                  <% end %>
 
-              <%= button_to "Force", run_data_fetchers_path(slug: fetcher[:slug], force: true),
-                  method: :post,
-                  class: "btn btn-sm btn-outline-danger",
-                  data: { turbo_confirm: "Are you sure you want to force a fetch for #{fetcher[:name]}?" } %>
-            </div>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+                  <%= button_to run_data_fetchers_path(slug: fetcher[:slug], force: true),
+                      method: :post,
+                      form: { class: "d-inline" },
+                      class: "btn btn-sm btn-outline-danger px-3",
+                      data: { turbo_confirm: "Force signal ingestion for #{fetcher[:name]}?" } do %>
+                    Force
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
-<%= link_to "Back to Dashboard", root_path, class: "btn btn-secondary mt-3" %>
+<div class="mt-4">
+  <%= link_to root_path, class: "btn btn-link text-muted text-decoration-none p-0" do %>
+    <i class="bi bi-arrow-left me-2"></i> Return to Dashboard
+  <% end %>
+</div>

@@ -142,18 +142,48 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--gemini-text);
 }
 
+.table {
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--gemini-text) !important;
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.05) !important;
+  --bs-table-border-color: var(--gemini-border) !important;
+  color: var(--gemini-text) !important;
+}
+
 .btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-  border: none;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6) !important;
+  border: none !important;
+  color: white !important;
   font-weight: 600;
   padding: 0.6rem 1.5rem;
   border-radius: 10px;
   transition: all 0.2s;
   
   &:hover {
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
     transform: translateY(-1px);
+    opacity: 0.9;
   }
+
+  &:disabled {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+  }
+}
+
+.btn-outline-danger {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  color: #ef4444 !important;
+  &:hover {
+    background: #ef4444 !important;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+  }
+}
+
+.btn-outline-secondary {
+  border-color: var(--gemini-border) !important;
+  color: var(--gemini-text-muted) !important;
 }
 
 // Gemini Footer
