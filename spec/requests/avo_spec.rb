@@ -15,6 +15,11 @@ RSpec.describe 'Avo Resources', type: :request do
   end
 
   describe 'Job Boards Resources' do
+    it 'loads job_postings' do
+      get '/avo/resources/job_postings', headers: auth_headers
+      expect(response).to have_http_status(:ok)
+    end
+
     it 'loads job_boards_sources' do
       get '/avo/resources/job_boards_sources', headers: auth_headers
       expect(response).to have_http_status(:ok)

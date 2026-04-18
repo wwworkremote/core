@@ -25,12 +25,12 @@ module Avo
           error: 'Sales',
           info: 'Software Engineering',
           neutral: 'Other'
-        } do |model|
-          model.data['ai_category']
+        } do |record|
+          record&.data&.[]('ai_category')
         end
 
-        field :found_by_terms, as: :tags, hide_on: :index do |model|
-          model.data['found_by_terms']
+        field :found_by_terms, as: :tags, hide_on: :index do |record|
+          record&.data&.[]('found_by_terms')
         end
 
         field :published_at, as: :date_time, name: 'Posted'
