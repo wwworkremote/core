@@ -24,8 +24,8 @@ module JobBoards
         map_attributes(jp, data, source.slug)
         jp.save!
 
-        Categorizer.new(jp).call
-        Embedder.new(jp).call
+        JobBoards::Categorizer.new(jp).call
+        JobBoards::Embedder.new(jp).call
       end
     end
 

@@ -24,7 +24,7 @@ module HackerNews
 
       signature = Digest::SHA256.hexdigest("hn-#{jobstory_id}")
 
-      JobBoards::Document.find_or_create_by!(signature: signature) do |doc|
+      JobBoards::Document.create_or_find_by!(signature: signature) do |doc|
         doc.source_id = source_id
         doc.job_boards_query_id = query_id
         doc.document = data.to_json

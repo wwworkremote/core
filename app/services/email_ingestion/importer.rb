@@ -83,7 +83,7 @@ module EmailIngestion
         fetch_mode: fetch_result[:fetch_mode]
       )
 
-      JobBoards::Document.find_or_create_by!(signature: signature) do |doc|
+      JobBoards::Document.create_or_find_by!(signature: signature) do |doc|
         doc.source_id = source.id
         doc.job_boards_query_id = query.id
         doc.document = enriched_data.to_json

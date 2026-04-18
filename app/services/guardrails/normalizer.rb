@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+module Guardrails
+  class Normalizer
+    def initialize(text)
+      @text = text.to_s
+    end
+
+    def call
+      return '' if @text.blank?
+
+      # 1. Normalize encoding
+      normalized = @text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+
+      # 2. Replace null bytes with space (to prevent joining words)
+      normalized.gsub!("\u0000", ' ')
+
+      # 3. Collapse pathological whitespace
+      # First collapse spaces
+      normalized.gsub!(/[ \t]{2,}/, ' ')
+      
+      # Then collapse excessive newlines (more than 2 -> 2)
+      normalized.gsub!(/\n{3,}/, "\n\n")
+
+      normalized.strip
+    end
+  end
+end
