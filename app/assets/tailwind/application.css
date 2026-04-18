@@ -1,126 +1,37 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 @theme {
-  /* Dracula Pro Palette Overrides for standard Tailwind colors */
-  --color-slate-900: #17161D; /* bg_dark */
-  --color-slate-800: #22212C; /* bg */
-  --color-slate-700: #454158; /* bg_light */
-  --color-slate-600: #504C67; /* gray_light */
-  --color-slate-500: #7970A9; /* gray */
-  --color-slate-400: #C6C6C2; /* fg_dark */
-  --color-slate-300: #F8F8F2; /* fg */
-  --color-slate-200: #FFFFFF; /* fg_light */
-  --color-slate-50:  #FFFFFF; /* fg_light */
-  
-  --color-violet-600: #9580FF; /* purple */
-  --color-violet-500: #9580FF; 
-  --color-violet-400: #9580FF;
-  --color-violet-300: #9580FF;
-  
-  --color-blue-600: #80FFEA; /* cyan */
-  --color-blue-500: #80FFEA;
-  --color-blue-400: #80FFEA;
-  --color-blue-300: #80FFEA;
-
-  --color-emerald-600: #8AFF80; /* green */
-  --color-emerald-500: #8AFF80; 
-  --color-emerald-400: #8AFF80;
-  
-  --color-amber-600: #FFCA80; /* orange */
-  --color-amber-500: #FFCA80; 
-  --color-amber-400: #FFCA80;
-  
-  --color-rose-600: #FF9580; /* red */
-  --color-rose-500: #FF9580; 
-  --color-rose-400: #FF9580;
-
-  /* Maintain existing custom variables but map to Dracula */
-  --color-gemini-bg: #22212C; /* bg */
-  --color-gemini-surface: rgba(69, 65, 88, 0.7); /* bg_light with alpha */
-  --color-gemini-accent: #9580FF; /* purple */
-  --color-gemini-glow: #80FFEA; /* cyan */
-  --color-gemini-border: rgba(248, 248, 242, 0.1); /* fg with alpha */
+  /* Design Tokens */
+  --color-gemini-bg: #282a36; /* Dracula Background */
+  --color-gemini-surface: #44475a; /* Dracula Current Line */
+  --color-gemini-accent: #bd93f9; /* Dracula Purple */
+  --color-gemini-glow: #8be9fd; /* Dracula Cyan */
+  --color-gemini-border: rgba(248, 248, 242, 0.1);
   
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
   body {
-    @apply font-inter bg-slate-800 text-slate-300 min-h-screen relative overflow-x-hidden pt-36 text-sm;
+    @apply font-inter bg-base-300 text-base-content min-h-screen relative overflow-x-hidden pt-36 text-sm;
     -webkit-font-smoothing: antialiased;
   }
 }
 
 @layer components {
-  /* ... existing components ... */
-  
-  /* Markdown Typography */
-  .prose-invert {
-    @apply text-slate-300;
-  }
-  .prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4 {
-    @apply text-white font-bold mt-8 mb-4 tracking-tight;
-  }
-  .prose-invert h1 { @apply text-2xl; }
-  .prose-invert h2 { @apply text-xl border-b border-white/10 pb-2; }
-  .prose-invert p { @apply mb-4 leading-relaxed; }
-  .prose-invert ul { @apply list-disc list-outside ml-5 mb-4 space-y-1; }
-  .prose-invert ol { @apply list-decimal list-outside ml-5 mb-4 space-y-1; }
-  .prose-invert li { @apply pl-1; }
-  .prose-invert a {
-    @apply text-violet-400 hover:text-violet-300 underline underline-offset-4 decoration-violet-500/50 transition-colors;
-  }
-  .prose-invert strong { @apply font-bold text-white; }
-  .prose-invert blockquote {
-    @apply border-l-4 border-violet-500/50 pl-4 py-1 italic text-slate-400 bg-slate-900/30 rounded-r;
-  }
-  .prose-invert code {
-    @apply font-mono text-[0.9em] bg-slate-900 px-1.5 py-0.5 rounded border border-white/5 text-emerald-400;
-  }
-  .prose-invert pre {
-    @apply bg-slate-900 p-4 rounded-xl border border-white/10 overflow-x-auto mb-4;
-  }
-  .prose-invert pre code {
-    @apply bg-transparent p-0 border-0 text-slate-300;
-  }
-
-  /* Kaminari Pagination Overrides */
-  .pagination {
-    @apply flex flex-wrap items-center justify-center gap-2;
-  }
-  .pagination .page, .pagination .next, .pagination .prev, .pagination .first, .pagination .last {
-    @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 rounded-lg font-bold text-sm transition-all duration-150;
-  }
-  .pagination a {
-    @apply bg-slate-800/80 text-slate-400 border border-white/10 hover:bg-violet-500/20 hover:text-violet-400 hover:border-violet-500/30;
-  }
-  .pagination .current {
-    @apply bg-violet-600/20 text-violet-400 border border-violet-500/50 shadow-[0_0_10px_rgba(139,92,246,0.2)];
-  }
-  .pagination .gap {
-    @apply text-slate-500 font-bold px-2;
-  }
-
+  /* DaisyUI Overrides or Custom Extras */
   .gemini-mesh {
-    @apply fixed inset-0 -z-10 opacity-40;
+    @apply fixed inset-0 -z-10 opacity-30;
     background: 
-      radial-gradient(at 0% 0%, rgba(149, 128, 255, 0.15) 0px, transparent 40%),
-      radial-gradient(at 100% 100%, rgba(128, 255, 234, 0.15) 0px, transparent 40%),
-      radial-gradient(at 50% 50%, #17161D 0px, transparent 100%);
+      radial-gradient(at 0% 0%, rgba(189, 147, 249, 0.1) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, rgba(139, 233, 253, 0.1) 0px, transparent 40%),
+      radial-gradient(at 50% 50%, #282a36 0px, transparent 100%);
   }
 
-  .glass {
-    @apply bg-slate-900/80 backdrop-blur-md border border-white/5 shadow-xl;
-  }
-
-  .btn-neural {
-    @apply px-4 py-1.5 rounded-lg font-bold transition-all duration-150 
-           bg-slate-700 text-slate-200 border border-white/10
-           hover:bg-slate-600 hover:border-violet-500/50 active:scale-95 text-xs uppercase tracking-wider;
-  }
-
-  .card-neural {
-    @apply bg-slate-900/60 backdrop-blur-md shadow-xl rounded-xl border border-white/5 overflow-hidden;
+  /* Glassmorphism using DaisyUI semantics */
+  .glass-neural {
+    @apply bg-opacity-60 backdrop-blur-md border border-white/5 shadow-xl;
   }
 
   .sparkle-ai {
@@ -129,7 +40,7 @@
 
   .sparkle-ai::after {
     content: "✦";
-    @apply absolute -top-2 -right-3 text-violet-400 text-sm animate-pulse;
+    @apply absolute -top-2 -right-3 text-secondary text-sm animate-pulse;
   }
 }
 

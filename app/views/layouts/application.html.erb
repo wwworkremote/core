@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dracula">
   <head>
-    <title>WWWorkRemote | System Admin</title>
+    <title>WWWorkRemote | Admin</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -13,72 +13,63 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gemini-bg text-slate-400 min-h-screen relative overflow-x-hidden pt-36 font-sans antialiased text-sm">
+  <body class="min-h-screen font-sans antialiased text-sm">
     <div class="gemini-mesh"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/5 px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-10">
-        <a href="/" class="text-lg font-black tracking-tighter text-white hover:text-violet-400 transition-colors">
-          WWWork<span class="text-violet-500">Remote</span>
-        </a>
-        
-        <div class="hidden md:flex items-center gap-2">
-          <%= link_to root_path, class: "px-3 py-1.5 rounded-md hover:bg-white/5 transition-colors font-semibold text-slate-300 flex items-center gap-2" do %>
-            <%= heroicon "chart-bar", variant: :outline, options: { class: "w-4 h-4" } %> Dashboard
-          <% end %>
-          <%= link_to job_postings_path, class: "px-3 py-1.5 rounded-md hover:bg-white/5 transition-colors font-semibold text-slate-300 flex items-center gap-2" do %>
-            <%= heroicon "briefcase", variant: :outline, options: { class: "w-4 h-4" } %> Job Market
-          <% end %>
-          <%= link_to llm_chats_path, class: "px-3 py-1.5 rounded-md hover:bg-white/5 transition-colors font-semibold text-slate-300 flex items-center gap-2" do %>
-            <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "w-4 h-4" } %> Neural Dialogues
-          <% end %>
-          <%= link_to models_path, class: "px-3 py-1.5 rounded-md hover:bg-white/5 transition-colors font-semibold text-slate-300 flex items-center gap-2" do %>
-            <%= heroicon "cpu-chip", variant: :outline, options: { class: "w-4 h-4" } %> Model Registry
-          <% end %>
+    <!-- DaisyUI Navbar -->
+    <div class="fixed top-0 left-0 right-0 z-50 px-6 pt-4">
+      <div class="navbar bg-base-100/80 backdrop-blur-md border border-white/5 rounded-2xl shadow-xl max-w-[1600px] mx-auto">
+        <div class="navbar-start">
+          <a href="/" class="btn btn-ghost text-xl font-black tracking-tighter normal-case">
+            WWWork<span class="text-primary">Remote</span>
+          </a>
         </div>
-      </div>
+        
+        <div class="navbar-center hidden lg:flex">
+          <ul class="menu menu-horizontal px-1 gap-1">
+            <li><%= link_to 'Dashboard', root_path, class: "font-bold uppercase tracking-wider text-[11px]" %></li>
+            <li><%= link_to 'Job Market', job_postings_path, class: "font-bold uppercase tracking-wider text-[11px]" %></li>
+            <li><%= link_to 'Neural Dialogues', llm_chats_path, class: "font-bold uppercase tracking-wider text-[11px]" %></li>
+            <li><%= link_to 'Model Registry', models_path, class: "font-bold uppercase tracking-wider text-[11px]" %></li>
+          </ul>
+        </div>
 
-      <div class="flex items-center gap-4">
-        <div class="relative group">
-          <button class="px-3 py-1.5 rounded-md bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all font-bold text-xs uppercase tracking-widest text-slate-300 flex items-center gap-2">
-            System <%= heroicon "chevron-down", variant: :outline, options: { class: "w-3 h-3" } %>
-          </button>
-          <div class="absolute right-0 top-full mt-1 w-52 glass rounded-lg overflow-hidden shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-1">
-            <%= link_to data_fetchers_path, class: "flex items-center px-4 py-2 hover:bg-violet-500/10 transition-colors gap-3 text-xs font-bold uppercase tracking-wider text-slate-300" do %>
-              <%= heroicon "cloud-arrow-down", variant: :outline, options: { class: "w-4 h-4 opacity-50" } %> Data Fetchers
-            <% end %>
-            <%= link_to '/jobs', class: "flex items-center px-4 py-2 hover:bg-violet-500/10 transition-colors gap-3 text-xs font-bold uppercase tracking-wider text-slate-300" do %>
-              <%= heroicon "bolt", variant: :outline, options: { class: "w-4 h-4 opacity-50" } %> Background Jobs
-            <% end %>
-            <div class="border-t border-white/5 my-1"></div>
-            <%= link_to admin_root_path, class: "flex items-center px-4 py-2 hover:bg-violet-500/10 transition-colors gap-3 text-xs font-bold uppercase tracking-wider text-slate-300" do %>
-              <%= heroicon "shield-check", variant: :outline, options: { class: "w-4 h-4 opacity-50" } %> Admin
-            <% end %>
-            <%= link_to '/pghero', class: "flex items-center px-4 py-2 hover:bg-violet-500/10 transition-colors gap-3 text-xs font-bold uppercase tracking-wider text-slate-300" do %>
-              <%= heroicon "server", variant: :outline, options: { class: "w-4 h-4 opacity-50" } %> PgHero
-            <% end %>
+        <div class="navbar-end gap-2">
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-sm rounded-lg flex items-center gap-2 uppercase tracking-widest text-[10px] font-black">
+              System <%= heroicon "chevron-down", variant: :outline, options: { class: "w-3 h-3" } %>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-2xl bg-base-200 rounded-xl w-52 border border-white/5">
+              <li><%= link_to data_fetchers_path do %><%= heroicon "cloud-arrow-down", options: { class: "w-4 h-4" } %> Data Fetchers<% end %></li>
+              <li><%= link_to '/jobs' do %><%= heroicon "bolt", options: { class: "w-4 h-4" } %> Background Jobs<% end %></li>
+              <div class="divider my-1 opacity-10"></div>
+              <li><%= link_to admin_root_path do %><%= heroicon "shield-check", options: { class: "w-4 h-4" } %> Admin<% end %></li>
+              <li><%= link_to '/pghero' do %><%= heroicon "server", options: { class: "w-4 h-4" } %> PgHero<% end %></li>
+            </ul>
           </div>
         </div>
       </div>
-    </nav>
+    </div>
 
-    <main class="max-w-[1600px] mx-auto px-10 animate-fade-in pb-16">
+    <main class="max-w-[1600px] mx-auto px-10 animate-fade-in pb-12 pt-28">
       <% if notice.present? %>
-        <div class="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-xs font-bold flex items-center gap-3">
-          <%= heroicon "check-circle", variant: :solid, options: { class: "w-4 h-4" } %> <%= notice %>
+        <div class="alert alert-success shadow-lg mb-8 border border-success/20">
+          <%= heroicon "check-circle", variant: :solid, options: { class: "w-5 h-5" } %>
+          <span><%= notice %></span>
         </div>
       <% end %>
       <% if alert.present? %>
-        <div class="mb-6 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400 text-xs font-bold flex items-center gap-3">
-          <%= heroicon "exclamation-triangle", variant: :solid, options: { class: "w-4 h-4" } %> <%= alert %>
+        <div class="alert alert-error shadow-lg mb-8 border border-error/20">
+          <%= heroicon "exclamation-triangle", variant: :solid, options: { class: "w-5 h-5" } %>
+          <span><%= alert %></span>
         </div>
       <% end %>
 
       <%= yield %>
 
-      <footer class="mt-20 pt-8 border-t border-white/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
-        <div>Refined by <span class="text-violet-500/50">Gemini AI Agent</span></div>
-        <div class="opacity-40">&copy; <%= Time.current.year %> WWWorkRemote. Intelligence Aggregator.</div>
+      <footer class="mt-20 pt-10 border-t border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-base-content/40">
+        <div>Refined by <span class="text-primary">Gemini AI Agent</span></div>
+        <div>&copy; <%= Time.current.year %> WWWorkRemote. Intelligence Aggregator.</div>
       </footer>
     </main>
   </body>
