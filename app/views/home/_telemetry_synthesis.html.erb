@@ -1,0 +1,25 @@
+<div id="synthesis_stats" class="stats stats-vertical lg:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
+  <div class="stat px-8 py-6">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">NEW_SIGNALS</div>
+    <div class="stat-value text-info text-4xl font-black tracking-tighter animate-in fade-in zoom-in duration-500">
+      <%= JobPosting.where(published_at: 1.hour.ago..).count %>
+    </div>
+    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic text-info">Neural_Pulse_Detected</div>
+  </div>
+  
+  <div class="stat px-8 py-6">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">DAILY_SYNC</div>
+    <div class="stat-value text-success text-4xl font-black tracking-tighter">
+      <%= JobPosting.where(published_at: 1.day.ago..).count %>
+    </div>
+    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Market_Inflow</div>
+  </div>
+  
+  <div class="stat px-8 py-6">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">STALE_NODES</div>
+    <div class="stat-value text-slate-500 text-4xl font-black tracking-tighter">
+      <%= JobPosting.where('published_at < ?', 30.days.ago).count %>
+    </div>
+    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Prune_Queue</div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div id="source_stats" class="stats stats-vertical lg:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
+  <div class="stat px-8 py-6">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">1H_VOL</div>
+    <div class="stat-value text-primary text-4xl font-black tracking-tighter animate-in fade-in zoom-in duration-500">
+      <%= Source.where(created_at: 1.hour.ago..).count %>
+    </div>
+    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic text-primary">Live_Sync_Active</div>
+  </div>
+  
+  <div class="stat px-8 py-6">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">24H_VOL</div>
+    <div class="stat-value text-secondary text-4xl font-black tracking-tighter">
+      <%= Source.where(created_at: 1.day.ago..).count %>
+    </div>
+    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Node_Payload</div>
+  </div>
+  
+  <div class="stat px-8 py-6">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">7D_VOL</div>
+    <div class="stat-value text-accent text-4xl font-black tracking-tighter">
+      <%= Source.where(created_at: 1.week.ago..).count %>
+    </div>
+    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Network_Growth</div>
+  </div>
+</div>

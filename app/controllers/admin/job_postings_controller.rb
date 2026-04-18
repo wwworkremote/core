@@ -8,7 +8,10 @@ module Admin
 
     def show
       @job_posting = JobPosting.find(params[:id])
-      @similar_jobs = @job_posting.embedding.present? ? @job_posting.nearest_neighbors(:embedding, distance: 'cosine').limit(5) : []
+      if params[:frame] == "semantic_matches"
+        @similar_jobs = @job_posting.embedding.present? ? @job_posting.nearest_neighbors(:embedding, distance: 'cosine').limit(5) : []
+        render partial: "semantic_matches", locals: { similar_jobs: @similar_jobs }
+      end
     end
 
     def destroy

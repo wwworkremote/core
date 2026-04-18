@@ -52,6 +52,9 @@ class JobPosting < ApplicationRecord
     end
   end
 
+  # Real-time dashboard telemetry
+  after_create_commit -> { broadcast_replace_to "system_telemetry", target: "synthesis_stats", partial: "home/telemetry_synthesis" }
+
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source
 
   # rails_admin do
