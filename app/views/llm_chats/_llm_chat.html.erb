@@ -1,16 +1,16 @@
-<div id="<%= dom_id llm_chat %>" class="w-full sm:w-auto my-5 space-y-3">
+<div id="<%= dom_id llm_chat %>" class="d-inline-flex flex-wrap gap-4">
   <div>
-    <strong class="block font-medium mb-1">Model:</strong>
-    <%= llm_chat.model&.label || default_model_display_name %>
+    <span class="text-muted small d-block">Model</span>
+    <strong><%= llm_chat.model&.label || "Default" %></strong>
   </div>
 
   <div>
-    <strong class="block font-medium mb-1">Messages:</strong>
-    <%= llm_chat.llm_messages.count %>
+    <span class="text-muted small d-block">Messages</span>
+    <span class="badge bg-secondary rounded-pill"><%= llm_chat.llm_messages.count %></span>
   </div>
 
   <div>
-    <strong class="block font-medium mb-1">Created:</strong>
-    <%= llm_chat.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+    <span class="text-muted small d-block">Created</span>
+    <span><%= llm_chat.created_at.strftime("%b %d, %H:%M") %></span>
   </div>
 </div>

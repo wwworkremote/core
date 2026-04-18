@@ -1,27 +1,55 @@
-<% content_for :title, "Showing model" %>
+<% content_for :title, "Model: #{@model.name}" %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
-  <h1 class="font-bold text-4xl">Showing model</h1>
-
-  <div class="my-5 space-y-3">
-    <p><strong class="block font-medium mb-1">Provider:</strong> <%= @model.provider_class&.name || @model.provider %></p>
-    <p><strong class="block font-medium mb-1">Model:</strong> <%= @model.name %></p>
-    <p><strong class="block font-medium mb-1">ID:</strong> <%= @model.model_id %></p>
-    <p><strong class="block font-medium mb-1">Context Window:</strong> <%= number_with_delimiter(@model.context_window) if @model.context_window %></p>
-    <p><strong class="block font-medium mb-1">Max Output Tokens:</strong> <%= number_with_delimiter(@model.max_output_tokens) if @model.max_output_tokens %></p>
+<div class="container-fluid">
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h1 class="display-5">Model Details</h1>
+    </div>
+    <div class="col-auto">
+      <%= link_to "Back to all models", models_path, class: "btn btn-outline-secondary" %>
+    </div>
   </div>
 
-  <% if @model.capabilities.any? %>
-    <div class="my-5">
-      <strong class="block font-medium mb-1">Capabilities:</strong>
-      <%= @model.capabilities.join(", ") %>
-    </div>
-  <% end %>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="row mb-3">
+            <div class="col-sm-3 text-muted">Provider</div>
+            <div class="col-sm-9"><strong><%= @model.provider_class&.name || @model.provider %></strong></div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-3 text-muted">Model Name</div>
+            <div class="col-sm-9"><strong><%= @model.name %></strong></div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-3 text-muted">Model ID</div>
+            <div class="col-sm-9"><code><%= @model.model_id %></code></div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-3 text-muted">Context Window</div>
+            <div class="col-sm-9"><%= number_with_delimiter(@model.context_window) if @model.context_window %> tokens</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-3 text-muted">Max Output</div>
+            <div class="col-sm-9"><%= number_with_delimiter(@model.max_output_tokens) if @model.max_output_tokens %> tokens</div>
+          </div>
 
-  <%= link_to "Start llm chat with this model", new_llm_chat_path(model: @model.model_id), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "All models", models_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+          <% if @model.capabilities.any? %>
+            <div class="row">
+              <div class="col-sm-3 text-muted">Capabilities</div>
+              <div class="col-sm-9">
+                <% @model.capabilities.each do |capability| %>
+                  <span class="badge bg-light text-dark border me-1"><%= capability %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="card-footer bg-light p-3">
+          <%= link_to "Start chat with this model", new_llm_chat_path(model: @model.model_id), class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

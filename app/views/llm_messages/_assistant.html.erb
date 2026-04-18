@@ -1,14 +1,11 @@
 <% assistant ||= local_assigns[:message] %>
-<div id="llm_message_<%= assistant.id %>" class="w-full sm:w-auto my-5 space-y-3 rounded-md px-3 py-2 bg-green-50">
-  <div>
-    <span class="inline-block rounded px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">
-      Assistant
-    </span>
-  </div>
+<div id="llm_message_<%= assistant.id %>" class="card mb-3 border-0 bg-white shadow-sm me-5 border-start border-4 border-success">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="badge bg-success text-uppercase" style="font-size: 0.65rem;">Assistant</span>
+      <span class="text-muted small"><%= assistant.created_at&.strftime("%H:%M") %></span>
+    </div>
 
-  <div id="llm_message_<%= assistant.id %>_content" class="whitespace-pre-wrap"><%= assistant.content %></div>
-
-  <div>
-    <span class="text-sm text-gray-600"><%= assistant.created_at&.strftime("%I:%M %p") %></span>
+    <div id="llm_message_<%= assistant.id %>_content" class="text-break"><%= assistant.content %></div>
   </div>
 </div>

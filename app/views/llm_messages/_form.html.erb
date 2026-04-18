@@ -1,9 +1,8 @@
-<%= form_with(model: llm_message, url: [@llm_chat, llm_message], id: "new_llm_message", class: "contents") do |form| %>
+<%= form_with(model: llm_message, url: [@llm_chat, llm_message], id: "new_llm_message") do |form| %>
   <% if llm_message.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(llm_message.errors.count, "error") %> prohibited this llm message from being saved:</h2>
-
-      <ul class="list-disc ml-6">
+    <div id="error_explanation" class="alert alert-danger">
+      <h6 class="alert-heading"><%= pluralize(llm_message.errors.count, "error") %> prohibited this message from being saved:</h6>
+      <ul class="mb-0">
         <% llm_message.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,13 +10,10 @@
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :content, "Message" %>
-    <%= form.text_area :content, rows: 4, placeholder: "Message...", autofocus: true,
-        class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": llm_message.errors[:content].none?, "border-red-400 focus:outline-red-600": llm_message.errors[:content].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit "Send llm message", class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div class="input-group">
+    <%= form.text_area :content, rows: 2, placeholder: "Type your message...", autofocus: true,
+        class: "form-control border-0 shadow-none bg-white",
+        data: { controller: "textarea-autoresize" } %>
+    <%= form.submit "Send", class: "btn btn-primary px-4" %>
   </div>
 <% end %>
