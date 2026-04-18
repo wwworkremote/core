@@ -10,6 +10,7 @@ module JobBoards
     end
 
     def call
+      return unless enabled?
       return if @job_posting.body.blank? && @job_posting.title.blank?
 
       # Construct text for embedding
@@ -35,7 +36,7 @@ module JobBoards
           false
         end
       else
-        Rails.logger.error "[Embedder] API Error: #{response.status} - #{response.body}"
+        handle_error(response)
         false
       end
     rescue StandardError => e
@@ -45,6 +46,8 @@ module JobBoards
 
     # Utility to embed a query string for semantic search
     def self.embed_text(text)
+      return nil unless new(nil).send(:enabled?)
+
       response = Faraday.post(API_URL) do |req|
         req.headers['Content-Type'] = 'application/json'
         req.body = {
@@ -57,6 +60,24 @@ module JobBoards
 
       data = JSON.parse(response.body)
       data.dig('data', 0, 'embedding') || data['embedding']
+    end
+
+    private
+
+    def enabled?
+      return false if ENV['ENABLE_EMBEDDINGS'] == 'false'
+
+      true
+    end
+
+    def handle_error(response)
+      if response.status == 501
+        Rails.logger.warn '[Embedder] Local LLM server does not support embeddings. ' \
+                          'Fix: Restart llama-server with the `--embeddings` flag. ' \
+                          'To suppress this warning, set ENABLE_EMBEDDINGS=false'
+      else
+        Rails.logger.error "[Embedder] API Error: #{response.status} - #{response.body}"
+      end
     end
   end
 end

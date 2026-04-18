@@ -29,9 +29,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # WwworkRemote / Data Acquisition Routes
-  put 'hacker_news/fetch_jobstory'
-
   mount PgHero::Engine, at: 'pghero'
   get '/pages/*page' => 'pages#show'
 end
