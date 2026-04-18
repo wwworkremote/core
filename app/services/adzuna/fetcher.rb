@@ -19,14 +19,17 @@ module Adzuna
       with_api_guard('adzuna', cooldown: 4.hours, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        conn = Faraday.new(url: BASE_URL) do |f|
-          f.params['app_id'] = app_id
-          f.params['app_key'] = app_key
-          f.params['what'] = 'remote'
-          f.params['content-type'] = 'application/json'
-        end
+        client = JobBoards::Client.new('adzuna')
+        params = {
+          app_id: app_id,
+          app_key: app_key,
+          what: 'remote',
+          'content-type': 'application/json'
+        }
+        
+        response = client.get(BASE_URL, params)
+        return false if response.nil? || response.status != 200
 
-        response = conn.get
         data = JSON.parse(response.body)
 
         unless data['results']

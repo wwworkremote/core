@@ -10,8 +10,9 @@ module Arbeitnow
       with_api_guard('arbeitnow', cooldown: 2.hours, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        response = Faraday.get(API_URL)
-        return false unless response.success?
+        client = JobBoards::Client.new('arbeitnow')
+        response = client.get(API_URL)
+        return false if response.nil? || response.status != 200
 
         data = Oj.load(response.body)
         jobs = data['data'] || []

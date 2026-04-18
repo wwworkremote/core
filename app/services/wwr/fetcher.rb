@@ -12,7 +12,11 @@ module Wwr
       with_api_guard('wwr', cooldown: 30.minutes, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        xml = Faraday.get(RSS_URL).body
+        client = JobBoards::Client.new('wwr')
+        response = client.get(RSS_URL)
+        return false if response.nil? || response.status != 200
+
+        xml = response.body
         feed = Feedjira.parse(xml)
 
         feed.entries.each do |entry|

@@ -12,8 +12,9 @@ module Yc
       with_api_guard('yc', cooldown: 4.hours, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        response = Faraday.get(BASE_URL)
-        return false unless response.success?
+        client = JobBoards::Client.new('yc')
+        response = client.get(BASE_URL)
+        return false if response.nil? || response.status != 200
 
         doc = Nokogiri::HTML(response.body)
         data_attr = doc.at_css('div[data-page]')&.[]('data-page')

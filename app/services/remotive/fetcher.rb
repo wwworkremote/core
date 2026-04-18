@@ -11,7 +11,10 @@ module Remotive
       with_api_guard('remotive', cooldown: 1.hour, force:) do |source|
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        response = Faraday.get(API_URL)
+        client = JobBoards::Client.new('remotive')
+        response = client.get(API_URL)
+        return false if response.nil? || response.status != 200
+
         data = JSON.parse(response.body)
 
         data['jobs'].each do |job|

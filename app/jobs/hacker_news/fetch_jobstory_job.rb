@@ -2,16 +2,17 @@
 
 module HackerNews
   class FetchJobstoryJob < ApplicationJob
+    include ApiGuard
     queue_as :default
 
     def perform(jobstory_id, source_id = nil, query_id = nil)
-      conn = Faraday.new(
-        url: 'https://hacker-news.firebaseio.com',
-        headers: { 'Content-Type' => 'application/json' }
-      )
+      return if source_locked?('hackernews')
 
-      response = conn.get("/v0/item/#{jobstory_id}.json")
-      return unless response.success?
+      client = JobBoards::Client.new('hackernews')
+      url = "https://hacker-news.firebaseio.com/v0/item/#{jobstory_id}.json"
+      
+      response = client.get(url)
+      return if response.nil? || response.status != 200
 
       data = Oj.load(response.body, symbolize_names: true)
       return unless data && data[:type] == 'job'
