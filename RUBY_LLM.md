@@ -6,7 +6,7 @@ This project uses **RubyLLM** to provide a unified interface for interacting wit
 
 - **Gem:** `ruby_llm`
 - **Persistence:** Database-backed chats and messages.
-- **Admin:** Managed via **Avo 3.0** under the "AI / LLM" section.
+- **Admin:** Managed via native Rails **Admin Namespace** at `/admin`.
 
 ## Models & Providers
 

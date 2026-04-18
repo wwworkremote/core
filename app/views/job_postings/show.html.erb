@@ -4,7 +4,7 @@
   <nav aria-label="breadcrumb">
     <ol class="flex items-center space-x-2 text-sm font-medium text-slate-500">
       <li><%= link_to "Job Market", job_postings_path, class: "hover:text-violet-400 transition-colors" %></li>
-      <li><i class="bi bi-chevron-right text-[10px]"></i></li>
+      <li><%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %></li>
       <li class="text-slate-300 truncate max-w-xs" aria-current="page"><%= @job_posting.title %></li>
     </ol>
   </nav>
@@ -23,44 +23,44 @@
         
         <% if @job_posting.source&.origin&.name %>
           <div class="md:shrink-0">
-            <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "inline-flex items-center px-4 py-2 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-black uppercase tracking-widest whitespace-nowrap hover:bg-violet-500/20 hover:text-white transition-colors shadow-sm" do %>
-              <i class="bi bi-link-45deg me-1"></i> <%= @job_posting.source.origin.name %>
+            <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "inline-flex items-center px-4 py-2 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-[10px] font-black uppercase tracking-widest whitespace-nowrap hover:bg-violet-500/20 hover:text-white transition-colors shadow-sm" do %>
+              <%= heroicon "link", variant: :outline, options: { class: "w-3 h-3 me-1.5" } %> <%= @job_posting.source.origin.name %>
             <% end %>
           </div>
         <% end %>
       </div>
 
-      <div class="flex flex-wrap items-center gap-6 text-sm font-medium text-slate-400">
+      <div class="flex flex-wrap items-center gap-6 text-xs font-bold uppercase tracking-widest text-slate-500">
         <% if @job_posting.location.present? %>
           <div class="flex items-center gap-2">
-            <i class="bi bi-geo-alt-fill text-violet-500"></i>
-            <%= @job_posting.location %>
+            <%= heroicon "map-pin", variant: :solid, options: { class: "w-4 h-4 text-violet-500" } %>
+            <span class="text-slate-400"><%= @job_posting.location %></span>
           </div>
         <% end %>
         <% if @job_posting.published_at %>
           <div class="flex items-center gap-2">
-            <i class="bi bi-calendar-event text-blue-500"></i>
-            Published <%= @job_posting.published_at.strftime("%B %d, %Y") %>
+            <%= heroicon "calendar-days", variant: :outline, options: { class: "w-4 h-4 text-blue-500" } %>
+            <span class="text-slate-400">Published <%= @job_posting.published_at.strftime("%B %d, %Y") %></span>
           </div>
         <% end %>
       </div>
     </header>
 
     <div class="card-neural p-8 lg:p-10">
-      <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/10 pb-4">Position Intelligence</h2>
+      <h2 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 mb-8 border-b border-white/5 pb-4">Position Intelligence</h2>
       
-      <div class="text-slate-300 leading-relaxed space-y-4 text-[15px] prose-invert max-w-none">
+      <div class="prose-invert max-w-none">
         <%= markdown(@job_posting.body) %>
       </div>
 
       <% if @job_posting.target_url.present? %>
-        <div class="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center gap-4">
-          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", rel: "noopener noreferrer", class: "btn-neural w-full sm:w-auto flex justify-center items-center gap-2 px-6 py-3 text-sm shadow-md hover:shadow-violet-500/20" do %>
-            <i class="bi bi-box-arrow-up-right"></i> Initiate Application
+        <div class="mt-12 pt-8 border-t border-white/5 flex flex-wrap items-center gap-4">
+          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", rel: "noopener noreferrer", class: "btn-neural !px-8 !py-3 !text-xs shadow-md hover:shadow-violet-500/20 flex items-center gap-2" do %>
+            <%= heroicon "arrow-top-right-on-square", variant: :outline, options: { class: "w-4 h-4" } %> Initiate Application
           <% end %>
           
-          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", rel: "noopener noreferrer", class: "w-full sm:w-auto px-6 py-3 rounded-lg font-bold transition-all duration-150 bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white text-xs uppercase tracking-wider text-center flex justify-center items-center gap-2 shadow-sm" do %>
-            <i class="bi bi-link-45deg"></i> Source Origin
+          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", rel: "noopener noreferrer", class: "px-6 py-3 rounded-lg font-bold transition-all duration-150 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-sm" do %>
+            <%= heroicon "link", variant: :outline, options: { class: "w-4 h-4" } %> Source Origin
           <% end %>
         </div>
       <% end %>
@@ -68,38 +68,38 @@
   </article>
 
   <aside class="lg:col-span-1">
-    <div class="card-neural p-6 sticky top-28">
-      <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/10 pb-4">Telemetry Metrics</h3>
+    <div class="card-neural p-6 sticky top-24">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 mb-6 border-b border-white/5 pb-4">Telemetry Metrics</h3>
       
       <ul class="space-y-6">
         <% if @job_posting.data && @job_posting.data['ai_category'].present? %>
           <li>
-            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Neural Category</div>
-            <div class="inline-flex items-center px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">
-              <i class="bi bi-cpu me-2"></i> <%= @job_posting.data['ai_category'] %>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Neural Category</div>
+            <div class="inline-flex items-center px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-black uppercase tracking-wider">
+              <%= heroicon "cpu-chip", variant: :outline, options: { class: "w-3 h-3 me-2" } %> <%= @job_posting.data['ai_category'] %>
             </div>
           </li>
         <% end %>
 
         <li>
-          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Ingestion Source</div>
-          <div class="text-slate-300 font-medium">
+          <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Ingestion Source</div>
+          <div class="text-slate-300 font-bold">
             <% if @job_posting.source&.origin&.name %>
               <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "hover:text-violet-400 underline underline-offset-4 transition-colors" do %>
                 <%= @job_posting.source.origin.name %>
               <% end %>
             <% else %>
-              External Network
+              EXTERNAL_NETWORK
             <% end %>
           </div>
         </li>
         
         <% if @job_posting.tags.present? && @job_posting.tags.any? %>
           <li>
-            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Extracted Vectors</div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Extracted Vectors</div>
             <div class="flex flex-wrap gap-2">
               <% @job_posting.tags.each do |tag| %>
-                <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                   <%= tag %>
                 </span>
               <% end %>
@@ -109,25 +109,25 @@
 
         <% if @job_posting.embedding.present? %>
           <li>
-            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Vector Status</div>
-            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
-              <i class="bi bi-check-circle-fill"></i> Embedding Indexed
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Vector Status</div>
+            <div class="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-wider">
+              <%= heroicon "check-circle", variant: :solid, options: { class: "w-4 h-4" } %> Indexed
             </div>
           </li>
         <% end %>
 
         <li>
-          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">System Status</div>
-          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Listing
+          <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">System Status</div>
+          <div class="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ACTIVE_NODE
           </div>
         </li>
       </ul>
 
       <% if @job_posting.embedding.present? %>
-        <div class="mt-8 pt-6 border-t border-white/10">
-          <%= link_to avo.resources_job_posting_path(@job_posting), class: "w-full px-4 py-2 rounded-lg font-bold transition-all duration-150 bg-violet-600/20 text-violet-400 border border-violet-500/30 hover:bg-violet-600/40 hover:text-white text-xs uppercase tracking-wider flex justify-center items-center gap-2" do %>
-            <i class="bi bi-diagram-3"></i> View Semantic Matches
+        <div class="mt-8 pt-6 border-t border-white/5">
+          <%= link_to admin_job_posting_path(@job_posting), class: "w-full px-4 py-2.5 rounded-lg font-black transition-all duration-150 bg-violet-600/10 text-violet-400 border border-violet-500/30 hover:bg-violet-600/20 hover:text-white text-[10px] uppercase tracking-[0.2em] flex justify-center items-center gap-2 shadow-sm" do %>
+            <%= heroicon "square-3-stack-3d", variant: :outline, options: { class: "w-4 h-4" } %> Semantic Matches
           <% end %>
         </div>
       <% end %>
