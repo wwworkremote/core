@@ -17,15 +17,44 @@
   </div>
 </div>
 
+<% if @company.present? || @source_id.present? || @query.present? %>
+  <div class="mb-6 flex items-center gap-3">
+    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Active Filters:</span>
+    <% if @company.present? %>
+      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">
+        Company: <%= @company %>
+        <%= link_to job_postings_path(q: @query, source_id: @source_id), class: "hover:text-white" do %><i class="bi bi-x-circle"></i><% end %>
+      </span>
+    <% end %>
+    <% if @source_id.present? %>
+      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-bold">
+        Source ID: <%= @source_id %>
+        <%= link_to job_postings_path(q: @query, company: @company), class: "hover:text-white" do %><i class="bi bi-x-circle"></i><% end %>
+      </span>
+    <% end %>
+    <% if @query.present? %>
+      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+        Query: <%= @query %>
+        <%= link_to job_postings_path(company: @company, source_id: @source_id), class: "hover:text-white" do %><i class="bi bi-x-circle"></i><% end %>
+      </span>
+    <% end %>
+    <%= link_to "Clear All", job_postings_path, class: "text-xs font-bold text-rose-400 hover:text-rose-300 underline underline-offset-4 ml-2" %>
+  </div>
+<% end %>
+
 <div class="space-y-4">
   <% if @job_postings.any? %>
     <div class="grid gap-4">
       <% @job_postings.each do |job| %>
-        <%= link_to job_posting_path(job), class: "card-neural p-6 group block no-underline" do %>
+        <article class="card-neural p-6 group relative">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex-1">
-              <h4 class="text-xl font-bold text-white group-hover:text-violet-400 transition-colors mb-1"><%= job.title %></h4>
-              <p class="text-blue-400 font-semibold text-sm mb-3 tracking-wide"><%= job.company %></p>
+              <h4 class="text-xl font-bold text-white group-hover:text-violet-400 transition-colors mb-1">
+                <%= link_to job.title, job_posting_path(job), class: "before:absolute before:inset-0" %>
+              </h4>
+              <p class="text-blue-400 font-semibold text-sm mb-3 tracking-wide relative z-10">
+                <%= link_to job.company, job_postings_path(company: job.company), class: "hover:text-blue-300 hover:underline transition-colors" %>
+              </p>
               
               <% if job.location.present? %>
                 <div class="flex items-center text-slate-400 text-xs font-medium gap-2">
@@ -35,20 +64,20 @@
               <% end %>
             </div>
 
-            <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3">
-              <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300">
+            <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 relative z-10">
+              <%= link_to job_postings_path(source_id: job.source_id), class: "px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-violet-500/20 hover:text-violet-400 hover:border-violet-500/30 transition-colors" do %>
                 <%= job.source.try(:origin)&.name || 'Network' %>
-              </span>
+              <% end %>
               <div class="text-slate-500 text-[11px] font-medium">
                 <%= time_ago_in_words(job.published_at) if job.published_at %> ago
               </div>
             </div>
           </div>
-        <% end %>
+        </article>
       <% end %>
     </div>
 
-    <div class="mt-12 py-8 flex justify-center border-t border-white/5">
+    <div class="mt-12 py-8 flex justify-center border-t border-white/5 relative z-20">
       <%= paginate @job_postings, window: 2 %>
     </div>
   <% else %>

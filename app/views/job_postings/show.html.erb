@@ -16,13 +16,15 @@
       <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-6">
         <div>
           <h1 class="text-3xl md:text-4xl font-black text-white mb-2 sparkle-ai"><%= @job_posting.title %></h1>
-          <p class="text-xl font-bold text-blue-400 tracking-wide"><%= @job_posting.company %></p>
+          <p class="text-xl font-bold text-blue-400 tracking-wide">
+            <%= link_to @job_posting.company, job_postings_path(company: @job_posting.company), class: "hover:text-blue-300 hover:underline transition-colors" %>
+          </p>
         </div>
         
         <% if @job_posting.source&.origin&.name %>
-          <span class="inline-flex items-center px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-black uppercase tracking-widest whitespace-nowrap">
+          <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "inline-flex items-center px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-black uppercase tracking-widest whitespace-nowrap hover:bg-violet-500/20 hover:text-white transition-colors" do %>
             <%= @job_posting.source.origin.name %>
-          </span>
+          <% end %>
         <% end %>
       </div>
 
