@@ -23,7 +23,6 @@ end
 # == Schema Information
 #
 # Table name: domains
-# Database name: primary
 #
 #  id             :bigint           not null, primary key
 #  name           :citext           not null

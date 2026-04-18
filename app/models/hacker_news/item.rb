@@ -3,7 +3,6 @@
 # == Schema Information
 #
 # Table name: hacker_news_items
-# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  data       :jsonb

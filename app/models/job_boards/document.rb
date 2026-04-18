@@ -1,7 +1,6 @@
 # == Schema Information
 #
 # Table name: job_boards_documents
-# Database name: primary
 #
 #  id                  :uuid             not null, primary key
 #  aasm_state          :string

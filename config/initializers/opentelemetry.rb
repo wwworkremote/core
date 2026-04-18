@@ -12,6 +12,6 @@ Rails.application.config.after_initialize do
     c.use 'OpenTelemetry::Instrumentation::Rails'
     c.use 'OpenTelemetry::Instrumentation::PG'
     c.use 'OpenTelemetry::Instrumentation::Faraday'
-    c.use 'OpenTelemetry::Instrumentation::Net::HTTP' unless Rails.env.test?
+    # Net::HTTP instrumentation is disabled to avoid SystemStackErrors
   end
 end

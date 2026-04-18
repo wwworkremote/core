@@ -43,3 +43,8 @@ Avo.configure do |config|
     }
   }
 end
+
+Rails.configuration.to_prepare do
+  Avo::BaseController.include Authenticatable
+  Avo::ApplicationController.include Authenticatable
+end

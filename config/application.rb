@@ -20,18 +20,6 @@ require 'action_cable/engine'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-class Nodes # :nodoc:
-  CURRENT = 1
-  def self.current = CURRENT
-  def self.siblings = []
-  def self.upstream = nil
-  def self.downstream = nil
-  def self.previous = nil
-  def self.next = nil
-  def self.from(_node_id) = :current
-  def self.representation = [1]
-end
-
 module WwworkRemote
   class Application < Rails::Application # :nodoc:
     # Initialize configuration defaults for Rails 8.0.

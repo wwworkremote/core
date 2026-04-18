@@ -3,7 +3,6 @@
 # == Schema Information
 #
 # Table name: job_postings
-# Database name: primary
 #
 #  id                 :bigint           not null, primary key
 #  body               :string

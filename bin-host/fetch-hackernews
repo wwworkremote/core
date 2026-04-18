@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.." || exit
 
 echo "--- Starting Hacker News Job Fetch ---"
 
-docker-compose exec -T web bin/rails runner - <<'EOF'
+bin/rails runner - <<'EOF'
   puts "Phase 1: Fetching raw data from Hacker News API..."
   source = JobBoards::Source.find_or_create_by!(slug: "hackernews", name: "Hacker News")
   JobBoards::Query.find_or_create_by!(source_id: source.id)

@@ -2,7 +2,7 @@
 cd "$(dirname "$0")/.." || exit
 BEFORE=${1:-$(date +%s)}
 echo "--- Starting Hacker News Backfill (Before $BEFORE) ---"
-docker-compose exec -T web bin/rails runner - <<EOF
+bin/rails runner - <<EOF
   HackerNews::Backfill.new.call(before_timestamp: $BEFORE)
   JobBoards::Syncer.new.call
 EOF

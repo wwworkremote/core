@@ -1,7 +1,6 @@
 # == Schema Information
 #
 # Table name: models
-# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  capabilities      :jsonb

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 cd "$(dirname "$0")/.." || exit
 echo "--- Starting Arbeitnow Job Fetch ---"
-docker-compose exec -T web bin/rails runner - <<'EOF'
+bin/rails runner - <<'EOF'
   Arbeitnow::Fetcher.new.call
   JobBoards::Syncer.new.call
 EOF

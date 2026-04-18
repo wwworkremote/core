@@ -8,15 +8,6 @@ development:
   primary:
     <<: *default
     url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
-  cache:
-    <<: *default
-    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
-  queue:
-    <<: *default
-    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
-  cable:
-    <<: *default
-    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
 
 test:
   <<: *default

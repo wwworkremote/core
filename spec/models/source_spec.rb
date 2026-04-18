@@ -3,7 +3,6 @@
 # == Schema Information
 #
 # Table name: sources
-# Database name: primary
 #
 #  id         :bigint           not null, primary key
 #  event      :jsonb            not null
