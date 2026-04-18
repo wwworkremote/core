@@ -1,39 +1,172 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #4f46e5;
-  --bg-main: #f8fafc;
-  --text-main: #1e293b;
+  --gemini-bg: #020617; // Deep Indigo-950
+  --gemini-surface: rgba(15, 23, 42, 0.7); // Slate-900 with alpha
+  --gemini-accent: #8b5cf6; // Violet-500
+  --gemini-glow: #3b82f6; // Blue-500
+  --gemini-text: #f8fafc; // Slate-50
+  --gemini-text-muted: #94a3b8; // Slate-400
+  --gemini-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(12px);
 }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  padding-top: 80px;
+  background-color: var(--gemini-bg);
+  color: var(--gemini-text);
+  min-height: 100vh;
+  margin: 0;
+  padding-top: 100px;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e2e8f0;
+// Gemini Mesh Background
+.gemini-mesh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: 
+    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(2, 6, 23, 1) 0px, transparent 100%);
+  filter: contrast(120%);
+}
+
+// Glassmorphism Utility
+.glass {
+  background: var(--gemini-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--gemini-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+// Layout Components
+.navbar.glass {
+  margin: 1rem;
+  border-radius: 16px;
+  width: calc(100% - 2rem);
+  padding: 0.75rem 1.5rem;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(to right, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Cards & Components
+.card.glass {
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-4px) scale(1.01);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.1);
+  }
+
+  .card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--gemini-border);
+    padding: 1.25rem;
   }
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
+.badge.gemini-pill {
+  background: rgba(139, 92, 246, 0.1);
+  color: #c4b5fd;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  padding: 0.4em 0.8em;
   border-radius: 9999px;
+  font-weight: 500;
   font-size: 0.75rem;
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+// Sparkle Effect
+.sparkle-ai {
+  position: relative;
+  display: inline-block;
+  &::after {
+    content: "✦";
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    color: var(--gemini-accent);
+    font-size: 14px;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+// Typography overrides for dark theme
+h1, h2, h3, h4, h5, h6 {
+  color: var(--gemini-text);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.text-muted {
+  color: var(--gemini-text-muted) !important;
+}
+
+// Specific view overrides
+.list-group-item {
+  background: transparent !important;
+  border-color: var(--gemini-border) !important;
+  color: var(--gemini-text);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  border: none;
   font-weight: 600;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  transition: all 0.2s;
+  
+  &:hover {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+// Gemini Footer
+.gemini-footer {
+  margin-top: 5rem;
+  padding: 2rem;
+  text-align: center;
+  border-top: 1px solid var(--gemini-border);
+  color: var(--gemini-text-muted);
+  font-size: 0.875rem;
+  
+  .signature {
+    font-weight: 600;
+    color: var(--gemini-accent);
+  }
 }

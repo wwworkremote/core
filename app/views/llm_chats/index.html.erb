@@ -1,33 +1,67 @@
-<% content_for :title, "AI Chats" %>
-
-<div class="row mb-4 align-items-center">
-  <div class="col">
-    <h1 class="display-4">AI Chats</h1>
+<div class="row mb-5 align-items-center">
+  <div class="col-md-8">
+    <h1 class="display-4 fw-bold sparkle-ai">Neural Dialogues</h1>
+    <p class="text-muted lead">Direct interface with aggregated AI models.</p>
   </div>
-  <div class="col-auto">
-    <div class="btn-group">
-      <%= link_to "Models Registry", models_path, class: "btn btn-outline-secondary" %>
-      <%= link_to "New AI Chat", new_llm_chat_path, class: "btn btn-primary" %>
+  <div class="col-md-4 text-md-end">
+    <div class="btn-group shadow-lg">
+      <%= link_to "Model Registry", models_path, class: "btn btn-outline-primary px-4" %>
+      <%= link_to "Initiate Chat", new_llm_chat_path, class: "btn btn-primary px-4" %>
     </div>
   </div>
 </div>
 
-<div id="llm_chats" class="list-group list-group-flush border-top">
+<div id="llm_chats" class="row g-4">
   <% if @llm_chats.any? %>
     <% @llm_chats.each do |llm_chat| %>
-      <div class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-center py-3">
-        <div class="mb-2 mb-sm-0">
-          <%= render llm_chat %>
-        </div>
-        <div class="btn-group">
-          <%= link_to "Show", llm_chat, class: "btn btn-sm btn-outline-primary" %>
-          <%= button_to "Destroy", llm_chat, method: :delete, class: "btn btn-sm btn-outline-danger", data: { turbo_confirm: "Are you sure?" } %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card glass h-100 border-0 shadow-lg p-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+              <div class="bg-primary bg-opacity-10 p-3 rounded-4 mb-3">
+                <i class="bi bi-chat-dots-fill text-primary fs-3"></i>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu glass border-0 shadow-lg">
+                  <li><%= button_to "Terminate", llm_chat, method: :delete, class: "dropdown-item text-danger", data: { turbo_confirm: "Are you sure?" } %></li>
+                </ul>
+              </div>
+            </div>
+
+            <h5 class="fw-bold mb-1 text-white">Chat #<%= llm_chat.id %></h5>
+            <div class="text-muted small mb-3">
+              Model: <span class="text-primary opacity-75"><%= llm_chat.model&.label || "System Default" %></span>
+            </div>
+
+            <div class="d-flex align-items-center gap-4 mb-4">
+              <div class="text-center">
+                <div class="h5 fw-bold mb-0 text-white"><%= llm_chat.llm_messages.count %></div>
+                <div class="text-muted small opacity-50">signals</div>
+              </div>
+              <div class="text-center">
+                <div class="small fw-medium mb-0 text-white"><%= llm_chat.created_at.strftime("%b %d") %></div>
+                <div class="text-muted small opacity-50">timestamp</div>
+              </div>
+            </div>
+
+            <%= link_to "Resume Interface", llm_chat, class: "btn btn-outline-primary w-100 rounded-pill py-2" %>
+          </div>
         </div>
       </div>
     <% end %>
   <% else %>
-    <div class="text-center my-5 py-5 border rounded bg-light">
-      <p class="lead mb-0">No AI chats found.</p>
+    <div class="col-12 text-center py-5">
+      <div class="card glass border-0 py-5 mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <i class="bi bi-cpu display-1 text-muted opacity-25 mb-4 d-block"></i>
+          <h3 class="fw-bold">No active sessions</h3>
+          <p class="text-muted">Initiate a new neural dialogue to begin exploration.</p>
+          <%= link_to "Initiate Chat", new_llm_chat_path, class: "btn btn-primary mt-3 px-5 rounded-pill" %>
+        </div>
+      </div>
     </div>
   <% end %>
 </div>

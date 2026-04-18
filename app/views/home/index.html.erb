@@ -1,82 +1,123 @@
-<h2>Sources</h2>
-
-<div class="mb-3">
-  <%= link_to "Manage Data Fetchers", data_fetchers_path, class: "btn btn-outline-primary" %>
-</div>
-
-<div class="row gx-5">
-  <div class="col">
-    <div class="card text-center">
-      <div class="card-header display-2">
-        <%= Source.where(created_at: 1.hour.ago..).count %>
-      </div>
-      <div class="card-body">
-        <div class="card-title">past hour</div>
-      </div>
-    </div>
+<div class="row mb-5 align-items-center">
+  <div class="col-md-8">
+    <h1 class="display-3 fw-bold sparkle-ai">Intelligence Dashboard</h1>
+    <p class="lead text-muted">Real-time job market aggregation and AI synthesis.</p>
   </div>
-  <div class="col">
-    <div class="card text-center">
-      <div class="card-header display-2">
-        <%= Source.where(created_at: 1.day.ago..).count %>
-      </div>
-      <div class="card-body">
-        <div class="card-title">past day</div>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card text-center">
-      <div class="card-header display-2">
-        <%= Source.where(created_at: 1.week.ago..).count %>
-      </div>
-      <div class="card-body">
-        <div class="card-title">past week</div>
-      </div>
-    </div>
+  <div class="col-md-4 text-md-end">
+    <%= link_to "System Control", data_fetchers_path, class: "btn btn-primary shadow-lg" %>
   </div>
 </div>
 
-<div class="row">
-  <%= line_chart(charts_data_sources_path(days: 21), discrete: true, label: 'Created At', format: '%Y-%m-%d', time_zone: false) %>
-</div>
-
-<hr>
-<h2>Job Postings</h2>
-
-<div class="row gx-5">
-  <div class="col">
-    <div class="card text-center">
-      <div class="card-header display-2">
-        <%= JobPosting.where(published_at: 1.hour.ago..).count %>
-      </div>
-      <div class="card-body">
-        <div class="card-title">past hour</div>
+<h2 class="h4 mb-4 opacity-75">Aggregation Flow</h2>
+<div class="row g-4 mb-5">
+  <div class="col-md-4">
+    <div class="card glass text-center h-100">
+      <div class="card-body p-4">
+        <div class="display-4 fw-extrabold mb-2 text-primary">
+          <%= Source.where(created_at: 1.hour.ago..).count %>
+        </div>
+        <div class="text-muted small text-uppercase tracking-wider">past hour</div>
       </div>
     </div>
   </div>
-  <div class="col">
-    <div class="card text-center">
-      <div class="card-header display-2">
-        <%= JobPosting.where(published_at: 1.day.ago..).count %>
-      </div>
-      <div class="card-body">
-        <div class="card-title">past day</div>
+  <div class="col-md-4">
+    <div class="card glass text-center h-100">
+      <div class="card-body p-4">
+        <div class="display-4 fw-extrabold mb-2 text-primary">
+          <%= Source.where(created_at: 1.day.ago..).count %>
+        </div>
+        <div class="text-muted small text-uppercase tracking-wider">past day</div>
       </div>
     </div>
   </div>
-  <div class="col">
-    <div class="card text-center">
-      <div class="card-header display-2">
-        <%= JobPosting.where(published_at: 1.week.ago..).count %>
-      </div>
-      <div class="card-body">
-        <div class="card-title">past week</div>
+  <div class="col-md-4">
+    <div class="card glass text-center h-100">
+      <div class="card-body p-4">
+        <div class="display-4 fw-extrabold mb-2 text-primary">
+          <%= Source.where(created_at: 1.week.ago..).count %>
+        </div>
+        <div class="text-muted small text-uppercase tracking-wider">past week</div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="row">
-  <%= line_chart(charts_data_job_postings_path(days: 21), discrete: true, label: 'Published At', format: '%Y-%m-%d', time_zone: false) %>
+<div class="card glass border-0 mb-5 overflow-hidden">
+  <div class="card-header border-0 bg-transparent py-4">
+    <h3 class="h5 mb-0 px-2 opacity-75">Source Ingestion Velocity</h3>
+  </div>
+  <div class="card-body p-0">
+    <div class="px-4 pb-4">
+      <%= line_chart(charts_data_sources_path(days: 21), 
+          discrete: true, 
+          label: 'Created', 
+          format: '%Y-%m-%d', 
+          time_zone: false,
+          colors: ["#8b5cf6"],
+          library: { 
+            scales: { 
+              y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#94a3b8" } },
+              x: { grid: { display: false }, ticks: { color: "#94a3b8" } }
+            },
+            plugins: { legend: { display: false } }
+          }) %>
+    </div>
+  </div>
+</div>
+
+<h2 class="h4 mb-4 opacity-75">Market Intel</h2>
+<div class="row g-4 mb-5">
+  <div class="col-md-4">
+    <div class="card glass text-center h-100">
+      <div class="card-body p-4">
+        <div class="display-4 fw-extrabold mb-2 text-info">
+          <%= JobPosting.where(published_at: 1.hour.ago..).count %>
+        </div>
+        <div class="text-muted small text-uppercase tracking-wider">past hour</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card glass text-center h-100">
+      <div class="card-body p-4">
+        <div class="display-4 fw-extrabold mb-2 text-info">
+          <%= JobPosting.where(published_at: 1.day.ago..).count %>
+        </div>
+        <div class="text-muted small text-uppercase tracking-wider">past day</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card glass text-center h-100">
+      <div class="card-body p-4">
+        <div class="display-4 fw-extrabold mb-2 text-info">
+          <%= JobPosting.where(published_at: 1.week.ago..).count %>
+        </div>
+        <div class="text-muted small text-uppercase tracking-wider">past week</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card glass border-0 mb-5 overflow-hidden">
+  <div class="card-header border-0 bg-transparent py-4">
+    <h3 class="h5 mb-0 px-2 opacity-75">Market Publication Volume</h3>
+  </div>
+  <div class="card-body p-0">
+    <div class="px-4 pb-4">
+      <%= line_chart(charts_data_job_postings_path(days: 21), 
+          discrete: true, 
+          label: 'Published', 
+          format: '%Y-%m-%d', 
+          time_zone: false,
+          colors: ["#3b82f6"],
+          library: { 
+            scales: { 
+              y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#94a3b8" } },
+              x: { grid: { display: false }, ticks: { color: "#94a3b8" } }
+            },
+            plugins: { legend: { display: false } }
+          }) %>
+    </div>
+  </div>
 </div>
