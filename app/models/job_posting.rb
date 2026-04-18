@@ -14,38 +14,18 @@ class JobPosting < ApplicationRecord
   has_many :domains, -> { readonly }, through: :target_domains
 
   geocoded_by :location
-  after_validation :geocode, if: ->(obj) { obj.location.present? && obj.location_changed? }
+  # after_validation :geocode, if: ->(obj) { obj.location.present? && obj.location_changed? }
+  after_commit :enqueue_geocoding, on: %i[create update], if: -> { location.present? && (saved_change_to_location? || latitude.nil?) }
 
   scope :recent, -> { order(published_at: :desc) }
 
-  # Advanced full-text search
-  pg_search_scope :search,
-                  against: { title: 'A', body: 'B' },
-                  using: {
-                    tsearch: { prefix: true, dictionary: 'english' },
-                    trigram: { threshold: 0.1 }
-                  }
-
-  def self.semantic_search(query_text, limit: 10)
-    embedding = JobBoards::Embedder.embed_text(query_text)
-    return none if embedding.blank?
-
-    nearest_neighbors(:embedding, embedding, distance: 'cosine').limit(limit)
-  end
-
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[id title company location published_at target_url source_id created_at updated_at latitude longitude]
-  end
-
-  def self.ransackable_associations(_auth_object = nil)
-    %w[source domains target_domains]
+  def enqueue_geocoding
+    JobBoards::GeocodingJob.perform_later(id)
   end
 
   def self.geocode_all
     where(latitude: nil, longitude: nil).where.not(location: nil).find_each do |posting|
-      posting.geocode
-      posting.save
-      sleep(1.0) # Be kind to the geocoding API (Nominatim limit is 1 req/sec)
+      JobBoards::GeocodingJob.perform_later(posting.id)
     end
   end
 

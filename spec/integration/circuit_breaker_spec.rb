@@ -53,4 +53,16 @@ RSpec.describe 'Distributed Circuit Breaker Integration', type: :request do
     other_slug = 'remotive'
     expect(source_locked?(other_slug)).to be false
   end
+
+  it 'trips the circuit breaker for geocoding on a 429 error' do
+    # Mock a Geocoder 429 error (simulating always_raise: :all behavior)
+    allow(Geocoder).to receive(:search).and_raise(StandardError.new('Geocoding API error: 429 Too Many Requests'))
+
+    job_posting = JobPosting.create!(signature: 'geo-test', location: 'New York', title: 'Test', company: 'Test')
+    
+    job = JobBoards::GeocodingJob.new
+    expect {
+      job.perform(job_posting.id)
+    }.to change { source_locked?('geocoding') }.from(false).to(true)
+  end
 end

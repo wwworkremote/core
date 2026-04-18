@@ -13,6 +13,9 @@ Geocoder.configure(
   # geocoding service request timeout, in seconds (default 3):
   timeout: 10,
 
+  # always raise errors (see https://github.com/alexreisnero/geocoder/blob/master/README.md#error-handling)
+  always_raise: :all,
+
   # set default units to kilometers:
   units: :km,
 
