@@ -59,17 +59,20 @@ module WwworkRemote
     # config.api_only = true
 
     # Lograge configuration for OTel-friendly structured logs
-    config.lograge.enabled = true
-    config.lograge.formatter = Lograge::Formatters::Json.new
-    config.lograge.custom_options = lambda do |event|
-      {
-        time: event.time,
-        remote_ip: event.payload[:remote_ip],
-        user_agent: event.payload[:user_agent],
-        # Add OTel context if available
-        trace_id: OpenTelemetry::Trace.current_span.context.trace_id.unpack1('H*'),
-        span_id: OpenTelemetry::Trace.current_span.context.span_id.unpack1('H*')
-      }
+    config.after_initialize do
+      config.lograge.enabled = true
+      config.lograge.support_action_cable = false
+      config.lograge.formatter = Lograge::Formatters::Json.new
+      config.lograge.custom_options = lambda do |event|
+        {
+          time: event.time,
+          remote_ip: event.payload[:remote_ip],
+          user_agent: event.payload[:user_agent],
+          # Add OTel context if available
+          trace_id: OpenTelemetry::Trace.current_span.context.trace_id.unpack1('H*'),
+          span_id: OpenTelemetry::Trace.current_span.context.span_id.unpack1('H*')
+        }
+      end
     end
   end
 end

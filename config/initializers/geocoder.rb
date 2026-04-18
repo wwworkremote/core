@@ -17,12 +17,12 @@ Geocoder.configure(
   units: :km,
 
   # caching (see https://github.com/alexreisnero/geocoder/blob/master/README.md#caching for details)
-  # cache: Redis.new,
-  # cache_options: {
-  #   expiration: 2.days,
-  #   prefix: "geocoder:"
-  # }
+  cache: Rails.cache,
+  cache_options: {
+    expiration: 1.month,
+    prefix: 'geocoder:'
+  },
 
   # Nominatim requires a user agent
-  http_headers: { 'User-Agent' => 'wwworkremote-job-aggregator (local-personal-use)' }
+  http_headers: { 'User-Agent' => 'WWWorkRemote (mike@just3ws.com)' }
 )

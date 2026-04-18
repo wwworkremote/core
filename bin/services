@@ -18,7 +18,7 @@ KNOWN_SERVICES=("server" "automation" "assets" "specs" "logs")
 get_service_cmd() {
   case "$1" in
     server)     echo "rm -f tmp/pids/server.pid && WEB_CONCURRENCY=0 bin/rails server -p 3010 -b 0.0.0.0" ;;
-    automation) echo "bin/jobs" ;;
+    automation) echo "bin/jobs --mode=async" ;;
     assets)     echo "bin/rails dartsass:watch" ;;
     specs)      echo "bundle exec guard --no-interactions" ;;
     logs)       echo "tail -F log/development.log $LOG_DIR/server.log $LOG_DIR/automation.log $LOG_DIR/assets.log $LOG_DIR/specs.log" ;;
@@ -90,6 +90,13 @@ if [ "$COMMAND" = "attach" ]; then
   fi
 fi
 
+if [ "$COMMAND" = "start" ] && [ "$USE_TMUX" = "true" ] && [ "$DAEMON" = "false" ]; then
+  if command -v tmux >/dev/null && tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
+    echo "🔳 tmux session '$TMUX_SESSION' already running. Attaching..."
+    exec tmux attach -t "$TMUX_SESSION"
+  fi
+fi
+
 if [ -z "$SERVICE" ]; then
   if [ "$COMMAND" = "status" ] || [ "$COMMAND" = "logs" ] || [ "$COMMAND" = "stop" ]; then
     SERVICE="all"
@@ -136,9 +143,10 @@ run_prechecks() {
   echo "🔍 Running pre-boot checks..."
   # Kill anything on port 3010
   lsof -ti:3010 | xargs kill -9 2>/dev/null || true
-  # Run migrations for all databases
+  # Run migrations for all databases (Solid Queue, Cache, Cable, etc.)
+  # This uses db:prepare which is idempotent and non-destructive
   bin/rails db:prepare
-  # Ensure queue environment is set
+  # Ensure environment is set
   bin/rails db:environment:set RAILS_ENV=development 2>/dev/null || true
   # Touch log files to ensure tail -F doesn't fail
   touch log/development.log "$LOG_DIR/server.log" "$LOG_DIR/automation.log" "$LOG_DIR/assets.log" "$LOG_DIR/specs.log"

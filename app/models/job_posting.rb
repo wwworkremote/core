@@ -45,7 +45,7 @@ class JobPosting < ApplicationRecord
     where(latitude: nil, longitude: nil).where.not(location: nil).find_each do |posting|
       posting.geocode
       posting.save
-      sleep(0.5) # Be kind to the geocoding API
+      sleep(1.0) # Be kind to the geocoding API (Nominatim limit is 1 req/sec)
     end
   end
 
