@@ -14,8 +14,13 @@
 
 @layer base {
   body {
-    @apply font-inter bg-base-300 text-base-content min-h-screen relative overflow-x-hidden pt-36 text-sm;
+    @apply font-inter bg-base-300 text-base-content min-h-screen relative overflow-x-hidden pt-0 text-sm;
     -webkit-font-smoothing: antialiased;
+  }
+  
+  /* Global Icon Constraints */
+  svg {
+    @apply inline-block shrink-0;
   }
 }
 
@@ -28,10 +33,9 @@
       radial-gradient(at 100% 100%, rgba(139, 233, 253, 0.1) 0px, transparent 40%),
       radial-gradient(at 50% 50%, #282a36 0px, transparent 100%);
   }
-
   /* Glassmorphism using DaisyUI semantics */
   .glass-neural {
-    @apply bg-opacity-60 backdrop-blur-md border border-white/5 shadow-xl;
+    @apply bg-slate-900/60 backdrop-blur-md border border-white/5 shadow-xl;
   }
 
   .sparkle-ai {

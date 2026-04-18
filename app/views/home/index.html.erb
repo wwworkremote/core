@@ -3,107 +3,115 @@
     <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Operational Overview</h1>
     <p class="text-base-content/50 font-bold uppercase tracking-widest text-[10px]">Real-time system telemetry and node status</p>
   </div>
-  <div>
-    <%= link_to data_fetchers_path, class: "btn btn-primary btn-sm flex items-center gap-2 rounded-lg" do %>
-      <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> MANAGE_INGESTION_NODES
-    <% end %>
+  <div class="flex items-center gap-3">
+    <div class="badge badge-outline border-white/10 gap-2 px-4 py-3 font-mono text-[10px]">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> SYSTEM_LIVE
+    </div>
   </div>
 </div>
 
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-12 mb-20">
+<div class="space-y-12">
   <!-- Ingestion Telemetry -->
-  <div class="space-y-6">
-    <div class="flex items-center gap-4 opacity-50 px-2">
+  <section>
+    <div class="flex items-center gap-4 mb-6 opacity-30">
       <h2 class="text-[10px] font-black uppercase tracking-[0.3em]">Telemetry_Ingestion</h2>
       <div class="h-px flex-1 bg-white/10"></div>
     </div>
 
-    <div class="stats stats-vertical md:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
-      <div class="stat px-8">
-        <div class="stat-title text-[10px] font-black uppercase tracking-widest">1H_VOL</div>
-        <div class="stat-value text-primary text-4xl"><%= Source.where(created_at: 1.hour.ago..).count %></div>
-        <div class="stat-desc font-bold text-[9px] opacity-40">Sync_Buffer</div>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div class="xl:col-span-2">
+        <div class="stats stats-vertical lg:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
+          <div class="stat px-8 py-6">
+            <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">1H_VOL</div>
+            <div class="stat-value text-primary text-4xl font-black tracking-tighter"><%= Source.where(created_at: 1.hour.ago..).count %></div>
+            <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Sync_Buffer</div>
+          </div>
+          
+          <div class="stat px-8 py-6">
+            <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">24H_VOL</div>
+            <div class="stat-value text-secondary text-4xl font-black tracking-tighter"><%= Source.where(created_at: 1.day.ago..).count %></div>
+            <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Node_Payload</div>
+          </div>
+          
+          <div class="stat px-8 py-6">
+            <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">7D_VOL</div>
+            <div class="stat-value text-accent text-4xl font-black tracking-tighter"><%= Source.where(created_at: 1.week.ago..).count %></div>
+            <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Network_Growth</div>
+          </div>
+        </div>
       </div>
-      
-      <div class="stat px-8">
-        <div class="stat-title text-[10px] font-black uppercase tracking-widest">24H_VOL</div>
-        <div class="stat-value text-secondary text-4xl"><%= Source.where(created_at: 1.day.ago..).count %></div>
-        <div class="stat-desc font-bold text-[9px] opacity-40">Node_Payload</div>
-      </div>
-      
-      <div class="stat px-8">
-        <div class="stat-title text-[10px] font-black uppercase tracking-widest">7D_VOL</div>
-        <div class="stat-value text-accent text-4xl"><%= Source.where(created_at: 1.week.ago..).count %></div>
-        <div class="stat-desc font-bold text-[9px] opacity-40">Network_Growth</div>
+
+      <div class="card bg-base-200/50 border border-white/5 shadow-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-base-300/30">
+          <span class="text-[9px] font-black uppercase tracking-widest opacity-40">Node_Velocity</span>
+          <span class="badge badge-primary badge-xs rounded font-black tracking-widest px-2 py-2 text-[8px]">ACTIVE</span>
+        </div>
+        <div class="p-4">
+          <%= line_chart(charts_data_sources_path(days: 21), 
+              discrete: true, 
+              height: "120px",
+              colors: ["#bd93f9"],
+              library: { 
+                scales: { 
+                  y: { display: false },
+                  x: { display: false }
+                },
+                plugins: { legend: { display: false } }
+              }) %>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="card bg-base-200/50 border border-white/5 shadow-2xl overflow-hidden">
-      <div class="px-8 py-4 border-b border-white/5 flex justify-between items-center bg-base-300/30">
-        <span class="text-[10px] font-black uppercase tracking-widest text-base-content/50">Node_Velocity_Map</span>
-        <span class="badge badge-primary badge-xs rounded font-black tracking-widest px-2 py-2 text-[8px]">REAL_TIME</span>
-      </div>
-      <div class="p-6">
-        <%= line_chart(charts_data_sources_path(days: 21), 
-            discrete: true, 
-            height: "180px",
-            colors: ["#bd93f9"],
-            library: { 
-              scales: { 
-                y: { grid: { color: "rgba(255,255,255,0.02)" }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } },
-                x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } }
-              },
-              plugins: { legend: { display: false } }
-            }) %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Processing Telemetry -->
-  <div class="space-y-6">
-    <div class="flex items-center gap-4 opacity-50 px-2">
+  <!-- Synthesis Telemetry -->
+  <section>
+    <div class="flex items-center gap-4 mb-6 opacity-30">
       <h2 class="text-[10px] font-black uppercase tracking-[0.3em]">Telemetry_Synthesis</h2>
       <div class="h-px flex-1 bg-white/10"></div>
     </div>
 
-    <div class="stats stats-vertical md:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
-      <div class="stat px-8">
-        <div class="stat-title text-[10px] font-black uppercase tracking-widest">NEW_SIGNALS</div>
-        <div class="stat-value text-info text-4xl"><%= JobPosting.where(published_at: 1.hour.ago..).count %></div>
-        <div class="stat-desc font-bold text-[9px] opacity-40">Neural_Pulse</div>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div class="xl:col-span-2">
+        <div class="stats stats-vertical lg:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
+          <div class="stat px-8 py-6">
+            <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">NEW_SIGNALS</div>
+            <div class="stat-value text-info text-4xl font-black tracking-tighter"><%= JobPosting.where(published_at: 1.hour.ago..).count %></div>
+            <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Neural_Pulse</div>
+          </div>
+          
+          <div class="stat px-8 py-6">
+            <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">DAILY_SYNC</div>
+            <div class="stat-value text-success text-4xl font-black tracking-tighter"><%= JobPosting.where(published_at: 1.day.ago..).count %></div>
+            <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Market_Inflow</div>
+          </div>
+          
+          <div class="stat px-8 py-6">
+            <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">STALE_NODES</div>
+            <div class="stat-value text-slate-500 text-4xl font-black tracking-tighter"><%= JobPosting.where('published_at < ?', 30.days.ago).count %></div>
+            <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Prune_Queue</div>
+          </div>
+        </div>
       </div>
-      
-      <div class="stat px-8">
-        <div class="stat-title text-[10px] font-black uppercase tracking-widest">DAILY_SYNC</div>
-        <div class="stat-value text-success text-4xl"><%= JobPosting.where(published_at: 1.day.ago..).count %></div>
-        <div class="stat-desc font-bold text-[9px] opacity-40">Market_Inflow</div>
-      </div>
-      
-      <div class="stat px-8">
-        <div class="stat-title text-[10px] font-black uppercase tracking-widest">STALE_JOBS</div>
-        <div class="stat-value text-slate-500 text-4xl"><%= JobPosting.where('published_at < ?', 30.days.ago).count %></div>
-        <div class="stat-desc font-bold text-[9px] opacity-40">Prune_Queue</div>
-      </div>
-    </div>
 
-    <div class="card bg-base-200/50 border border-white/5 shadow-2xl overflow-hidden">
-      <div class="px-8 py-4 border-b border-white/5 flex justify-between items-center bg-base-300/30">
-        <span class="text-[10px] font-black uppercase tracking-widest text-base-content/50">Market_Distribution_Curve</span>
-        <span class="badge badge-info badge-xs rounded font-black tracking-widest px-2 py-2 text-[8px]">SYNTHETIC_SCAN</span>
-      </div>
-      <div class="p-6">
-        <%= line_chart(charts_data_job_postings_path(days: 21), 
-            discrete: true, 
-            height: "180px",
-            colors: ["#8be9fd"],
-            library: { 
-              scales: { 
-                y: { grid: { color: "rgba(255,255,255,0.02)" }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } },
-                x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } }
-              },
-              plugins: { legend: { display: false } }
-            }) %>
+      <div class="card bg-base-200/50 border border-white/5 shadow-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-base-300/30">
+          <span class="text-[9px] font-black uppercase tracking-widest opacity-40">Distribution_Curve</span>
+          <span class="badge badge-info badge-xs rounded font-black tracking-widest px-2 py-2 text-[8px]">STABLE</span>
+        </div>
+        <div class="p-4">
+          <%= line_chart(charts_data_job_postings_path(days: 21), 
+              discrete: true, 
+              height: "120px",
+              colors: ["#8be9fd"],
+              library: { 
+                scales: { 
+                  y: { display: false },
+                  x: { display: false }
+                },
+                plugins: { legend: { display: false } }
+              }) %>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </div>
