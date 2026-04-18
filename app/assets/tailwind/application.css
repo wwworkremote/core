@@ -2,40 +2,70 @@
 @plugin "daisyui";
 
 @theme {
-  /* Design Tokens */
-  --color-gemini-bg: #282a36; /* Dracula Background */
-  --color-gemini-surface: #44475a; /* Dracula Current Line */
-  --color-gemini-accent: #bd93f9; /* Dracula Purple */
-  --color-gemini-glow: #8be9fd; /* Dracula Cyan */
-  --color-gemini-border: rgba(248, 248, 242, 0.1);
+  /* Official Dracula Pro Palette */
+  --color-dracula-bg: #22212c;
+  --color-dracula-bg-dark: #17161d;
+  --color-dracula-bg-light: #454158;
+  --color-dracula-fg: #f8f8f2;
+  --color-dracula-comment: #7970a9;
+  --color-dracula-selection: #454158;
+  
+  --color-dracula-cyan: #80ffea;
+  --color-dracula-green: #8aff80;
+  --color-dracula-orange: #ffca80;
+  --color-dracula-pink: #ff80bf;
+  --color-dracula-purple: #9580ff;
+  --color-dracula-red: #ff9580;
+  --color-dracula-yellow: #ffff80;
+
+  /* Map to Gemini Neural variables for backward compatibility in views */
+  --color-gemini-bg: var(--color-dracula-bg);
+  --color-gemini-surface: var(--color-dracula-bg-light);
+  --color-gemini-accent: var(--color-dracula-purple);
+  --color-gemini-glow: var(--color-dracula-cyan);
   
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
+  :root {
+    /* DaisyUI Dracula Overrides */
+    --p: 149 128 255;  /* Purple */
+    --s: 255 128 191;  /* Pink */
+    --a: 128 255 234;  /* Cyan */
+    --n: 69 65 88;     /* Selection/Neutral */
+    --b1: 34 33 44;    /* Background */
+    --b2: 23 22 29;    /* Background Dark */
+    --b3: 69 65 88;    /* Background Light */
+    --bc: 248 248 242; /* Foreground */
+    
+    --in: 128 255 234; /* Info -> Cyan */
+    --su: 138 255 128; /* Success -> Green */
+    --wa: 255 255 128; /* Warning -> Yellow */
+    --er: 255 149 128; /* Error -> Red */
+  }
+
   body {
-    @apply font-inter bg-base-300 text-base-content min-h-screen relative overflow-x-hidden pt-0 text-sm;
+    @apply font-inter bg-dracula-bg text-dracula-fg min-h-screen relative overflow-x-hidden pt-0 text-sm;
     -webkit-font-smoothing: antialiased;
   }
   
-  /* Global Icon Constraints */
   svg {
     @apply inline-block shrink-0;
   }
 }
 
 @layer components {
-  /* DaisyUI Overrides or Custom Extras */
   .gemini-mesh {
-    @apply fixed inset-0 -z-10 opacity-30;
+    @apply fixed inset-0 -z-10 opacity-40;
     background: 
-      radial-gradient(at 0% 0%, rgba(189, 147, 249, 0.1) 0px, transparent 40%),
-      radial-gradient(at 100% 100%, rgba(139, 233, 253, 0.1) 0px, transparent 40%),
-      radial-gradient(at 50% 50%, #282a36 0px, transparent 100%);
+      radial-gradient(at 0% 0%, rgba(149, 128, 255, 0.12) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, rgba(128, 255, 234, 0.12) 0px, transparent 40%),
+      radial-gradient(at 50% 50%, #17161d 0px, transparent 100%);
   }
-  /* Glassmorphism using DaisyUI semantics */
+
   .glass-neural {
-    @apply bg-slate-900/60 backdrop-blur-md border border-white/5 shadow-xl;
+    @apply bg-dracula-bg/60 backdrop-blur-md border border-white/5 shadow-xl;
   }
 
   .sparkle-ai {
@@ -44,7 +74,7 @@
 
   .sparkle-ai::after {
     content: "✦";
-    @apply absolute -top-2 -right-3 text-secondary text-sm animate-pulse;
+    @apply absolute -top-2 -right-3 text-dracula-purple text-sm animate-pulse;
   }
 }
 
