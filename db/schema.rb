@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_18_135823) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_18_135926) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -275,7 +275,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_135823) do
     t.index ["family"], name: "index_models_on_family"
     t.index ["modalities"], name: "index_models_on_modalities", using: :gin
     t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
-    t.index ["provider"], name: "index_models_on_provider"
   end
 
   create_table "origins", force: :cascade do |t|
@@ -464,9 +463,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_135823) do
     t.bigint "job_posting_id", null: false
     t.datetime "updated_at", null: false
     t.index ["domain_id", "job_posting_id"], name: "index_target_domains_on_domain_id_and_job_posting_id", unique: true
-    t.index ["domain_id"], name: "index_target_domains_on_domain_id"
     t.index ["job_posting_id", "domain_id"], name: "index_target_domains_on_job_posting_id_and_domain_id", unique: true
-    t.index ["job_posting_id"], name: "index_target_domains_on_job_posting_id"
   end
 
   create_table "tool_calls", force: :cascade do |t|
@@ -510,12 +507,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_135823) do
   add_foreign_key "llm_messages", "llm_chats"
   add_foreign_key "llm_messages", "models"
   add_foreign_key "llm_messages", "tool_calls"
-  add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade, validate: false
-  add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade, validate: false
-  add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade, validate: false
-  add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade, validate: false
-  add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade, validate: false
-  add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade, validate: false
+  add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "sources", "origins"
   add_foreign_key "target_domains", "domains"
   add_foreign_key "target_domains", "job_postings"

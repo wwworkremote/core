@@ -23,7 +23,6 @@
 #  index_models_on_capabilities           (capabilities) USING gin
 #  index_models_on_family                 (family)
 #  index_models_on_modalities             (modalities) USING gin
-#  index_models_on_provider               (provider)
 #  index_models_on_provider_and_model_id  (provider,model_id) UNIQUE
 #
 class Model < ApplicationRecord
