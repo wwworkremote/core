@@ -2,20 +2,26 @@
 
 Avo.configure do |config|
   ## == Configuration ==
-  # config.root_path = '/avo'
+  config.home_path = -> { '/avo/dashboards/wwwork_remote_dashboard' }
   config.app_name = 'WWWorkRemote'
 
   config.branding = {
     colors: {
-      primary: '#4f46e5' # Indigo 600
+      background: '#020617', # Deep Indigo-950
+      surface: '#0f172a',    # Slate-900
+      primary: '#8b5cf6'     # Violet-500
     },
-    chart_colors: ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444']
+    chart_colors: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
   }
 
   ## == Authentication ==
   config.current_user_method = :current_user
 
   config.main_menu = lambda {
+    section 'Dashboards', icon: 'heroicons/outline/chart-bar' do
+      dashboard :wwwork_remote_dashboard
+    end
+
     section 'WwworkRemote', icon: 'heroicons/outline/briefcase' do
       resource :job_posting
     end
