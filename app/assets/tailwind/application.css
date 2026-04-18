@@ -52,6 +52,55 @@
 }
 
 @layer components {
+  /* ... existing components ... */
+  
+  /* Markdown Typography */
+  .prose-invert {
+    @apply text-slate-300;
+  }
+  .prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4 {
+    @apply text-white font-bold mt-8 mb-4 tracking-tight;
+  }
+  .prose-invert h1 { @apply text-2xl; }
+  .prose-invert h2 { @apply text-xl border-b border-white/10 pb-2; }
+  .prose-invert p { @apply mb-4 leading-relaxed; }
+  .prose-invert ul { @apply list-disc list-outside ml-5 mb-4 space-y-1; }
+  .prose-invert ol { @apply list-decimal list-outside ml-5 mb-4 space-y-1; }
+  .prose-invert li { @apply pl-1; }
+  .prose-invert a {
+    @apply text-violet-400 hover:text-violet-300 underline underline-offset-4 decoration-violet-500/50 transition-colors;
+  }
+  .prose-invert strong { @apply font-bold text-white; }
+  .prose-invert blockquote {
+    @apply border-l-4 border-violet-500/50 pl-4 py-1 italic text-slate-400 bg-slate-900/30 rounded-r;
+  }
+  .prose-invert code {
+    @apply font-mono text-[0.9em] bg-slate-900 px-1.5 py-0.5 rounded border border-white/5 text-emerald-400;
+  }
+  .prose-invert pre {
+    @apply bg-slate-900 p-4 rounded-xl border border-white/10 overflow-x-auto mb-4;
+  }
+  .prose-invert pre code {
+    @apply bg-transparent p-0 border-0 text-slate-300;
+  }
+
+  /* Kaminari Pagination Overrides */
+  .pagination {
+    @apply flex flex-wrap items-center justify-center gap-2;
+  }
+  .pagination .page, .pagination .next, .pagination .prev, .pagination .first, .pagination .last {
+    @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 rounded-lg font-bold text-sm transition-all duration-150;
+  }
+  .pagination a {
+    @apply bg-slate-800/80 text-slate-400 border border-white/10 hover:bg-violet-500/20 hover:text-violet-400 hover:border-violet-500/30;
+  }
+  .pagination .current {
+    @apply bg-violet-600/20 text-violet-400 border border-violet-500/50 shadow-[0_0_10px_rgba(139,92,246,0.2)];
+  }
+  .pagination .gap {
+    @apply text-slate-500 font-bold px-2;
+  }
+
   .gemini-mesh {
     @apply fixed inset-0 -z-10 opacity-40;
     background: 

@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   root to: 'home#index'
   get 'home/index'
 
+  resources :outbound_links, only: [:show]
   resources :job_postings, only: %i[index show]
 
   resources :data_fetchers, only: [:index] do

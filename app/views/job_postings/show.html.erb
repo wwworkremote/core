@@ -14,7 +14,7 @@
   <article class="lg:col-span-2 space-y-8">
     <header class="card-neural p-8 lg:p-10 border-t-4 border-t-violet-500">
       <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-6">
-        <div>
+        <div class="flex-1">
           <h1 class="text-3xl md:text-4xl font-black text-white mb-2 sparkle-ai"><%= @job_posting.title %></h1>
           <p class="text-xl font-bold text-blue-400 tracking-wide">
             <%= link_to @job_posting.company, job_postings_path(company: @job_posting.company), class: "hover:text-blue-300 hover:underline transition-colors" %>
@@ -22,9 +22,11 @@
         </div>
         
         <% if @job_posting.source&.origin&.name %>
-          <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "inline-flex items-center px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-black uppercase tracking-widest whitespace-nowrap hover:bg-violet-500/20 hover:text-white transition-colors" do %>
-            <%= @job_posting.source.origin.name %>
-          <% end %>
+          <div class="md:shrink-0">
+            <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "inline-flex items-center px-4 py-2 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-black uppercase tracking-widest whitespace-nowrap hover:bg-violet-500/20 hover:text-white transition-colors shadow-sm" do %>
+              <i class="bi bi-link-45deg me-1"></i> <%= @job_posting.source.origin.name %>
+            <% end %>
+          </div>
         <% end %>
       </div>
 
@@ -47,16 +49,17 @@
     <div class="card-neural p-8 lg:p-10">
       <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/10 pb-4">Position Intelligence</h2>
       
-      <div class="text-slate-300 leading-relaxed space-y-5 text-[15px] prose-invert max-w-none">
-        <%= simple_format(@job_posting.body) %>
+      <div class="text-slate-300 leading-relaxed space-y-4 text-[15px] prose-invert max-w-none">
+        <%= markdown(@job_posting.body) %>
       </div>
 
       <% if @job_posting.target_url.present? %>
-        <div class="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-4">
-          <%= link_to safe_job_url(@job_posting.target_url), target: "_blank", rel: "noopener noreferrer", class: "btn-neural flex justify-center items-center gap-2 px-8 py-3 text-sm" do %>
+        <div class="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center gap-4">
+          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", rel: "noopener noreferrer", class: "btn-neural w-full sm:w-auto flex justify-center items-center gap-2 px-6 py-3 text-sm shadow-md hover:shadow-violet-500/20" do %>
             <i class="bi bi-box-arrow-up-right"></i> Initiate Application
           <% end %>
-          <%= link_to safe_job_url(@job_posting.target_url), target: "_blank", rel: "noopener noreferrer", class: "px-8 py-3 rounded-lg font-bold transition-all duration-150 bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white text-xs uppercase tracking-wider text-center flex justify-center items-center gap-2" do %>
+          
+          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", rel: "noopener noreferrer", class: "w-full sm:w-auto px-6 py-3 rounded-lg font-bold transition-all duration-150 bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white text-xs uppercase tracking-wider text-center flex justify-center items-center gap-2 shadow-sm" do %>
             <i class="bi bi-link-45deg"></i> Source Origin
           <% end %>
         </div>
@@ -80,7 +83,15 @@
 
         <li>
           <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Ingestion Source</div>
-          <div class="text-slate-300 font-medium"><%= @job_posting.source&.origin&.name || "External Network" %></div>
+          <div class="text-slate-300 font-medium">
+            <% if @job_posting.source&.origin&.name %>
+              <%= link_to job_postings_path(source_id: @job_posting.source_id), class: "hover:text-violet-400 underline underline-offset-4 transition-colors" do %>
+                <%= @job_posting.source.origin.name %>
+              <% end %>
+            <% else %>
+              External Network
+            <% end %>
+          </div>
         </li>
         
         <% if @job_posting.tags.present? && @job_posting.tags.any? %>
