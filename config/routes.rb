@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :llm_chats do
+    resources :llm_messages, only: %i[create]
+  end
+  resources :models, only: %i[index show] do
+    collection do
+      post :refresh
+    end
+  end
   mount_avo
   # Dashboard Routes
   root to: 'home#index'
