@@ -1,71 +1,124 @@
-<div class="row mb-4">
-  <div class="col">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><%= link_to "Jobs", job_postings_path %></li>
-        <li class="breadcrumb-item active" aria-current="page text-truncate"><%= @job_posting.title %></li>
-      </ol>
-    </nav>
-  </div>
+<% content_for :title, "#{@job_posting.title} at #{@job_posting.company}" %>
+
+<div class="mb-8">
+  <nav aria-label="breadcrumb">
+    <ol class="flex items-center space-x-2 text-sm font-medium text-slate-500">
+      <li><%= link_to "Job Market", job_postings_path, class: "hover:text-violet-400 transition-colors" %></li>
+      <li><i class="bi bi-chevron-right text-[10px]"></i></li>
+      <li class="text-slate-300 truncate max-w-xs" aria-current="page"><%= @job_posting.title %></li>
+    </ol>
+  </nav>
 </div>
 
-<div class="row">
-  <div class="col-lg-8">
-    <div class="card shadow border-0 p-4 p-md-5 mb-4 rounded-4">
-      <div class="d-flex justify-content-between align-items-start mb-4">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <article class="lg:col-span-2 space-y-8">
+    <header class="card-neural p-8 lg:p-10 border-t-4 border-t-violet-500">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-6">
         <div>
-          <h1 class="h2 mb-1 text-primary"><%= @job_posting.title %></h1>
-          <p class="h4 text-muted mb-3"><%= @job_posting.company %></p>
-          <% if @job_posting.location? %>
-            <div class="text-muted mb-2">
-              <i class="bi bi-geo-alt-fill me-1"></i> <%= @job_posting.location %>
-            </div>
-          <% end %>
-          <div class="text-muted small">
-            <i class="bi bi-calendar-event me-1"></i> Published <%= @job_posting.published_at.strftime("%B %d, %Y") if @job_posting.published_at %>
-          </div>
+          <h1 class="text-3xl md:text-4xl font-black text-white mb-2 sparkle-ai"><%= @job_posting.title %></h1>
+          <p class="text-xl font-bold text-blue-400 tracking-wide"><%= @job_posting.company %></p>
         </div>
-        <span class="badge bg-primary px-3 py-2"><%= @job_posting.source&.origin&.name %></span>
+        
+        <% if @job_posting.source&.origin&.name %>
+          <span class="inline-flex items-center px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-black uppercase tracking-widest whitespace-nowrap">
+            <%= @job_posting.source.origin.name %>
+          </span>
+        <% end %>
       </div>
 
-      <hr class="my-4 opacity-10">
+      <div class="flex flex-wrap items-center gap-6 text-sm font-medium text-slate-400">
+        <% if @job_posting.location.present? %>
+          <div class="flex items-center gap-2">
+            <i class="bi bi-geo-alt-fill text-violet-500"></i>
+            <%= @job_posting.location %>
+          </div>
+        <% end %>
+        <% if @job_posting.published_at %>
+          <div class="flex items-center gap-2">
+            <i class="bi bi-calendar-event text-blue-500"></i>
+            Published <%= @job_posting.published_at.strftime("%B %d, %Y") %>
+          </div>
+        <% end %>
+      </div>
+    </header>
 
-      <div class="job-body lead-sm text-dark overflow-hidden">
+    <div class="card-neural p-8 lg:p-10">
+      <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/10 pb-4">Position Intelligence</h2>
+      
+      <div class="text-slate-300 leading-relaxed space-y-5 text-[15px] prose-invert max-w-none">
         <%= simple_format(@job_posting.body) %>
       </div>
 
-      <% if @job_posting.target_url? %>
-        <div class="mt-5 d-grid gap-2 d-md-flex">
-          <%= link_to "Apply Now", safe_job_url(@job_posting.target_url), target: "_blank", class: "btn btn-primary btn-lg px-5 shadow-sm" %>
-          <%= link_to "View Original", safe_job_url(@job_posting.target_url), target: "_blank", class: "btn btn-outline-secondary btn-lg shadow-sm" %>
+      <% if @job_posting.target_url.present? %>
+        <div class="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-4">
+          <%= link_to safe_job_url(@job_posting.target_url), target: "_blank", rel: "noopener noreferrer", class: "btn-neural flex justify-center items-center gap-2 px-8 py-3 text-sm" do %>
+            <i class="bi bi-box-arrow-up-right"></i> Initiate Application
+          <% end %>
+          <%= link_to safe_job_url(@job_posting.target_url), target: "_blank", rel: "noopener noreferrer", class: "px-8 py-3 rounded-lg font-bold transition-all duration-150 bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white text-xs uppercase tracking-wider text-center flex justify-center items-center gap-2" do %>
+            <i class="bi bi-link-45deg"></i> Source Origin
+          <% end %>
         </div>
       <% end %>
     </div>
-  </div>
+  </article>
 
-  <div class="col-lg-4">
-    <div class="card border-0 shadow-sm p-4 rounded-4 sticky-top" style="top: 120px;">
-      <h5>Quick Info</h5>
-      <ul class="list-unstyled mb-0 mt-3">
-        <li class="mb-3">
-          <div class="text-muted small uppercase fw-bold mb-1">Source</div>
-          <div><%= @job_posting.source&.origin&.name %></div>
+  <aside class="lg:col-span-1">
+    <div class="card-neural p-6 sticky top-28">
+      <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/10 pb-4">Telemetry Metrics</h3>
+      
+      <ul class="space-y-6">
+        <% if @job_posting.data && @job_posting.data['ai_category'].present? %>
+          <li>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Neural Category</div>
+            <div class="inline-flex items-center px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">
+              <i class="bi bi-cpu me-2"></i> <%= @job_posting.data['ai_category'] %>
+            </div>
+          </li>
+        <% end %>
+
+        <li>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Ingestion Source</div>
+          <div class="text-slate-300 font-medium"><%= @job_posting.source&.origin&.name || "External Network" %></div>
         </li>
-        <% if @job_posting.tags? %>
-          <li class="mb-3">
-            <div class="text-muted small uppercase fw-bold mb-1">Tags</div>
-            <div class="d-flex flex-wrap gap-1">
+        
+        <% if @job_posting.tags.present? && @job_posting.tags.any? %>
+          <li>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Extracted Vectors</div>
+            <div class="flex flex-wrap gap-2">
               <% @job_posting.tags.each do |tag| %>
-                <span class="badge bg-light text-primary border"><%= tag %></span>
+                <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <%= tag %>
+                </span>
               <% end %>
             </div>
           </li>
         <% end %>
-        <li class="mb-0">
-          <div class="text-muted small uppercase fw-bold mb-1">Status</div>
-          <div class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Active Listing</div>
+
+        <% if @job_posting.embedding.present? %>
+          <li>
+            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Vector Status</div>
+            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+              <i class="bi bi-check-circle-fill"></i> Embedding Indexed
+            </div>
+          </li>
+        <% end %>
+
+        <li>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">System Status</div>
+          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Listing
+          </div>
         </li>
       </ul>
+
+      <% if @job_posting.embedding.present? %>
+        <div class="mt-8 pt-6 border-t border-white/10">
+          <%= link_to avo.resources_job_posting_path(@job_posting), class: "w-full px-4 py-2 rounded-lg font-bold transition-all duration-150 bg-violet-600/20 text-violet-400 border border-violet-500/30 hover:bg-violet-600/40 hover:text-white text-xs uppercase tracking-wider flex justify-center items-center gap-2" do %>
+            <i class="bi bi-diagram-3"></i> View Semantic Matches
+          <% end %>
+        </div>
+      <% end %>
+
     </div>
-  </div>
+  </aside>
 </div>
