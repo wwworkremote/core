@@ -102,6 +102,13 @@ module JobBoards
         jp.company      = data['company']
         jp.location     = data['location']
         jp.tags         = Array(data['role_type'])
+      when 'email_ingestion'
+        jp.title        = data['title']
+        jp.body         = data['description']
+        jp.target_url   = data['canonical_url'] || data['url']
+        jp.published_at = Time.zone.parse(data['email_received_at']) rescue Time.zone.now
+        jp.company      = data['company']
+        jp.location     = data['location']
       end
 
       # Preserve intersection data in the JobPosting payload

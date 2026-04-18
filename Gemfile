@@ -34,7 +34,9 @@ gem 'jsonb_accessor', '~> 1.0'
 gem 'kamal'
 gem 'kaminari', '~> 1.2'
 gem 'lograge'
+gem 'mail', '~> 2.8'
 gem 'meta-tags'
+gem 'mission_control-jobs'
 gem 'neighbor'
 gem 'oj'
 gem 'opentelemetry-api'
@@ -55,7 +57,6 @@ gem 'ransack'
 gem 'redcarpet'
 gem 'reverse_markdown'
 gem 'ruby_llm'
-gem 'mission_control-jobs'
 gem 'solid_cable'
 gem 'solid_cache'
 gem 'solid_queue'
@@ -106,4 +107,4 @@ gem 'guard-rspec', '~> 4.7', group: :development
 
 gem 'standard', '~> 1.35', groups: %i[development test]
 
-gem "tailwindcss-rails", "~> 4.4"
+gem 'tailwindcss-rails', '~> 4.4'

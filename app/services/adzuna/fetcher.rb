@@ -26,7 +26,7 @@ module Adzuna
           what: 'remote',
           'content-type': 'application/json'
         }
-        
+
         response = client.get(BASE_URL, params)
         return false if response.nil? || response.status != 200
 

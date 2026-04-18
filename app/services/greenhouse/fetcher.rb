@@ -29,7 +29,7 @@ module Greenhouse
     def fetch_granular(board, term, source_id, query_id)
       client = JobBoards::Client.new('greenhouse')
       url = "#{BASE_URL}/#{board}/jobs?content=true"
-      
+
       response = client.get(url)
       return if response.nil? || response.status != 200
 

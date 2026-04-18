@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_18_181703) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_18_214705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -99,6 +99,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_18_181703) do
     t.bigint "root_domain_id"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_domains_on_name", unique: true
+  end
+
+  create_table "email_import_records", force: :cascade do |t|
+    t.string "message_id"
+    t.string "file_path"
+    t.string "file_checksum"
+    t.string "source"
+    t.string "status"
+    t.text "error_message"
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["file_checksum"], name: "index_email_import_records_on_file_checksum"
+    t.index ["message_id"], name: "index_email_import_records_on_message_id"
   end
 
   create_table "emails", force: :cascade do |t|

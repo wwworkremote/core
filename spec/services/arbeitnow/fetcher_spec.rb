@@ -20,7 +20,7 @@ RSpec.describe Arbeitnow::Fetcher, type: :service do
 
       doc = JobBoards::Document.last
       data = JSON.parse(doc.document)
-      
+
       expect(doc.source_id).to eq(source.id)
       expect(data).to have_key('slug')
       expect(data).to have_key('company_name')

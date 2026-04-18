@@ -855,6 +855,7 @@ DEPENDENCIES
   kamal
   kaminari (~> 1.2)
   lograge
+  mail (~> 2.8)
   meta-tags
   mission_control-jobs
   neighbor

@@ -10,7 +10,7 @@ module HackerNews
 
       client = JobBoards::Client.new('hackernews')
       url = "https://hacker-news.firebaseio.com/v0/item/#{jobstory_id}.json"
-      
+
       response = client.get(url)
       return if response.nil? || response.status != 200
 

@@ -20,7 +20,7 @@ RSpec.describe HackerNews::Backfill, type: :service do
 
       doc = JobBoards::Document.last
       data = JSON.parse(doc.document)
-      
+
       expect(doc.source_id).to eq(source.id)
       expect(data).to have_key('id')
       expect(data).to have_key('title')

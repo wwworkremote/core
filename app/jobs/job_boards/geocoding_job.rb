@@ -14,7 +14,7 @@ module JobBoards
       begin
         # Geocoder.search returns an array of Geocoder::Result objects
         results = Geocoder.search(job_posting.location)
-        
+
         if results.present?
           result = results.first
           job_posting.update_columns(

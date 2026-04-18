@@ -11,7 +11,7 @@ module JobBoards
 
       fetcher_class = fetcher_class_name.constantize
       fetcher = fetcher_class.new
-      
+
       # Execute the specific fetch logic
       # We'll pass the necessary IDs and parameters to a specialized method
       fetcher.fetch_granular(site_slug, term, source_id, query_id)

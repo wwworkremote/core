@@ -11,7 +11,7 @@ RSpec.describe 'Mission Control - Jobs', type: :request do
     it 'loads the background jobs dashboard' do
       get '/jobs', headers: auth_headers
       expect(response).to have_http_status(:success).or have_http_status(:found)
-      
+
       if response.status == 302
         follow_redirect!
         expect(response).to have_http_status(:success)

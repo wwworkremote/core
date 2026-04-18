@@ -18,7 +18,7 @@ RSpec.describe 'Distributed Circuit Breaker Integration', type: :request do
     stub_request(:get, /api.lever.co/).to_return(status: 429, headers: { 'Retry-After' => '60' })
 
     client = JobBoards::Client.new(source_slug)
-    
+
     # Directly test the helper first
     lock_source!(source_slug, duration: 10.seconds)
     expect(source_locked?(source_slug)).to be true
@@ -39,17 +39,17 @@ RSpec.describe 'Distributed Circuit Breaker Integration', type: :request do
 
     # Execute the granular fetch job
     job = JobBoards::GranularFetchJob.new
-    
+
     # It should return early because the source is locked
     # We can verify this by checking that no logs were produced for fetching
     expect(Rails.logger).not_to receive(:info).with(/Lever: Fetched jobs/)
-    
+
     job.perform('Lever::Fetcher', 'test-site', '', source.id, query.id)
   end
 
   it 'does not affect other sources when one is locked' do
     lock_source!(source_slug, duration: 1.minute)
-    
+
     other_slug = 'remotive'
     expect(source_locked?(other_slug)).to be false
   end
@@ -59,7 +59,7 @@ RSpec.describe 'Distributed Circuit Breaker Integration', type: :request do
     allow(Geocoder).to receive(:search).and_raise(StandardError.new('Geocoding API error: 429 Too Many Requests'))
 
     job_posting = JobPosting.create!(signature: 'geo-test', location: 'New York', title: 'Test', company: 'Test')
-    
+
     job = JobBoards::GeocodingJob.new
     expect {
       job.perform(job_posting.id)
