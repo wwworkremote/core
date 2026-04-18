@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: llm_messages
+# Database name: primary
 #
 #  id                    :bigint           not null, primary key
 #  cache_creation_tokens :integer

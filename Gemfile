@@ -34,7 +34,6 @@ gem 'jbuilder'
 gem 'jsonb_accessor', '~> 1.0'
 gem 'kamal'
 gem 'kaminari', '~> 1.2'
-gem 'kredis'
 gem 'lograge'
 gem 'meta-tags'
 gem 'neighbor'
@@ -69,11 +68,10 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 # Development & Testing
 group :development, :test do
   gem 'brakeman'
-  gem 'bullet'
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'byebug', platforms: %i[mri windows]
   gem 'capybara'
   gem 'database_consistency', require: false
-  gem 'debug', platforms: %i[mri mingw x64_mingw]
+  gem 'debug', platforms: %i[mri windows]
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'faker'
@@ -104,3 +102,7 @@ end
 group :development do
   gem 'rack-mini-profiler'
 end
+
+gem 'guard-rspec', '~> 4.7', group: :development
+
+gem 'standard', '~> 1.35', groups: %i[development test]

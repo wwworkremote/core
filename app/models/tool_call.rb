@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: tool_calls
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  arguments         :jsonb

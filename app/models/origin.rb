@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: origins
+# Database name: primary
 #
 #  id         :bigint           not null, primary key
 #  data       :jsonb            not null

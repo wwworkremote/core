@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: hacker_news_v0_jobstories
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  by         :string

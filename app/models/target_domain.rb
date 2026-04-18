@@ -8,6 +8,7 @@ end
 # == Schema Information
 #
 # Table name: target_domains
+# Database name: primary
 #
 #  id             :bigint           not null, primary key
 #  created_at     :datetime         not null

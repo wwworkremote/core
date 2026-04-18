@@ -1,12 +1,24 @@
----
 default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  url: <%= ENV.fetch("DATABASE_URL") { "postgres://localhost/wwworkremote_development" } %>
 
 development:
-  <<: *default
+  primary:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
+  cache:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
+    migrations_paths: db/cable_migrate
 
 test:
   <<: *default

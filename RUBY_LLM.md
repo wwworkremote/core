@@ -38,10 +38,10 @@ The following providers are supported via environment variables:
 2. **Basic Usage in Rails:**
    ```ruby
    # Create a chat session
-   chat = LlmChat.create!(model: 'llama3.2:1b', provider: 'ollama')
+chat = LlmChat.create!(model: 'llama3.2:1b', provider: 'ollama')
 
    # Send a prompt
-   response = chat.ask("Analyze this job post: [description]")
+   response = chat.ask('Analyze this job post: [description]')
    ```
 
 ## Development & Testing

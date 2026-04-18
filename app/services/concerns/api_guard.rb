@@ -9,6 +9,7 @@ module ApiGuard
       Rails.logger.warn "[ApiGuard] Source #{source_slug} not found in database. Skipping."
       return :missing_source
     end
+
     last_fetched_at = last_fetched_at(source_slug)
     if !force && last_fetched_at && last_fetched_at > cooldown.ago
       Rails.logger.info "[ApiGuard] Skipping #{source_slug}, last fetched #{time_ago_in_words(last_fetched_at)} ago."
@@ -17,13 +18,13 @@ module ApiGuard
 
     yield(source)
 
-    # If successful, update the timestamp
-    Kredis.datetime("api_guard:#{source_slug}:last_fetched_at").value = Time.zone.now
+    # If successful, update the timestamp in the database-backed cache
+    Rails.cache.write("api_guard:#{source_slug}:last_fetched_at", Time.zone.now)
     true
   end
 
   def last_fetched_at(source_slug)
-    Kredis.datetime("api_guard:#{source_slug}:last_fetched_at").value
+    Rails.cache.read("api_guard:#{source_slug}:last_fetched_at")
   end
 
   def can_fetch?(source_slug, cooldown: 15.minutes)

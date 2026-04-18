@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: job_boards_documents
+# Database name: primary
 #
 #  id                  :uuid             not null, primary key
 #  aasm_state          :string
@@ -18,6 +19,9 @@
 #  index_job_boards_documents_on_source_id            (source_id)
 #
 class JobBoards::Document < ApplicationRecord
+  belongs_to :job_boards_source, class_name: 'JobBoards::Source', foreign_key: 'source_id'
+  belongs_to :job_boards_query, class_name: 'JobBoards::Query', foreign_key: 'job_boards_query_id'
+
   validates :signature, presence: true, uniqueness: true
   validates :source_id, presence: true
   validates :job_boards_query_id, presence: true

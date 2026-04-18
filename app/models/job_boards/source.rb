@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: job_boards_sources
+# Database name: primary
 #
 #  id         :bigint           not null, primary key
 #  aasm_state :string
@@ -15,6 +16,9 @@
 #  index_job_boards_sources_on_slug  (slug) UNIQUE
 #
 class JobBoards::Source < ApplicationRecord
+  has_many :job_boards_queries, class_name: 'JobBoards::Query', foreign_key: 'source_id', dependent: :destroy
+  has_many :job_boards_documents, class_name: 'JobBoards::Document', foreign_key: 'source_id', dependent: :destroy
+
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
 
