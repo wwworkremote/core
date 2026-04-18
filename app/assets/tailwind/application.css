@@ -2,13 +2,12 @@
 @plugin "daisyui";
 
 @theme {
-  /* Official Dracula Pro Palette */
+  /* Official Dracula Pro Hex Palette */
   --color-dracula-bg: #22212c;
   --color-dracula-bg-dark: #17161d;
   --color-dracula-bg-light: #454158;
   --color-dracula-fg: #f8f8f2;
   --color-dracula-comment: #7970a9;
-  --color-dracula-selection: #454158;
   
   --color-dracula-cyan: #80ffea;
   --color-dracula-green: #8aff80;
@@ -18,71 +17,63 @@
   --color-dracula-red: #ff9580;
   --color-dracula-yellow: #ffff80;
 
-  /* Map to Gemini Neural variables for backward compatibility in views */
-  --color-gemini-bg: var(--color-dracula-bg);
-  --color-gemini-surface: var(--color-dracula-bg-light);
-  --color-gemini-accent: var(--color-dracula-purple);
-  --color-gemini-glow: var(--color-dracula-cyan);
-  
+  /* Explicitly override standard slate/grey to prevent "light mode" leaks */
+  --color-slate-950: #17161d;
+  --color-slate-900: #22212c;
+  --color-slate-800: #454158;
+
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
   :root {
-    /* DaisyUI Dracula Overrides */
-    --p: 149 128 255;  /* Purple */
-    --s: 255 128 191;  /* Pink */
-    --a: 128 255 234;  /* Cyan */
-    --n: 69 65 88;     /* Selection/Neutral */
-    --b1: 34 33 44;    /* Background */
-    --b2: 23 22 29;    /* Background Dark */
-    --b3: 69 65 88;    /* Background Light */
-    --bc: 248 248 242; /* Foreground */
+    /* Map Dracula Pro into DaisyUI v5 CSS Variables */
+    --color-base-100: var(--color-dracula-bg);
+    --color-base-200: var(--color-dracula-bg-dark);
+    --color-base-300: var(--color-dracula-bg-light);
+    --color-base-content: var(--color-dracula-fg);
+
+    --color-primary: var(--color-dracula-purple);
+    --color-primary-content: var(--color-dracula-bg-dark);
     
-    --in: 128 255 234; /* Info -> Cyan */
-    --su: 138 255 128; /* Success -> Green */
-    --wa: 255 255 128; /* Warning -> Yellow */
-    --er: 255 149 128; /* Error -> Red */
+    --color-secondary: var(--color-dracula-pink);
+    --color-secondary-content: var(--color-dracula-bg-dark);
+
+    --color-accent: var(--color-dracula-cyan);
+    --color-accent-content: var(--color-dracula-bg-dark);
+
+    --color-info: var(--color-dracula-cyan);
+    --color-success: var(--color-dracula-green);
+    --color-warning: var(--color-dracula-yellow);
+    --color-error: var(--color-dracula-red);
+
+    /* System Typography */
+    font-family: var(--font-inter);
+    background-color: var(--color-dracula-bg);
+    color: var(--color-dracula-fg);
   }
 
   body {
-    @apply font-inter bg-dracula-bg text-dracula-fg min-h-screen relative overflow-x-hidden pt-0 text-sm;
-    -webkit-font-smoothing: antialiased;
+    @apply bg-base-100 text-base-content antialiased min-h-screen;
+    background-image: radial-gradient(at 0% 0%, rgba(149, 128, 255, 0.05) 0px, transparent 50%),
+                      radial-gradient(at 100% 100%, rgba(128, 255, 234, 0.05) 0px, transparent 50%);
   }
-  
-  svg {
-    @apply inline-block shrink-0;
-  }
+
+  /* Force dark icons */
+  svg { @apply inline-block shrink-0; }
 }
 
 @layer components {
-  .gemini-mesh {
-    @apply fixed inset-0 -z-10 opacity-40;
-    background: 
-      radial-gradient(at 0% 0%, rgba(149, 128, 255, 0.12) 0px, transparent 40%),
-      radial-gradient(at 100% 100%, rgba(128, 255, 234, 0.12) 0px, transparent 40%),
-      radial-gradient(at 50% 50%, #17161d 0px, transparent 100%);
+  /* Work-oriented components */
+  .card-admin {
+    @apply bg-base-200 border border-white/5 rounded-xl shadow-xl overflow-hidden;
+  }
+  
+  .table-admin {
+    @apply w-full text-left border-collapse text-xs;
   }
 
-  .glass-neural {
-    @apply bg-dracula-bg/60 backdrop-blur-md border border-white/5 shadow-xl;
+  .btn-admin {
+    @apply btn btn-sm rounded-lg font-black uppercase tracking-widest text-[10px];
   }
-
-  .sparkle-ai {
-    @apply relative inline-block;
-  }
-
-  .sparkle-ai::after {
-    content: "✦";
-    @apply absolute -top-2 -right-3 text-dracula-purple text-sm animate-pulse;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
 }

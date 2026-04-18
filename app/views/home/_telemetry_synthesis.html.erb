@@ -1,25 +1,19 @@
-<div id="synthesis_stats" class="stats stats-vertical lg:stats-horizontal shadow-2xl bg-base-200/50 border border-white/5 w-full">
-  <div class="stat px-8 py-6">
-    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">NEW_SIGNALS</div>
-    <div class="stat-value text-dracula-cyan text-4xl font-black tracking-tighter animate-in fade-in zoom-in duration-500">
-      <%= JobPosting.where(published_at: 1.hour.ago..).count %>
-    </div>
-    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic text-dracula-cyan">Neural_Pulse_Detected</div>
+<div id="synthesis_stats" class="stats stats-vertical md:stats-horizontal w-full bg-base-200 shadow-xl border border-white/5">
+  <div class="stat">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Pulse_1H</div>
+    <div class="stat-value text-dracula-cyan text-3xl"><%= JobPosting.where(published_at: 1.hour.ago..).count %></div>
+    <div class="stat-desc font-bold text-[9px] text-dracula-cyan/50 uppercase tracking-tighter">New_Signals</div>
   </div>
   
-  <div class="stat px-8 py-6">
-    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">DAILY_SYNC</div>
-    <div class="stat-value text-dracula-green text-4xl font-black tracking-tighter">
-      <%= JobPosting.where(published_at: 1.day.ago..).count %>
-    </div>
-    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic text-dracula-green">Market_Inflow</div>
+  <div class="stat">
+    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Inflow_24H</div>
+    <div class="stat-value text-dracula-green text-3xl"><%= JobPosting.where(published_at: 1.day.ago..).count %></div>
+    <div class="stat-desc font-bold text-[9px] text-dracula-green/50 uppercase tracking-tighter">Neural_Classification</div>
   </div>
   
-  <div class="stat px-8 py-6">
+  <div class="stat border-none!">
     <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">STALE_NODES</div>
-    <div class="stat-value text-dracula-comment text-4xl font-black tracking-tighter text-opacity-50">
-      <%= JobPosting.where('published_at < ?', 30.days.ago).count %>
-    </div>
-    <div class="stat-desc font-bold text-[9px] opacity-30 mt-1 italic">Prune_Queue</div>
+    <div class="stat-value text-dracula-comment text-3xl"><%= JobPosting.where('published_at < ?', 30.days.ago).count %></div>
+    <div class="stat-desc font-bold text-[9px] text-dracula-comment/50 uppercase tracking-tighter">Prune_Registry</div>
   </div>
 </div>

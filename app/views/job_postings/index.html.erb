@@ -1,75 +1,75 @@
-<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-10 mb-16">
   <div class="max-w-2xl">
-    <h1 class="text-5xl font-black tracking-tight sparkle-ai mb-3 text-white">Remote Job Market</h1>
-    <p class="text-slate-400 text-lg">Real-time signals aggregated from across the global ecosystem.</p>
+    <h1 class="text-4xl font-black tracking-tight text-white mb-2 uppercase">Neural Job Market</h1>
+    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Real-time aggregation of the global remote ecosystem</p>
   </div>
   
   <div class="w-full lg:max-w-md">
-    <div class="glass p-1.5 rounded-2xl shadow-2xl flex items-center group focus-within:ring-2 focus-within:ring-violet-500/50 transition-all">
+    <div class="bg-base-200 p-1.5 rounded-xl shadow-2xl flex items-center border border-white/5 group focus-within:border-primary/50 transition-all">
       <%= form_with url: job_postings_path, method: :get, class: "flex w-full" do |f| %>
         <%= f.text_field :q, value: @query, 
             placeholder: "Filter intelligence...", 
-            class: "flex-1 bg-transparent border-0 text-white placeholder:text-slate-500 px-4 py-2 focus:ring-0 text-sm",
-            style: "caret-color: var(--color-gemini-accent);" %>
-        <%= f.submit "Analyze", class: "btn-neural !px-5 !py-2 !text-sm !rounded-xl" %>
+            class: "flex-1 bg-transparent border-none text-white placeholder:text-base-content/20 px-4 py-2 focus:ring-0 text-sm font-bold tracking-tight",
+            style: "caret-color: var(--color-primary);" %>
+        <%= f.submit "ANALYZE", class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-[10px] px-6" %>
       <% end %>
     </div>
   </div>
 </div>
 
 <% if @company.present? || @source_id.present? || @query.present? %>
-  <div class="mb-6 flex items-center gap-3">
-    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Active Filters:</span>
+  <div class="mb-10 flex flex-wrap items-center gap-3">
+    <span class="text-[10px] font-black text-base-content/30 uppercase tracking-widest">Active_Filters:</span>
     <% if @company.present? %>
-      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">
+      <div class="badge badge-outline border-primary/30 text-primary gap-2 p-3 font-bold text-[10px] uppercase">
         Company: <%= @company %>
-        <%= link_to job_postings_path(q: @query, source_id: @source_id), class: "hover:text-white" do %><i class="bi bi-x-circle"></i><% end %>
-      </span>
+        <%= link_to job_postings_path(q: @query, source_id: @source_id), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+      </div>
     <% end %>
     <% if @source_id.present? %>
-      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 text-xs font-bold">
-        Source ID: <%= @source_id %>
-        <%= link_to job_postings_path(q: @query, company: @company), class: "hover:text-white" do %><i class="bi bi-x-circle"></i><% end %>
-      </span>
+      <div class="badge badge-outline border-secondary/30 text-secondary gap-2 p-3 font-bold text-[10px] uppercase">
+        Source_ID: <%= @source_id %>
+        <%= link_to job_postings_path(q: @query, company: @company), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+      </div>
     <% end %>
     <% if @query.present? %>
-      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+      <div class="badge badge-outline border-accent/30 text-accent gap-2 p-3 font-bold text-[10px] uppercase">
         Query: <%= @query %>
-        <%= link_to job_postings_path(company: @company, source_id: @source_id), class: "hover:text-white" do %><i class="bi bi-x-circle"></i><% end %>
-      </span>
+        <%= link_to job_postings_path(company: @company, source_id: @source_id), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+      </div>
     <% end %>
-    <%= link_to "Clear All", job_postings_path, class: "text-xs font-bold text-rose-400 hover:text-rose-300 underline underline-offset-4 ml-2" %>
+    <%= link_to "PURGE_FILTERS", job_postings_path, class: "text-[10px] font-black text-error hover:underline ml-2 uppercase tracking-widest" %>
   </div>
 <% end %>
 
-<div class="space-y-6">
+<div class="space-y-4">
   <% if @job_postings.any? %>
-    <div class="grid gap-6">
+    <div class="grid gap-4">
       <% @job_postings.each do |job| %>
-        <article class="card-neural p-6 group relative">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex-1">
-              <h4 class="text-xl font-bold text-white group-hover:text-violet-400 transition-colors mb-1">
+        <article class="card bg-base-200 border border-white/5 hover:border-primary/30 hover:shadow-2xl transition-all group overflow-hidden relative">
+          <div class="card-body p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex-1 relative">
+              <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors mb-1 uppercase tracking-tight">
                 <%= link_to job.title, job_posting_path(job), class: "before:absolute before:inset-0" %>
               </h4>
-              <p class="text-blue-400 font-semibold text-sm mb-3 tracking-wide relative z-10">
-                <%= link_to job.company, job_postings_path(company: job.company), class: "hover:text-blue-300 hover:underline transition-colors" %>
+              <p class="text-secondary font-black text-[11px] tracking-[0.2em] mb-3 relative z-10">
+                <%= link_to job.company.upcase, job_postings_path(company: job.company), class: "hover:underline transition-all" %>
               </p>
               
               <% if job.location.present? %>
-                <div class="flex items-center text-slate-400 text-xs font-medium gap-2">
-                  <i class="bi bi-geo-alt text-violet-500"></i>
+                <div class="flex items-center text-base-content/40 text-[10px] font-black uppercase tracking-widest gap-2">
+                  <%= heroicon "map-pin", variant: :solid, options: { class: "w-3 h-3 text-primary" } %>
                   <%= job.location %>
                 </div>
               <% end %>
             </div>
 
             <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 relative z-10">
-              <%= link_to job_postings_path(source_id: job.source_id), class: "px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-violet-500/20 hover:text-violet-400 hover:border-violet-500/30 transition-colors" do %>
-                <%= job.source.try(:origin)&.name || 'Network' %>
+              <%= link_to job_postings_path(source_id: job.source_id), class: "badge badge-neutral bg-base-300 border-white/10 hover:border-primary/50 text-[9px] font-black uppercase tracking-widest py-3 px-4 transition-all" do %>
+                <%= job.source.try(:origin)&.name || 'NETWORK' %>
               <% end %>
-              <div class="text-slate-500 text-[11px] font-medium">
-                <%= time_ago_in_words(job.published_at) if job.published_at %> ago
+              <div class="text-base-content/30 text-[9px] font-black uppercase tracking-tighter">
+                <%= time_ago_in_words(job.published_at).upcase %>_AGO
               </div>
             </div>
           </div>
@@ -77,17 +77,15 @@
       <% end %>
     </div>
 
-    <div class="mt-12 py-8 flex justify-center border-t border-white/5 relative z-20">
-      <%= paginate @job_postings, window: 2 %>
+    <div class="mt-16 py-8 flex justify-center border-t border-white/5">
+      <%= paginate @job_postings %>
     </div>
   <% else %>
-    <div class="card-neural py-20 text-center max-w-xl mx-auto">
-      <div class="bg-slate-800/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
-        <i class="bi bi-search text-3xl text-slate-600"></i>
-      </div>
-      <h3 class="text-2xl font-bold text-white mb-2">No signals detected</h3>
-      <p class="text-slate-500 mb-8 px-8">No job intelligence matching your current filters was found in the neural corpus.</p>
-      <%= link_to "Reset All Filters", job_postings_path, class: "text-violet-400 hover:text-violet-300 font-bold text-sm underline underline-offset-8 transition-all" %>
+    <div class="py-20 text-center bg-base-200 rounded-2xl border border-dashed border-white/10 max-w-xl mx-auto">
+      <%= heroicon "magnifying-glass", options: { class: "w-12 h-12 text-base-content/10 mx-auto mb-6" } %>
+      <h3 class="text-xl font-black text-white mb-2 uppercase">Zero_Signals_Detected</h3>
+      <p class="text-base-content/30 font-bold text-xs uppercase tracking-widest mb-8">No job intelligence matches the current search parameters.</p>
+      <%= link_to "RESET_NEURAL_CORPUS", job_postings_path, class: "btn btn-outline btn-sm rounded-lg font-black tracking-widest text-[10px]" %>
     </div>
   <% end %>
 </div>

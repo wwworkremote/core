@@ -1,40 +1,37 @@
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
     <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Operational Overview</h1>
-    <p class="text-base-content/50 font-bold uppercase tracking-widest text-[10px]">Real-time system telemetry and node status</p>
+    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Real-time node telemetry and signal velocity</p>
   </div>
-  <div class="flex items-center gap-3">
-    <div class="badge badge-outline border-white/10 gap-2 px-4 py-3 font-mono text-[10px]">
-      <span class="w-2 h-2 rounded-full bg-dracula-green animate-pulse shadow-[0_0_8px_#8aff80]"></span> SYSTEM_LIVE
-    </div>
+  <div>
+    <%= link_to data_fetchers_path, class: "btn btn-primary btn-sm rounded-lg font-black uppercase tracking-widest text-[10px]" do %>
+      <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> INGESTION_CONTROL
+    <% end %>
   </div>
 </div>
 
 <%= turbo_stream_from "system_telemetry" %>
 
-<div class="space-y-12">
-  <!-- Ingestion Telemetry -->
+<div class="grid grid-cols-1 gap-12">
+  <!-- Ingestion Block -->
   <section>
-    <div class="flex items-center gap-4 mb-6 opacity-30">
-      <h2 class="text-[10px] font-black uppercase tracking-[0.3em]">Telemetry_Ingestion</h2>
-      <div class="h-px flex-1 bg-white/10"></div>
+    <div class="flex items-center gap-4 mb-6 opacity-20">
+      <h2 class="text-[10px] font-black uppercase tracking-[0.4em]">Node_Ingestion</h2>
+      <div class="h-px flex-1 bg-white/20"></div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      <div class="xl:col-span-2">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
         <%= render "home/telemetry_ingestion" %>
       </div>
 
-      <div class="card bg-base-200/50 border border-white/5 shadow-2xl overflow-hidden">
-        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-base-300/30">
-          <span class="text-[9px] font-black uppercase tracking-widest opacity-40">Node_Velocity</span>
-          <span class="badge badge-primary badge-xs rounded font-black tracking-widest px-2 py-2 text-[8px]">ACTIVE</span>
-        </div>
-        <div class="p-4">
+      <div class="card bg-base-200 border border-white/5 shadow-xl">
+        <div class="card-body p-6">
+          <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">Ingestion_Velocity</h3>
           <%= line_chart(charts_data_sources_path(days: 21), 
               discrete: true, 
-              height: "120px",
-              colors: ["#bd93f9"],
+              height: "140px",
+              colors: ["#9580FF"],
               library: { 
                 scales: { 
                   y: { display: false },
@@ -47,28 +44,25 @@
     </div>
   </section>
 
-  <!-- Synthesis Telemetry -->
+  <!-- Synthesis Block -->
   <section>
-    <div class="flex items-center gap-4 mb-6 opacity-30">
-      <h2 class="text-[10px] font-black uppercase tracking-[0.3em]">Telemetry_Synthesis</h2>
-      <div class="h-px flex-1 bg-white/10"></div>
+    <div class="flex items-center gap-4 mb-6 opacity-20">
+      <h2 class="text-[10px] font-black uppercase tracking-[0.4em]">Node_Synthesis</h2>
+      <div class="h-px flex-1 bg-white/20"></div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      <div class="xl:col-span-2">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
         <%= render "home/telemetry_synthesis" %>
       </div>
 
-      <div class="card bg-base-200/50 border border-white/5 shadow-2xl overflow-hidden">
-        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-base-300/30">
-          <span class="text-[9px] font-black uppercase tracking-widest opacity-40">Distribution_Curve</span>
-          <span class="badge badge-info badge-xs rounded font-black tracking-widest px-2 py-2 text-[8px]">STABLE</span>
-        </div>
-        <div class="p-4">
+      <div class="card bg-base-200 border border-white/5 shadow-xl">
+        <div class="card-body p-6">
+          <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">Market_Publication_Curve</h3>
           <%= line_chart(charts_data_job_postings_path(days: 21), 
               discrete: true, 
-              height: "120px",
-              colors: ["#8be9fd"],
+              height: "140px",
+              colors: ["#80FFEA"],
               library: { 
                 scales: { 
                   y: { display: false },
