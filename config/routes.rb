@@ -9,7 +9,11 @@ Rails.application.routes.draw do
       post :refresh
     end
   end
-  mount_avo
+  namespace :admin do
+    root to: 'dashboard#index'
+    resources :job_postings, only: %i[index show destroy]
+  end
+
   # Dashboard Routes
   root to: 'home#index'
   get 'home/index'

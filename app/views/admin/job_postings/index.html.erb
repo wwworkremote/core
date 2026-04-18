@@ -1,0 +1,72 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Job Postings Management</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Administrative CRUD Registry</p>
+  </div>
+</div>
+
+<div class="card-neural mb-6">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Title / Company</th>
+          <th class="px-6 py-4">Location</th>
+          <th class="px-6 py-4 text-center">Neural Status</th>
+          <th class="px-6 py-4 text-center">Vectors</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+        <% @job_postings.each do |job| %>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <div class="text-white font-bold mb-0.5"><%= job.title %></div>
+              <div class="text-blue-400 font-bold text-[10px] uppercase"><%= job.company %></div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-slate-400"><%= job.location || "REMOTE" %></span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <% category = job.data&.[]('ai_category') %>
+              <% if category.present? %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-violet-500/10 text-violet-400 border border-violet-500/20 text-[9px] font-black">
+                  <%= category.upcase %>
+                </span>
+              <% else %>
+                <span class="text-slate-700 italic">PENDING_CLASSIFICATION</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <% if job.embedding.present? %>
+                <span class="text-emerald-500"><i class="bi bi-cpu"></i></span>
+              <% else %>
+                <span class="text-slate-800"><i class="bi bi-cpu"></i></span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2 text-[10px]">
+                <%= link_to admin_job_posting_path(job), class: "px-3 py-1 rounded font-black border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
+                  READ
+                <% end %>
+                <%= button_to admin_job_posting_path(job), method: :delete, form: { class: "inline-block" }, class: "px-3 py-1 rounded font-black border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all", data: { turbo_confirm: "Permanently purge this record?" } do %>
+                  PURGE
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= paginate @job_postings %>
+</div>
+
+<div class="mt-8 flex items-center justify-between opacity-50 font-bold text-[10px] uppercase tracking-widest px-2">
+  <%= link_to admin_root_path, class: "hover:text-white transition-colors flex items-center gap-2" do %>
+    <i class="bi bi-chevron-left"></i> ESCAPE_TO_ADMIN_DASHBOARD
+  <% end %>
+</div>

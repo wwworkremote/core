@@ -1,0 +1,50 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+  <div>
+    <h1 class="text-4xl font-black tracking-tight sparkle-ai mb-3">System Administration</h1>
+    <p class="text-slate-400 text-lg">Direct control over the core database records.</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+  <div class="card-neural p-8 text-center">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-600 mb-2">
+      <%= @job_postings_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Job Postings</div>
+    <div class="mt-4">
+      <%= link_to "Manage Postings", admin_job_postings_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 text-center">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-emerald-300 to-emerald-600 mb-2">
+      <%= @sources_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Raw Source Documents</div>
+    <div class="mt-4">
+      <button disabled class="btn-neural w-full block text-center opacity-50 cursor-not-allowed">Coming Soon</button>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 text-center">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-violet-300 to-violet-600 mb-2">
+      <%= @active_fetchers_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Fetchers</div>
+    <div class="mt-4">
+      <%= link_to "Ingestion Control", data_fetchers_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
+</div>
+
+<div class="card-neural p-8">
+  <h2 class="text-xl font-bold text-white mb-4">Administration Guide</h2>
+  <div class="prose-invert">
+    <p>Welcome to the native Rails administration dashboard. This system replaces external dependencies to provide full control over styling, routing, and data presentation.</p>
+    <ul>
+      <li><strong>No Magic:</strong> Everything you see here is a standard Rails Controller and View.</li>
+      <li><strong>Consistent Styling:</strong> It seamlessly inherits the Dracula Pro "Command Center" theme.</li>
+      <li><strong>Performant:</strong> Data is queried efficiently using standard Active Record syntax.</li>
+    </ul>
+  </div>
+</div>

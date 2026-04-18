@@ -1,0 +1,73 @@
+<div class="flex items-center gap-2 text-slate-500 font-bold text-[10px] uppercase tracking-widest mb-10">
+  <%= link_to admin_job_postings_path, class: "hover:text-white transition-colors" do %>Registry<% end %>
+  <i class="bi bi-chevron-right text-[8px]"></i>
+  <span class="text-white">Record_<%= @job_posting.id %></span>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2 space-y-6">
+    <div class="card-neural p-8 border-t-4 border-t-violet-500">
+      <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-tight"><%= @job_posting.title %></h1>
+      <p class="text-blue-400 font-black text-xs uppercase tracking-[0.2em] mb-6"><%= @job_posting.company %></p>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-white/5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        <div>
+          <div class="mb-1 text-slate-600">Sync_Signature</div>
+          <div class="truncate text-white" title="<%= @job_posting.signature %>"><%= @job_posting.signature[0..12] %>...</div>
+        </div>
+        <div>
+          <div class="mb-1 text-slate-600">External_ID</div>
+          <div class="text-white"><%= @job_posting.external_id || "NULL" %></div>
+        </div>
+        <div>
+          <div class="mb-1 text-slate-600">Location_Vectors</div>
+          <div class="text-white"><%= @job_posting.latitude || "0.0" %>, <%= @job_posting.longitude || "0.0" %></div>
+        </div>
+        <div>
+          <div class="mb-1 text-slate-600">Published_At</div>
+          <div class="text-white"><%= @job_posting.published_at&.strftime("%Y-%m-%d") || "NULL" %></div>
+        </div>
+      </div>
+
+      <div class="mt-8 prose-invert text-slate-300 leading-relaxed text-xs font-medium">
+        <%= markdown(@job_posting.body) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Record Control</h3>
+      <div class="grid gap-3">
+        <%= link_to job_posting_path(@job_posting), class: "btn-neural text-center py-2" do %>
+          VIEW_PUBLIC_NODE
+        <% end %>
+        <%= button_to admin_job_posting_path(@job_posting), method: :delete, class: "w-full px-4 py-2 rounded-lg font-black border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all text-[10px] uppercase tracking-widest", data: { turbo_confirm: "Permanently purge this record?" } do %>
+          PURGE_FROM_SYSTEM
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card-neural p-6">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Semantic_Clustering</h3>
+      <% if @similar_jobs.any? %>
+        <div class="space-y-4">
+          <% @similar_jobs.each do |job| %>
+            <% match_score = ((1.0 - job.neighbor_distance) * 100).round(1) %>
+            <div class="border-l-2 border-l-violet-500/30 pl-4 py-1">
+              <%= link_to admin_job_posting_path(job), class: "text-[11px] font-bold text-white hover:text-violet-400 block mb-1 truncate" do %>
+                <%= job.title %>
+              <% end %>
+              <div class="flex items-center justify-between">
+                <span class="text-[9px] font-black text-slate-600 uppercase tracking-tighter"><%= job.company %></span>
+                <span class="text-[9px] font-black text-violet-500 font-mono"><%= match_score %>%</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-4 text-[10px] font-bold text-slate-700 italic uppercase">NO_VECTORS_FOUND</div>
+      <% end %>
+    </div>
+  </div>
+</div>
