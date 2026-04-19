@@ -20,8 +20,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
           POSTGRES_DB: wwworkremote_test
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -30,7 +28,7 @@ jobs:
 
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test
+      DATABASE_URL: postgres://postgres:password@postgres:5432/wwworkremote_test
 
     steps:
       - name: Checkout
@@ -92,8 +90,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
           POSTGRES_DB: wwworkremote_test
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -102,7 +98,7 @@ jobs:
 
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test
+      DATABASE_URL: postgres://postgres:password@postgres:5432/wwworkremote_test
 
     steps:
       - name: Checkout
