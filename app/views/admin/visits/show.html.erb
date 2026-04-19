@@ -1,0 +1,78 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Visit Trace</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Session Token: <%= @visit.visit_token %></p>
+  </div>
+  <div>
+    <%= link_to admin_visits_path, class: "btn-neural text-[10px]" do %>
+      BACK_TO_REGISTRY
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="lg:col-span-1 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Connection</h3>
+      <dl class="space-y-4 font-mono text-[11px]">
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">IP Address</dt>
+          <dd class="text-white font-bold"><%= @visit.ip %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">User Agent</dt>
+          <dd class="text-slate-400 break-all text-[9px] leading-relaxed"><%= @visit.user_agent %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Location</h3>
+      <dl class="space-y-4 font-mono text-[11px]">
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">City / Region</dt>
+          <dd class="text-white"><%= @visit.city %>, <%= @visit.region %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Country</dt>
+          <dd class="text-white"><%= @visit.country %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Event Timeline (<%= @events.count %>)</h3>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-white/5 border-b border-white/10 text-[9px] font-black uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-4 py-3">Event Name</th>
+              <th class="px-4 py-3">Time</th>
+              <th class="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 font-mono text-[10px]">
+            <% @events.each do |event| %>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="px-4 py-3 text-blue-400 font-bold">
+                  <%= event.name %>
+                </td>
+                <td class="px-4 py-3 text-slate-400">
+                  <%= event.time.strftime("%H:%M:%S") %>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <%= link_to "INSPECT", admin_event_path(event), class: "text-slate-500 hover:text-white transition-colors" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

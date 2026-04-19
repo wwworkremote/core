@@ -67,6 +67,26 @@
       <%= link_to "Ingestion Sources", admin_sources_path, class: "btn-neural w-full block text-center" %>
     </div>
   </div>
+
+  <div class="card-neural p-8 text-center border-t border-white/5 pt-8">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 mb-2">
+      <%= @visits_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">User Visits</div>
+    <div class="mt-4">
+      <%= link_to "Session Intelligence", admin_visits_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 text-center border-t border-white/5 pt-8">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-indigo-300 to-indigo-600 mb-2">
+      <%= @events_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Granular Events</div>
+    <div class="mt-4">
+      <%= link_to "Activity Registry", admin_events_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
 </div>
 
 <div class="card-neural p-8">

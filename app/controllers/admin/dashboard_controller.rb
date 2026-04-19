@@ -9,6 +9,8 @@ module Admin
       @domains_count = Domain.count
       @email_records_count = EmailImportRecord.count
       @models_count = Model.count
+      @visits_count = Ahoy::Visit.count
+      @events_count = Ahoy::Event.count
       @active_fetchers_count = JobBoards::Source.count # Simple count for overview
     end
   end

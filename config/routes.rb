@@ -18,6 +18,8 @@ Rails.application.routes.draw do
     resources :domains, only: %i[index show destroy]
     resources :email_import_records, only: %i[index show]
     resources :models, only: %i[index show]
+    resources :visits, only: %i[index show]
+    resources :events, only: %i[index show]
   end
 
   # Dashboard Routes
