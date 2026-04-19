@@ -82,9 +82,27 @@ module Llm
       
       chat = @chat || LlmChat.create!(model: model)
       
-      # Use RubyLLM.providers.[provider].new(model: model_id)
-      provider_name = model.provider.to_sym
-      client = RubyLLM.providers.send(provider_name).new(model: model.model_id)
+      # Correct RubyLLM registry resolution
+      provider_map = {
+        anthropic: RubyLLM::Providers::Anthropic,
+        azure:     RubyLLM::Providers::Azure,
+        bedrock:   RubyLLM::Providers::Bedrock,
+        deepseek:  RubyLLM::Providers::DeepSeek,
+        gemini:    RubyLLM::Providers::Gemini,
+        gpustack:  RubyLLM::Providers::GPUStack,
+        mistral:   RubyLLM::Providers::Mistral,
+        ollama:    RubyLLM::Providers::Ollama,
+        openai:    RubyLLM::Providers::OpenAI,
+        openrouter: RubyLLM::Providers::OpenRouter,
+        perplexity: RubyLLM::Providers::Perplexity,
+        vertexai:  RubyLLM::Providers::VertexAI,
+        xai:       RubyLLM::Providers::XAI
+      }
+      
+      provider_class = provider_map[model.provider.to_sym]
+      raise "Unknown provider: #{model.provider}" unless provider_class
+      
+      client = provider_class.new(model: model.model_id)
       
       # Use the native ask pattern to stream content directly
       client.chat(messages: chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } }, &block)
