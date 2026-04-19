@@ -35,8 +35,4 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 echo "--- Running Local CI via act ---"
-# Bind the detected docker host to the standard path inside the runner for services to work
-act --container-architecture linux/amd64 \
-    --bind \
-    --container-daemon-socket "${DOCKER_HOST#unix://}" \
-    "$@"
+act "$@"
