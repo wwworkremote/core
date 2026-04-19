@@ -1,6 +1,7 @@
 <div class="card-neural mb-8 overflow-hidden">
   <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pipeline Health Monitor</h3>
+    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pipeline Health Snapshot</h3>
+    <%= link_to "View All Fetchers", data_fetchers_path, class: "text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-white" %>
   </div>
   <table class="w-full text-left border-collapse">
     <thead class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5 bg-white/[0.02]">
@@ -8,40 +9,19 @@
         <th class="px-6 py-3">Source</th>
         <th class="px-6 py-3">Type</th>
         <th class="px-6 py-3">Last Sync</th>
-        <th class="px-6 py-3">Freshness Gap</th>
-        <th class="px-6 py-3 text-right">Action</th>
         <th class="px-6 py-3 text-right">Health</th>
       </tr>
     </thead>
     <tbody class="font-mono text-[11px] divide-y divide-white/5">
-      <% 
-        fetchers = DataAcquisitionManager::FETCHERS
-        JobBoards::Source.order(name: :asc).each do |source| 
-          fetcher_config = fetchers[source.slug]
-          pipeline_type = fetcher_config&.fetch(:type, "Unknown")
-          
+      <% JobBoards::Source.order(name: :asc).limit(5).each do |source| %>
+        <%
           sync_gap = Time.current - (source.last_synced_at || 1.week.ago)
-          
-          status = :healthy
-          status = :warning if sync_gap > 6.hours
-          status = :critical if sync_gap > 24.hours
-      %>
+          status = sync_gap > 24.hours ? :critical : (sync_gap > 6.hours ? :warning : :healthy)
+        %>
         <tr class="hover:bg-white/[0.03]">
           <td class="px-6 py-3 font-bold text-white"><%= source.name %></td>
-          <td class="px-6 py-3">
-             <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5 font-black text-[9px]">
-               <%= pipeline_type %>
-             </span>
-          </td>
+          <td class="px-6 py-3"><span class="text-slate-500 uppercase"><%= DataAcquisitionManager::FETCHERS.dig(source.slug, :type) %></span></td>
           <td class="px-6 py-3 text-slate-400"><%= source.last_synced_at&.strftime("%b %d, %H:%M") || "NEVER" %></td>
-          <td class="px-6 py-3 text-slate-400"><%= source.last_ingested_at&.strftime("%b %d, %H:%M") || "NEVER" %></td>
-          <td class="px-6 py-3 text-right">
-            <% if source.slug == 'email' %>
-               <%= button_to "RUN", "/admin/data_fetchers/run", params: { slug: "email" }, class: "btn btn-xs btn-outline btn-primary text-[9px] font-black" %>
-            <% else %>
-               <%= button_to "RUN", "/admin/data_fetchers/run", params: { slug: source.slug }, class: "btn btn-xs btn-outline btn-primary text-[9px] font-black" %>
-            <% end %>
-          </td>
           <td class="px-6 py-3 text-right">
             <% case status
                when :healthy %><span class="badge badge-success badge-xs"></span>
