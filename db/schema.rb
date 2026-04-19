@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_175957) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_190143) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -91,6 +91,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_175957) do
     t.string "visitor_token"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "board_queries", force: :cascade do |t|
+    t.string "board_name"
+    t.text "terms"
+    t.boolean "remote"
+    t.integer "priority"
+    t.json "query_params"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "companies", force: :cascade do |t|
