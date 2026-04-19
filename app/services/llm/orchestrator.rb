@@ -83,10 +83,17 @@ module Llm
       provider_class = provider_map[model.provider.to_sym]
       raise "Unknown provider: #{model.provider}" unless provider_class
       
-      client = provider_class.new(model: model.model_id, config: RubyLLM.config)
+      # Use RubyLLM's standard instantiation pattern
+      client = provider_class.new(RubyLLM.config)
       
-      # Use the native ask pattern to stream content directly
-      client.chat(messages: chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } }, &block)
+      # Use the native complete pattern to stream content directly
+      client.complete(
+        chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } },
+        tools: [],
+        temperature: 0.7,
+        model: model.model_id,
+        &block
+      )
       
       span.add_event('received_llm_response')
       { success: true, model: model.model_id }
