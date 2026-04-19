@@ -10,17 +10,17 @@ rescue LoadError
 end
 
 # Mission Control Jobs expects adapters to implement a specific interface.
-# We explicitly include their base module and provide minimal implementations.
+# We provide minimal implementations to prevent crashes.
 module MissionControlAsyncJobAdapterExtension
-  def self.included(base)
-    base.include MissionControl::Jobs::Adapter if defined?(MissionControl::Jobs::Adapter)
-  end
-
   def activating(&)
     yield
   end
 
   def queues
+    []
+  end
+
+  def queue_names
     []
   end
 
@@ -70,7 +70,9 @@ end
 
 # Apply the extension to the adapter class
 if defined?(ActiveJob::QueueAdapters::AsyncJobAdapter)
-  ActiveJob::QueueAdapters::AsyncJobAdapter.include(MissionControlAsyncJobAdapterExtension)
+  # Include the base module first so our extension can override its default methods
+  ActiveJob::QueueAdapters::AsyncJobAdapter.include(MissionControl::Jobs::Adapter) if defined?(MissionControl::Jobs::Adapter)
+  ActiveJob::QueueAdapters::AsyncJobAdapter.prepend(MissionControlAsyncJobAdapterExtension)
 end
 
 Rails.application.configure do
