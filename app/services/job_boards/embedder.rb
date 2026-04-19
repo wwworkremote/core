@@ -39,6 +39,9 @@ module JobBoards
         handle_error(response)
         false
       end
+    rescue ActiveRecord::ConnectionTimeoutError => e
+      Rails.logger.error "[Embedder] Database connection timeout: #{e.message}. Skipping embedding for Job #{@job_posting.id}."
+      false
     rescue StandardError => e
       Rails.logger.error "[Embedder] Exception for Job #{@job_posting.id}: #{e.message}"
       false

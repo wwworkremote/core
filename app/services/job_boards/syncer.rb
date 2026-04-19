@@ -8,6 +8,8 @@ module JobBoards
       JobBoards::Document.find_each do |doc|
         sync_document(doc)
       end
+    rescue ActiveRecord::ConnectionTimeoutError => e
+      Rails.logger.error "[Syncer] Database connection pool exhausted: #{e.message}. Halting sync."
     end
 
     private
