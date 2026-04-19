@@ -22,6 +22,18 @@ class DataFetchersController < ApplicationController
     redirect_to data_fetchers_path
   end
 
+  def run_all_by_type
+    type = params[:type]
+    fetchers = DataAcquisitionManager.fetchers.select { |f| DataAcquisitionManager::FETCHERS[f[:slug]][:type] == type }
+    
+    fetchers.each do |f|
+      DataAcquisitionManager.run(f[:slug])
+    end
+
+    flash[:notice] = "Triggered all #{type} pipelines."
+    redirect_to data_fetchers_path
+  end
+
   def audit
     JobBoards::AuditJob.perform_later
     flash[:notice] = 'Audit and repair job has been enqueued.'

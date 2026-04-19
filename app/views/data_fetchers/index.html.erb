@@ -1,90 +1,32 @@
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1">INGESTION CONTROL</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Active Data Fetcher Registry</p>
-  </div>
-  <div>
-    <%= button_to audit_data_fetchers_path,
-        method: :post,
-        class: "btn-neural !bg-violet-600 !text-white !border-none flex items-center gap-2",
-        data: { turbo_confirm: "This will check for missing postings, categories, and embeddings. Proceed?" } do %>
-      <i class="bi bi-shield-check"></i> RUN SYSTEM AUDIT
-    <% end %>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Pipeline Orchestration</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Data Ingestion & Fetcher Registry</p>
   </div>
 </div>
 
-<div class="card-neural mb-6">
-  <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse">
-      <thead class="bg-white/5 border-b border-white/10">
-        <tr>
-          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Provider Module</th>
-          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Last Successful Sync</th>
-          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">TTL / Cooldown</th>
-          <th class="px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Core Status</th>
-          <th class="px-6 py-3 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Manual Overrides</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
-        <% @fetchers.each do |fetcher| %>
-          <tr class="group hover:bg-white/[0.03] transition-colors">
-            <td class="px-6 py-4">
-              <span class="text-sm font-bold text-white tracking-tight"><%= fetcher[:name].upcase %></span>
-            </td>
-            <td class="px-6 py-4">
-              <% if fetcher[:last_fetched_at] %>
-                <span class="text-slate-300"><%= fetcher[:last_fetched_at].strftime("%Y-%m-%d %H:%M:%S") %></span>
-                <span class="text-slate-600 ml-2">(<%= time_ago_in_words(fetcher[:last_fetched_at]) %> ago)</span>
-              <% else %>
-                <span class="text-rose-500 font-bold italic">NO_DATA</span>
-              <% end %>
-            </td>
-            <td class="px-6 py-4 text-slate-500">
-              <%= fetcher[:cooldown] / 60 %>m
-            </td>
-            <td class="px-6 py-4">
-              <% if fetcher[:can_fetch] %>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-black">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> READY
-                </span>
-              <% else %>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 font-black">
-                  <i class="bi bi-hourglass-split"></i> WAIT_<%= (fetcher[:time_until_reset] / 60).to_i %>M
-                </span>
-              <% end %>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2 text-[10px]">
-                <%= button_to run_data_fetchers_path(slug: fetcher[:slug]),
-                    method: :post,
-                    class: "px-3 py-1 rounded font-black border transition-all
-                           #{fetcher[:can_fetch] ? 'bg-slate-100 text-slate-900 border-white hover:bg-white' : 'bg-white/5 text-slate-700 border-white/5 cursor-not-allowed'}",
-                    disabled: !fetcher[:can_fetch] do %>
-                  EXEC
-                <% end %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <% DataAcquisitionManager::FETCHERS.group_by { |_, c| c[:type] }.each do |type, fetchers| %>
+    <div class="card-neural p-6">
+      <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-primary"><%= type %> Pipelines</h3>
+        <%= button_to "Run All #{type}", run_all_by_type_data_fetchers_path, params: { type: type }, class: "btn-admin bg-primary/20 hover:bg-primary/40 text-primary border-none" %>
+      </div>
 
-                <%= button_to run_data_fetchers_path(slug: fetcher[:slug], force: true),
-                    method: :post,
-                    form: { class: "inline-block" },
-                    class: "px-3 py-1 rounded font-black border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all",
-                    data: { turbo_confirm: "FORCE manual ingestion for #{fetcher[:name]}?" } do %>
-                  FORCE
-                <% end %>
-              </div>
-            </td>
-          </tr>
+      <div class="space-y-3">
+        <% fetchers.each do |slug, config| %>
+          <% status = DataAcquisitionManager.status(slug) %>
+          <div class="bg-base-300 p-4 rounded-lg flex items-center justify-between group">
+            <div>
+              <div class="font-bold text-white text-xs"><%= config[:name] %></div>
+              <div class="text-[9px] text-slate-500 font-mono">Last: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
+            </div>
+            <%= button_to "Run", run_data_fetchers_path, params: { slug: slug }, class: "btn-admin bg-white/5 hover:bg-white/10" %>
+          </div>
         <% end %>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="flex items-center justify-between opacity-50 font-bold text-[10px] uppercase tracking-widest px-2">
-  <%= link_to root_path, class: "hover:text-white transition-colors flex items-center gap-2" do %>
-    <i class="bi bi-chevron-left"></i> ESCAPE_TO_DASHBOARD
+      </div>
+    </div>
   <% end %>
-  <div class="flex items-center gap-4">
-    <span>SYSTEM_OPERATIONAL: TRUE</span>
-    <span class="text-violet-500">ENCRYPTION: AES-256</span>
-  </div>
 </div>
