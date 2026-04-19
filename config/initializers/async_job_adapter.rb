@@ -36,6 +36,18 @@ module AsyncJobAdapterActivatingPatch
   def paused_queues
     []
   end
+
+  def supported_job_statuses
+    []
+  end
+
+  def supports_filtering?
+    false
+  end
+
+  def recurring_tasks
+    []
+  end
 end
 
 ActiveSupport.on_load(:active_job) do
