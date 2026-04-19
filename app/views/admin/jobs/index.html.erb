@@ -1,0 +1,75 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Background Pipeline</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Solid Queue Execution Registry</p>
+  </div>
+  <div>
+    <%= link_to "/jobs", class: "btn-neural !bg-slate-800 !text-white flex items-center gap-2", target: "_blank" do %>
+      <i class="bi bi-box-arrow-up-right"></i> MISSION_CONTROL_DEEP_LINK
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+  <div class="card-neural p-6 text-center">
+    <div class="text-2xl font-black text-white mb-1"><%= number_with_delimiter(@ready_count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Ready</div>
+  </div>
+  <div class="card-neural p-6 text-center">
+    <div class="text-2xl font-black text-blue-400 mb-1"><%= number_with_delimiter(@scheduled_count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Scheduled</div>
+  </div>
+  <div class="card-neural p-6 text-center">
+    <div class="text-2xl font-black text-amber-500 mb-1"><%= number_with_delimiter(@blocked_count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Blocked</div>
+  </div>
+  <div class="card-neural p-6 text-center border-rose-900/30">
+    <div class="text-2xl font-black text-rose-500 mb-1"><%= number_with_delimiter(@failed_count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Failed</div>
+  </div>
+</div>
+
+<div class="card-neural">
+  <div class="p-4 border-b border-white/5 bg-white/5">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Recent Executions</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Job ID / Class</th>
+          <th class="px-6 py-4">Queue</th>
+          <th class="px-6 py-4 text-center">Status</th>
+          <th class="px-6 py-4 text-right">Created At</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+        <% @recent_jobs.each do |job| %>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <div class="text-white font-bold mb-0.5">#<%= job.id %></div>
+              <div class="text-blue-400 font-bold text-[9px] truncate max-w-xs"><%= job.class_name %></div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-slate-500"><%= job.queue_name.upcase %></span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <% if job.failed? %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[9px] font-black">FAILED</span>
+              <% elsif job.finished? %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[9px] font-black">FINISHED</span>
+              <% else %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black">PENDING</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-right text-slate-600">
+              <%= time_ago_in_words(job.created_at) %> ago
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

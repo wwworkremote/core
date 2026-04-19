@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: 'dashboard#index'
     get 'analytics' => 'analytics#index'
+    get 'jobs' => 'jobs#index'
     resources :job_postings, only: %i[index show destroy]
     resources :sources, only: %i[index show]
     resources :queries, only: %i[index show]
