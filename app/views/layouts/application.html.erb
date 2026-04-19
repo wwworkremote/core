@@ -25,11 +25,17 @@
         <ul class="menu menu-horizontal px-1 gap-2 font-bold uppercase tracking-widest text-[10px]">
           <li><%= link_to 'Dashboard', root_path %></li>
           <li><%= link_to 'Market', job_postings_path %></li>
-          <li><%= link_to 'Dialogues', llm_chats_path %></li>
-          <li><%= link_to 'Models', models_path %></li>
           
           <li class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded">System</div>
+            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded">AI Lab</div>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
+              <li><%= link_to 'Dialogues', llm_chats_path %></li>
+              <li><%= link_to 'Models', models_path %></li>
+            </ul>
+          </li>
+          
+          <li class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded">Control</div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
               <li><%= link_to 'Data Fetchers', data_fetchers_path %></li>
               <li><%= link_to 'Background Jobs', '/jobs' %></li>
