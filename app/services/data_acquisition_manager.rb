@@ -56,10 +56,22 @@ class DataAcquisitionManager
       name: 'YC',
       type: 'Scraper'
     },
-    'email' => {
+    'email_indeed' => {
       class: EmailIngestion::Importer,
       cooldown: 1.hour,
-      name: 'Email Ingestion',
+      name: 'Email (Indeed)',
+      type: 'Email'
+    },
+    'email_adzuna' => {
+      class: EmailIngestion::Importer,
+      cooldown: 1.hour,
+      name: 'Email (Adzuna)',
+      type: 'Email'
+    },
+    'email_linkedin' => {
+      class: EmailIngestion::Importer,
+      cooldown: 1.hour,
+      name: 'Email (LinkedIn)',
       type: 'Email'
     }
   }.freeze
@@ -122,9 +134,12 @@ class DataAcquisitionManager
     fetcher = config[:class].new
     method = fetcher.method(:call)
 
+    # Detect if fetcher accepts 'force' or 'source' as keyword arguments
     keyword_params = %i[key keyreq]
     result = if method.parameters.any? { |p| keyword_params.include?(p[0]) }
-               fetcher.call(force:)
+               args = { force: }
+               args[:source] = slug.split('_').last if slug.start_with?('email_')
+               fetcher.call(**args)
              else
                fetcher.call
              end
