@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_074315) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_074407) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -339,6 +339,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_074315) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "link"
+    t.text "note"
     t.index ["job_posting_id"], name: "index_pipeline_steps_on_job_posting_id"
   end
 

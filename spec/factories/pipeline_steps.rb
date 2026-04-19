@@ -3,6 +3,8 @@
 # Table name: pipeline_steps
 #
 #  id             :bigint           not null, primary key
+#  link           :string
+#  note           :text
 #  notes          :text
 #  status         :string
 #  created_at     :datetime         not null

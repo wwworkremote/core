@@ -3,6 +3,8 @@
 # Table name: pipeline_steps
 #
 #  id             :bigint           not null, primary key
+#  link           :string
+#  note           :text
 #  notes          :text
 #  status         :string
 #  created_at     :datetime         not null
@@ -19,4 +21,9 @@
 #
 class PipelineStep < ApplicationRecord
   belongs_to :job_posting
+  
+  # Optional link and note fields to capture pipeline activity
+  # Status: favorited, applied, interview, offered, archived, noted
+  
+  validates :status, presence: true
 end
