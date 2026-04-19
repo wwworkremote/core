@@ -2,13 +2,15 @@
 #
 # Table name: job_boards_sources
 #
-#  id         :bigint           not null, primary key
-#  aasm_state :string
-#  data       :jsonb            not null
-#  name       :string           not null
-#  slug       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id               :bigint           not null, primary key
+#  aasm_state       :string
+#  data             :jsonb            not null
+#  last_ingested_at :datetime
+#  last_synced_at   :datetime
+#  name             :string           not null
+#  slug             :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
 #
 # Indexes
 #

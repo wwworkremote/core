@@ -98,10 +98,15 @@ class DataAcquisitionManager
     config = FETCHERS[slug]
     return { error: 'Fetcher not found' } unless config
 
+    # Ensure source exists and track the start of sync
+    source = JobBoards::Source.find_or_create_by!(slug:) do |s|
+      s.name = config[:name]
+    end
+    source.update!(last_synced_at: Time.current)
+
     fetcher = config[:class].new
     method = fetcher.method(:call)
 
-    # Correctly detect if the fetcher accepts 'force' as a keyword argument
     keyword_params = %i[key keyreq]
     result = if method.parameters.any? { |p| keyword_params.include?(p[0]) }
                fetcher.call(force:)
@@ -111,7 +116,9 @@ class DataAcquisitionManager
 
     case result
     when true
-      JobBoards::Syncer.new.call
+      # Update ingestion time if postings were actually synced
+      syncer_result = JobBoards::Syncer.new.call
+      source.update!(last_ingested_at: Time.current) if syncer_result
       { success: true }
     when false
       { success: false, error: 'Fetcher reported failure (Check logs)' }
