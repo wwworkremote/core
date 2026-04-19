@@ -10,16 +10,33 @@ if ! command -v act >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! docker info >/dev/null 2>&1; then
-  # Try to detect colima socket
-  COLIMA_SOCKET="$HOME/.config/colima/default/docker.sock"
-  if [[ -S "$COLIMA_SOCKET" ]]; then
-    export DOCKER_HOST="unix://$COLIMA_SOCKET"
+# Ensure DOCKER_HOST is set for act, as it doesn't always respect docker contexts
+if [[ -z "${DOCKER_HOST:-}" ]]; then
+  # Try to get host from current docker context
+  CURRENT_HOST=$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null || true)
+  if [[ -n "$CURRENT_HOST" ]]; then
+    export DOCKER_HOST="$CURRENT_HOST"
   else
-    echo "Error: Docker is not running or socket not found."
-    exit 1
+    # Fallback to common socket paths if context fails
+    COLIMA_SOCKET="$HOME/.config/colima/default/docker.sock"
+    ORBSTACK_SOCKET="$HOME/.orbstack/run/docker.sock"
+    
+    if [[ -S "$COLIMA_SOCKET" ]]; then
+      export DOCKER_HOST="unix://$COLIMA_SOCKET"
+    elif [[ -S "$ORBSTACK_SOCKET" ]]; then
+      export DOCKER_HOST="unix://$ORBSTACK_SOCKET"
+    fi
   fi
 fi
 
+if ! docker info >/dev/null 2>&1; then
+  echo "Error: Docker is not running or accessible (DOCKER_HOST=${DOCKER_HOST:-default})."
+  exit 1
+fi
+
 echo "--- Running Local CI via act ---"
-act --container-architecture linux/amd64 "$@"
+# Bind the detected docker host to the standard path inside the runner for services to work
+act --container-architecture linux/amd64 \
+    --bind \
+    --container-daemon-socket "${DOCKER_HOST#unix://}" \
+    "$@"
