@@ -1,4 +1,4 @@
-<% assistant ||= local_assigns[:message] %>
+<% assistant ||= local_assigns[:llm_message] || local_assigns[:message] %>
 <div id="llm_message_<%= assistant.id %>" class="chat chat-start group">
   <div class="chat-header opacity-50 text-[10px] font-bold uppercase tracking-widest mb-1">
     Assistant
