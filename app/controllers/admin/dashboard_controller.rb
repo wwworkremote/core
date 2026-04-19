@@ -11,7 +11,7 @@ module Admin
       @models_count = Model.count
       @visits_count = Ahoy::Visit.count
       @events_count = Ahoy::Event.count
-      @active_fetchers_count = JobBoards::Source.count # Simple count for overview
+      @active_fetchers_count = @sources_count
     end
   end
 end
