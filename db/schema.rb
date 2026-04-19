@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_230438) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -111,6 +111,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
     t.string "experience_level"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "contact_info"
+    t.jsonb "location_info"
     t.index ["user_id"], name: "index_career_profiles_on_user_id"
   end
 
@@ -209,6 +211,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
     t.index ["created_at"], name: "index_event_store_events_in_streams_on_created_at"
     t.index ["stream", "event_id"], name: "index_event_store_events_in_streams_on_stream_and_event_id", unique: true
     t.index ["stream", "position"], name: "index_event_store_events_in_streams_on_stream_and_position", unique: true
+  end
+
+  create_table "experience_highlights", force: :cascade do |t|
+    t.bigint "work_experience_id", null: false
+    t.string "label"
+    t.text "text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["work_experience_id"], name: "index_experience_highlights_on_work_experience_id"
   end
 
   create_table "hacker_news_items", id: false, force: :cascade do |t|
@@ -625,6 +636,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "work_experiences", force: :cascade do |t|
+    t.bigint "career_profile_id", null: false
+    t.string "company_name"
+    t.string "location"
+    t.string "title"
+    t.string "employment_type"
+    t.date "start_date"
+    t.date "end_date"
+    t.text "context"
+    t.text "description"
+    t.text "summary"
+    t.text "action"
+    t.text "impact"
+    t.jsonb "scope"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "external_id"
+    t.index ["career_profile_id"], name: "index_work_experiences_on_career_profile_id"
+    t.index ["external_id"], name: "index_work_experiences_on_external_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "career_profiles", "users"
@@ -632,6 +664,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
   add_foreign_key "company_pipeline_steps", "users"
   add_foreign_key "contacts", "job_postings"
   add_foreign_key "contacts", "users"
+  add_foreign_key "experience_highlights", "work_experiences"
   add_foreign_key "job_experiences", "career_profiles"
   add_foreign_key "job_postings", "sources"
   add_foreign_key "llm_chats", "models"
@@ -652,4 +685,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
   add_foreign_key "tool_calls", "llm_messages"
   add_foreign_key "user_job_postings", "job_postings"
   add_foreign_key "user_job_postings", "users"
+  add_foreign_key "work_experiences", "career_profiles"
 end

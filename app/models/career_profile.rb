@@ -3,8 +3,10 @@
 # Table name: career_profiles
 #
 #  id               :bigint           not null, primary key
+#  contact_info     :jsonb
 #  experience_level :string
 #  goals            :text
+#  location_info    :jsonb
 #  resume_text      :text
 #  skills           :text
 #  created_at       :datetime         not null
@@ -21,6 +23,8 @@
 #
 class CareerProfile < ApplicationRecord
   belongs_to :user
-  has_many :job_experiences, dependent: :destroy
-  accepts_nested_attributes_for :job_experiences, allow_destroy: true
+  has_many :work_experiences, dependent: :destroy
+  has_many :experience_highlights, through: :work_experiences
+  
+  accepts_nested_attributes_for :work_experiences, allow_destroy: true
 end

@@ -10,7 +10,10 @@ class CareerProfilesController < ApplicationController
   end
 
   def update
-    if @career_profile.update(career_profile_params)
+    if params[:sync]
+      Resume::YamlImporter.call(current_user)
+      redirect_to career_profile_path, notice: "Career profile synchronized from YAML successfully."
+    elsif @career_profile.update(career_profile_params)
       redirect_to career_profile_path, notice: "Career profile updated successfully."
     else
       render :edit, status: :unprocessable_entity

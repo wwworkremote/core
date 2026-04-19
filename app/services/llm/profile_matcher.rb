@@ -4,9 +4,23 @@ module Llm
   class ProfileMatcher
     def self.call(user, job_posting)
       profile = user.career_profile
-      return { success: false, error: "Profile incomplete. Please set up your resume." } unless profile&.resume_text.present?
+      return { success: false, error: "Profile incomplete. Please set up your resume." } unless profile&.resume_text.present? || profile.work_experiences.any?
 
       user_job = user.user_job_postings.find_or_create_by!(job_posting: job_posting)
+
+      # Build structured experience context
+      experiences_context = profile.work_experiences.order(start_date: :desc).limit(10).map do |exp|
+        highlights = exp.experience_highlights.map { |h| "- [#{h.label}] #{h.text}" }.join("\n")
+        <<~EXP
+          ### #{exp.title} at #{exp.company_name}
+          Dates: #{exp.start_date} to #{exp.end_date || 'Present'}
+          Summary: #{exp.summary}
+          Action: #{exp.action}
+          Impact: #{exp.impact}
+          Highlights:
+          #{highlights}
+        EXP
+      end.join("\n\n")
 
       prompt = <<~PROMPT
         [SYSTEM_OBJECTIVE]
@@ -17,7 +31,9 @@ module Llm
         Tier: #{profile.experience_level}
         Skills: #{profile.skills}
         Goals: #{profile.goals}
-        Resume_Data: #{profile.resume_text}
+        
+        [STRUCTURED_EXPERIENCE]
+        #{experiences_context}
 
         [JOB_POSTING]
         Title: #{job_posting.title}

@@ -3,8 +3,10 @@
 # Table name: career_profiles
 #
 #  id               :bigint           not null, primary key
+#  contact_info     :jsonb
 #  experience_level :string
 #  goals            :text
+#  location_info    :jsonb
 #  resume_text      :text
 #  skills           :text
 #  created_at       :datetime         not null
