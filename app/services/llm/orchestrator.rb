@@ -18,7 +18,11 @@ module Llm
 
     def call(&block)
       tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
-      tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }.merge(@metadata)) do |span|
+      
+      # Ensure all metadata keys are strings for OTel
+      stringified_metadata = @metadata.transform_keys(&:to_s)
+      
+      tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }.merge(stringified_metadata)) do |span|
         unless @model
           span.status = OpenTelemetry::Trace::Status.error("No model provided or found in registry")
           return format_failure("No model provided or found in registry")

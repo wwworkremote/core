@@ -12,7 +12,7 @@ module JobBoards
         agent: self,
         untrusted_text: job_posting.body&.truncate(4000),
         schema: { 'category' => String, 'tags' => Array },
-        metadata: { job_posting_id: job_posting.id }
+        metadata: { 'job_posting_id' => job_posting.id }
       )
     end
   end
