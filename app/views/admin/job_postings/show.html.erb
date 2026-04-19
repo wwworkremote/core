@@ -48,6 +48,7 @@
             <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "btn-admin bg-primary/20 text-primary border-primary/20 hover:bg-primary/40" %>
           <% end %>
         <% end %>
+        <%= button_to "Enrich Data", admin_job_posting_path(@job_posting), params: { action: 'enrich' }, class: "btn-admin bg-violet-600 text-white" %>
       </div>
 
       <!-- Activity Form -->

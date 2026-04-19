@@ -14,10 +14,12 @@ module Admin
       end
     end
 
-    def destroy
-      @job_posting = JobPosting.find(params[:id])
-      @job_posting.destroy
-      redirect_to admin_job_postings_path, notice: "Job posting was successfully deleted."
+    def update
+      if params[:action] == 'enrich'
+        @job_posting = JobPosting.find(params[:id])
+        Scraper::Enricher.call(@job_posting)
+        redirect_to admin_job_posting_path(@job_posting), notice: "Enrichment complete."
+      end
     end
   end
 end

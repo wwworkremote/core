@@ -117,8 +117,10 @@ end
 #  id                 :bigint           not null, primary key
 #  body               :string
 #  company            :string
+#  crawl_status       :string
 #  data               :jsonb            not null
 #  embedding          :vector(3584)
+#  enriched_at        :datetime
 #  latitude           :float
 #  location           :string
 #  longitude          :float
