@@ -38,6 +38,8 @@ module JobBoards
     private
 
     def parse_response(response)
+      return nil if response.blank?
+
       # Basic JSON extraction in case the LLM adds chatter
       json_match = response.match(/\{.*\}/m)
       return nil unless json_match
