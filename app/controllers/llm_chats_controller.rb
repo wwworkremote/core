@@ -14,10 +14,11 @@ class LlmChatsController < ApplicationController
   def create
     prompt = params.dig(:llm_chat, :prompt)
     if prompt.present?
-      @llm_chat = LlmChat.create!(model: params.dig(:llm_chat, :model).presence)
+      @llm_chat = LlmChat.create!(model_id: params.dig(:llm_chat, :model_id).presence)
+      @llm_chat.llm_messages.create!(role: "user", content: prompt)
       LlmChatResponseJob.perform_later(@llm_chat.id, prompt)
 
-      redirect_to @llm_chat, notice: "Llmchat was successfully created."
+      redirect_to @llm_chat, notice: "Neural link established."
     end
   end
 

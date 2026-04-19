@@ -2,22 +2,23 @@
 
 class OutboundLinksController < ApplicationController
   def show
-    url = params[:url]
-    job_posting_id = params[:job_posting_id]
+    # Security: Only redirect to URLs stored in our database for a specific job posting
+    job_posting = JobPosting.find_by(id: params[:job_posting_id])
 
-    if url.present?
-      # Validate URL is safe before redirecting
-      uri = URI.parse(url)
-      if %w[http https].include?(uri.scheme)
-        ahoy.track "Clicked Outbound Link", job_posting_id: job_posting_id, url: url
-        redirect_to url, allow_other_host: true
-      else
-        redirect_back fallback_location: root_path, alert: "Invalid destination URL."
-      end
+    if job_posting&.target_url.present?
+      ahoy.track "Clicked Outbound Link", job_posting_id: job_posting.id, url: job_posting.target_url
+      redirect_to job_posting.target_url, allow_other_host: true
     else
-      redirect_back fallback_location: root_path, alert: "No destination URL provided."
+      # If no posting ID, check if the URL exists in any of our records as a secondary verification
+      verified_url = JobPosting.where(target_url: params[:url]).limit(1).pluck(:target_url).first
+      
+      if verified_url.present?
+        ahoy.track "Clicked Outbound Link", url: verified_url
+        redirect_to verified_url, allow_other_host: true
+      else
+        Rails.logger.warn "SECURITY: Blocked attempt to use OutboundLinksController for open redirect to: #{params[:url]}"
+        redirect_back fallback_location: root_path, alert: "Security Exception: Invalid destination."
+      end
     end
-  rescue URI::InvalidURIError
-    redirect_back fallback_location: root_path, alert: "Invalid destination URL."
   end
 end

@@ -1,0 +1,28 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "cc8547226a03534ce23c2c55445404fc180e90b09a818dacfbc3e5fc78a55306",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/outbound_links_controller.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(JobPosting.find_by(:id => params[:job_posting_id]).target_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OutboundLinksController",
+        "method": "show"
+      },
+      "user_input": "JobPosting.find_by(:id => params[:job_posting_id]).target_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    }
+  ],
+  "brakeman_version": "8.0.4"
+}

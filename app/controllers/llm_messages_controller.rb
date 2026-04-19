@@ -4,6 +4,7 @@ class LlmMessagesController < ApplicationController
   def create
     content = params.dig(:llm_message, :content)
     if content.present?
+      @llm_message = @llm_chat.llm_messages.create!(role: "user", content: content)
       LlmChatResponseJob.perform_later(@llm_chat.id, content)
 
       respond_to do |format|
