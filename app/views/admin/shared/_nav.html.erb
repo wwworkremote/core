@@ -1,12 +1,44 @@
-<nav class="flex flex-wrap gap-4 mb-8 border-b border-white/5 pb-4">
-  <%= link_to "Dashboard", admin_root_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'dashboard' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Analytics", admin_analytics_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'analytics' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Job Postings", admin_job_postings_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'job_postings' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Source Docs", admin_documents_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'documents' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Sources", admin_sources_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'sources' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Domains", admin_domains_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'domains' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Email Logs", admin_email_import_records_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'email_import_records' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Models", admin_models_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'models' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Visits", admin_visits_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'visits' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-  <%= link_to "Events", admin_events_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'events' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
-</nav>
+<div class="mb-10 space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
+      <div class="flex items-center gap-4">
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-600">Core</span>
+        <%= link_to "Dashboard", admin_root_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'dashboard' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Analytics", admin_analytics_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'analytics' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+      </div>
+
+      <div class="w-px h-3 bg-white/10 hidden md:block"></div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-600">Inventory</span>
+        <%= link_to "Postings", admin_job_postings_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'job_postings' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Docs", admin_documents_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'documents' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Domains", admin_domains_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'domains' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+      </div>
+
+      <div class="w-px h-3 bg-white/10 hidden md:block"></div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-600">Engine</span>
+        <%= link_to "Sources", admin_sources_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'sources' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Emails", admin_email_import_records_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'email_import_records' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Registry", admin_models_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'models' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+      </div>
+
+      <div class="w-px h-3 bg-white/10 hidden md:block"></div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-600">Intel</span>
+        <%= link_to "Visits", admin_visits_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'visits' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Events", admin_events_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'events' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+      </div>
+    </div>
+
+    <div>
+      <%= link_to root_path, class: "group flex items-center gap-2 px-3 py-1 rounded bg-white/5 border border-white/10 hover:bg-white/10 transition-all" do %>
+        <i class="bi bi-arrow-left text-slate-500 group-hover:text-white transition-colors"></i>
+        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white">Exit Admin</span>
+      <% end %>
+    </div>
+  </div>
+</div>
