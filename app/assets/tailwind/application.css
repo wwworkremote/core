@@ -76,4 +76,24 @@
   .btn-admin {
     @apply btn btn-sm rounded-lg font-black uppercase tracking-widest text-[10px];
   }
+
+  /* Neural Design System (High-Density Dracula Pro) */
+  .btn-neural {
+    @apply px-4 py-1.5 rounded font-black uppercase tracking-widest text-[10px] transition-all
+           bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white
+           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .card-neural {
+    @apply bg-base-200 border border-white/5 rounded shadow-xl overflow-hidden;
+  }
+
+  .sparkle-ai {
+    @apply relative inline-block;
+  }
+
+  .sparkle-ai::after {
+    content: "✦";
+    @apply absolute -top-2 -right-3 text-dracula-purple text-sm animate-pulse;
+  }
 }
