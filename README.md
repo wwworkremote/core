@@ -101,5 +101,24 @@ Access the dashboard at `http://localhost:3010`.
 
 ---
 
+## ✅ Local CI via GitHub Actions (act)
+
+WWWorkRemote supports running the full GitHub Actions pipeline locally using `act`.
+
+### Prerequisites
+- Docker (e.g., Docker Desktop, Colima, or OrbStack)
+- `act` CLI: `brew install act`
+
+### Running CI
+```bash
+# Run all jobs
+bin/ci
+
+# Run specific job (e.g., test)
+bin/ci -j test
+```
+
+---
+
 ## ⚖️ License
 WWWorkRemote is proprietary software. All rights reserved.

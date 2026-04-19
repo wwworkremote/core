@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# frozen_string_literal: true
+set -euo pipefail
+
+# bin/ci: Local CI runner via act (GitHub Actions)
+
+if ! command -v act >/dev/null 2>&1; then
+  echo "Error: 'act' is not installed."
+  echo "Install it via homebrew: brew install act"
+  exit 1
+fi
+
+if ! docker info >/dev/null 2>&1; then
+  # Try to detect colima socket
+  COLIMA_SOCKET="$HOME/.config/colima/default/docker.sock"
+  if [[ -S "$COLIMA_SOCKET" ]]; then
+    export DOCKER_HOST="unix://$COLIMA_SOCKET"
+  else
+    echo "Error: Docker is not running or socket not found."
+    exit 1
+  fi
+fi
+
+echo "--- Running Local CI via act ---"
+act --container-architecture linux/amd64 "$@"
