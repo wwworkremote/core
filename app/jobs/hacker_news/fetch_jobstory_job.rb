@@ -24,10 +24,14 @@ module HackerNews
 
       signature = Digest::SHA256.hexdigest("hn-#{jobstory_id}")
 
-      JobBoards::Document.create_or_find_by!(signature: signature) do |doc|
+      doc = JobBoards::Document.find_or_initialize_by(signature: signature)
+      if doc.new_record?
         doc.source_id = source_id
         doc.job_boards_query_id = query_id
         doc.document = data.to_json
+        unless doc.save
+          Rails.logger.error "[HackerNews::FetchJobstoryJob] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}"
+        end
       end
 
       # Trigger sync after fetch

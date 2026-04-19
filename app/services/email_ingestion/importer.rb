@@ -83,10 +83,14 @@ module EmailIngestion
         fetch_mode: fetch_result[:fetch_mode]
       )
 
-      JobBoards::Document.create_or_find_by!(signature: signature) do |doc|
+      doc = JobBoards::Document.find_or_initialize_by(signature: signature)
+      if doc.new_record?
         doc.source_id = source.id
         doc.job_boards_query_id = query.id
         doc.document = enriched_data.to_json
+        unless doc.save
+          Rails.logger.error "[EmailIngestion::Importer] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}"
+        end
       end
     end
   end
