@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_074407) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_075157) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -91,6 +91,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_074407) do
     t.string "visitor_token"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "companies", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_companies_on_slug"
+  end
+
+  create_table "company_pipeline_steps", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.string "status"
+    t.text "note"
+    t.string "link"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_pipeline_steps_on_company_id"
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -542,6 +561,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_074407) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "company_pipeline_steps", "companies"
   add_foreign_key "contacts", "job_postings"
   add_foreign_key "job_postings", "sources"
   add_foreign_key "llm_chats", "models"
