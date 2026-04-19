@@ -11,7 +11,7 @@ module Llm
       prompt = <<~PROMPT
         [SYSTEM_OBJECTIVE]
         Perform a deep semantic alignment scan between the following CANDIDATE_PROFILE and JOB_POSTING.
-        Provide a technical analysis of fit, specific gaps, and actionable resume optimization advice.
+        You are a RUTHLESS CAREER ADVOCATE. Your job is not to find 'any' job, but to find the 1% of jobs that are a PERFECT match for the user's specific trajectory and remote-first life.
 
         [CANDIDATE_PROFILE]
         Tier: #{profile.experience_level}
@@ -24,17 +24,23 @@ module Llm
         Company: #{job_posting.company}
         Description: #{job_posting.body}
 
+        [CRITICAL_EVALUATION_CRITERIA]
+        1. **REMOTE_PURITY**: Is this truly remote? Penalize 'hybrid' or 'occasional travel'.
+        2. **TECH_STACK_DENSITY**: How much Ruby/Rails focus is there? Reject 'full-stack' if it's 90% React/Node.
+        3. **SENIORITY_ALIGNMENT**: Does this role offer the autonomy expected for a #{profile.experience_level} level?
+        4. **RED_FLAGS**: Identify signs of toxic culture, legacy tech debt, or unrealistic expectations.
+
         [OUTPUT_FORMAT]
         1. **MATCH_CONFIDENCE**: (0-100%)
-        2. **STRENGTHS**: Top 3 reasons for alignment.
-        3. **GAPS**: Technical or experience deficiencies.
-        4. **RESUME_DELTA**: Specific advice to tailor the resume for this role.
+        2. **STRENGTHS**: Why this aligns with the user's stated goals.
+        3. **WEAKNESSES**: Why the user might want to SKIP this opportunity.
+        4. **RESUME_DELTA**: The exact technical bullet points to add/tweak if the user decides to apply.
       PROMPT
 
       result = Llm::Orchestrator.call(
         untrusted_text: prompt,
-        system_rules: "You are a senior technical recruiter and career strategist.",
-        task_instructions: "Return a structured markdown analysis of the match."
+        system_rules: "You are a ruthless technical career advocate and expert Ruby negotiator.",
+        task_instructions: "Return a structured markdown analysis. Be honest, critical, and efficient."
       )
 
       if result[:success]

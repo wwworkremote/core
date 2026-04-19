@@ -1,78 +1,66 @@
 # Engineering Backlog: Job Search Automation Platform
 
 ## Backlog Audit
-- **Status**: Updated via ADR 002 (Ultimate Stack Consolidation).
-- **Task Distribution**: Finalizing the "Solid" shift and investigating new sources.
-- **Major Gaps**: Otta investigation, Dynamite Jobs investigation.
-- **Quality Issues**: Transaction safety and migration guardrails.
+- **Status**: Synchronized with active mass-scraping and AI-alignment features.
+- **Current Focus**: Scaling ingestion pipelines and refining personal career matching.
+- **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, and API-First Scraping Strategy.
 
 ---
 
 ## Priority Backlog (Dependency-Ordered)
 
 ### 1. Implement Distributed Circuit Breaker for Rate Limiting
-- **Description**: Add a non-blocking locking mechanism to job fetchers to handle HTTP 429 errors gracefully without thread-blocking sleeps.
+- **Description**: Add a non-blocking locking mechanism to job fetchers to handle HTTP 429 errors gracefully.
 - **Acceptance Criteria**:
-  - `ApiGuard` enhanced with `lock_source!` and `source_locked?` methods using `Rails.cache`.
-  - Shared `JobBoards::Client` wrapper implemented to detect `429` errors and trip the breaker.
-  - High-volume fetchers (Lever/Greenhouse) refactored to check lock state before execution.
-  - No `sleep` calls allowed in any fetcher path.
-- **Definition of Done**:
-  - Circuit trips globally for a source when a 429 is encountered.
-  - Subsequent jobs for that source skip execution gracefully while the lock is active.
-  - Isolation verified: Tripping Foo fetcher does not block Bar fetcher.
-  - Integration test demonstrating skip-on-lock behavior.
+  - `ApiGuard` enhanced with `lock_source!` and `source_locked?`.
+  - Shared `JobBoards::Client` trips the breaker on 429s.
 - **Labels**: resilience, performance
 
-### 5. Remove Devise and Simplify Auth
-- **Description**: Replace the heavy Devise stack with `has_secure_password` and HTTP Basic Auth for a single-admin local tool.
-- **Acceptance Criteria**:
-  - `devise` gem removed.
-  - `User` model updated with `password_digest`.
-  - Avo dashboard protected via HTTP Basic Auth.
-- **Labels**: auth, refactor
+### 2. Scale Job Board Discovery & Ingestion
+- **Description**: Scale the `Scraper::CrawlDiscoveryJob` to cover the full matrix of prioritized boards.
+- **Tasks**:
+  - [ ] Implement `Scraper::Indeed::ApiClient` (API-first).
+  - [ ] Implement `Scraper::LinkedIn::ApiClient` (API-first).
+  - [ ] Add Glassdoor and Dice crawler patterns to `DiscoveryLink` filtering.
+- **Labels**: ingestion, scraper
 
-### 6. Complete Solid Queue & Cache Migration
-- **Description**: Move background jobs and caching to PostgreSQL, dropping Redis entirely.
+### 3. Deep AI Career Alignment (V2)
+- **Description**: Refine the `Llm::ProfileMatcher` to provide more granular, multi-stage analysis.
 - **Acceptance Criteria**:
-  - `sidekiq` removed.
-  - `solid_queue` and `solid_cache` fully configured.
-  - `docker-compose.yml` and `.env` cleaned of Redis.
-- **Labels**: infrastructure
+  - [ ] Support multi-document resume uploads (PDF/Docx).
+  - [ ] Add "Actionable Interview Prep" section to the match analysis.
+  - [ ] Enable "Career Comparison" to compare 3 job nodes against profile simultaneously.
+- **Labels**: ai, product
 
-### 7. Implement Safety Guardrails
-- **Description**: Add gems to catch bad migrations, transaction leaks, and schema inconsistencies.
-- **Acceptance Criteria**:
-  - `strong_migrations`, `database_consistency`, and `isolator` added.
-  - Initial run of `database_consistency` passes.
-- **Labels**: safety, dev-tools
-
-### 8. Investigate Next Sources: Otta & Dynamite Jobs
-- **Description**: Map out extraction strategies for Otta and Dynamite Jobs.
-- **Acceptance Criteria**:
-  - API endpoints or scrape targets identified.
-  - Signal quality (remote, salary, tech stack) evaluated.
-- **Labels**: ingestion
+### 4. Golden Signals & Behavioral Analytics Dashboard
+- **Description**: Move beyond simple sync timestamps to a full observability dashboard.
+- **Tasks**:
+  - [ ] Implement Latency (Duration), Traffic (Volume), Errors, and Saturation charts in Admin.
+  - [ ] Build "Behavioral Intelligence" dashboard for Ahoy event flow.
+- **Labels**: monitoring, analytics
 
 ---
 
-## Future Enhancements (Deferred)
+## Recently Completed
+- [x] **Unify Research UI**: Merged Admin pipeline tools into primary `JobPosting` and `Company` views.
+- [x] **Mass Ingestion Foundation**: Distributed `Scraper::Crawler` and `DiscoveryLink` architecture established.
+- [x] **Career Identity Hub**: Implemented editable job history and goals for personalized AI matching.
+- [x] **API-First Scraping**: Built `ApiInterceptor` to bypass HTML scraping via browser-internal endpoints (Cord.com proven).
+- [x] **Pipeline Health SLOs**: Status/Sync/Ingest tracking added to the orchestration dashboard.
+- [x] **Simple Auth & Solid Migration**: Dropped Redis/Devise for a lean PostgreSQL-only stack.
+
+---
+
+## Future Enhancements
 - **Serialization**: Adopt `alba` for `api/v0/` if complexity increases.
-- **Profiling**: Add `test-prof` to optimize slow scraper specs.
-- **Headless Browser**: Move from Selenium to `cuprite` for system tests.
-- **Components**: Evaluate `view_component` if custom UI becomes non-trivial.
-- **SPA**: Evaluate `inertia_rails` only if complex client-side state is required.
+- **Notification Engine**: Trigger email/Slack alerts when a "High Confidence Match" is ingested.
+- **Browser Farm**: Evaluate `Browserless.io` or similar if local Chromium becomes a resource bottleneck.
+- **Semantic Search (V2)**: Enable full-profile-to-database vector similarity search ("Find all jobs matching my entire resume").
 
 ---
 
 ## Guardrails
 - **Job Idempotency**: All new workers must prove safe duplicate execution.
-- **LLM Boundaries**: No LLM calls in web requests; must have timeouts and retries.
-- **Query Safety**: EXPLAIN ANALYZE required for any new search or high-volume query.
-- **Contract First**: No new feed source without a live contract spec.
-
-## Tool Strategy
-- **RuboCop**: Keep (Primary). Hardened with performance and rails plugins.
-- **Brakeman**: Keep. Security gate.
-- **Strong Migrations**: NEW. Protect production schema.
-- **Isolator**: NEW. Prevent transaction bleed.
+- **LLM Boundaries**: No LLM calls in web requests; must use `AsyncJobAdapter`.
+- **Crawler Politeness**: Respect `robots.txt` and implement randomized jitter on browser sessions.
+- **Data Privacy**: Profile and Match data must remain strictly isolated to the authenticated user.
