@@ -11,7 +11,7 @@ module EmailIngestion
       @file_path = record&.file_path
     end
 
-    def call(source: nil)
+    def call(source: nil, force: false)
       if @record
         process_record
       else
@@ -19,7 +19,7 @@ module EmailIngestion
         rake = Rake::Application.new
         Rake.application = rake
         Rake::Task.define_task(:environment)
-        load Rails.root.join('lib', 'tasks', 'email_ingestion.rake') # Adjust path if necessary
+        load Rails.root.join('lib', 'tasks', 'email_ingestion.rake')
         rake['eml:scan_source'].invoke(source)
       end
     end
