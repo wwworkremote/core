@@ -121,4 +121,7 @@ bin/ci -j test
 ---
 
 ## ⚖️ License
-WWWorkRemote is proprietary software. All rights reserved.
+
+Copyright &copy; 2024-2026 Mike Hall. All rights reserved.
+
+**WWWorkRemote** is proprietary software. Unauthorized copying, modification, or distribution is strictly prohibited. See the [LICENSE](LICENSE) file for more details.

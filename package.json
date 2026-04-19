@@ -19,8 +19,8 @@
     "url": "git+https://github.com/wwworkremote/core.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Mike Hall",
+  "license": "Proprietary",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/wwworkremote/core/issues"
