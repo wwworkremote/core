@@ -82,11 +82,8 @@ module Llm
       
       chat = @chat || LlmChat.create!(model: model)
       
-      client = RubyLLM.client(model: model.model_id)
-      raise "Model #{model.model_id} not found in RubyLLM registry" unless client
-      
-      # Use the native ask pattern to stream content directly
-      chat.ask(sanitized_text, model: client, &block)
+      # Use RubyLLM.chat as the entry point
+      response = RubyLLM.chat(model: model.model_id, messages: chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } }, &block)
       
       span.add_event('received_llm_response')
       { success: true, model: model.model_id }
