@@ -1,5 +1,6 @@
 <nav class="flex flex-wrap gap-4 mb-8 border-b border-white/5 pb-4">
   <%= link_to "Dashboard", admin_root_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'dashboard' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
+  <%= link_to "Analytics", admin_analytics_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'analytics' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
   <%= link_to "Job Postings", admin_job_postings_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'job_postings' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
   <%= link_to "Source Docs", admin_documents_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'documents' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>
   <%= link_to "Sources", admin_sources_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'sources' ? 'text-blue-400' : 'text-slate-500 hover:text-white'}" %>

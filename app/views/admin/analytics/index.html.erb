@@ -1,0 +1,61 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Pipeline Intelligence</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Real-time Throughput & Health Analytics</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-violet-500"></span> Ingestion Funnel
+    </h3>
+    <div class="h-80">
+      <%= column_chart charts_data_pipeline_funnel_path, 
+            colors: ["#9580ff"], 
+            library: { 
+              plugins: { legend: { display: false } },
+              scales: { 
+                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#7970a9" } },
+                x: { grid: { display: false }, ticks: { color: "#7970a9" } }
+              }
+            } %>
+    </div>
+    <p class="mt-4 text-[10px] text-slate-600 font-medium italic italic">Cross-entity distribution from raw JSON to neural-indexed postings.</p>
+  </div>
+
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-cyan-500"></span> Provider Volume (7d)
+    </h3>
+    <div class="h-80">
+      <%= pie_chart charts_data_pipeline_health_path, 
+            colors: ["#80ffea", "#8aff80", "#ffca80", "#ff80bf", "#9580ff", "#ff9580", "#ffff80"],
+            donut: true,
+            library: { 
+              plugins: { legend: { labels: { color: "#7970a9", font: { weight: 'bold', size: 10 } } } }
+            } %>
+    </div>
+    <p class="mt-4 text-[10px] text-slate-600 font-medium italic">Document acquisition density per upstream provider.</p>
+  </div>
+
+  <div class="card-neural p-8 lg:col-span-2">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Synthesis Velocity
+    </h3>
+    <div class="h-80">
+      <%= area_chart charts_data_job_postings_path(days: 30), 
+            colors: ["#8aff80"],
+            points: false,
+            library: {
+              scales: { 
+                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#7970a9" } },
+                x: { grid: { display: false }, ticks: { color: "#7970a9" } }
+              }
+            } %>
+    </div>
+    <p class="mt-4 text-[10px] text-slate-600 font-medium italic">Daily production of sanitized job postings over the last 30 days.</p>
+  </div>
+</div>

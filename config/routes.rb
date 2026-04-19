@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   end
   namespace :admin do
     root to: 'dashboard#index'
+    get 'analytics' => 'analytics#index'
     resources :job_postings, only: %i[index show destroy]
     resources :sources, only: %i[index show]
     resources :queries, only: %i[index show]
@@ -49,6 +50,8 @@ Rails.application.routes.draw do
       get 'sources' => 'sources#index'
       get 'job_postings' => 'job_postings#index'
       get 'job_postings/corpus'
+      get 'pipeline/health' => 'pipeline#health'
+      get 'pipeline/funnel' => 'pipeline#funnel'
     end
   end
 
