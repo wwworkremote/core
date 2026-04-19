@@ -5,47 +5,62 @@ class DataAcquisitionManager
     'adzuna' => {
       class: Adzuna::Fetcher,
       cooldown: 4.hours,
-      name: 'Adzuna'
+      name: 'Adzuna',
+      type: 'API'
     },
     'arbeitnow' => {
       class: Arbeitnow::Fetcher,
       cooldown: 2.hours,
-      name: 'Arbeitnow'
+      name: 'Arbeitnow',
+      type: 'Feed'
     },
     'greenhouse' => {
       class: Greenhouse::Fetcher,
       cooldown: 4.hours,
-      name: 'Greenhouse'
+      name: 'Greenhouse',
+      type: 'Scraper'
     },
     'hackernews' => {
       class: HackerNews::FetchLatestJobstories,
       cooldown: 15.minutes,
-      name: 'HackerNews'
+      name: 'HackerNews',
+      type: 'API'
     },
     'jobicy' => {
       class: Jobicy::Fetcher,
       cooldown: 4.hours,
-      name: 'Jobicy'
+      name: 'Jobicy',
+      type: 'Feed'
     },
     'lever' => {
       class: Lever::Fetcher,
       cooldown: 4.hours,
-      name: 'Lever'
+      name: 'Lever',
+      type: 'Scraper'
     },
     'remotive' => {
       class: Remotive::Fetcher,
       cooldown: 1.hour,
-      name: 'Remotive'
+      name: 'Remotive',
+      type: 'API'
     },
     'wwr' => {
       class: Wwr::Fetcher,
       cooldown: 30.minutes,
-      name: 'Wwr'
+      name: 'Wwr',
+      type: 'Scraper'
     },
     'yc' => {
       class: Yc::Scraper,
       cooldown: 4.hours,
-      name: 'YC'
+      name: 'YC',
+      type: 'Scraper'
+    },
+    'email' => {
+      class: EmailIngestion::Importer,
+      cooldown: 1.hour,
+      name: 'Email Ingestion',
+      type: 'Email'
     }
   }.freeze
 

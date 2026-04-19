@@ -6,24 +6,32 @@
     <thead class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5 bg-white/[0.02]">
       <tr>
         <th class="px-6 py-3">Source</th>
+        <th class="px-6 py-3">Type</th>
         <th class="px-6 py-3">Last Sync</th>
         <th class="px-6 py-3">Freshness Gap</th>
         <th class="px-6 py-3 text-right">Health</th>
       </tr>
     </thead>
     <tbody class="font-mono text-[11px] divide-y divide-white/5">
-      <% JobBoards::Source.order(name: :asc).each do |source| %>
-        <%
-          sync_gap = Time.current - (source.last_synced_at || 1.week.ago)
-          fresh_gap = Time.current - (source.last_ingested_at || 1.week.ago)
+      <% 
+        fetchers = DataAcquisitionManager::FETCHERS
+        JobBoards::Source.order(name: :asc).each do |source| 
+          fetcher_config = fetchers[source.slug]
+          pipeline_type = fetcher_config&.fetch(:type, "Unknown")
           
-          # Health status logic
+          sync_gap = Time.current - (source.last_synced_at || 1.week.ago)
+          
           status = :healthy
           status = :warning if sync_gap > 6.hours
           status = :critical if sync_gap > 24.hours
-        %>
+      %>
         <tr class="hover:bg-white/[0.03]">
           <td class="px-6 py-3 font-bold text-white"><%= source.name %></td>
+          <td class="px-6 py-3">
+             <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5 font-black text-[9px]">
+               <%= pipeline_type %>
+             </span>
+          </td>
           <td class="px-6 py-3 text-slate-400"><%= source.last_synced_at&.strftime("%b %d, %H:%M") || "NEVER" %></td>
           <td class="px-6 py-3 text-slate-400"><%= source.last_ingested_at&.strftime("%b %d, %H:%M") || "NEVER" %></td>
           <td class="px-6 py-3 text-right">
