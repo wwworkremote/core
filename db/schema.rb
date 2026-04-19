@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_172722) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_175957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -122,6 +122,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_172722) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["job_posting_id"], name: "index_contacts_on_job_posting_id"
+  end
+
+  create_table "discovery_links", force: :cascade do |t|
+    t.string "board_name"
+    t.string "url"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["url"], name: "index_discovery_links_on_url"
   end
 
   create_table "domains", force: :cascade do |t|
