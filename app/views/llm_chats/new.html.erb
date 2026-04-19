@@ -1,14 +1,21 @@
-<% content_for :title, "New AI Chat" %>
+<% content_for :title, "Initiate Dialogue" %>
 
-<div class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card shadow-sm border-0 mt-4">
-        <div class="card-body p-4">
-          <h1 class="h2 mb-4">New AI Chat</h1>
-          <%= render "form", llm_chat: @llm_chat %>
-        </div>
-      </div>
+<div class="max-w-xl mx-auto py-12">
+  <div class="bg-base-200 p-12 rounded-[3rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+    <div class="absolute -top-12 -left-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all"></div>
+    
+    <header class="text-center mb-12 relative">
+      <%= heroicon "plus-circle", variant: :solid, options: { class: "w-16 h-16 text-primary mx-auto mb-6 group-hover:scale-110 transition-transform duration-500" } %>
+      <h1 class="text-3xl font-black uppercase tracking-tighter italic">Initiate <span class="text-primary">Dialogue</span></h1>
+      <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 mt-1 max-w-[200px] mx-auto leading-relaxed">Select model and provide initial instruction</p>
+    </header>
+
+    <%= render "form", llm_chat: @llm_chat %>
+    
+    <div class="mt-8 text-center">
+      <%= link_to llm_chats_path, class: "text-[10px] font-black uppercase tracking-[0.2em] opacity-20 hover:opacity-100 transition-opacity" do %>
+        &larr; Abort and Return
+      <% end %>
     </div>
   </div>
 </div>

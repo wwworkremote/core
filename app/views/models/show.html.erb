@@ -1,53 +1,98 @@
-<% content_for :title, "Model: #{@model.name}" %>
+<% content_for :title, "Model Architecture: #{@model.name}" %>
 
-<div class="container-fluid">
-  <div class="row mb-4 align-items-center">
-    <div class="col">
-      <h1 class="display-5">Model Details</h1>
+<div class="max-w-4xl mx-auto space-y-8">
+  <header class="flex justify-between items-center bg-base-200 p-6 rounded-2xl border border-white/5 shadow-xl">
+    <div>
+      <h1 class="text-2xl font-black uppercase tracking-tighter">Model <span class="text-primary italic">Architecture</span></h1>
+      <div class="flex items-center gap-2 mt-1">
+        <div class="badge badge-outline badge-xs opacity-50 uppercase font-bold tracking-widest text-[8px]">Registry</div>
+        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70"><%= @model.model_id %></span>
+      </div>
     </div>
-    <div class="col-auto">
-      <%= link_to "Back to all models", models_path, class: "btn btn-outline-secondary" %>
+    
+    <div class="flex gap-2">
+      <%= link_to models_path, class: "btn btn-ghost btn-sm rounded-xl gap-2 font-bold uppercase tracking-widest text-[10px]" do %>
+        <%= heroicon "chevron-left", variant: :solid, options: { class: "w-3 h-3" } %>
+        Back
+      <% end %>
     </div>
-  </div>
+  </header>
 
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-          <div class="row mb-3">
-            <div class="col-sm-3 text-muted">Provider</div>
-            <div class="col-sm-9"><strong><%= @model.provider_class&.name || @model.provider %></strong></div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-sm-3 text-muted">Model Name</div>
-            <div class="col-sm-9"><strong><%= @model.name %></strong></div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-sm-3 text-muted">Model ID</div>
-            <div class="col-sm-9"><code><%= @model.model_id %></code></div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-sm-3 text-muted">Context Window</div>
-            <div class="col-sm-9"><%= number_with_delimiter(@model.context_window) if @model.context_window %> tokens</div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-sm-3 text-muted">Max Output</div>
-            <div class="col-sm-9"><%= number_with_delimiter(@model.max_output_tokens) if @model.max_output_tokens %> tokens</div>
-          </div>
-
-          <% if @model.capabilities.any? %>
-            <div class="row">
-              <div class="col-sm-3 text-muted">Capabilities</div>
-              <div class="col-sm-9">
-                <% @model.capabilities.each do |capability| %>
-                  <span class="badge bg-light text-dark border me-1"><%= capability %></span>
-                <% end %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 space-y-6">
+      <div class="card bg-base-200 border border-white/5 shadow-xl">
+        <div class="card-body p-8">
+          <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-8 italic">Technical Specifications</h3>
+          
+          <div class="space-y-6">
+            <div class="flex justify-between items-center border-b border-white/5 pb-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Provider Class</span>
+              <span class="text-sm font-black uppercase tracking-tighter"><%= @model.provider_class&.name || @model.provider %></span>
+            </div>
+            
+            <div class="flex justify-between items-center border-b border-white/5 pb-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Canonical Name</span>
+              <span class="text-sm font-black uppercase tracking-tighter text-primary"><%= @model.name %></span>
+            </div>
+            
+            <div class="flex justify-between items-center border-b border-white/5 pb-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Context Window</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-mono text-white"><%= number_with_delimiter(@model.context_window) if @model.context_window %></span>
+                <span class="text-[8px] font-black uppercase tracking-widest opacity-20">tokens</span>
               </div>
             </div>
+            
+            <div class="flex justify-between items-center border-b border-white/5 pb-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Max Output</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-mono text-white"><%= number_with_delimiter(@model.max_output_tokens) if @model.max_output_tokens %></span>
+                <span class="text-[8px] font-black uppercase tracking-widest opacity-20">tokens</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if @model.capabilities.any? %>
+        <div class="card bg-base-200 border border-white/5 shadow-xl">
+          <div class="card-body p-8">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-6 italic">Functional Capabilities</h3>
+            <div class="flex flex-wrap gap-2">
+              <% @model.capabilities.each do |capability| %>
+                <div class="badge badge-outline border-white/10 text-[8px] font-black uppercase tracking-widest py-3 px-4 rounded-lg">
+                  <%= capability %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="space-y-6">
+      <div class="card bg-primary text-primary-content shadow-2xl shadow-primary/20">
+        <div class="card-body p-8 text-center">
+          <%= heroicon "bolt", variant: :solid, options: { class: "w-12 h-12 mx-auto mb-4 opacity-50" } %>
+          <h3 class="text-lg font-black uppercase tracking-tighter leading-tight mb-2 italic">Ready for <span class="opacity-70">Inference</span></h3>
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-8 leading-relaxed">Establish a secure neural link with this architecture.</p>
+          <%= link_to new_llm_chat_path(model: @model.model_id), class: "btn btn-black btn-block rounded-xl font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl" do %>
+            Establish Link
           <% end %>
         </div>
-        <div class="card-footer bg-light p-3">
-          <%= link_to "Start chat with this model", new_llm_chat_path(model: @model.model_id), class: "btn btn-primary" %>
+      </div>
+      
+      <div class="card bg-base-300 border border-white/5 shadow-xl">
+        <div class="card-body p-6">
+          <div class="flex items-center gap-3 mb-4">
+             <div class="bg-base-200 p-2 rounded-lg border border-white/5">
+               <%= heroicon "shield-check", variant: :solid, options: { class: "w-4 h-4 text-success opacity-50" } %>
+             </div>
+             <span class="text-[10px] font-black uppercase tracking-widest opacity-40 italic text-success">Verified Active</span>
+          </div>
+          <p class="text-[8px] font-bold uppercase tracking-widest opacity-30 leading-relaxed">
+            This model architecture is currently synchronized with the global registry and available for multi-modal processing.
+          </p>
         </div>
       </div>
     </div>

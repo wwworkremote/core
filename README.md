@@ -1,76 +1,99 @@
-# WWWorkRemote: The Ultimate Rails Job Engine
+# WWWorkRemote: The Autonomous Remote Job Synthesis Engine
 
-Bleeding-edge data acquisition engine and dashboard for remote job listings, powered by the "Ultimate Rails Platform Stack."
+> "Because searching for remote work shouldn't be a second full-time job."
 
-## 🚀 The Stack
-- **Ruby 4.0.2:** Bleeding-edge performance and features.
-- **Rails 8.2.0.alpha:** Tracking the `main` branch for the latest framework innovations.
-- **Solid Infrastructure (PostgreSQL-backed):**
-  - `solid_queue`: High-performance, database-backed background jobs.
-  - `solid_cache`: Database-backed caching.
-  - `solid_cable`: Database-backed Action Cable.
-- **Modern Asset Pipeline:** Propshaft, DartSass, and Importmaps (no-build JS).
-- **Search & AI:**
-  - `pgvector`: Semantic similarity search on host PostgreSQL.
-  - `PgSearch`: Advanced full-text search with trigram support.
-  - `llama.cpp`: Local AI integration for job categorization and embeddings.
+---
 
-## 🛠 Getting Started
+## 📖 The Story of WWWorkRemote
 
-### Default Port
-The application listens on port **3010** by default.
+### The Genesis (Early 2024)
+WWWorkRemote was born out of frustration. In the post-2023 remote work landscape, job seekers were drowning in noise. LinkedIn was flooded with ghost postings, Indeed was cluttered with stale data, and niche boards like HackerNews and WWR required manual monitoring. 
 
-### Local Development (Host)
-Ensure you have Ruby 4.0.2 and PostgreSQL (with `pgvector`) installed on your host machine.
+The original vision was simple: **Aggregated Clarity**. It started as a few Ruby scripts to fetch job stories from the HackerNews API and store them in a local SQLite database.
 
-```bash
-# Install dependencies
-bundle install
+### The Evolution (2025)
+As the project grew, so did the complexity of the remote job market. Simple scraping wasn't enough; we needed **Synthesis**. 
+- **The Vector Pivot**: We integrated `pgvector` to allow for semantic search—finding jobs based on *what they are*, not just the keywords they used.
+- **The LLM Revolution**: Instead of manual tagging, we introduced a local-first LLM pipeline (the "Captain Caveman" architecture) to categorize jobs, extract technical tags, and identify "real" remote opportunities from "remote-optional" noise.
 
-# Run migrations (on host DB)
-bin/rails db:migrate
+### The Modern Era (April 2026)
+Today, WWWorkRemote is a high-performance, autonomous engine built on **Rails 8** and **Ruby 4.0**. It doesn't just fetch; it *understands*.
+- It scans your **Apple Mail exports (.eml)** for job alerts.
+- It protects your LLM context with a robust **Guardrails Pipeline**.
+- It runs concurrently using **Falcon** and **Fibers**, processing thousands of job postings per minute while you sleep.
 
-# Start development server and assets watcher
-./bin/dev
+---
+
+## 🏗️ System Architecture
+
+### 1. Ingestion Pipeline
+We utilize a multi-source ingestion strategy:
+- **API Fetchers**: Direct integrations with Adzuna, LinkedIn, Indeed, Remotive, and HackerNews.
+- **Email Ingestion**: A unique local adapter that scans `~/.wwworkremote/` for `.eml` files, extracting canonical links from tracker-heavy emails.
+
+### 2. The "Captain Caveman" LLM Strategy
+We follow a strict "Local First, Frontier Fallback" rule:
+- **Local**: `llama.cpp` (Qwen 2.5 Coder) handles high-volume tasks like categorization and sanitization.
+- **Frontier**: Claude 3.5 Sonnet fills the gaps for complex reasoning or multi-document synthesis.
+- **Guardrails**: All untrusted text (job descriptions) passes through a `Normalize -> Heuristic Scan -> Risk Classification` pipeline before reaching the LLM.
+
+### 3. High-Performance Concurrency
+Built on **Falcon**, our server operates in a single-process, fiber-based threaded mode. This allows for:
+- Non-blocking I/O during long LLM calls.
+- Thousands of concurrent jobs via **Async Job**.
+- Minimal infrastructure footprint.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Rails 8.0.x
+- **Runtime**: Ruby 4.0.2 (Optimized for Fibers)
+- **App Server**: Falcon (Fiber-based)
+- **Database**: PostgreSQL + `pgvector` + `pg_trgm`
+- **LLM Engine**: RubyLLM + llama.cpp + Claude 3.5
+- **UI**: Dracula Pro + Tailwind CSS + DaisyUI
+- **Observability**: OpenTelemetry + PgHero + Mission Control Jobs
+
+---
+
+## 🗺️ Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    JobBoardsSource ||--o{ JobBoardsQuery : "has"
+    JobBoardsQuery ||--o{ JobBoardsDocument : "contains"
+    JobPosting }o--|| JobBoardsSource : "originated from"
+    JobPosting ||--o{ TargetDomain : "targets"
+    TargetDomain }o--|| Domain : "belongs to"
+    LlmChat ||--o{ LlmMessage : "contains"
+    LlmChat }o--|| Model : "uses"
+    EmailImportRecord ||--o{ JobBoardsDocument : "references"
 ```
-Access the dashboard at: `http://localhost:3010`
 
-### Local Development (Docker)
-The environment is containerized but connects to your **host machine's PostgreSQL** for high-performance search capabilities.
+---
 
+## 🚀 Getting Started
+
+### Prerequisites
+- PostgreSQL 16+
+- llama.cpp server running on `localhost:8080`
+- Redis (for ActionCable/Solid Queue)
+
+### Setup
 ```bash
-# Start background services and application
-docker-compose up -d
-
-# Verify scheduled fetchers (Solid Queue)
-docker-compose exec web bin/rails runner "puts SolidQueue::Job.all"
+bin/setup
+bin/rails ruby_llm:load_models
+bundle exec rake eml:scan
 ```
 
-## 🛰 Data Acquisition
-
-### Supported Sources
-- **Greenhouse:** Direct employer API with keyword filtering.
-- **Lever:** Direct employer API with keyword filtering.
-- **YC (Work at a Startup):** Curated startup jobs via specialized scraper.
-- **Jobicy / Arbeitnow / Remotive / WWR:** Broad remote-first APIs and feeds.
-- **Hacker News:** Real-time job story ingestion.
-
-### Triggering Ingest
-To manually trigger a fresh fetch of all jobs across all platforms:
+### Development
 ```bash
-./bin-host/fetch-all
+bin/dev
 ```
+Access the dashboard at `http://localhost:3010`.
 
-## 🔍 Advanced Search
-- **Text Search:** `JobPosting.search("Ruby on Rails")` (Ranked by relevance).
-- **Semantic Search:** `JobPosting.semantic_search("Staff level backend roles in AI")` (Context-aware).
-- **Intersection Analysis:** Jobs track which specific query terms found them (`found_by_terms` metadata).
+---
 
-## 📊 Observability
-- **OpenTelemetry:** Integrated with your host's OTel Collector and global LGTM stack.
-- **Dashboard:** Performance and job monitoring available via Avo Admin and PgHero.
-- **PgHero:** Database performance insights available at `/pghero`.
-
-## 📝 Documentation
-- [RUBY_LLM.md](./RUBY_LLM.md): AI integration and local LLM configuration.
-- [PICKUP.md](./PICKUP.md): Recent architectural changes and port reconfigurations.
+## ⚖️ License
+WWWorkRemote is proprietary software. All rights reserved.

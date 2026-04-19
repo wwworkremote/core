@@ -1,11 +1,12 @@
 <% user ||= local_assigns[:message] %>
-<div id="llm_message_<%= user.id %>" class="card mb-3 border-0 bg-light-subtle shadow-sm ms-5">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem;">User</span>
-      <span class="text-muted small"><%= user.created_at&.strftime("%H:%M") %></span>
-    </div>
-
-    <div id="llm_message_<%= user.id %>_content" class="text-break"><%= user.content %></div>
+<div id="llm_message_<%= user.id %>" class="chat chat-end group">
+  <div class="chat-header opacity-50 text-[10px] font-bold uppercase tracking-widest mb-1">
+    User
+  </div>
+  <div id="llm_message_<%= user.id %>_content" class="chat-bubble chat-bubble-primary shadow-lg text-sm leading-relaxed">
+    <%= user.content %>
+  </div>
+  <div class="chat-footer opacity-20 text-[8px] font-bold uppercase tracking-widest mt-1">
+    <%= user.created_at&.strftime("%I:%M %p") %>
   </div>
 </div>

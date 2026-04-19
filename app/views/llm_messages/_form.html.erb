@@ -1,8 +1,7 @@
-<%= form_with(model: llm_message, url: [@llm_chat, llm_message], id: "new_llm_message") do |form| %>
+<%= form_with(model: [llm_chat, llm_message], id: "new_llm_message", class: "flex gap-2 items-end") do |form| %>
   <% if llm_message.errors.any? %>
-    <div id="error_explanation" class="alert alert-danger">
-      <h6 class="alert-heading"><%= pluralize(llm_message.errors.count, "error") %> prohibited this message from being saved:</h6>
-      <ul class="mb-0">
+    <div id="error_explanation" class="alert alert-error mb-4">
+      <ul class="text-xs">
         <% llm_message.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,10 +9,11 @@
     </div>
   <% end %>
 
-  <div class="input-group">
-    <%= form.text_area :content, rows: 2, placeholder: "Type your message...", autofocus: true,
-        class: "form-control border-0 shadow-none bg-white",
-        data: { controller: "textarea-autoresize" } %>
-    <%= form.submit "Send", class: "btn btn-primary px-4" %>
+  <div class="flex-1">
+    <%= form.text_area :content, rows: 1, placeholder: "Describe your objective...", autofocus: true,
+        class: "textarea textarea-bordered bg-base-300 border-white/10 w-full focus:outline-primary font-medium text-sm rounded-xl py-4",
+        onkeydown: "if (event.keyCode == 13 && !event.shiftKey) { event.preventDefault(); this.form.requestSubmit(); }" %>
   </div>
+
+  <%= form.submit "Send", class: "btn btn-primary rounded-xl px-8 font-bold uppercase tracking-widest text-[10px]" %>
 <% end %>

@@ -1,13 +1,14 @@
-<div id="llm_message_<%= llm_message.id %>" class="w-full sm:w-auto my-5 space-y-3 rounded-md px-3 py-2 bg-red-50 border border-red-200">
-  <div>
-    <span class="inline-block rounded px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">
-      <%= title.presence || "Error" %>
-    </span>
+<div id="llm_message_<%= llm_message.id %>" class="chat chat-start group">
+  <div class="chat-header opacity-50 text-[10px] font-bold uppercase tracking-widest mb-1">
+    System Exception
   </div>
-
-  <pre class="whitespace-pre-wrap text-red-900 text-sm overflow-x-auto"><%= error_message %></pre>
-
-  <div>
-    <span class="text-sm text-red-700"><%= llm_message.created_at&.strftime("%I:%M %p") %></span>
+  <div class="chat-bubble chat-bubble-error shadow-lg text-sm leading-relaxed p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <div class="badge badge-outline badge-xs opacity-50 uppercase font-bold tracking-widest text-[8px] text-error-content"><%= title.presence || "Error" %></div>
+    </div>
+    <pre class="bg-black/20 p-3 rounded-lg text-[10px] font-mono opacity-70 overflow-x-auto text-error-content"><%= error_message %></pre>
+  </div>
+  <div class="chat-footer opacity-20 text-[8px] font-bold uppercase tracking-widest mt-1">
+    <%= llm_message.created_at&.strftime("%I:%M %p") %>
   </div>
 </div>

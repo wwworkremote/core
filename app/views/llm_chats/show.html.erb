@@ -1,26 +1,33 @@
-<% content_for :title, "AI Chat ##{@llm_chat.id}" %>
+<% content_for :title, "Dialogue ##{@llm_chat.id}" %>
 
 <%= turbo_stream_from "llm_chat_#{@llm_chat.id}" %>
 
-<div class="container-fluid">
-  <div class="row mb-4 align-items-center">
-    <div class="col">
-      <h1 class="display-5">AI Chat #<%= @llm_chat.id %></h1>
-      <p class="text-muted">Model: <strong><%= @llm_chat.model&.label || "Default" %></strong></p>
+<div class="max-w-4xl mx-auto space-y-8">
+  <header class="flex justify-between items-center bg-base-200 p-6 rounded-2xl border border-white/5 shadow-xl">
+    <div>
+      <h1 class="text-2xl font-black uppercase tracking-tighter">Dialogue <span class="text-primary">#<%= @llm_chat.id %></span></h1>
+      <div class="flex items-center gap-2 mt-1">
+        <div class="badge badge-outline badge-xs opacity-50 uppercase font-bold tracking-widest text-[8px]">Model</div>
+        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70"><%= @llm_chat.model&.name || "Default Model" %></span>
+      </div>
     </div>
-    <div class="col-auto">
-      <%= link_to "Back to AI chats", llm_chats_path, class: "btn btn-outline-secondary" %>
+    
+    <div class="flex gap-2">
+      <%= link_to llm_chats_path, class: "btn btn-ghost btn-sm rounded-xl gap-2 font-bold uppercase tracking-widest text-[10px]" do %>
+        <%= heroicon "chevron-left", variant: :solid, options: { class: "w-3 h-3" } %>
+        Back
+      <% end %>
     </div>
-  </div>
+  </header>
 
-  <div id="llm_messages" class="mb-4">
+  <div id="llm_messages" class="space-y-6">
     <% @llm_chat.llm_messages.where.not(id: nil).each do |llm_message| %>
       <%= render llm_message %>
     <% end %>
   </div>
 
-  <div class="card bg-light border-0 shadow-sm sticky-bottom mb-4">
-    <div class="card-body">
+  <div class="sticky bottom-8 z-10">
+    <div class="bg-base-200 p-6 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-md bg-opacity-80">
       <%= render "llm_messages/form", llm_chat: @llm_chat, llm_message: @llm_message %>
     </div>
   </div>

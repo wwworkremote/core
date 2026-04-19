@@ -1,13 +1,15 @@
-<div id="llm_message_<%= tool_calls.id %>" class="w-full sm:w-auto my-5 space-y-3 rounded-md px-3 py-2 bg-gray-50 border border-gray-200">
-  <div>
-    <span class="inline-block rounded px-2 py-0.5 text-xs font-medium bg-gray-200 text-gray-700">
-      Tool Call
-    </span>
+<div id="llm_message_<%= tool_calls.id %>" class="chat chat-start group">
+  <div class="chat-header opacity-50 text-[10px] font-bold uppercase tracking-widest mb-1">
+    Tool Invocation
   </div>
-
-  <pre class="whitespace-pre-wrap text-gray-700 text-sm overflow-x-auto"><%= tool_call.name %>(<%= tool_call.arguments.map { |k, v| "#{k}: #{v.inspect}" }.join(", ") %>)</pre>
-
-  <div>
-    <span class="text-sm text-gray-600"><%= tool_calls.created_at&.strftime("%I:%M %p") %></span>
+  <div class="chat-bubble bg-base-300/50 text-base-content border border-dashed border-white/10 shadow-lg text-sm leading-relaxed p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <div class="badge badge-accent badge-xs opacity-50 uppercase font-bold tracking-widest text-[8px]">Call</div>
+      <span class="font-black tracking-tighter text-accent uppercase"><%= tool_call.name %></span>
+    </div>
+    <pre class="bg-black/20 p-3 rounded-lg text-[10px] font-mono opacity-70 overflow-x-auto"><%= tool_call.arguments.map { |k, v| "#{k}: #{v.inspect}" }.join("\n") %></pre>
+  </div>
+  <div class="chat-footer opacity-20 text-[8px] font-bold uppercase tracking-widest mt-1">
+    <%= tool_calls.created_at&.strftime("%I:%M %p") %>
   </div>
 </div>
