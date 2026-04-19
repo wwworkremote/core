@@ -82,8 +82,12 @@ module Llm
       
       chat = @chat || LlmChat.create!(model: model)
       
-      # Use RubyLLM.chat as the entry point
-      response = RubyLLM.chat(model: model.model_id, messages: chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } }, &block)
+      # Use RubyLLM.send(provider, model: model_id) to get the correct client
+      provider = model.provider.to_sym
+      client = RubyLLM.send(provider, model: model.model_id)
+      
+      # Use the native ask pattern to stream content directly
+      client.chat(messages: chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } }, &block)
       
       span.add_event('received_llm_response')
       { success: true, model: model.model_id }
