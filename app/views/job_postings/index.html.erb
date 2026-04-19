@@ -69,7 +69,8 @@
                 <%= job.source.try(:origin)&.name || 'NETWORK' %>
               <% end %>
               <div class="text-base-content/30 text-[9px] font-black uppercase tracking-tighter">
-                <%= time_ago_in_words(job.published_at).upcase %>_AGO
+                <% published_time = job.published_at || job.created_at %>
+                <%= time_ago_in_words(published_time).upcase %>_AGO
               </div>
             </div>
           </div>
