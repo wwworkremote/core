@@ -82,60 +82,61 @@ module Llm
       
       chat = @chat || LlmChat.create!(model: model)
       
-      # Ensure system rules are present
-      if @system_rules.present? && chat.llm_messages.none? { |m| m.role == 'system' }
-        chat.llm_messages.create!(role: 'system', content: @system_rules)
+      # 1. Prepare the messages for the LLM.
+      # We combine history from the DB with our current system rules and task instructions.
+      llm_payload = []
+      
+      # Inject System Rules
+      llm_payload << { role: 'system', content: @system_rules } if @system_rules.present?
+      
+      # Inject Task Instructions (Separate from User message so it stays clean in the UI)
+      llm_payload << { role: 'system', content: @task_instructions } if @task_instructions.present?
+      
+      # Add history from the chat
+      chat.llm_messages.order(:id).each do |m|
+        next if m.role == 'system' # We already handled system rules
+        next if m.content.blank? && m.assistant? # Skip empty placeholders
+        llm_payload << { role: m.role, content: m.content }
       end
       
-      full_prompt = @task_instructions.present? ? "#{@task_instructions}\n\n#{sanitized_text}" : sanitized_text
+      # Ensure the latest sanitized text is the final user message if not already in history
+      unless llm_payload.last&.dig(:role) == 'user' && (llm_payload.last[:content] == sanitized_text || llm_payload.last[:content] == @untrusted_text)
+        llm_payload << { role: 'user', content: sanitized_text }
+      end
+
+      # 2. Create/Find assistant placeholder for streaming
+      # We look for an existing empty assistant message first (in case of retry/escalation)
+      assistant_message = chat.llm_messages.where(role: 'assistant', content: [nil, '']).last
+      assistant_message ||= chat.llm_messages.create!(role: 'assistant', content: '')
       
-      # If @chat was provided, we assume the user message was already created (e.g. by controller)
-      # with the simple sanitized_text. We'll update it to the full_prompt for the LLM.
-      user_message = nil
-      if @chat
-        user_message = @chat.llm_messages.where(role: 'user').last
-        if user_message && (user_message.content == sanitized_text || user_message.content == @untrusted_text)
-          user_message.update!(content: full_prompt)
-        else
-          user_message = @chat.llm_messages.create!(role: 'user', content: full_prompt)
+      begin
+        response = model.chat(messages: llm_payload) do |chunk|
+          if chunk.content.present?
+            assistant_message.content = assistant_message.content.to_s + chunk.content
+            assistant_message.broadcast_append_chunk(chunk.content)
+          end
+          yield chunk if block_given?
         end
-      else
-        user_message = chat.llm_messages.create!(role: 'user', content: full_prompt)
-      end
+        
+        span.add_event('received_llm_response')
+        assistant_message.save!
+        
+        text = assistant_message.content
 
-      # Create placeholder for assistant response to enable streaming
-      assistant_message = chat.llm_messages.create!(role: 'assistant', content: '')
-      
-      # Use the model's chat API directly to avoid RubyLLM's automatic message creation in chat.ask
-      messages = chat.llm_messages.where("id <= ?", assistant_message.id).order(:id).map do |m|
-        { role: m.role, content: m.content }
-      end
-      # Remove the empty assistant message from the payload for the LLM
-      messages.pop if messages.last[:role] == 'assistant' && messages.last[:content].blank?
-
-      response = model.chat(messages: messages) do |chunk|
-        if chunk.content.present?
-          assistant_message.content += chunk.content
-          # Broadcast the chunk to the UI
-          assistant_message.broadcast_append_chunk(chunk.content)
+        # 3. Outbound Validation
+        output_guard = Guardrails::OutputValidator.new(text, schema: @schema).call
+        unless output_guard[:valid]
+          span.set_attribute('app.guardrails.output_valid', false)
+          return format_failure("Output validation failed: #{output_guard[:findings].join(', ')}")
         end
-        yield chunk if block_given?
+
+        span.set_attribute('app.guardrails.output_valid', true)
+        { success: true, output: text, model: model.model_id }
+      rescue StandardError => e
+        # If we failed, clear the placeholder so we don't leave empty bubbles in the UI
+        assistant_message.destroy if assistant_message.content.blank?
+        raise e
       end
-      
-      span.add_event('received_llm_response')
-      assistant_message.save!
-
-      text = assistant_message.content
-
-      # 4. Outbound Validation
-      output_guard = Guardrails::OutputValidator.new(text, schema: @schema).call
-      unless output_guard[:valid]
-        span.set_attribute('app.guardrails.output_valid', false)
-        return format_failure("Output validation failed: #{output_guard[:findings].join(', ')}")
-      end
-
-      span.set_attribute('app.guardrails.output_valid', true)
-      { success: true, output: text, model: model.model_id }
     end
 
     def format_failure(reason)
