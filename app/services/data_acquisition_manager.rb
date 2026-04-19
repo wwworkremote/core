@@ -56,6 +56,12 @@ class DataAcquisitionManager
       name: 'YC',
       type: 'Scraper'
     },
+    'cord' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 2.hours,
+      name: 'Cord',
+      type: 'Scraper'
+    },
     'email_indeed' => {
       class: EmailIngestion::Importer,
       cooldown: 1.hour,
