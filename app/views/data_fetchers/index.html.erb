@@ -23,8 +23,19 @@
               <div class="font-bold text-white text-xs"><%= config[:name] %></div>
               <div class="text-[9px] text-slate-500 font-mono">Last: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
             </div>
+          <div class="bg-base-300 p-4 rounded-lg flex items-center justify-between group">
+            <div>
+              <div class="font-bold text-white text-xs"><%= config[:name] %></div>
+              <div class="text-[9px] text-slate-500 font-mono">Last: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
+            </div>
             <div class="flex items-center gap-2">
-              <%= button_to "Run", run_data_fetchers_path, params: { slug: slug }, class: "btn-admin bg-white/5 hover:bg-white/10" %>
+              <% if status[:can_fetch] %>
+                <%= button_to "Run", run_data_fetchers_path, params: { slug: slug }, class: "btn-admin bg-white/5 hover:bg-white/10" %>
+              <% else %>
+                <button class="btn-admin bg-base-200 text-slate-600 cursor-not-allowed" disabled>
+                  <%= (status[:time_until_reset] / 60).round %>m
+                </button>
+              <% end %>
               <%= button_to "Force", run_data_fetchers_path, params: { slug: slug, force: true }, class: "btn-admin bg-rose-900/20 text-rose-500 hover:bg-rose-900/40 border-none" %>
             </div>
           </div>
