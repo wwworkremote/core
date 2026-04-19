@@ -6,9 +6,19 @@ development:
   sync_to_dashboard:
     class: SyncDashboardJob
     schedule: every hour at minute 45
-  scan_emails:
-    class: EmailIngestion::ScanJob
-    schedule: every hour at minute 5
+  sync_emails_indeed:
+    class: EmailIngestion::Importer
+    args: [{ source: "indeed" }]
+    schedule: every 1 hour at minute 5
+  sync_emails_adzuna:
+    class: EmailIngestion::Importer
+    args: [{ source: "adzuna" }]
+    schedule: every 1 hour at minute 10
+  sync_emails_linkedin:
+    class: EmailIngestion::Importer
+    args: [{ source: "linkedin" }]
+    schedule: every 1 hour at minute 15
+
 
 production:
   fetch_all_jobs:
@@ -17,9 +27,19 @@ production:
   sync_to_dashboard:
     class: SyncDashboardJob
     schedule: every hour at minute 45
-  scan_emails:
-    class: EmailIngestion::ScanJob
-    schedule: every hour at minute 5
+  sync_emails_indeed:
+    class: EmailIngestion::Importer
+    args: [{ source: "indeed" }]
+    schedule: every 1 hour at minute 5
+  sync_emails_adzuna:
+    class: EmailIngestion::Importer
+    args: [{ source: "adzuna" }]
+    schedule: every 1 hour at minute 10
+  sync_emails_linkedin:
+    class: EmailIngestion::Importer
+    args: [{ source: "linkedin" }]
+    schedule: every 1 hour at minute 15
+
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12

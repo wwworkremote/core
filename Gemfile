@@ -116,3 +116,7 @@ gem 'standard', '~> 1.35', groups: %i[development test]
 gem 'tailwindcss-rails', '~> 4.4'
 
 gem "cuprite", "~> 0.17"
+
+gem "listen", "~> 3.10"
+
+gem "guard-livereload", "~> 2.5", group: :development
