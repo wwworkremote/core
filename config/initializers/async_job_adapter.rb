@@ -24,11 +24,47 @@ module MissionControlAsyncJobAdapterExtension
     []
   end
 
-  def jobs
+  def queue_size(*)
+    0
+  end
+
+  def clear_queue(*)
+  end
+
+  def pause_queue(*)
+  end
+
+  def resume_queue(*)
+  end
+
+  def queue_paused?(*)
+    false
+  end
+
+  def jobs_count(*)
+    0
+  end
+
+  def fetch_jobs(*)
     []
   end
 
-  def find_job(job_id, *)
+  def retry_all_jobs(*)
+  end
+
+  def retry_job(*)
+  end
+
+  def discard_all_jobs(*)
+  end
+
+  def discard_job(*)
+  end
+
+  def dispatch_job(*)
+  end
+
+  def find_job(*)
     nil
   end
 
@@ -58,13 +94,6 @@ module MissionControlAsyncJobAdapterExtension
 
   def recurring_tasks
     []
-  end
-
-  def queue_size(*)
-    0
-  end
-
-  def clear_queue(*)
   end
 end
 
