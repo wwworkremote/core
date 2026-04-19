@@ -162,6 +162,9 @@ GEM
       rexml
     crass (1.0.6)
     csv (3.3.5)
+    cuprite (0.17)
+      capybara (~> 3.0)
+      ferrum (~> 0.17.0)
     database_consistency (3.0.2)
       activerecord (>= 3.2)
     date (3.5.1)
@@ -946,6 +949,7 @@ DEPENDENCIES
   byebug
   capybara
   chartkick
+  cuprite (~> 0.17)
   database_consistency
   debug
   dotenv-rails
@@ -1077,6 +1081,7 @@ CHECKSUMS
   crack (1.0.1) sha256=ff4a10390cd31d66440b7524eb1841874db86201d5b70032028553130b6d4c7e
   crass (1.0.6) sha256=dc516022a56e7b3b156099abc81b6d2b08ea1ed12676ac7a5657617f012bd45d
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
+  cuprite (0.17) sha256=b140d5dc70d08b97ad54bcf45cd95d0bd430e291e9dffe76fff851fddd57c12b
   database_consistency (3.0.2) sha256=7dbcccee51e125de5512eeb36a26ec78196904f6db84e95beeb859a971bd79e0
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   debug (1.11.1) sha256=2e0b0ac6119f2207a6f8ac7d4a73ca8eb4e440f64da0a3136c30343146e952b6

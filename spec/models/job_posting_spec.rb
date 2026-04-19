@@ -14,6 +14,7 @@
 #  longitude          :float
 #  published_at       :datetime
 #  signature          :string           not null
+#  status             :string
 #  tags               :string           is an Array
 #  target_url         :string
 #  title              :string

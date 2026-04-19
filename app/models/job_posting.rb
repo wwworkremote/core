@@ -13,6 +13,36 @@ class JobPosting < ApplicationRecord
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
 
+  include AASM
+  
+  has_many :pipeline_steps, dependent: :destroy
+  has_many :contacts, dependent: :destroy
+
+  aasm column: :status do
+    state :none, initial: true
+    state :favorited, :applied, :interview, :offered, :archived
+
+    event :favorite do
+      transitions from: [:none, :archived], to: :favorited
+    end
+
+    event :apply do
+      transitions from: [:favorited, :interview], to: :applied
+    end
+
+    event :interview do
+      transitions from: [:favorited, :applied], to: :interview
+    end
+
+    event :offer do
+      transitions from: [:favorited, :applied, :interview], to: :offered
+    end
+
+    event :archive do
+      transitions from: [:favorited, :applied, :interview, :offered], to: :archived
+    end
+  end
+
   geocoded_by :location
   # after_validation :geocode, if: ->(obj) { obj.location.present? && obj.location_changed? }
   after_commit :enqueue_geocoding, on: %i[create update], if: -> { location.present? && (saved_change_to_location? || latitude.nil?) }
@@ -90,6 +120,7 @@ end
 #  longitude          :float
 #  published_at       :datetime
 #  signature          :string           not null
+#  status             :string
 #  tags               :string           is an Array
 #  target_url         :string
 #  title              :string

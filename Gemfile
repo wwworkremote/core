@@ -114,3 +114,5 @@ gem 'guard-rspec', '~> 4.7', group: :development
 gem 'standard', '~> 1.35', groups: %i[development test]
 
 gem 'tailwindcss-rails', '~> 4.4'
+
+gem "cuprite", "~> 0.17"
