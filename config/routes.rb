@@ -12,6 +12,12 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: 'dashboard#index'
     resources :job_postings, only: %i[index show destroy]
+    resources :sources, only: %i[index show]
+    resources :queries, only: %i[index show]
+    resources :documents, only: %i[index show destroy]
+    resources :domains, only: %i[index show destroy]
+    resources :email_import_records, only: %i[index show]
+    resources :models, only: %i[index show]
   end
 
   # Dashboard Routes

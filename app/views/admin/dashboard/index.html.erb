@@ -1,3 +1,5 @@
+<%= render "admin/shared/nav" %>
+
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
     <h1 class="text-4xl font-black tracking-tight sparkle-ai mb-3">System Administration</h1>
@@ -18,21 +20,51 @@
 
   <div class="card-neural p-8 text-center">
     <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-emerald-300 to-emerald-600 mb-2">
-      <%= @sources_count %>
+      <%= @documents_count %>
     </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Raw Source Documents</div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Source Documents</div>
     <div class="mt-4">
-      <button disabled class="btn-neural w-full block text-center opacity-50 cursor-not-allowed">Coming Soon</button>
+      <%= link_to "Review Documents", admin_documents_path, class: "btn-neural w-full block text-center" %>
     </div>
   </div>
 
   <div class="card-neural p-8 text-center">
     <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-violet-300 to-violet-600 mb-2">
-      <%= @active_fetchers_count %>
+      <%= @domains_count %>
     </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Fetchers</div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Normalized Domains</div>
     <div class="mt-4">
-      <%= link_to "Ingestion Control", data_fetchers_path, class: "btn-neural w-full block text-center" %>
+      <%= link_to "Manage Links", admin_domains_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 text-center">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-300 to-amber-600 mb-2">
+      <%= @email_records_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Email Imports</div>
+    <div class="mt-4">
+      <%= link_to "View Logs", admin_email_import_records_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 text-center">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-rose-300 to-rose-600 mb-2">
+      <%= @models_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">LLM Models</div>
+    <div class="mt-4">
+      <%= link_to "Model Registry", admin_models_path, class: "btn-neural w-full block text-center" %>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 text-center">
+    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-300 to-slate-600 mb-2">
+      <%= @sources_count %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Sources</div>
+    <div class="mt-4">
+      <%= link_to "Ingestion Sources", admin_sources_path, class: "btn-neural w-full block text-center" %>
     </div>
   </div>
 </div>

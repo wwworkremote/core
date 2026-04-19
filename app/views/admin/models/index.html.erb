@@ -1,0 +1,50 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">LLM Model Registry</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Neural Capability Inventory</p>
+  </div>
+</div>
+
+<div class="card-neural mb-6">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Name / Provider</th>
+          <th class="px-6 py-4">Model ID</th>
+          <th class="px-6 py-4 text-center">Context</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+        <% @models.each do |model| %>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <div class="text-white font-bold mb-0.5"><%= model.name %></div>
+              <div class="text-violet-400 font-bold text-[10px] uppercase"><%= model.provider %></div>
+            </td>
+            <td class="px-6 py-4 text-slate-400">
+              <%= model.model_id %>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="text-blue-400 font-bold"><%= number_with_delimiter(model.context_window) %></span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2 text-[10px]">
+                <%= link_to admin_model_path(model), class: "px-3 py-1 rounded font-black border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
+                  CONFIG
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= paginate @models %>
+</div>

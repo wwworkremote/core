@@ -1,0 +1,25 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Source Document</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Signature: <%= @document.signature %></p>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to admin_documents_path, class: "btn-neural text-[10px]" do %>
+      BACK_TO_REGISTRY
+    <% end %>
+    <%= button_to admin_document_path(@document), method: :delete, class: "btn-neural border-rose-900/50 text-rose-500 text-[10px]", data: { turbo_confirm: "Permanently purge this document?" } do %>
+      PURGE_DOC
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 mb-12">
+  <div class="card-neural p-6">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Raw Document JSON</h3>
+    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-[11px] text-emerald-500/80 whitespace-pre-wrap overflow-x-auto leading-relaxed">
+      <%= JSON.pretty_generate(JSON.parse(@document.document)) rescue @document.document %>
+    </div>
+  </div>
+</div>

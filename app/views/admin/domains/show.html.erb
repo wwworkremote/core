@@ -1,0 +1,72 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Domain Detail</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Authoritative Record: <%= @domain.name %></p>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to admin_domains_path, class: "btn-neural text-[10px]" do %>
+      BACK_TO_REGISTRY
+    <% end %>
+    <%= button_to admin_domain_path(@domain), method: :delete, class: "btn-neural border-rose-900/50 text-rose-500 text-[10px]", data: { turbo_confirm: "Permanently purge this domain?" } do %>
+      PURGE_DOMAIN
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="lg:col-span-1 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Metadata</h3>
+      <dl class="space-y-4 font-mono text-[11px]">
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Domain Name</dt>
+          <dd class="text-white font-bold italic"><%= @domain.name %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Created At</dt>
+          <dd class="text-slate-400"><%= @domain.created_at.strftime("%Y-%m-%d %H:%M:%S") %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Hierarchy</dt>
+          <dd class="text-slate-400"><%= @domain.root_domain_id.present? ? "Subdomain" : "Root Domain" %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Associated Job Postings (<%= @domain.job_postings.count %>)</h3>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-white/5 border-b border-white/10 text-[9px] font-black uppercase tracking-widest text-slate-500">
+            <tr>
+              <th class="px-4 py-3">Title / Company</th>
+              <th class="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 font-mono text-[10px]">
+            <% @job_postings.each do |job| %>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="px-4 py-3 text-slate-300">
+                  <div class="font-bold"><%= job.title %></div>
+                  <div class="text-[9px] text-blue-400 font-black"><%= job.company %></div>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <%= link_to "VIEW", admin_job_posting_path(job), class: "text-blue-500 hover:text-white transition-colors" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="mt-6">
+        <%= paginate @job_postings, param_name: :job_page %>
+      </div>
+    </div>
+  </div>
+</div>

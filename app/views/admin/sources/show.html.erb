@@ -1,0 +1,36 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Source Profile</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Pipeline Node: <%= @source.name %></p>
+  </div>
+  <div>
+    <%= link_to admin_sources_path, class: "btn-neural text-[10px]" do %>
+      BACK_TO_SOURCES
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="card-neural p-6">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Pipeline Health</h3>
+    <dl class="space-y-4 font-mono text-[11px]">
+       <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">State</dt>
+          <dd class="text-emerald-400 font-bold"><%= @source.aasm_state&.upcase || "ACTIVE" %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Ingested Documents</dt>
+          <dd class="text-white"><%= number_with_delimiter(@source.documents.count) %></dd>
+        </div>
+    </dl>
+  </div>
+
+  <div class="lg:col-span-2 card-neural p-6">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Source Payload Context</h3>
+    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-[10px] text-slate-400">
+      <%= JSON.pretty_generate(@source.payload) rescue "{}" %>
+    </div>
+  </div>
+</div>
