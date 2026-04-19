@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+json.geoip do
+  json.area_code @geo[:area_code]
+  json.city_name @geo[:city_name]
+  json.continent_code @geo[:continent_code]
+  json.country_code2 @geo[:country_code2]
+  json.country_code3 @geo[:country_code3]
+  json.country_name @geo[:country_name]
+  json.dma_code @geo[:dma_code]
+  json.ip @geo[:ip]
+  json.latitude @geo[:latitude]
+  json.longitude @geo[:longitude]
+  json.postal_code @geo[:postal_code]
+  json.region_name @geo[:region_name]
+  json.request @geo[:request]
+  json.timezone @geo[:timezone]
+end

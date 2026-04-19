@@ -5,7 +5,12 @@ Geocoder.configure(
   lookup: :nominatim,
 
   # IP address geocoding service
-  # ip_lookup: :ipinfo_io,
+  ip_lookup: :geoip2,
+
+  # configuration options for geoip2
+  geoip2: {
+    file: Rails.root.join('data/maxmind/GeoLite2-City.mmdb')
+  },
 
   # to use an API key:
   # api_key: "...",

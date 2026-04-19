@@ -84,6 +84,12 @@ erDiagram
 ```bash
 bin/setup
 bin/rails ruby_llm:load_models
+
+# Configure MaxMind for local geolocation
+export MAXMIND_ACCOUNT_ID="your_id"
+export MAXMIND_LICENSE_KEY="your_key"
+bin/update-geoip
+
 bundle exec rake eml:scan
 ```
 

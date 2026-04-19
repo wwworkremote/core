@@ -30,6 +30,7 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json }, constraints: { format: :json } do
     namespace :v0 do
+      get 'geo' => 'geo#index'
       resources :sources, only: %i[index show]
       resources :job_postings, only: %i[index show]
     end

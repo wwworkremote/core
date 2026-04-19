@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# frozen_string_literal: true
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TMP_DIR="$ROOT_DIR/tmp/geoipupdate"
+
+env_value() {
+  local canonical="$1"
+  local alias_key="$2"
+
+  local value="${!canonical:-}"
+  if [[ -n "$value" ]]; then
+    printf "%s" "$value"
+    return
+  fi
+
+  if [[ -n "$alias_key" ]]; then
+    local alias_val="${!alias_key:-}"
+    if [[ -n "$alias_val" ]]; then
+      printf "%s" "$alias_val"
+      return
+    fi
+  fi
+
+  printf ""
+}
+
+ACCOUNT_ID="$(env_value "MAXMIND_ACCOUNT_ID" "GEOIP_ACCOUNT_ID")"
+LICENSE_KEY="$(env_value "MAXMIND_LICENSE_KEY" "GEOIP_LICENSE_KEY")"
+EDITION_IDS="$(env_value "MAXMIND_EDITION_IDS" "GEOIP_EDITION_IDS")"
+CITY_DB_PATH="$(env_value "MAXMIND_CITY_DB_PATH" "GEOIP_DB_PATH")"
+EDITION_IDS="${EDITION_IDS:-GeoLite2-City}"
+
+if [[ -z "$CITY_DB_PATH" ]]; then
+  DB_DIR="${MAXMIND_DB_DIR:-$ROOT_DIR/data/maxmind}"
+  CITY_DB_PATH="$DB_DIR/GeoLite2-City.mmdb"
+else
+  DB_DIR="$(dirname "$CITY_DB_PATH")"
+fi
+
+if ! command -v geoipupdate >/dev/null 2>&1; then
+  echo "Missing required executable: geoipupdate" >&2
+  exit 1
+fi
+
+if [[ -z "$ACCOUNT_ID" || -z "$LICENSE_KEY" ]]; then
+  echo "Missing required credentials. Set MAXMIND_ACCOUNT_ID and MAXMIND_LICENSE_KEY." >&2
+  exit 1
+fi
+
+mkdir -p "$DB_DIR" "$TMP_DIR"
+
+CONF_PATH="$TMP_DIR/GeoIP.conf"
+LOCK_PATH="$TMP_DIR/.geoipupdate.lock"
+
+cat >"$CONF_PATH" <<EOF
+AccountID $ACCOUNT_ID
+LicenseKey $LICENSE_KEY
+EditionIDs $EDITION_IDS
+DatabaseDirectory $DB_DIR
+LockFile $LOCK_PATH
+EOF
+
+geoipupdate -f "$CONF_PATH"
+
+if [[ ! -f "$CITY_DB_PATH" ]]; then
+  echo "Expected database not found after update: $CITY_DB_PATH" >&2
+  exit 1
+fi
+
+echo "MaxMind DB updated at: $CITY_DB_PATH"
