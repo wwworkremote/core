@@ -139,18 +139,25 @@ class DataAcquisitionManager
     end
     source.update!(last_synced_at: Time.current)
 
-    fetcher = config[:class].new
-    method = fetcher.method(:call)
+    if config[:class] < ApplicationJob
+      # For ActiveJobs (like CrawlDiscoveryJob), enqueue them
+      config[:class].perform_later(slug, 'https://cord.com/search/jobs/software-developer', 'a[href*="/job/"]')
+      result = true # Assume success for enqueue
+    else
+      # For Service Objects
+      fetcher = config[:class].new
+      method = fetcher.method(:call)
 
-    # Detect if fetcher accepts 'force' or 'source' as keyword arguments
-    keyword_params = %i[key keyreq]
-    result = if method.parameters.any? { |p| keyword_params.include?(p[0]) }
-               args = { force: }
-               args[:source] = slug.split('_').last if slug.start_with?('email_')
-               fetcher.call(**args)
-             else
-               fetcher.call
-             end
+      # Detect if fetcher accepts 'force' or 'source' as keyword arguments
+      keyword_params = %i[key keyreq]
+      result = if method.parameters.any? { |p| keyword_params.include?(p[0]) }
+                 args = { force: }
+                 args[:source] = slug.split('_').last if slug.start_with?('email_')
+                 fetcher.call(**args)
+               else
+                 fetcher.call
+               end
+    end
 
     case result
     when true
