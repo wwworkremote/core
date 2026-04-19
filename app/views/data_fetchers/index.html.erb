@@ -21,7 +21,8 @@
           <div class="bg-base-300 p-4 rounded-lg flex items-center justify-between group">
             <div>
               <div class="font-bold text-white text-xs"><%= config[:name] %></div>
-              <div class="text-[9px] text-slate-500 font-mono">Last: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
+              <div class="text-[9px] text-slate-500 font-mono">Sync: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
+              <div class="text-[9px] text-slate-500 font-mono">Ingest: <%= status[:last_ingested_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
             </div>
             <div class="flex items-center gap-2">
               <% if status[:can_fetch] %>

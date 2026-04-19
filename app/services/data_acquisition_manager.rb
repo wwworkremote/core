@@ -108,6 +108,7 @@ class DataAcquisitionManager
       slug:,
       name: config[:name],
       last_fetched_at: last_fetched,
+      last_ingested_at: source.last_ingested_at,
       can_fetch: can_fetch,
       time_until_reset: time_until_reset,
       cooldown: config[:cooldown]
