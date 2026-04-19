@@ -19,10 +19,11 @@ class ApplicationController < ActionController::Base
 
   def available_chat_models
     if Model.any?
-      Model.all.order(:provider, :name)
+      # Prioritize "local" provider at the top
+      Model.all.order(Arel.sql("CASE WHEN provider = 'local' THEN 0 ELSE 1 END"), :name)
     else
       RubyLLM.models.chat_models.all
-             .sort_by { |model| [model.provider.to_s, model.name.to_s] }
+             .sort_by { |model| [model.provider == :local ? 0 : 1, model.name.to_s] }
     end
   end
 end

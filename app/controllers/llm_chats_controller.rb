@@ -7,8 +7,8 @@ class LlmChatsController < ApplicationController
 
   def new
     @llm_chat = LlmChat.new
-    @selected_model = params[:model]
     @chat_models = available_chat_models
+    @selected_model = params[:model] || @chat_models.first&.id
   end
 
   def create
