@@ -62,7 +62,17 @@
     </main>
 
     <footer class="footer p-10 bg-base-200 text-base-content border-t border-white/5">
-      <aside>
+      <nav>
+        <h6 class="footer-title text-white opacity-40 uppercase tracking-[0.2em] font-black text-[9px]">Operational Intelligence</h6>
+        <%= link_to 'Project Genesis (About)', about_path, class: "link link-hover text-xs font-bold text-slate-400" %>
+        <%= link_to 'Source Code (GitHub)', 'https://github.com/wwworkremote/core', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
+        <%= link_to 'Primary Node (just3ws.com)', 'https://www.just3ws.com', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
+      </nav>
+      <nav>
+        <h6 class="footer-title text-white opacity-40 uppercase tracking-[0.2em] font-black text-[9px]">Partner Projects</h6>
+        <%= link_to 'Phalanx Duel', 'https://phalanxduel.com', class: "link link-hover text-xs font-bold text-primary italic", target: "_blank" %>
+      </nav>
+      <aside class="md:justify-self-end">
         <p class="font-black uppercase tracking-tighter text-xl">WWWork<span class="text-primary">Remote</span></p>
         <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Refined with precision by Gemini AI Agent</p>
         <p class="text-[10px] opacity-20">&copy; <%= Time.current.year %> - Functional Admin Interface</p>

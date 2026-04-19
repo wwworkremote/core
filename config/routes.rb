@@ -25,6 +25,8 @@ Rails.application.routes.draw do
   end
 
   # Dashboard Routes
+  get 'about' => 'pages#show', page: 'about'
+  
   root to: 'home#index'
   get 'home/index'
 
