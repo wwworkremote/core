@@ -18,9 +18,8 @@ class JobPosting < ApplicationRecord
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
 
-  def add_pipeline_note(note, link: nil)
-    pipeline_steps.create!(status: 'noted', note: note, link: link)
-  end
+  aasm column: :status do
+    state :none, initial: true
     state :favorited, :applied, :interview, :offered, :archived
 
     event :favorite do
@@ -42,6 +41,10 @@ class JobPosting < ApplicationRecord
     event :archive do
       transitions from: [:favorited, :applied, :interview, :offered], to: :archived
     end
+  end
+
+  def add_pipeline_note(note, link: nil)
+    pipeline_steps.create!(status: 'noted', note: note, link: link)
   end
 
   geocoded_by :location
