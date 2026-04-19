@@ -40,11 +40,11 @@
 
   <div class="card-neural p-8 text-center">
     <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-300 to-amber-600 mb-2">
-      <%= @email_records_count %>
+      <%= number_with_delimiter(SolidQueue::Job.count) %>
     </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Email Imports</div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Pipeline Queue</div>
     <div class="mt-4">
-      <%= link_to "View Logs", admin_email_import_records_path, class: "btn-neural w-full block text-center" %>
+      <%= link_to "Monitor Jobs", admin_jobs_path, class: "btn-neural w-full block text-center" %>
     </div>
   </div>
 

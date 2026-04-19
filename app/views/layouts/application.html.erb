@@ -39,9 +39,10 @@
           <li class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded">Control</div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
+              <li><%= link_to 'Pipeline Intel', admin_analytics_path %></li>
+              <li><%= link_to 'Background Pipeline', admin_jobs_path %></li>
               <li><%= link_to 'Data Fetchers', data_fetchers_path %></li>
-              <li><%= link_to 'Background Jobs', '/jobs' %></li>
-              <li><%= link_to 'Admin CRUD', admin_root_path %></li>
+              <li><%= link_to 'Admin Registry', admin_root_path %></li>
               <li><%= link_to 'PgHero', '/pghero' %></li>
             </ul>
           </li>
