@@ -36,7 +36,7 @@ module Llm
           return format_failure("Blocked by guardrails: #{guardrail_result.findings.join(', ')}")
         end
 
-        # 2. Execution with Potential Escalation
+        # 2. Execution (No fallback/escalation for local-only)
         begin
           execute_with_model(@model, guardrail_result.sanitized_text, span, &block)
         rescue ActiveRecord::ConnectionTimeoutError => e
@@ -44,28 +44,9 @@ module Llm
           span.status = OpenTelemetry::Trace::Status.error("DB Connection Timeout: #{e.message}")
           format_failure("Database connection timeout. Please try again later.")
         rescue StandardError => e
-          Rails.logger.warn "[Orchestrator] Primary model (#{@model.model_id}) failed: #{e.message}. Escalating..."
-          span.add_event('primary_model_failed', attributes: { 'error' => e.message, 'model' => @model.model_id })
-          
-          begin
-            fallback_model_id = YAML.load_file(Llm::Registry::CONFIG_PATH).dig('defaults', 'fallback')
-            fallback_model = ::Model.find_by(model_id: fallback_model_id)
-            
-            if fallback_model && fallback_model != @model
-              span.set_attribute('app.llm.escalated', true)
-              execute_with_model(fallback_model, guardrail_result.sanitized_text, span, &block)
-            else
-              span.status = OpenTelemetry::Trace::Status.error(e.message)
-              format_failure("Model execution failed and no fallback available: #{e.message}")
-            end
-          rescue ActiveRecord::ConnectionTimeoutError => conn_e
-            Rails.logger.error "[Orchestrator] Database connection timeout during escalation: #{conn_e.message}"
-            span.status = OpenTelemetry::Trace::Status.error("DB Connection Timeout during escalation: #{conn_e.message}")
-            format_failure("Database connection timeout during escalation.")
-          rescue StandardError => fallback_e
-            span.status = OpenTelemetry::Trace::Status.error(fallback_e.message)
-            format_failure("Both primary and fallback models failed. Fallback error: #{fallback_e.message}")
-          end
+          Rails.logger.error "[Orchestrator] Model (#{@model.model_id}) execution failed: #{e.message}."
+          span.status = OpenTelemetry::Trace::Status.error(e.message)
+          format_failure("Model execution failed: #{e.message}")
         end
       end
     end
