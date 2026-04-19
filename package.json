@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/wwworkremote/core/issues"
   },
-  "homepage": "https://github.com/wwworkremote/core#readme"
+  "homepage": "https://github.com/wwworkremote/core#readme",
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
 }

@@ -2,12 +2,13 @@
 #
 # Table name: discovery_links
 #
-#  id         :bigint           not null, primary key
-#  board_name :string
-#  status     :string
-#  url        :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id            :bigint           not null, primary key
+#  board_name    :string
+#  error_message :text
+#  status        :string
+#  url           :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
 #
 # Indexes
 #

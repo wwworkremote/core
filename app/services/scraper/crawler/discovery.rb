@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'playwright'
+
 module Scraper
   module Crawler
     class Discovery
@@ -10,20 +12,33 @@ module Scraper
       end
 
       def call
-        # Initialize Playwright/HTTP client
-        browser = Playwright.create(headless: true)
-        page = browser.new_page
-        page.goto(@base_url)
-        
-        # Discover links
-        links = page.eval_on_selector_all(@selector, 'elements => elements.map(el => el.href)')
-        
-        links.uniq.each do |url|
-          DiscoveryLink.find_or_create_by!(board_name: @board_name, url: url) do |link|
-            link.status = 'pending'
+        Playwright.create(playwright_cli_executable_path: Rails.root.join('node_modules', '.bin', 'playwright').to_s) do |playwright|
+          playwright.chromium.launch(headless: true) do |browser|
+            page = browser.new_page
+            page.goto(@base_url)
+            page.wait_for_load_state(state: 'networkidle')
+            
+            # Discover links
+            all_links = page.eval_on_selector_all(@selector, 'elements => elements.map(el => el.href)')
+            
+            # Filter links based on board-specific patterns to ensure we only get job details
+            job_links = all_links.select do |url|
+              case @board_name.downcase
+              when 'cord' then url.include?('/jobs/') && url =~ /\d+/
+              when 'linkedin' then url.include?('/jobs/view/') || url.include?('/jobs/search/')
+              when 'indeed' then url.include?('/rc/clk') || url.include?('/job/')
+              when 'dice' then url.include?('/job-detail/')
+              else url.include?('/job')
+              end
+            end
+
+            job_links.uniq.each do |url|
+              DiscoveryLink.find_or_create_by!(board_name: @board_name, url: url) do |link|
+                link.status = 'pending'
+              end
+            end
           end
         end
-        browser.close
       end
     end
   end

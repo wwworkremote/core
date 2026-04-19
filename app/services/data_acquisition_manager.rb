@@ -62,6 +62,72 @@ class DataAcquisitionManager
       name: 'Cord',
       type: 'Scraper'
     },
+    'linkedin' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 1.hour,
+      name: 'LinkedIn',
+      type: 'Scraper'
+    },
+    'indeed' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 1.hour,
+      name: 'Indeed',
+      type: 'Scraper'
+    },
+    'dice' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 2.hours,
+      name: 'Dice',
+      type: 'Scraper'
+    },
+    'glassdoor' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'Glassdoor',
+      type: 'Scraper'
+    },
+    'builtin' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'BuiltIn',
+      type: 'Scraper'
+    },
+    'remoteio' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'Remote IO',
+      type: 'Scraper'
+    },
+    'remoteok' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'RemoteOK',
+      type: 'Scraper'
+    },
+    'flexjobs' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'FlexJobs',
+      type: 'Scraper'
+    },
+    'bestjobs' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'BestJobs',
+      type: 'Scraper'
+    },
+    'echojobs' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'EchoJobs',
+      type: 'Scraper'
+    },
+    'roberthalf' => {
+      class: Scraper::CrawlDiscoveryJob,
+      cooldown: 4.hours,
+      name: 'Robert Half',
+      type: 'Scraper'
+    },
     'email_indeed' => {
       class: EmailIngestion::Importer,
       cooldown: 1.hour,
@@ -139,11 +205,37 @@ class DataAcquisitionManager
     end
     source.update!(last_synced_at: Time.current)
 
-    if config[:class] < ApplicationJob
-      # For ActiveJobs (like CrawlDiscoveryJob), enqueue them
-      config[:class].perform_later(slug, 'https://cord.com/search/jobs/software-developer', 'a[href*="/job/"]')
-      result = true # Assume success for enqueue
-    else
+    if config[:class] == Scraper::CrawlDiscoveryJob
+      # For Scrapers, look for all active queries for this board
+      queries = BoardQuery.where(board_name: slug.downcase)
+      
+      if queries.any?
+        queries.each do |q|
+          url = q.build_url || q.query_params['start_url']
+          selector = q.query_params['selector'] || 'a[href*="/job/"]'
+          config[:class].perform_later(slug, url, selector) if url.present?
+        end
+        result = true
+      else
+        # Fallback to a default search if no specific queries are defined
+        default_url = case slug
+                     when 'cord' then 'https://cord.com/search/jobs/software-developer'
+                     when 'linkedin' then 'https://www.linkedin.com/jobs/search/?keywords=Software%20Engineer'
+                     when 'indeed' then 'https://www.indeed.com/jobs?q=Software%20Engineer'
+                     when 'dice' then 'https://www.dice.com/jobs?q=Staff%20Engineer&location=Remote'
+                     when 'remoteok' then 'https://remoteok.com/remote-ruby-jobs'
+                     when 'wwr' then 'https://weworkremotely.com/categories/remote-programming-jobs'
+                     else nil
+                     end
+        
+        if default_url
+          config[:class].perform_later(slug, default_url, 'a[href*="/job/"]')
+          result = true
+        else
+          result = { success: false, error: "No active queries found for #{slug}" }
+        end
+      end
+    elsif config[:class] < ApplicationJob
       # For Service Objects
       fetcher = config[:class].new
       method = fetcher.method(:call)

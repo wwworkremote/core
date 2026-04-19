@@ -14,9 +14,10 @@ class JobPostingsController < ApplicationController
 
     @job_postings = @job_postings.page(params[:page]).per(20)
   end
+def show
+  @job_posting = JobPosting.includes(:source, :pipeline_steps, :contacts, versions: :item).find(params[:id])
+end
 
-  def show
-    @job_posting = JobPosting.find(params[:id])
     ahoy.track "Viewed Job Posting", job_posting_id: @job_posting.id, title: @job_posting.title
   end
 end

@@ -13,46 +13,65 @@
 #
 class BoardQuery < ApplicationRecord
   serialize :terms, type: Array, coder: JSON
-  serialize :query_params, type: Hash, coder: JSON
+
+  def build_url
+    case board_name.to_s.downcase
+    when 'cord' then build_cord_url
+    when 'linkedin' then build_linkedin_url
+    when 'indeed' then build_indeed_url
+    when 'dice' then build_dice_url
+    when 'remoteok' then build_remoteok_url
+    else
+      nil
+    end
+  end
 
   def build_cord_url
-    return nil unless board_name == 'cord'
-    
-    # Base URL component from terms
+    # ... existing cord logic ...
     keyword = terms.first
     base_slug = keyword.parameterize
     
-    # Build dynamic filter array
     filters = [
       { a: 'sortBy', l: 'Responsiveness', v: 'response_rate' },
       { a: 'keyword', l: keyword, v: keyword }
     ]
     
-    # Handle remote/location
     if query_params['remote']
       filters << { a: 'remote', l: ' Remote', v: 'remote' }
-      if query_params['country'].present?
-        filters << { a: 'remoteLocationCountries', l: " #{query_params['country']}", v: query_params['country'] }
-      end
+      filters << { a: 'remoteLocationCountries', l: " #{query_params['country']}", v: query_params['country'] } if query_params['country'].present?
     end
 
-    # Handle seniority (expecting array)
-    Array(query_params['seniority']).each do |s|
-      filters << { a: 'seniority', l: " #{s.capitalize}", v: s.downcase }
-    end
-
-    # Handle salary (min)
-    if query_params['min_salary'].present?
-      filters << { a: 'salary', l: "Min: £#{query_params['min_salary'].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, '\1,')}", v: query_params['min_salary'].to_i }
-    end
+    Array(query_params['seniority']).each { |s| filters << { a: 'seniority', l: " #{s.capitalize}", v: s.downcase } }
+    filters << { a: 'salary', l: "Min: £#{query_params['min_salary'].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, '\1,')}", v: query_params['min_salary'].to_i } if query_params['min_salary'].present?
     
-    # Construct query
-    query = {
-      filters: filters.to_json,
-      v: { label: 'Positions', value: 'listing' }.to_json,
-      resultType: 'all'
-    }
-    
+    query = { filters: filters.to_json, v: { label: 'Positions', value: 'listing' }.to_json, resultType: 'all' }
     "https://cord.com/search/jobs/#{base_slug}?#{query.to_query}"
+  end
+
+  def build_linkedin_url
+    keyword = terms.first
+    query = { keywords: keyword, location: query_params['location'] || 'United States' }
+    query[:f_WT] = 2 if query_params['remote']
+    "https://www.linkedin.com/jobs/search/?#{query.to_query}"
+  end
+
+  def build_indeed_url
+    keyword = terms.first
+    query = { q: keyword, l: query_params['location'] || 'Remote' }
+    # Remote attribute for Indeed
+    query[:sc] = '0kf:attr(DSQF7);' if query_params['remote']
+    "https://www.indeed.com/jobs?#{query.to_query}"
+  end
+
+  def build_dice_url
+    keyword = terms.first
+    query = { q: keyword, countryCode: 'US', radius: 30, radiusUnit: 'mi', page: 1, pageSize: 20 }
+    query['filters.isRemote'] = 'true' if query_params['remote']
+    "https://www.dice.com/jobs?#{query.to_query}"
+  end
+
+  def build_remoteok_url
+    keyword = terms.first
+    "https://remoteok.com/remote-#{keyword.parameterize}-jobs"
   end
 end
