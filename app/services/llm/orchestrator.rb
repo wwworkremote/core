@@ -91,7 +91,7 @@ module Llm
         chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } },
         tools: [],
         temperature: 0.7,
-        model: model.model_id,
+        model: OpenStruct.new(id: model.model_id),
         &block
       )
       
