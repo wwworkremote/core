@@ -30,3 +30,4 @@ data/*.xml
 /app/assets/builds/*
 !/app/assets/builds/.keep
 coverage/
+node_modules/
