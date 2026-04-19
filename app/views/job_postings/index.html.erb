@@ -53,7 +53,7 @@
                 <%= link_to job.title, job_posting_path(job), class: "before:absolute before:inset-0" %>
               </h4>
               <p class="text-secondary font-black text-[11px] tracking-[0.2em] mb-3 relative z-10">
-                <%= link_to job.company.upcase, job_postings_path(company: job.company), class: "hover:underline transition-all" %>
+                <%= link_to job.company&.upcase, job_postings_path(company: job.company), class: "hover:underline transition-all" %>
               </p>
               
               <% if job.location.present? %>
