@@ -83,12 +83,23 @@ module Llm
       provider_class = provider_map[model.provider.to_sym]
       raise "Unknown provider: #{model.provider}" unless provider_class
       
-      # Use RubyLLM's standard instantiation pattern
       client = provider_class.new(RubyLLM.config)
       
+      # Wrap messages in OpenStruct to satisfy RubyLLM's expectation for .role and .content methods
+      llm_messages = chat.llm_messages.order(:id).map do |m|
+        OpenStruct.new(
+          role: m.role, 
+          content: m.content, 
+          tool_calls: nil, 
+          tool_call_id: nil,
+          thinking_text: nil,
+          thinking_signature: nil
+        )
+      end
+
       # Use the native complete pattern to stream content directly
       client.complete(
-        chat.llm_messages.order(:id).map { |m| { role: m.role, content: m.content } },
+        llm_messages,
         tools: [],
         temperature: 0.7,
         model: OpenStruct.new(id: model.model_id),
