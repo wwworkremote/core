@@ -16,9 +16,14 @@ module Llm
       @metadata = metadata
     end
 
-    def call
+    def call(&block)
       tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
       tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }.merge(@metadata)) do |span|
+        unless @model
+          span.status = OpenTelemetry::Trace::Status.error("No model provided or found in registry")
+          return format_failure("No model provided or found in registry")
+        end
+
         # 1. Inbound Guardrails
         guardrail_result = Guardrails::Pipeline.call(@untrusted_text)
         unless guardrail_result.allowed?
@@ -35,17 +40,22 @@ module Llm
 
         # 3. Execution with Potential Escalation
         begin
-          execute_with_model(@model, prompt, span)
+          execute_with_model(@model, prompt, span, &block)
         rescue StandardError => e
-          Rails.logger.warn "[Orchestrator] Primary model failed: #{e.message}. Escalating..."
-          span.add_event('primary_model_failed', attributes: { 'error' => e.message })
+          Rails.logger.warn "[Orchestrator] Primary model (#{@model.model_id}) failed: #{e.message}. Escalating..."
+          span.add_event('primary_model_failed', attributes: { 'error' => e.message, 'model' => @model.model_id })
           
           fallback_model_id = YAML.load_file(Llm::Registry::CONFIG_PATH).dig('defaults', 'fallback')
           fallback_model = ::Model.find_by(model_id: fallback_model_id)
           
           if fallback_model && fallback_model != @model
             span.set_attribute('app.llm.escalated', true)
-            execute_with_model(fallback_model, prompt, span)
+            begin
+              execute_with_model(fallback_model, prompt, span, &block)
+            rescue StandardError => fallback_e
+              span.status = OpenTelemetry::Trace::Status.error(fallback_e.message)
+              format_failure("Both primary and fallback models failed. Fallback error: #{fallback_e.message}")
+            end
           else
             span.status = OpenTelemetry::Trace::Status.error(e.message)
             format_failure("Model execution failed and no fallback available: #{e.message}")
@@ -61,10 +71,10 @@ module Llm
       ::Model.find_by(model_id: @agent.model_id)
     end
 
-    def execute_with_model(model, prompt, span)
+    def execute_with_model(model, prompt, span, &block)
       span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
       chat = LlmChat.create!(model: model)
-      response = chat.ask(prompt)
+      response = chat.ask(prompt, &block)
       span.add_event('received_llm_response')
 
       text = response.content.is_a?(String) ? response.content : response.content.text

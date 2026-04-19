@@ -9,7 +9,7 @@ module Llm
 
       config = YAML.load_file(CONFIG_PATH)
       config['models'].each do |model_id, attrs|
-        Model.create_or_find_by!(provider: attrs['provider'], model_id: model_id) do |m|
+        Model.find_or_create_by!(provider: attrs['provider'], model_id: model_id) do |m|
           m.name = attrs['name']
           m.family = attrs['family']
           m.context_window = attrs['context_window']
