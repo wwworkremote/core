@@ -20,6 +20,12 @@
 class User < ApplicationRecord
   has_secure_password
 
+  has_one :career_profile, dependent: :destroy
+  has_many :user_job_postings, dependent: :destroy
+  has_many :pipeline_steps, dependent: :destroy
+  has_many :contacts, dependent: :destroy
+  has_many :company_pipeline_steps, dependent: :destroy
+
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true

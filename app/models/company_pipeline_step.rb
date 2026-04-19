@@ -9,14 +9,17 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  company_id :bigint           not null
+#  user_id    :bigint
 #
 # Indexes
 #
 #  index_company_pipeline_steps_on_company_id  (company_id)
+#  index_company_pipeline_steps_on_user_id     (user_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (company_id => companies.id)
+#  fk_rails_...  (user_id => users.id)
 #
 class CompanyPipelineStep < ApplicationRecord
   belongs_to :company

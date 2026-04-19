@@ -15,11 +15,17 @@ module Admin
     end
 
     def update
-      if params[:action] == 'enrich'
-        @job_posting = JobPosting.find(params[:id])
+      @job_posting = JobPosting.find(params[:id])
+      
+      if params[:action_type] == 'enrich'
         Scraper::Enricher.call(@job_posting)
-        redirect_to admin_job_posting_path(@job_posting), notice: "Enrichment complete."
+        flash[:notice] = "Enrichment complete."
+      elsif params[:action_type] == 'synthesize'
+        JobBoards::Categorizer.new.call(@job_posting.id)
+        flash[:notice] = "Synthesis triggered."
       end
+
+      redirect_back fallback_location: admin_job_posting_path(@job_posting)
     end
   end
 end

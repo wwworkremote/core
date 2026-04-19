@@ -1,21 +1,20 @@
 # == Schema Information
 #
-# Table name: pipeline_steps
+# Table name: user_job_postings
 #
 #  id             :bigint           not null, primary key
-#  link           :string
-#  note           :text
+#  match_analysis :text
 #  notes          :text
 #  status         :string
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  job_posting_id :bigint           not null
-#  user_id        :bigint
+#  user_id        :bigint           not null
 #
 # Indexes
 #
-#  index_pipeline_steps_on_job_posting_id  (job_posting_id)
-#  index_pipeline_steps_on_user_id         (user_id)
+#  index_user_job_postings_on_job_posting_id  (job_posting_id)
+#  index_user_job_postings_on_user_id         (user_id)
 #
 # Foreign Keys
 #
@@ -24,6 +23,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe PipelineStep, type: :model do
+RSpec.describe UserJobPosting, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end

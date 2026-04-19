@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_220231) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -103,6 +103,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "career_profiles", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "resume_text"
+    t.text "goals"
+    t.text "skills"
+    t.string "experience_level"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_career_profiles_on_user_id"
+  end
+
   create_table "companies", force: :cascade do |t|
     t.string "name"
     t.string "slug"
@@ -119,7 +130,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
     t.string "link"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["company_id"], name: "index_company_pipeline_steps_on_company_id"
+    t.index ["user_id"], name: "index_company_pipeline_steps_on_user_id"
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -131,7 +144,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
     t.bigint "job_posting_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["job_posting_id"], name: "index_contacts_on_job_posting_id"
+    t.index ["user_id"], name: "index_contacts_on_user_id"
   end
 
   create_table "discovery_links", force: :cascade do |t|
@@ -254,6 +269,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
     t.datetime "last_synced_at"
     t.datetime "last_ingested_at"
     t.index ["slug"], name: "index_job_boards_sources_on_slug", unique: true
+  end
+
+  create_table "job_experiences", force: :cascade do |t|
+    t.bigint "career_profile_id", null: false
+    t.string "title"
+    t.string "company"
+    t.date "start_date"
+    t.date "end_date"
+    t.boolean "current"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["career_profile_id"], name: "index_job_experiences_on_career_profile_id"
   end
 
   create_table "job_postings", force: :cascade do |t|
@@ -384,7 +412,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
     t.datetime "updated_at", null: false
     t.string "link"
     t.text "note"
+    t.bigint "user_id"
     t.index ["job_posting_id"], name: "index_pipeline_steps_on_job_posting_id"
+    t.index ["user_id"], name: "index_pipeline_steps_on_user_id"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -562,6 +592,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
     t.index ["tool_call_id"], name: "index_tool_calls_on_tool_call_id", unique: true
   end
 
+  create_table "user_job_postings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "job_posting_id", null: false
+    t.string "status"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "match_analysis"
+    t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
+    t.index ["user_id"], name: "index_user_job_postings_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -585,14 +627,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "career_profiles", "users"
   add_foreign_key "company_pipeline_steps", "companies"
+  add_foreign_key "company_pipeline_steps", "users"
   add_foreign_key "contacts", "job_postings"
+  add_foreign_key "contacts", "users"
+  add_foreign_key "job_experiences", "career_profiles"
   add_foreign_key "job_postings", "sources"
   add_foreign_key "llm_chats", "models"
   add_foreign_key "llm_messages", "llm_chats"
   add_foreign_key "llm_messages", "models"
   add_foreign_key "llm_messages", "tool_calls"
   add_foreign_key "pipeline_steps", "job_postings"
+  add_foreign_key "pipeline_steps", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -603,4 +650,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_195608) do
   add_foreign_key "target_domains", "domains"
   add_foreign_key "target_domains", "job_postings"
   add_foreign_key "tool_calls", "llm_messages"
+  add_foreign_key "user_job_postings", "job_postings"
+  add_foreign_key "user_job_postings", "users"
 end

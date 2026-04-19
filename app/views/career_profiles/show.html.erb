@@ -1,0 +1,65 @@
+<div class="max-w-4xl mx-auto py-10 px-6">
+  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+    <div class="flex items-center gap-3">
+      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <span class="text-white">Career_Profile_Node</span>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div>
+      <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none">Career Profile</h1>
+      <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Leveraged by AI for deep job matching.</p>
+    </div>
+    <%= link_to "RECONFIGURE_PROFILE", edit_career_profile_path, class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="md:col-span-2 space-y-8">
+      <div class="card-neural p-8">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Resume_Archive</h3>
+        <div class="prose prose-invert max-w-none text-sm font-medium leading-relaxed text-base-content/80 whitespace-pre-wrap">
+          <%= @career_profile.resume_text.presence || "NO_RESUME_FOUND. PLEASE_UPDATE." %>
+        </div>
+      </div>
+
+      <div class="card-neural p-8">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Goal_Parameters</h3>
+        <div class="text-sm font-medium leading-relaxed text-base-content/80">
+          <%= @career_profile.goals.presence || "NO_GOALS_DEFINED." %>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-8">
+      <div class="card-neural p-8">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Identity_Metrics</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-1 text-slate-500">Tier</div>
+            <div class="text-white font-bold text-lg uppercase"><%= @career_profile.experience_level || "UNDEFINED" %></div>
+          </div>
+          <div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-1 text-slate-500">Neural_Skills</div>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <% (@career_profile.skills || "").split(",").each do |skill| %>
+                <span class="px-3 py-1 rounded bg-white/5 border border-white/5 text-[9px] font-black text-slate-400 uppercase tracking-widest"><%= skill.strip %></span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-neural p-8">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Match_Intelligence</h3>
+        <div class="text-center py-6">
+          <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
+            AI_READY: <%= @career_profile.resume_text.present? ? "TRUE" : "FALSE" %>
+          </div>
+          <p class="text-[9px] text-slate-600 mt-4 italic">Your profile will be used to generate personalized match scores on job detail pages.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

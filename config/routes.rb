@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :user_job_postings, only: %i[index create update destroy] do
+    collection do
+      post :analyze_match
+    end
+  end
+  resource :career_profile, only: %i[show edit update]
   get "companies/index"
   get "companies/show"
   get "company_pipeline_steps/create"

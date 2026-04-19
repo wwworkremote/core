@@ -1,0 +1,12 @@
+class CreateUserJobPostings < ActiveRecord::Migration[8.0]
+  def change
+    create_table :user_job_postings do |t|
+      t.references :user, null: false, foreign_key: true
+      t.references :job_posting, null: false, foreign_key: true
+      t.string :status
+      t.text :notes
+
+      t.timestamps
+    end
+  end
+end

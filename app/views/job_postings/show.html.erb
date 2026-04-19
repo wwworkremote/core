@@ -56,6 +56,60 @@
   </article>
 
   <aside class="space-y-8">
+    <!-- Personal Tracking -->
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30">My_Interaction</h3>
+        <% user_job = current_user.user_job_postings.find_by(job_posting: @job_posting) %>
+        <div class="flex items-center gap-4">
+          <% if user_job&.status == 'favorited' %>
+            <div class="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
+              <%= heroicon "heart", variant: :solid, options: { class: "w-3 h-3" } %> RECORD_FAVORITED
+            </div>
+          <% else %>
+            <%= button_to user_job_postings_path(job_posting_id: @job_posting.id, status: 'favorited'), class: "group flex items-center gap-2 text-[9px] font-black text-slate-500 hover:text-primary transition-colors uppercase tracking-widest" do %>
+              <%= heroicon "heart", options: { class: "w-3 h-3 group-hover:scale-125 transition-transform" } %> MARK_AS_FAVORITE
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- AI Match Analysis -->
+      <div class="space-y-6 mb-10">
+        <div class="flex items-center justify-between">
+          <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20">AI_Profile_Alignment</div>
+          <% if current_user.career_profile&.resume_text.present? %>
+            <%= button_to "RUN_ALIGNMENT_SCAN", analyze_match_user_job_postings_path(job_posting_id: @job_posting.id), class: "text-[8px] font-black text-primary hover:text-white underline uppercase" %>
+          <% else %>
+            <%= link_to "SETUP_PROFILE_FOR_MATCHING", edit_career_profile_path, class: "text-[8px] font-black text-slate-500 hover:text-white underline" %>
+          <% end %>
+        </div>
+        
+        <div class="p-4 rounded-xl bg-white/5 border border-white/5 border-dashed">
+          <% if user_job&.match_analysis.present? %>
+            <div class="prose-invert text-[10px] leading-relaxed">
+              <%= markdown(user_job.match_analysis) %>
+            </div>
+          <% else %>
+            <div class="text-center py-4">
+              <div class="text-[9px] font-black uppercase text-slate-600 tracking-tighter mb-1 italic">MATCH_DATA_PENDING_GENERATION</div>
+              <p class="text-[8px] text-slate-700">Ensure your resume is updated in your profile to enable personalized analysis.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Personal Notes -->
+      <div class="space-y-4">
+        <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20">Personal_Internal_Notes</div>
+        <%= form_with model: user_job || current_user.user_job_postings.build(job_posting: @job_posting), url: (user_job ? user_job_posting_path(user_job) : user_job_postings_path), class: "space-y-2" do |f| %>
+          <%= f.hidden_field :job_posting_id, value: @job_posting.id %>
+          <%= f.text_area :notes, placeholder: "APPEND_PRIVATE_CONTEXT...", class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-[10px] font-mono", rows: 3 %>
+          <%= f.submit "SAVE_INTERNAL_NOTES", class: "w-full py-2 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all" %>
+        <% end %>
+      </div>
+    </div>
+
     <!-- Pipeline Control -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Research_Pipeline</h3>
@@ -124,7 +178,7 @@
               <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> <%= category || "PENDING_SYNTHESIS" %>
             </div>
             <% if category.blank? || params[:reprocess] %>
-              <%= button_to "RE-SYNTHESIZE", admin_job_posting_path(@job_posting), params: { action: 'enrich' }, class: "text-[8px] font-black text-primary hover:text-white underline" %>
+              <%= button_to "RE-SYNTHESIZE", admin_job_posting_path(@job_posting), params: { action_type: 'synthesize' }, method: :patch, class: "text-[8px] font-black text-primary hover:text-white underline" %>
             <% end %>
           </div>
         </div>

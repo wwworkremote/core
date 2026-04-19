@@ -1,0 +1,2 @@
+module UserJobPostingsHelper
+end
