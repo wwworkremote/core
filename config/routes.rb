@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  get "companies/index"
+  get "companies/show"
+  get "company_pipeline_steps/create"
   get "contacts/create"
   get "contacts/destroy"
   get "pipeline_steps/create"
@@ -16,7 +19,10 @@ Rails.application.routes.draw do
     root to: 'dashboard#index'
     get 'analytics' => 'analytics#index'
     get 'jobs' => 'jobs#index'
-    resources :job_postings, only: %i[index show] do
+    resources :companies, only: %i[index show] do
+    resources :company_pipeline_steps, only: [:create]
+  end
+  resources :job_postings, only: %i[index show] do
     resources :pipeline_steps, only: [:create]
     resources :contacts, only: [:create, :destroy]
   end
