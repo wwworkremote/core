@@ -99,7 +99,8 @@ class DataAcquisitionManager
     JobBoards::Query.find_or_create_by!(source_id: source.id)
 
     guard = Object.new.extend(ApiGuard)
-    last_fetched = guard.last_fetched_at(slug)
+    # Fallback to model data if ApiGuard returns nil
+    last_fetched = guard.last_fetched_at(slug) || source.last_synced_at
     can_fetch = guard.can_fetch?(slug, cooldown: config[:cooldown])
     time_until_reset = guard.time_until_reset(slug, cooldown: config[:cooldown])
 
