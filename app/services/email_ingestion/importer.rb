@@ -5,13 +5,28 @@ require 'fileutils'
 
 module EmailIngestion
   class Importer
-    def initialize(record)
+    def initialize(record = nil)
       @record = record
-      @source_provider = record.source
-      @file_path = record.file_path
+      @source_provider = record&.source
+      @file_path = record&.file_path
     end
 
-    def call
+    def call(source: nil)
+      if @record
+        process_record
+      else
+        # When called without a record, perform a scan for the given source
+        rake = Rake::Application.new
+        Rake.application = rake
+        Rake::Task.define_task(:environment)
+        load Rails.root.join('lib', 'tasks', 'email_ingestion.rake') # Adjust path if necessary
+        rake['eml:scan_source'].invoke(source)
+      end
+    end
+
+    private
+
+    def process_record
       @record.update!(status: 'processing')
 
       begin
