@@ -16,7 +16,7 @@ class LlmChatResponseJob < ApplicationJob
     if result[:success]
       # After streaming is complete, replace the entire message with the fully rendered markdown version
       final_message = llm_chat.llm_messages.where(role: 'assistant').last
-      final_message.broadcast_replace_to "llm_chat_#{llm_chat.id}"
+      final_message&.broadcast_replace_to "llm_chat_#{llm_chat.id}"
     else
       Rails.logger.error "[LlmChatResponseJob] Orchestrator failed: #{result[:error]}"
     end
