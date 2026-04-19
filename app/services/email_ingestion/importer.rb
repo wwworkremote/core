@@ -19,8 +19,9 @@ module EmailIngestion
         rake = Rake::Application.new
         Rake.application = rake
         Rake::Task.define_task(:environment)
-        load Rails.root.join('lib', 'tasks', 'email_ingestion.rake')
+        load Rails.root.join('lib', 'tasks', 'eml.rake')
         rake['eml:scan_source'].invoke(source)
+
       end
     end
 
