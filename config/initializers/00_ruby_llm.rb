@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 RubyLLM.configure do |config|
-  config.openai_api_key = ENV['OPENAI_API_KEY'] || Rails.application.credentials[:openai_api_key] || 'sk-local'
-  config.anthropic_api_key = ENV['ANTHROPIC_API_KEY'] || Rails.application.credentials[:anthropic_api_key]
-  config.gemini_api_key = ENV['GEMINI_API_KEY'] || Rails.application.credentials[:gemini_api_key]
+  config.openai_api_key = ENV['OPENAI_API_KEY'] || Rails.application.credentials.dig(:openai_api_key) || 'sk-local'
+  config.anthropic_api_key = ENV['ANTHROPIC_API_KEY'] || Rails.application.credentials.dig(:anthropic_api_key)
+  config.gemini_api_key = ENV['GEMINI_API_KEY'] || Rails.application.credentials.dig(:gemini_api_key)
 
   # Default to host llama.cpp server
   config.ollama_api_base = ENV['OLLAMA_API_BASE'] || 'http://localhost:8080/v1'
