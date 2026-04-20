@@ -13,6 +13,71 @@
 <%= turbo_stream_from "system_telemetry" %>
 
 <div class="grid grid-cols-1 gap-12">
+  <!-- Priority In-Box Block -->
+  <% if @priority_inbox.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Strategic_Priority_Inbox</h2>
+        <div class="h-px flex-1 bg-accent/20"></div>
+        <span class="badge badge-accent badge-xs font-black"><%= @priority_inbox.count %>_PENDING</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @priority_inbox.each do |user_job| %>
+          <% job = user_job.job_posting %>
+          <div class="card bg-base-200 border border-accent/10 hover:border-accent/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-[9px] font-black uppercase text-slate-500 tracking-widest"><%= job.company %></div>
+                <div class="badge badge-accent text-[8px] font-black tracking-tighter uppercase">High_Confidence</div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-accent transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-[9px] font-bold text-slate-600"><%= job.location || "REMOTE" %></div>
+                <div class="flex gap-2">
+                  <%= button_to "FAVORITE", user_job_postings_path(job_posting_id: job.id, status: 'favorited'), class: "text-[8px] font-black text-primary hover:underline uppercase" %>
+                  <%= link_to "REVIEW", job_posting_path(job), class: "text-[8px] font-black text-slate-400 hover:text-white uppercase" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Personal Alignment Block -->
+  <% if @top_matches.present? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Neural_Alignment_matches</h2>
+        <div class="h-px flex-1 bg-primary/20"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @top_matches.each do |job| %>
+          <div class="card bg-base-200 border border-primary/10 hover:border-primary/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-[9px] font-black uppercase text-slate-500 tracking-widest"><%= job.company %></div>
+                <div class="badge badge-primary badge-outline text-[8px] font-black tracking-tighter">AI_MATCH</div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-primary transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-[9px] font-bold text-slate-600"><%= job.location || "REMOTE" %></div>
+                <%= link_to "ANALYZE", job_posting_path(job), class: "text-[9px] font-black text-primary hover:underline" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
   <!-- Ingestion Block -->
   <section>
     <div class="flex items-center gap-4 mb-6 opacity-20">

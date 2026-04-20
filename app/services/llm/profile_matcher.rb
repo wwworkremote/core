@@ -61,7 +61,15 @@ module Llm
 
       if result[:success]
         user_job.update!(match_analysis: result[:output])
-        { success: true, output: result[:output] }
+        
+        # Try to extract numerical score (e.g. 85%)
+        score_match = result[:output].match(/MATCH_CONFIDENCE.*?(\d+)%/i)
+        if score_match
+          score = score_match[1].to_i
+          user_job.update!(priority_flag: true) if score >= 80
+        end
+
+        { success: true, output: result[:output], score: score }
       else
         { success: false, error: result[:error] }
       end

@@ -11,11 +11,20 @@ development:
   primary:
     <<: *default
     url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
+  replica:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_REPLICA_URL") { ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } } %>
+    replica: true
 
 test:
   <<: *default
   database: wwworkremote_test
 
 production:
-  <<: *default
-  url: <%= ENV.fetch("DATABASE_URL") { "postgres://deploy@localhost/wwworkremote_production" } %>
+  primary:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") { "postgres://deploy@localhost/wwworkremote_production" } %>
+  replica:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_REPLICA_URL") { ENV.fetch("DATABASE_URL") { "postgres://deploy@localhost/wwworkremote_production" } } %>
+    replica: true

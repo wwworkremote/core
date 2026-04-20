@@ -4,6 +4,7 @@
 #
 #  id               :bigint           not null, primary key
 #  contact_info     :jsonb
+#  embedding        :vector(3584)
 #  experience_level :string
 #  goals            :text
 #  location_info    :jsonb
@@ -25,6 +26,8 @@ class CareerProfile < ApplicationRecord
   belongs_to :user
   has_many :work_experiences, dependent: :destroy
   has_many :experience_highlights, through: :work_experiences
+
+  has_neighbors :embedding
   
   accepts_nested_attributes_for :work_experiences, allow_destroy: true
 end

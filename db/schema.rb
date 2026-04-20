@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_230438) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_19_235911) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -113,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_230438) do
     t.datetime "updated_at", null: false
     t.jsonb "contact_info"
     t.jsonb "location_info"
+    t.vector "embedding", limit: 3584
     t.index ["user_id"], name: "index_career_profiles_on_user_id"
   end
 
@@ -611,6 +612,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_230438) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "match_analysis"
+    t.boolean "priority_flag"
     t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
     t.index ["user_id"], name: "index_user_job_postings_on_user_id"
   end

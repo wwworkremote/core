@@ -12,9 +12,14 @@ class CareerProfilesController < ApplicationController
   def update
     if params[:sync]
       Resume::YamlImporter.call(current_user)
-      redirect_to career_profile_path, notice: "Career profile synchronized from YAML successfully."
+      Resume::ProfileEmbedder.new(@career_profile).call
+      redirect_to career_profile_path, notice: "Career profile synchronized and embedded successfully."
+    elsif params[:embed]
+      Resume::ProfileEmbedder.new(@career_profile).call
+      redirect_to career_profile_path, notice: "Neural vectors synchronized successfully."
     elsif @career_profile.update(career_profile_params)
-      redirect_to career_profile_path, notice: "Career profile updated successfully."
+      Resume::ProfileEmbedder.new(@career_profile).call
+      redirect_to career_profile_path, notice: "Career profile updated and embedded successfully."
     else
       render :edit, status: :unprocessable_entity
     end

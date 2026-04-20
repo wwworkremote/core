@@ -5,6 +5,7 @@
 #  id             :bigint           not null, primary key
 #  match_analysis :text
 #  notes          :text
+#  priority_flag  :boolean
 #  status         :string
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null

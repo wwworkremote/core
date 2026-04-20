@@ -4,6 +4,7 @@
 #
 #  id               :bigint           not null, primary key
 #  contact_info     :jsonb
+#  embedding        :vector(3584)
 #  experience_level :string
 #  goals            :text
 #  location_info    :jsonb
