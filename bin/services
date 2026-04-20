@@ -17,8 +17,8 @@ KNOWN_SERVICES=("server" "automation" "assets" "specs" "logs")
 # Service command mapping
 get_service_cmd() {
   case "$1" in
-    server)     echo "rm -f tmp/pids/server.pid && WEB_CONCURRENCY=0 bundle exec falcon serve --bind http://localhost:3010 --threaded --count 1" ;;
-    automation) echo "bin/jobs --mode=async" ;;
+    server)     echo "rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb" ;;
+    automation) echo "bin/jobs" ;;
     assets)     echo "bin/rails tailwindcss:watch" ;;
     specs)      echo "bundle exec guard --no-interactions" ;;
     logs)       echo "tail -F log/development.log $LOG_DIR/server.log $LOG_DIR/automation.log $LOG_DIR/assets.log $LOG_DIR/specs.log" ;;
