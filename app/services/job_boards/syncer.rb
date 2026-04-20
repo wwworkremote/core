@@ -5,11 +5,25 @@ require 'reverse_markdown'
 module JobBoards
   class Syncer
     def call
+      processed_count = 0
+      sources_to_update = Set.new
+
       JobBoards::Document.where(aasm_state: ['pending', nil]).find_each do |doc|
-        sync_document(doc)
+        if sync_document(doc)
+          processed_count += 1
+          sources_to_update << doc.source_id
+        end
       end
+
+      # Update last_ingested_at for all sources that brought in new data
+      sources_to_update.each do |source_id|
+        JobBoards::Source.find(source_id).update!(last_ingested_at: Time.current)
+      end
+
+      processed_count
     rescue ActiveRecord::ConnectionTimeoutError => e
       Rails.logger.error "[Syncer] Database connection pool exhausted: #{e.message}. Halting sync."
+      0
     end
 
     private
@@ -21,13 +35,23 @@ module JobBoards
       origin = Origin.find_or_create_by!(name: source.name)
       dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
 
-      JobPosting.find_or_initialize_by(signature: doc.signature) do |jp|
-        jp.source_id = dashboard_source.id
-        map_attributes(jp, data, source.slug)
-        jp.save!
+      jp = JobPosting.find_or_initialize_by(signature: doc.signature)
+      jp.source_id = dashboard_source.id
+      map_attributes(jp, data, source.slug)
+      
+      if jp.save!
+        # Transition document state if AASM is available, otherwise update column
+        if doc.respond_to?(:processed!)
+          doc.processed!
+        else
+          doc.update!(aasm_state: 'processed', updated_at: Time.current)
+        end
 
         JobBoards::Categorizer.new(jp).call
         JobBoards::Embedder.new(jp).call
+        true
+      else
+        false
       end
     end
 

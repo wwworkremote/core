@@ -175,8 +175,9 @@ start_service() {
         tmux new-session -d -s "$TMUX_SESSION" -n "coordinator" "echo 'Wwworkremote Tmux Coordinator' && bash"
       fi
 
-      # Keep window open on exit for debugging
-      tmux new-window -t "$TMUX_SESSION" -n "$svc" "cd \"$REPO_ROOT\" && { $cmd; echo; echo '--- Process terminated with exit code \$? ---'; echo 'Press enter to close window...'; read; }"
+      # Keep window open on exit for debugging by spawning a fallback shell
+      # This allows viewing logs/errors even if the process crashes
+      tmux new-window -t "$TMUX_SESSION" -n "$svc" "cd \"$REPO_ROOT\" && { $cmd; echo; echo '--- 🛑 Process Terminated (Exit: \$?) ---'; echo 'Entering debug shell...'; bash; }"
       echo "✔  $svc started in tmux session '$TMUX_SESSION:$svc'."
       return
     fi

@@ -2,6 +2,8 @@ default: &default
   adapter: postgresql
   encoding: unicode
   reconnect: true
+  # Disable GSSAPI encryption to prevent macOS fork segmentation faults
+  gssencmode: "disable"
   # High-density pool for high concurrency (Falcon/Puma threads + Solid Queue)
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 100 } %>
   # Long checkout timeout to prevent contention during heavy LLM orchestration

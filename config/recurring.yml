@@ -52,6 +52,10 @@ production:
     class: JobBoards::LinkMonitorJob
     schedule: every hour at minute 45
 
+  content_enrichment:
+    class: JobBoards::ContentEnrichmentJob
+    schedule: every 30 minutes
+
   nightly_database_backup:
     class: DatabaseBackupJob
     schedule: every day at 3am
