@@ -29,7 +29,7 @@
                 <%= button_to "Run", run_data_fetchers_path, params: { slug: slug }, class: "btn-admin bg-white/5 hover:bg-white/10" %>
               <% else %>
                 <button class="btn-admin bg-base-200 text-slate-600 cursor-not-allowed" disabled>
-                  <%= (status[:time_until_reset] / 60).round %>m
+                  <%= status[:time_until_reset] ? "#{(status[:time_until_reset] / 60).round}m" : "LOCKED" %>
                 </button>
               <% end %>
               <%= button_to "Force", run_data_fetchers_path, params: { slug: slug, force: true }, class: "btn-admin bg-rose-900/20 text-rose-500 hover:bg-rose-900/40 border-none" %>

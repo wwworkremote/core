@@ -116,10 +116,10 @@
                       <div class="text-slate-500 text-[9px] truncate max-w-xs"><%= job.class_name %></div>
                     </td>
                     <td class="px-6 py-4">
-                      <div class="text-rose-400 font-bold truncate max-w-xs" title="<%= failed_exec.error['message'] %>">
-                        <%= failed_exec.error['exception_class'] %>
+                      <div class="text-rose-400 font-bold truncate max-w-xs" title="<%= failed_exec.error&.fetch('message', 'No message') %>">
+                        <%= failed_exec.error&.fetch('exception_class', 'UnknownError') %>
                       </div>
-                      <div class="text-rose-900 text-[9px] truncate max-w-md"><%= failed_exec.error['message'] %></div>
+                      <div class="text-rose-900 text-[9px] truncate max-w-md"><%= failed_exec.error&.fetch('message', 'N/A') %></div>
                     </td>
                     <td class="px-6 py-4 text-right text-slate-600">
                       <%= time_ago_in_words(failed_exec.created_at) %> ago

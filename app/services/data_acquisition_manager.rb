@@ -174,14 +174,14 @@ class DataAcquisitionManager
     # Fallback to model data if ApiGuard returns nil
     last_fetched = guard.last_fetched_at(slug) || source.last_synced_at
     can_fetch = guard.can_fetch?(slug, cooldown: config[:cooldown])
-    time_until_reset = guard.time_until_reset(slug, cooldown: config[:cooldown])
+    time_until_reset = guard.time_until_reset(slug, cooldown: config[:cooldown]) rescue nil
 
     {
       slug:,
       name: config[:name],
       last_fetched_at: last_fetched,
       last_ingested_at: source.last_ingested_at,
-      can_fetch: can_fetch,
+      can_fetch: !!can_fetch,
       time_until_reset: time_until_reset,
       cooldown: config[:cooldown]
     }

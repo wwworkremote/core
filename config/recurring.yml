@@ -7,16 +7,16 @@ development:
     class: SyncDashboardJob
     schedule: every hour at minute 45
   sync_emails_indeed:
-    class: EmailIngestion::Importer
-    args: [{ source: "indeed" }]
+    class: EmailIngestion::ImportJob
+    args: ["indeed"]
     schedule: every 1 hour at minute 5
   sync_emails_adzuna:
-    class: EmailIngestion::Importer
-    args: [{ source: "adzuna" }]
+    class: EmailIngestion::ImportJob
+    args: ["adzuna"]
     schedule: every 1 hour at minute 10
   sync_emails_linkedin:
-    class: EmailIngestion::Importer
-    args: [{ source: "linkedin" }]
+    class: EmailIngestion::ImportJob
+    args: ["linkedin"]
     schedule: every 1 hour at minute 15
 
 
@@ -28,16 +28,16 @@ production:
     class: SyncDashboardJob
     schedule: every hour at minute 45
   sync_emails_indeed:
-    class: EmailIngestion::Importer
-    args: [{ source: "indeed" }]
+    class: EmailIngestion::ImportJob
+    args: ["indeed"]
     schedule: every 1 hour at minute 5
   sync_emails_adzuna:
-    class: EmailIngestion::Importer
-    args: [{ source: "adzuna" }]
+    class: EmailIngestion::ImportJob
+    args: ["adzuna"]
     schedule: every 1 hour at minute 10
   sync_emails_linkedin:
-    class: EmailIngestion::Importer
-    args: [{ source: "linkedin" }]
+    class: EmailIngestion::ImportJob
+    args: ["linkedin"]
     schedule: every 1 hour at minute 15
 
   clear_solid_queue_finished_jobs:
