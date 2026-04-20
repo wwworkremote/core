@@ -55,6 +55,19 @@ class UserJobPostingsController < ApplicationController
     redirect_back fallback_location: job_posting_path(@job_posting)
   end
 
+  def generate_artifacts
+    @job_posting = JobPosting.find(params[:job_posting_id])
+    result = Llm::ArtifactGenerator.call(current_user, @job_posting)
+    
+    if result[:success]
+      flash[:notice] = "Bespoke application artifacts generated and appended to notes."
+    else
+      flash[:alert] = "Generation failed: #{result[:error]}"
+    end
+    
+    redirect_back fallback_location: job_posting_path(@job_posting)
+  end
+
   private
 
   def user_job_posting_params

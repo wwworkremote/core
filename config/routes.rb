@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :user_job_postings, only: %i[index create update destroy] do
     collection do
       post :analyze_match
+      post :generate_artifacts
     end
   end
   resource :career_profile, only: %i[show edit update]

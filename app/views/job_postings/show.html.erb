@@ -87,9 +87,10 @@
         
         <div class="p-4 rounded-xl bg-white/5 border border-white/5 border-dashed">
           <% if user_job&.match_analysis.present? %>
-            <div class="prose-invert text-[10px] leading-relaxed">
+            <div class="prose-invert text-[10px] leading-relaxed mb-6">
               <%= markdown(user_job.match_analysis) %>
             </div>
+            <%= button_to "GENERATE_APPLICATION_PACK", generate_artifacts_user_job_postings_path(job_posting_id: @job_posting.id), class: "w-full py-2 rounded-xl bg-primary/20 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all" %>
           <% else %>
             <div class="text-center py-4">
               <div class="text-[9px] font-black uppercase text-slate-600 tracking-tighter mb-1 italic">MATCH_DATA_PENDING_GENERATION</div>
