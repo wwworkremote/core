@@ -5,10 +5,31 @@ require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
-abort('The Rails environment is running in production mode!') if Rails.env.production?
+abort("The Rails environment is running in production mode!") if Rails.env.production?
+
+# STRICT GUARD: Never allow tests to touch the development database
+if ActiveRecord::Base.connection_db_config.name == "development" || ActiveRecord::Base.connection.current_database == "wwworkremote_development"
+  abort("\nFATAL ERROR: Attempted to run tests against the development database. \nExecution halted to prevent data loss. \nCheck your RAILS_ENV or database.yml configuration.\n")
+end
+
 require 'rspec/rails'
+
 require 'webmock/rspec'
+require 'capybara/cuprite'
+
 # Add additional requires below this line. Rails is not loaded until this point!
+
+Capybara.javascript_driver = :cuprite
+Capybara.register_driver(:cuprite) do |app|
+  Capybara::Cuprite::Driver.new(app, 
+    window_size: [1200, 800], 
+    browser_options: { 'no-sandbox': true },
+    process_timeout: 30,
+    timeout: 30,
+    pending_connection_errors: false,
+    inspector: true
+  )
+end
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are

@@ -78,7 +78,7 @@
       <div class="space-y-6 mb-10">
         <div class="flex items-center justify-between">
           <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20">AI_Profile_Alignment</div>
-          <% if current_user.career_profile&.resume_text.present? %>
+          <% if current_user.career_profile&.resume_text.present? || current_user.career_profile&.work_experiences&.any? %>
             <%= button_to "RUN_ALIGNMENT_SCAN", analyze_match_user_job_postings_path(job_posting_id: @job_posting.id), class: "text-[8px] font-black text-primary hover:text-white underline uppercase" %>
           <% else %>
             <%= link_to "SETUP_PROFILE_FOR_MATCHING", edit_career_profile_path, class: "text-[8px] font-black text-slate-500 hover:text-white underline" %>

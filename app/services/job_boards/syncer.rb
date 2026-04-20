@@ -5,7 +5,7 @@ require 'reverse_markdown'
 module JobBoards
   class Syncer
     def call
-      JobBoards::Document.find_each do |doc|
+      JobBoards::Document.where(aasm_state: ['pending', nil]).find_each do |doc|
         sync_document(doc)
       end
     rescue ActiveRecord::ConnectionTimeoutError => e

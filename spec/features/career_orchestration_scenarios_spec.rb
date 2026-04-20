@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'The Career Orchestration Loop', type: :system do
+  let(:admin_user) { User.find_by(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com')) || create(:user) }
+  let!(:job_posting) { create(:job_posting, title: "Staff Ruby on Rails Engineer", body: "Deep Ruby and Rails expertise required.") }
+
+  before do
+    driven_by :cuprite
+    VCR.turn_off!(ignore_cassettes: true)
+    WebMock.allow_net_connect!
+  end
+
+  scenario 'User synchronizes identity and analyzes a match' do
+    # 1. Identity Synchronization
+    visit career_profile_path
+    click_button 'SYNC_FROM_YAML'
+    
+    # Verify sync by checking for content that should be in the DB after sync
+    expect(WorkExperience.count).to be > 0
+    expect(page).to have_content(/Career Profile/i)
+
+    # 2. Strategic Analysis
+    visit job_posting_path(job_posting)
+    
+    # Mock LLM Match Analysis
+    mock_analysis = "MATCH_CONFIDENCE: 92%"
+    expect(Llm::Orchestrator).to receive(:call).at_least(:once).and_return({ success: true, output: mock_analysis })
+
+    # Use a very specific button matcher
+    find('button', text: /RUN_ALIGNMENT_SCAN/i).click
+    expect(page).to have_content(/scan complete/i)
+    expect(page).to have_content('MATCH_CONFIDENCE: 92%')
+
+    # 3. Priority Recognition
+    visit root_path
+    expect(page).to have_content(job_posting.title)
+    expect(page).to have_content(/HIGH_CONFIDENCE/i)
+
+    puts "SCENARIO_SUCCESS: Career Orchestration Loop verified."
+  end
+end

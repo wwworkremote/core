@@ -219,7 +219,7 @@ class DataAcquisitionManager
           selector = q.query_params['selector'] || 'a[href*="/job/"]'
           config[:class].perform_later(slug, url, selector) if url.present?
         end
-        result = true
+        result = { success: true }
       else
         # Fallback to a default search if no specific queries are defined
         default_url = case slug
@@ -234,41 +234,48 @@ class DataAcquisitionManager
         
         if default_url
           config[:class].perform_later(slug, default_url, 'a[href*="/job/"]')
-          result = true
+          result = { success: true }
         else
           result = { success: false, error: "No active queries found for #{slug}" }
         end
       end
     elsif config[:class] < ApplicationJob
+      # For ActiveJobs (like CrawlDiscoveryJob), enqueue them
+      config[:class].perform_later(slug, 'https://cord.com/search/jobs/software-developer', 'a[href*="/job/"]')
+      result = { success: true }
+    else
       # For Service Objects
       fetcher = config[:class].new
       method = fetcher.method(:call)
 
       # Detect if fetcher accepts 'force' or 'source' as keyword arguments
-      keyword_params = %i[key keyreq]
-      result = if method.parameters.any? { |p| keyword_params.include?(p[0]) }
-                 args = { force: }
-                 args[:source] = slug.split('_').last if slug.start_with?('email_')
-                 fetcher.call(**args)
+      keyword_params = %i[key keyrest keyreq]
+      
+      call_args = {}
+      call_args[:force] = force if method.parameters.any? { |p| p[1] == :force }
+      call_args[:source] = slug.split('_').last if slug.start_with?('email_') && method.parameters.any? { |p| p[1] == :source }
+
+      result_raw = if call_args.any?
+                 fetcher.call(**call_args)
                else
                  fetcher.call
                end
+      
+      # Normalize result to hash
+      result = case result_raw
+               when true then { success: true }
+               when false then { success: false, error: 'Fetcher reported failure' }
+               when Hash then result_raw
+               else { success: true } # Assume success for other truthy values
+               end
     end
 
-    case result
-    when true
+    if result[:success]
       # Update ingestion time if postings were actually synced
       syncer_result = JobBoards::Syncer.new.call
       source.update!(last_ingested_at: Time.current) if syncer_result
-      { success: true }
-    when false
-      { success: false, error: 'Fetcher reported failure (Check logs)' }
-    when :cooldown
-      { success: false, error: 'Skipped: Cooldown in progress (Force to bypass)' }
-    when :missing_source
-      { success: false, error: 'Internal Error: Data source record missing in database' }
-    else
-      { success: false, error: "Unexpected result: #{result.inspect}" }
     end
+    
+    result
   end
 end

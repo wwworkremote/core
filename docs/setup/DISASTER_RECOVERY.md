@@ -13,12 +13,18 @@ The application is configured for a **Primary/Replica** architecture.
 - **Tool**: `DatabaseBackupJob` (ActiveJob).
 - **Format**: Postgres Custom Format (`.dump`) using `pg_dump -Fc`.
 - **Schedule**: Nightly at 3:00 AM (configured in `config/recurring.yml`).
-- **Location**: Backups are generated in `tmp/` and should be configured to upload to offsite S3-compatible storage.
+- **Storage**: Backups are stored in `data/backups/` with a 7-day retention policy.
 
-### Restoration Procedure
-To restore from a logical dump:
+### Full Restore
+To restore the entire database (including job postings and embeddings):
 ```bash
-pg_restore -d your_database_name tmp/wwworkremote_backup_TIMESTAMP.dump
+pg_restore -c -d your_database_name data/backups/full_backup_TIMESTAMP.dump
+```
+
+### Critical Data Restore
+To restore *only* your identity, work history, contacts, and pipeline configurations (useful if you want to rebuild the job database from scratch but keep your personal data):
+```bash
+pg_restore -c -d your_database_name data/backups/critical_data_TIMESTAMP.dump
 ```
 
 ## 3. Continuous Archiving (PITR)
