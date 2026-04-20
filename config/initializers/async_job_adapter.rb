@@ -105,7 +105,6 @@ if defined?(ActiveJob::QueueAdapters::AsyncJobAdapter)
 end
 
 Rails.application.configure do
-  config.async_job.define_queue 'default' do
-    dequeue Async::Job::Processor::Inline
-  end
+  # Removed Inline dequeueing to prevent web server freezes.
+  # Async Job will now use its default asynchronous processing.
 end

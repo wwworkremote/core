@@ -1,4 +1,6 @@
 class LlmChatResponseJob < ApplicationJob
+  self.queue_adapter = :async_job
+
   def perform(llm_chat_id, content)
     llm_chat = LlmChat.find(llm_chat_id)
 

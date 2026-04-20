@@ -35,8 +35,8 @@ module WwworkRemote
 
     config.generators.system_tests = nil
 
-    # Use Async Job for background jobs
-    config.active_job.queue_adapter = :async_job
+    # Use Solid Queue as the default for reliable background processing
+    config.active_job.queue_adapter = :solid_queue
 
     # Use Solid Cache for caching
     config.cache_store = :solid_cache_store

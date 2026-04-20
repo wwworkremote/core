@@ -2,10 +2,10 @@ default: &default
   adapter: postgresql
   encoding: unicode
   reconnect: true
-  # Increased pool for Async/Fibers concurrency and Solid Queue background processing
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 50 } %>
-  # Longer timeout to prevent ConnectionTimeoutError during heavy LLM orchestration
-  checkout_timeout: <%= ENV.fetch("DATABASE_CHECKOUT_TIMEOUT") { 10 } %>
+  # High-density pool for high concurrency (Falcon/Puma threads + Solid Queue)
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 100 } %>
+  # Long checkout timeout to prevent contention during heavy LLM orchestration
+  checkout_timeout: <%= ENV.fetch("DATABASE_CHECKOUT_TIMEOUT") { 20 } %>
 
 development:
   primary:
