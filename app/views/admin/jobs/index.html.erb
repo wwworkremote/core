@@ -74,7 +74,7 @@
                     <div class="text-blue-400 font-bold text-[9px] truncate max-w-xs"><%= job.class_name %></div>
                   </td>
                   <td class="px-6 py-4">
-                    <span class="text-slate-500"><%= job.queue_name.upcase %></span>
+                    <span class="text-slate-500"><%= job.queue_name&.upcase %></span>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <% if job.failed? %>
@@ -86,7 +86,7 @@
                     <% end %>
                   </td>
                   <td class="px-6 py-4 text-right text-slate-600">
-                    <%= time_ago_in_words(job.created_at) %>
+                    <%= job.created_at ? time_ago_in_words(job.created_at) : 'N/A' %>
                   </td>
                 </tr>
               <% end %>

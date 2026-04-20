@@ -2,8 +2,8 @@
 
 class DataFetchersController < ApplicationController
   def index
-    @fetchers = DataAcquisitionManager.fetchers.map do |f|
-      DataAcquisitionManager.status(f[:slug])
+    @fetcher_statuses = DataAcquisitionManager.fetchers.each_with_object({}) do |f, hash|
+      hash[f[:slug]] = DataAcquisitionManager.status(f[:slug])
     end
   end
 
@@ -11,12 +11,17 @@ class DataFetchersController < ApplicationController
     slug = params[:slug]
     force = params[:force] == 'true'
 
-    result = DataAcquisitionManager.run(slug, force:)
+    begin
+      result = DataAcquisitionManager.run(slug, force:)
 
-    if result[:success]
-      flash[:notice] = "Fetcher #{slug} started successfully."
-    else
-      flash[:alert] = "Error starting fetcher #{slug}: #{result[:error]}"
+      if result[:success]
+        flash[:notice] = "Fetcher #{slug} started successfully."
+      else
+        flash[:alert] = "Error starting fetcher #{slug}: #{result[:error]}"
+      end
+    rescue StandardError => e
+      flash[:alert] = "Critical error in fetcher #{slug}: #{e.message}"
+      Rails.logger.error "[DataFetchersController] Error: #{e.message}\n#{e.backtrace.join("\n")}"
     end
 
     redirect_to data_fetchers_path
@@ -26,11 +31,15 @@ class DataFetchersController < ApplicationController
     type = params[:type]
     fetchers = DataAcquisitionManager.fetchers.select { |f| DataAcquisitionManager::FETCHERS[f[:slug]][:type] == type }
     
-    fetchers.each do |f|
-      DataAcquisitionManager.run(f[:slug])
+    begin
+      fetchers.each do |f|
+        DataAcquisitionManager.run(f[:slug], force: false)
+      end
+      flash[:notice] = "Triggered all #{type} pipelines."
+    rescue StandardError => e
+      flash[:alert] = "Error triggering pipelines: #{e.message}"
     end
 
-    flash[:notice] = "Triggered all #{type} pipelines."
     redirect_to data_fetchers_path
   end
 

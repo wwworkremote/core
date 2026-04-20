@@ -129,19 +129,19 @@ class DataAcquisitionManager
       type: 'Scraper'
     },
     'email_indeed' => {
-      class: EmailIngestion::Importer,
+      class: EmailIngestion::ImportJob,
       cooldown: 1.hour,
       name: 'Email (Indeed)',
       type: 'Email'
     },
     'email_adzuna' => {
-      class: EmailIngestion::Importer,
+      class: EmailIngestion::ImportJob,
       cooldown: 1.hour,
       name: 'Email (Adzuna)',
       type: 'Email'
     },
     'email_linkedin' => {
-      class: EmailIngestion::Importer,
+      class: EmailIngestion::ImportJob,
       cooldown: 1.hour,
       name: 'Email (LinkedIn)',
       type: 'Email'
@@ -164,25 +164,21 @@ class DataAcquisitionManager
     config = FETCHERS[slug]
     return nil unless config
 
-    # Ensure source exists
-    source = JobBoards::Source.find_or_create_by!(slug:) do |s|
-      s.name = config[:name]
-    end
-    JobBoards::Query.find_or_create_by!(source_id: source.id)
-
+    # Use find_by instead of find_or_create to avoid writes in views/GET requests
+    source = JobBoards::Source.find_by(slug: slug)
+    
     guard = Object.new.extend(ApiGuard)
-    # Fallback to model data if ApiGuard returns nil
-    last_fetched = guard.last_fetched_at(slug) || source.last_synced_at
+    last_fetched = guard.last_fetched_at(slug) || source&.last_synced_at
     can_fetch = guard.can_fetch?(slug, cooldown: config[:cooldown])
-    time_until_reset = guard.time_until_reset(slug, cooldown: config[:cooldown]) rescue nil
+    time_until_reset = guard.time_until_reset(slug, cooldown: config[:cooldown]) rescue 0
 
     {
       slug:,
       name: config[:name],
       last_fetched_at: last_fetched,
-      last_ingested_at: source.last_ingested_at,
+      last_ingested_at: source&.last_ingested_at,
       can_fetch: !!can_fetch,
-      time_until_reset: time_until_reset,
+      time_until_reset: time_until_reset || 0,
       cooldown: config[:cooldown]
     }
   end
@@ -239,9 +235,13 @@ class DataAcquisitionManager
           result = { success: false, error: "No active queries found for #{slug}" }
         end
       end
-    elsif config[:class] < ApplicationJob
-      # For ActiveJobs (like CrawlDiscoveryJob), enqueue them
-      config[:class].perform_later(slug, 'https://cord.com/search/jobs/software-developer', 'a[href*="/job/"]')
+    elsif config[:class].respond_to?(:perform_later)
+      # For ActiveJobs (like ImportJob), check signature or use a standard pattern
+      if config[:class] == EmailIngestion::ImportJob
+        config[:class].perform_later(slug.split('_').last)
+      else
+        config[:class].perform_later
+      end
       result = { success: true }
     else
       # For Service Objects
