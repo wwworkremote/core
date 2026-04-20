@@ -4,11 +4,15 @@ module Charts
   module Data
     class JobPostingsController < DataController
       def index
-        Rails.logger.info "DEBUG: Reached JobPostingsController#index with params: #{params.inspect}"
         @days = Integer(params['days'] || 1)
         @days = 1 unless @days.positive?
 
-        render json: JobPosting.where(published_at: @days.days.ago..).group_by_day(:published_at).count
+        # Use created_at for velocity monitoring since published_at can be missing or stale
+        if @days == 1
+          render json: JobPosting.where(created_at: 24.hours.ago..).group_by_hour(:created_at).count
+        else
+          render json: JobPosting.where(created_at: @days.days.ago..).group_by_day(:created_at).count
+        end
       end
 
       def corpus

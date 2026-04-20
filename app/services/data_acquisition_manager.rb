@@ -198,6 +198,10 @@ class DataAcquisitionManager
   def self.run(slug, force: false)
     config = FETCHERS[slug]
     return { error: 'Fetcher not found' } unless config
+    
+    if SystemSetting.paused? && !force
+      return { success: false, error: 'Pipelines are globally paused.' }
+    end
 
     # Ensure source exists and track the start of sync
     source = JobBoards::Source.find_or_create_by!(slug:) do |s|

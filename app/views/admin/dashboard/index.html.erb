@@ -2,103 +2,85 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
-    <h1 class="text-4xl font-black tracking-tight sparkle-ai mb-3">System Administration</h1>
-    <p class="text-slate-400 text-lg">Direct control over the core database records.</p>
+    <h1 class="text-4xl font-black tracking-tight sparkle-ai mb-3">Command Center</h1>
+    <p class="text-slate-400 text-lg uppercase tracking-widest text-[10px] font-bold">System Status: <%= @pipelines_paused ? "PAUSED (EMERGENCY_BRAKE_ENGAGED)" : "OPERATIONAL" %></p>
+  </div>
+  <div class="flex items-center gap-4">
+    <%= button_to admin_toggle_pause_path, method: :post, class: "group relative" do %>
+      <div class="px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] transition-all border-2 <%= @pipelines_paused ? 'bg-emerald-900/20 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'bg-rose-900/20 border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white shadow-[0_0_20px_rgba(255,85,85,0.2)]' %>">
+        <%= @pipelines_paused ? "DISENGAGE_BRAKE" : "EMERGENCY_STOP" %>
+      </div>
+    <% end %>
   </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-  <div class="card-neural p-8 text-center">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-600 mb-2">
-      <%= number_with_delimiter(@job_postings_count) %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Job Postings</div>
-    <div class="mt-4">
-      <%= link_to "Manage Postings", admin_job_postings_path, class: "btn-neural w-full block text-center" %>
-    </div>
+<!-- Key Metrics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+  <div class="card-neural p-8 border-b-4 border-b-blue-500">
+    <div class="text-3xl font-black text-white mb-1"><%= number_with_delimiter(@job_postings_count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Total_Nodes</div>
   </div>
-
-  <div class="card-neural p-8 text-center">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-emerald-300 to-emerald-600 mb-2">
-      <%= number_with_delimiter(@documents_count) %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Source Documents</div>
-    <div class="mt-4">
-      <%= link_to "Review Documents", admin_documents_path, class: "btn-neural w-full block text-center" %>
-    </div>
+  <div class="card-neural p-8 border-b-4 border-b-emerald-500">
+    <div class="text-3xl font-black text-white mb-1"><%= number_with_delimiter(@documents_count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Raw_Documents</div>
   </div>
-
-  <div class="card-neural p-8 text-center border border-primary/20 shadow-[0_0_30px_rgba(149,128,255,0.05)]">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary to-blue-500 mb-2">
-      <i class="bi bi-graph-up-arrow"></i>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Pipeline Health</div>
-    <div class="mt-4">
-      <%= link_to "Intelligence", admin_analytics_path, class: "btn-neural w-full block text-center !bg-primary/10 !text-primary !border-primary/20" %>
-    </div>
+  <div class="card-neural p-8 border-b-4 border-b-amber-500">
+    <div class="text-3xl font-black text-white mb-1"><%= number_with_delimiter(SolidQueue::Job.count) %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Active_Queue</div>
   </div>
-
-  <div class="card-neural p-8 text-center">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-300 to-amber-600 mb-2">
-      <%= number_with_delimiter(SolidQueue::Job.count) %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Pipeline Queue</div>
-    <div class="mt-4">
-      <%= link_to "Monitor Jobs", admin_jobs_path, class: "btn-neural w-full block text-center" %>
-    </div>
-  </div>
-
-  <div class="card-neural p-8 text-center">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-rose-300 to-rose-600 mb-2">
-      <%= @models_count %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">LLM Models</div>
-    <div class="mt-4">
-      <%= link_to "Model Registry", admin_models_path, class: "btn-neural w-full block text-center" %>
-    </div>
-  </div>
-
-  <div class="card-neural p-8 text-center">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-slate-300 to-slate-600 mb-2">
-      <%= @sources_count %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Sources</div>
-    <div class="mt-4">
-      <%= link_to "Ingestion Sources", admin_sources_path, class: "btn-neural w-full block text-center" %>
-    </div>
-  </div>
-
-  <div class="card-neural p-8 text-center border-t border-white/5 pt-8">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 mb-2">
-      <%= @visits_count %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">User Visits</div>
-    <div class="mt-4">
-      <%= link_to "Session Intelligence", admin_visits_path, class: "btn-neural w-full block text-center" %>
-    </div>
-  </div>
-
-  <div class="card-neural p-8 text-center border-t border-white/5 pt-8">
-    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-indigo-300 to-indigo-600 mb-2">
-      <%= @events_count %>
-    </div>
-    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Granular Events</div>
-    <div class="mt-4">
-      <%= link_to "Activity Registry", admin_events_path, class: "btn-neural w-full block text-center" %>
-    </div>
+  <div class="card-neural p-8 border-b-4 border-b-rose-500">
+    <div class="text-3xl font-black text-white mb-1"><%= @models_count %></div>
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Neural_Models</div>
   </div>
 </div>
 
+<!-- Real-time Intelligence Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+  <!-- Live Traffic Feed -->
+  <div class="lg:col-span-1 card-neural flex flex-col h-[500px]">
+    <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30">Live_Ingestion_Stream</h3>
+      <div class="flex gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar" id="live_ingestion">
+      <%= turbo_stream_from "admin_live_feed" %>
+      <% @recent_ingestions.each do |job| %>
+        <%= render "admin/dashboard/live_feed/job_posting", job_posting: job %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Ingestion Velocity -->
+  <div class="lg:col-span-2">
+    <%= render "admin/dashboard/ingestion_velocity" %>
+  </div>
+</div>
+
+<!-- Source Health Grid -->
 <%= render "admin/dashboard/pipeline_health" %>
 
-<div class="card-neural p-8">
-  <h2 class="text-xl font-bold text-white mb-4">Administration Guide</h2>
-  <div class="prose-invert">
-    <p>Welcome to the native Rails administration dashboard. This system replaces external dependencies to provide full control over styling, routing, and data presentation.</p>
-    <ul>
-      <li><strong>No Magic:</strong> Everything you see here is a standard Rails Controller and View.</li>
-      <li><strong>Consistent Styling:</strong> It seamlessly inherits the Dracula Pro "Command Center" theme.</li>
-      <li><strong>Performant:</strong> Data is queried efficiently using standard Active Record syntax.</li>
-    </ul>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div class="card-neural p-8">
+    <h2 class="text-xl font-bold text-white mb-4 uppercase tracking-tight">Command Guide</h2>
+    <div class="prose-invert text-sm text-slate-400 leading-relaxed">
+      <p>This dashboard is your real-time oversight layer for the autonomous ingestion engine.</p>
+      <ul class="list-disc pl-5 space-y-2 mt-4">
+        <li><strong>Emergency Stop:</strong> Instantly kills all background scraper and matching loops.</li>
+        <li><strong>Live Stream:</strong> Real-time visualization of new job discovery and ingestion.</li>
+        <li><strong>Velocity:</strong> Monitoring traffic patterns to detect upstream API throttling or blocks.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-neural p-8 flex flex-col justify-center items-center text-center">
+    <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-6">Internal_Registries</div>
+    <div class="grid grid-cols-2 gap-4 w-full">
+      <%= link_to "Jobs", admin_job_postings_path, class: "btn-admin" %>
+      <%= link_to "Models", admin_models_path, class: "btn-admin" %>
+      <%= link_to "Sources", admin_sources_path, class: "btn-admin" %>
+      <%= link_to "Visits", admin_visits_path, class: "btn-admin" %>
+    </div>
   </div>
 </div>

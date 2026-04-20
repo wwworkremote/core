@@ -87,7 +87,10 @@ class JobPosting < ApplicationRecord
   end
 
   # Real-time dashboard telemetry
-  after_create_commit -> { broadcast_replace_to "system_telemetry", target: "synthesis_stats", partial: "home/telemetry_synthesis" }
+  after_create_commit do
+    broadcast_replace_to "system_telemetry", target: "synthesis_stats", partial: "home/telemetry_synthesis"
+    broadcast_prepend_to "admin_live_feed", target: "live_ingestion", partial: "admin/dashboard/live_feed/job_posting", locals: { job_posting: self }
+  end
 
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source
 

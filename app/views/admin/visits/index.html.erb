@@ -7,7 +7,54 @@
   </div>
 </div>
 
-<div class="card-neural mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+  <div class="card-neural p-8">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Session_Velocity</h3>
+    <div class="h-64">
+      <%= line_chart charts_data_behavior_visits_path, 
+          height: "100%",
+          colors: ["#9580FF"],
+          library: { 
+            plugins: { legend: { display: false } },
+            scales: { 
+              y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#7970a9" } },
+              x: { grid: { display: false }, border: { display: false }, ticks: { color: "#7970a9" } }
+            }
+          } %>
+    </div>
+  </div>
+
+  <div class="card-neural p-8">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Acquisition_Sources</h3>
+    <div class="h-64">
+      <%= pie_chart charts_data_behavior_referrers_path, 
+          height: "100%",
+          colors: ["#80FFEA", "#8AFF80", "#FFCA80", "#FF80BF", "#9580FF"],
+          library: { 
+            plugins: { 
+              legend: { position: 'bottom', labels: { color: "#7970a9", font: { weight: 'bold', size: 10 } } }
+            }
+          } %>
+    </div>
+  </div>
+  <div class="card-neural p-8">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Engagement_Events</h3>
+    <div class="h-64">
+      <%= column_chart charts_data_behavior_events_path, 
+          height: "100%",
+          colors: ["#80FFEA"],
+          library: { 
+            plugins: { legend: { display: false } },
+            scales: { 
+              y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#7970a9" } },
+              x: { grid: { display: false }, border: { display: false }, ticks: { color: "#7970a9", font: { size: 8 } } }
+            }
+          } %>
+    </div>
+  </div>
+</div>
+
+<div class="card-neural mb-12">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
       <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">

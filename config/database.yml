@@ -17,8 +17,13 @@ development:
     replica: true
 
 test:
-  <<: *default
-  database: wwworkremote_test
+  primary:
+    <<: *default
+    database: wwworkremote_test
+  replica:
+    <<: *default
+    database: wwworkremote_test
+    replica: true
 
 production:
   primary:

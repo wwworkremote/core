@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_19_235911) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_20_005542) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -580,6 +580,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_19_235911) do
     t.index ["origin_id"], name: "index_sources_on_origin_id"
     t.index ["payload"], name: "index_sources_on_payload", opclass: :jsonb_path_ops, using: :gin
     t.index ["signature"], name: "index_sources_on_signature", unique: true
+  end
+
+  create_table "system_settings", force: :cascade do |t|
+    t.string "key"
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_system_settings_on_key"
   end
 
   create_table "target_domains", force: :cascade do |t|

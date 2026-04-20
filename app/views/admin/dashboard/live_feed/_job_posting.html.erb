@@ -1,0 +1,13 @@
+<div id="<%= dom_id(job_posting) %>" class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 animate-in fade-in slide-in-from-right duration-500">
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-400 text-[8px] font-black uppercase tracking-tighter">INGESTED</span>
+      <span class="text-[9px] font-bold text-slate-500 uppercase"><%= job_posting.source&.name || "EXTERNAL" %></span>
+    </div>
+    <div class="text-xs font-bold text-white truncate"><%= job_posting.title %></div>
+    <div class="text-[10px] text-slate-400 truncate"><%= job_posting.company %></div>
+  </div>
+  <div class="text-[8px] font-mono text-slate-600 whitespace-nowrap ml-4">
+    <%= Time.current.strftime("%H:%M:%S") %>
+  </div>
+</div>

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   end
   namespace :admin do
     root to: 'dashboard#index'
+    post 'toggle_pause' => 'dashboard#toggle_pause'
     get 'analytics' => 'analytics#index'
     get 'jobs' => 'jobs#index'
     resources :companies, only: %i[index show] do
@@ -70,6 +71,9 @@ Rails.application.routes.draw do
 
   namespace :charts do
     namespace :data, defaults: { format: :json }, constraints: { format: :json } do
+      get 'behavior/visits' => 'behavior#visits'
+      get 'behavior/events' => 'behavior#events'
+      get 'behavior/referrers' => 'behavior#referrers'
       get 'sources' => 'sources#index'
       get 'job_postings' => 'job_postings#index'
       get 'job_postings/corpus'

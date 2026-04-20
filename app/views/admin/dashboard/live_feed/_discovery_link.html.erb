@@ -1,0 +1,12 @@
+<div id="<%= dom_id(discovery_link) %>" class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 animate-in fade-in slide-in-from-right duration-500">
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="px-1.5 py-0.5 rounded bg-violet-900/30 text-violet-400 text-[8px] font-black uppercase tracking-tighter">DISCOVERED</span>
+      <span class="text-[9px] font-bold text-slate-500 uppercase"><%= discovery_link.board_name %></span>
+    </div>
+    <div class="text-[10px] text-slate-400 truncate"><%= discovery_link.url %></div>
+  </div>
+  <div class="text-[8px] font-mono text-slate-600 whitespace-nowrap ml-4">
+    <%= Time.current.strftime("%H:%M:%S") %>
+  </div>
+</div>

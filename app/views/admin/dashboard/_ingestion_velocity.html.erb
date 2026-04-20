@@ -1,0 +1,18 @@
+<div class="card-neural p-8 h-full">
+  <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30">Ingestion_Velocity</h3>
+    <div class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Jobs / Hour</div>
+  </div>
+  <div class="h-48">
+    <%= area_chart charts_data_job_postings_path, 
+        height: "100%",
+        colors: ["#80FFEA"],
+        library: { 
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#7970a9", font: { size: 9 } } },
+            x: { grid: { display: false }, border: { display: false }, ticks: { color: "#7970a9", font: { size: 9 } } }
+          }
+        } %>
+  </div>
+</div>

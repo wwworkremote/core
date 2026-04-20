@@ -2,6 +2,7 @@ class Llm::BatchMatchJob < ApplicationJob
   queue_as :default
 
   def perform(limit: 50)
+    return if SystemSetting.paused?
     admin_user = User.find_by!(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com'))
     return unless admin_user.career_profile&.resume_text.present?
 
