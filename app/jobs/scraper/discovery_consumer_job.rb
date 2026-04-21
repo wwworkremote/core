@@ -1,5 +1,6 @@
 class Scraper::DiscoveryConsumerJob < ApplicationJob
   queue_as :default
+  mediumweight!
 
   def perform
     # Pick up pending links and process them

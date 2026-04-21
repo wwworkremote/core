@@ -1,5 +1,7 @@
 class Llm::BatchMatchJob < ApplicationJob
   queue_as :default
+  heavyweight!
+  idempotent!
 
   def perform(limit: 50)
     return if SystemSetting.paused?

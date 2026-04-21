@@ -3,6 +3,8 @@
 module DataAcquisition
   class RunAllJob < ApplicationJob
     queue_as :default
+    mediumweight!
+    idempotent!
 
     def perform
       DataAcquisitionManager.run_all

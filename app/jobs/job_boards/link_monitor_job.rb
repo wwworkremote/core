@@ -3,6 +3,8 @@
 module JobBoards
   class LinkMonitorJob < ApplicationJob
     queue_as :default
+    lightweight!
+    idempotent!
 
     def perform(limit: 100)
       # Check active job postings that haven't been checked recently

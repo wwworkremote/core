@@ -1,4 +1,7 @@
 class LlmChatResponseJob < ApplicationJob
+  heavyweight!
+  idempotent! ->(chat_id, _content) { "chat/#{chat_id}" }
+
   def perform(llm_chat_id, content)
     llm_chat = LlmChat.find(llm_chat_id)
 

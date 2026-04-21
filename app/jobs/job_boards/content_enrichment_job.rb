@@ -3,6 +3,8 @@
 module JobBoards
   class ContentEnrichmentJob < ApplicationJob
     queue_as :default
+    mediumweight!
+    idempotent!
 
     def perform(limit: 50)
       # Find postings with missing bodies that haven't been archived

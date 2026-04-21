@@ -4,6 +4,8 @@ module JobBoards
   class GeocodingJob < ApplicationJob
     include ApiGuard
     queue_as :default
+    lightweight!
+    idempotent! ->(id) { "geocoding/#{id}" }
 
     def perform(job_posting_id)
       return if source_locked?('geocoding')

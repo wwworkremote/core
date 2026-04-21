@@ -12,30 +12,144 @@
   </div>
 </div>
 
+<!-- Golden Signals -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+  <div class="card-neural p-6 border-l-4 border-l-blue-500">
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Latency (Oldest Ready)</div>
+    <div class="text-2xl font-black text-white"><%= @latency %>s</div>
+  </div>
+  <div class="card-neural p-6 border-l-4 border-l-emerald-500">
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Throughput (RPM)</div>
+    <div class="text-2xl font-black text-white"><%= @throughput %> <small class="text-[10px] opacity-40 uppercase">jobs/m</small></div>
+  </div>
+  <div class="card-neural p-6 border-l-4 border-l-rose-500">
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Error Rate (1h)</div>
+    <div class="text-2xl font-black text-white"><%= @error_rate %>%</div>
+  </div>
+  <div class="card-neural p-6 border-l-4 border-l-amber-500">
+    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Saturation</div>
+    <div class="text-2xl font-black text-white"><%= @saturation %>%</div>
+  </div>
+</div>
+
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-  <div class="card-neural p-6 text-center">
-    <div class="text-2xl font-black text-white mb-1"><%= number_with_delimiter(@ready_count) %></div>
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Ready</div>
+  <div class="card-neural p-4 text-center bg-white/5">
+    <div class="text-xl font-black text-white mb-1"><%= number_with_delimiter(@ready_count) %></div>
+    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Ready</div>
   </div>
-  <div class="card-neural p-6 text-center">
-    <div class="text-2xl font-black text-blue-400 mb-1"><%= number_with_delimiter(@scheduled_count) %></div>
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Scheduled</div>
+  <div class="card-neural p-4 text-center bg-white/5">
+    <div class="text-xl font-black text-blue-400 mb-1"><%= number_with_delimiter(@scheduled_count) %></div>
+    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Scheduled</div>
   </div>
-  <div class="card-neural p-6 text-center">
-    <div class="text-2xl font-black text-amber-500 mb-1"><%= number_with_delimiter(@blocked_count) %></div>
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Blocked</div>
+  <div class="card-neural p-4 text-center bg-white/5">
+    <div class="text-xl font-black text-amber-500 mb-1"><%= number_with_delimiter(@blocked_count) %></div>
+    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Blocked</div>
   </div>
-  <div class="card-neural p-6 text-center border-rose-900/30">
-    <div class="text-2xl font-black text-rose-500 mb-1"><%= number_with_delimiter(@failed_count) %></div>
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Failed</div>
+  <div class="card-neural p-4 text-center bg-white/5 border-rose-900/30">
+    <div class="text-xl font-black text-rose-500 mb-1"><%= number_with_delimiter(@failed_count) %></div>
+    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Failed</div>
+  </div>
+</div>
+
+<!-- Recurring Schedule -->
+<div class="card-neural mb-12 overflow-hidden">
+  <div class="p-4 border-b border-white/5 bg-white/5">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Recurring Task Schedule</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-white/[0.02] border-b border-white/5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+        <tr>
+          <th class="px-6 py-3">Task Key</th>
+          <th class="px-6 py-3 text-center">Health</th>
+          <th class="px-6 py-3">Schedule</th>
+          <th class="px-6 py-3 text-right">Last Run</th>
+          <th class="px-6 py-3 text-right">Next Run</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-mono text-[10px]">
+        <% @recurring_tasks.each do |task| %>
+          <% 
+            last_run = @last_runs[task.class_name]
+            is_stale = last_run && last_run < 2.hours.ago # Threshold for alert
+          %>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <span class="text-primary font-bold"><%= task.key %></span>
+              <div class="text-[8px] text-slate-600 mt-0.5"><%= task.class_name %></div>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <% if last_run %>
+                <% if is_stale %>
+                   <span class="badge badge-warning badge-xs" title="Not seen in > 2 hours"></span>
+                <% else %>
+                   <span class="badge badge-success badge-xs"></span>
+                <% end %>
+              <% else %>
+                <span class="badge badge-ghost badge-xs opacity-20"></span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-slate-500"><%= task.schedule %></span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <span class="<%= is_stale ? 'text-rose-400' : 'text-slate-400' %>">
+                <%= last_run ? "#{time_ago_in_words(last_run)} ago" : "NEVER" %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <%
+                cron = Fugit::Cron.parse(task.schedule)
+                next_run = cron&.next_time&.to_t
+              %>
+              <% if next_run %>
+                <span class="text-emerald-500/80"><%= time_ago_in_words(next_run) %></span>
+              <% else %>
+                <span class="text-slate-600">--</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-  <div class="lg:col-span-1">
+  <div class="lg:col-span-1 space-y-8">
+    <div class="card-neural">
+      <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Process Heartbeats</h3>
+        <span class="badge badge-success badge-xs"></span>
+      </div>
+      <div class="divide-y divide-white/5 font-mono text-[10px]">
+        <% if @active_processes.any? %>
+          <% @active_processes.each do |proc| %>
+            <div class="px-4 py-3 group hover:bg-white/[0.03]">
+              <div class="flex justify-between items-start mb-1">
+                <span class="text-white font-bold"><%= proc.kind %></span>
+                <span class="text-[8px] text-slate-600">PID: <%= proc.pid %></span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-[8px] text-slate-500 truncate max-w-[120px]"><%= proc.hostname %></span>
+                <span class="text-[8px] <%= proc.last_heartbeat_at > 1.minute.ago ? 'text-emerald-500' : 'text-rose-500' %>">
+                  <%= time_ago_in_words(proc.last_heartbeat_at) %> ago
+                </span>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="px-6 py-8 text-center text-rose-500 font-black text-[9px] uppercase tracking-widest">
+            0_ACTIVE_PROCESSES
+            <div class="text-[8px] text-slate-600 mt-1 font-normal lowercase italic">Queue is currently orphaned.</div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <div class="card-neural">
       <div class="p-4 border-b border-white/5 bg-white/5">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Queues</h3>
+        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Queue Depth</h3>
       </div>
       <div class="divide-y divide-white/5 font-mono text-[11px]">
         <% if @queues.any? %>
@@ -50,6 +164,22 @@
         <% end %>
       </div>
     </div>
+
+    <% if @stalled_jobs.any? %>
+      <div class="card-neural border-rose-900/30">
+        <div class="p-4 border-b border-rose-900/30 bg-rose-900/10">
+          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">Stalled Pipelines (> 24h)</h3>
+        </div>
+        <div class="divide-y divide-white/5 font-mono text-[10px]">
+          <% @stalled_jobs.each do |class_name, last_run| %>
+            <div class="px-6 py-4 flex flex-col gap-1">
+              <span class="text-white font-bold"><%= class_name %></span>
+              <span class="text-rose-400 opacity-80">Last seen: <%= time_ago_in_words(last_run) %> ago</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <div class="lg:col-span-2">

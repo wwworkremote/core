@@ -2,6 +2,8 @@
 
 class DatabaseBackupJob < ApplicationJob
   queue_as :default
+  heavyweight!
+  idempotent!
 
   def perform
     timestamp = Time.current.strftime('%Y%m%d%H%M%S')
