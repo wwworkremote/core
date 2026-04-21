@@ -47,8 +47,8 @@
             INITIATE_APPLICATION_LINK
           <% end %>
           
-          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] text-base-content/40 hover:text-white" do %>
-            SOURCE_ORIGIN_VERIFY
+          <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] text-base-content/40 hover:text-white" do %>
+            SOURCE_ORIGIN_VERIFY_&_ENRICH
           <% end %>
         </div>
       <% end %>

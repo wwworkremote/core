@@ -82,6 +82,15 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :api do
+    resources :job_postings, only: [] do
+      member do
+        post :enrich
+      end
+    end
+    # ... other api routes ...
+  end
+
   mount PgHero::Engine, at: 'pghero'
   mount MissionControl::Jobs::Engine, at: '/jobs'
   get '/pages/*page' => 'pages#show'

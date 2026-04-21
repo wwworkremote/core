@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "WWWorkRemote Ingestion Assistant",
+  "version": "1.0",
+  "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "http://localhost:3010/*",
+    "https://www.linkedin.com/*",
+    "https://www.indeed.com/*",
+    "https://*.adzuna.com/*",
+    "https://weworkremotely.com/*",
+    "https://remoteok.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
