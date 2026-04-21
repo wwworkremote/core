@@ -47,14 +47,14 @@ Rails.application.configure do
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
-  # Highlight code that triggered database queries in logs.
-  config.active_record.verbose_query_logs = true
+  # Disable verbose query logs to reduce OTel log volume
+  config.active_record.verbose_query_logs = false
 
-  # Highlight code that enqueued background job in logs.
-  config.active_job.verbose_enqueue_logs = true
+  # Disable verbose enqueue logs
+  config.active_job.verbose_enqueue_logs = false
 
-  # Annotate rendered view with file names.
-  config.action_view.annotate_rendered_view_with_filenames = true
+  # Disable view annotations for clean logs
+  config.action_view.annotate_rendered_view_with_filenames = false
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
