@@ -4,21 +4,26 @@ class ApplicationJob < ActiveJob::Base
   # Solid Queue Concurrency Helpers
   
   def self.heavyweight!
-    limits_concurrency to: 2, group: "heavyweight", key: -> { self.class.name }
+    job_class = self.name
+    limits_concurrency to: 2, group: "heavyweight", key: ->(*_args) { job_class }
   end
 
   def self.mediumweight!
-    limits_concurrency to: 5, group: "mediumweight", key: -> { self.class.name }
+    job_class = self.name
+    limits_concurrency to: 5, group: "mediumweight", key: ->(*_args) { job_class }
   end
 
   def self.lightweight!
-    limits_concurrency to: 20, group: "lightweight", key: -> { self.class.name }
+    job_class = self.name
+    limits_concurrency to: 20, group: "lightweight", key: ->(*_args) { job_class }
   end
 
   # Ensures only one instance of this job with these arguments can be enqueued or running
   def self.idempotent!(key_proc = nil)
+    job_class = self.name
     # Default key is the job class + arguments if no proc provided
-    key_proc ||= ->(job) { "#{job.class.name}/#{job.arguments.join('-')}" }
+    # The key proc receives the JOB ARGUMENTS as separate arguments
+    key_proc ||= ->(*args) { "#{job_class}/#{args.join('-')}" }
     limits_concurrency key: key_proc
   end
 end
