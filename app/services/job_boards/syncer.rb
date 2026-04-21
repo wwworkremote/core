@@ -33,7 +33,11 @@ module JobBoards
       data = JSON.parse(doc.document)
 
       origin = Origin.find_or_create_by!(name: source.name)
-      dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
+      # Ensure the dashboard Source has a name for telemetry/UI visibility
+      dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") do |s| 
+        s.origin = origin
+        s.name = source.name # jsonb_accessor will put this in the event field
+      end
 
       # Use a transaction and rescue uniqueness errors for high-concurrency safety
       begin
