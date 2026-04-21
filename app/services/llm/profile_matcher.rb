@@ -59,11 +59,12 @@ module Llm
         task_instructions: "Return a structured markdown analysis. Be honest, critical, and efficient."
       )
 
-      if result[:success]
+      if result[:success] && result[:output].present?
         user_job.update!(match_analysis: result[:output])
         
         # Try to extract numerical score (e.g. 85%)
         score_match = result[:output].match(/MATCH_CONFIDENCE.*?(\d+)%/i)
+        score = 0
         if score_match
           score = score_match[1].to_i
           user_job.update!(priority_flag: true) if score >= 80
@@ -71,7 +72,9 @@ module Llm
 
         { success: true, output: result[:output], score: score }
       else
-        { success: false, error: result[:error] }
+        error_msg = result[:error] || "LLM returned empty response"
+        Rails.logger.error "[ProfileMatcher] Failed for Job #{job_posting.id}: #{error_msg}"
+        { success: false, error: error_msg }
       end
     end
   end

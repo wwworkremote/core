@@ -63,6 +63,16 @@ module Llm
       
       chat = @chat || LlmChat.create!(model: model)
       
+      # If this is a new or empty chat, establish the context
+      # If untrusted_text was provided and not yet in messages, add it as a user message
+      if chat.llm_messages.empty?
+        chat.llm_messages.create!(role: 'system', content: @system_rules) if @system_rules.present?
+        chat.llm_messages.create!(role: 'user', content: "#{sanitized_text}\n\n#{@task_instructions}")
+      elsif sanitized_text.present? && chat.llm_messages.where(role: 'user').last&.content != sanitized_text
+        # Optional: Add the latest prompt if it is different from the last message
+        # In most chat loops, the user message is already added before the job is enqueued.
+      end
+
       # Correct RubyLLM registry resolution
       provider_map = {
         anthropic: RubyLLM::Providers::Anthropic,
@@ -97,17 +107,26 @@ module Llm
         )
       end
 
+      full_output = String.new
+
       # Use the native complete pattern to stream content directly
       client.complete(
         llm_messages,
         tools: [],
         temperature: 0.7,
-        model: OpenStruct.new(id: model.model_id),
-        &block
-      )
+        model: OpenStruct.new(id: model.model_id)
+      ) do |chunk|
+        # chunk is a RubyLLM::Chunk object, we need its content
+        text = chunk.content.to_s
+        full_output << text
+        yield text if block_given?
+      end
+
+      # Save the final response to the chat history
+      chat.llm_messages.create!(role: 'assistant', content: full_output) if full_output.present?
       
       span.add_event('received_llm_response')
-      { success: true, model: model.model_id }
+      { success: true, model: model.model_id, output: full_output }
     end
 
     def format_failure(reason)
