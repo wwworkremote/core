@@ -58,6 +58,7 @@ Rails.application.routes.draw do
       post :run
       post :run_all_by_type
       post :audit
+      post :enrich
     end
   end
 

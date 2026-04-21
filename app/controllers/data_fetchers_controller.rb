@@ -48,4 +48,10 @@ class DataFetchersController < ApplicationController
     flash[:notice] = 'Audit and repair job has been enqueued.'
     redirect_to data_fetchers_path
   end
+
+  def enrich
+    JobBoards::ContentEnrichmentJob.perform_later
+    flash[:notice] = 'Content enrichment pipeline triggered.'
+    redirect_to data_fetchers_path
+  end
 end

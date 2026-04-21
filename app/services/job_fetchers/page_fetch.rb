@@ -49,6 +49,11 @@ module JobFetchers
       Playwright.create(playwright_cli_executable_path: `which playwright`.strip) do |playwright|
         playwright.chromium.launch(headless: true) do |browser|
           page = browser.new_page(user_agent: USER_AGENT)
+          
+          # Optional: Intercept API calls if needed for specific providers
+          interceptor = Scraper::Crawler::ApiInterceptor.new(page)
+          interceptor.start_capturing
+
           page.goto(@url, wait_until: 'networkidle')
 
           # Wait for meaningful content
@@ -61,7 +66,8 @@ module JobFetchers
           {
             content: page.content,
             final_url: page.url,
-            fetch_mode: 'playwright'
+            fetch_mode: 'playwright',
+            api_calls: interceptor.captured_calls
           }
         end
       end

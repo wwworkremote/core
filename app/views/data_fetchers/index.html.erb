@@ -5,6 +5,20 @@
     <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Pipeline Orchestration</h1>
     <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Data Ingestion & Fetcher Registry</p>
   </div>
+  <div class="flex gap-4">
+    <% pending_enrichment = JobPosting.where(body: [nil, ""]).where.not(status: "archived").count %>
+    <% if pending_enrichment > 0 %>
+      <div class="card-neural bg-amber-900/10 border-amber-900/30 px-6 py-2 flex items-center gap-4">
+        <div>
+          <div class="text-[8px] font-black text-amber-500 uppercase">Pending Enrichment</div>
+          <div class="text-lg font-black text-white"><%= pending_enrichment %></div>
+        </div>
+        <%= button_to "START_ENRICHMENT", enrich_data_fetchers_path, class: "btn btn-xs rounded-lg bg-amber-500 text-black border-none font-black text-[9px]" %>
+      </div>
+    <% end %>
+    
+    <%= button_to "RUN_AUDIT", audit_data_fetchers_path, class: "btn-admin bg-white/5 hover:bg-white/10" %>
+  </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
