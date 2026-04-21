@@ -1,10 +1,27 @@
-Task: Categorize the following job posting.
+Task: Perform a deep analysis of the following job posting.
 
-Rules:
+Classification Rules:
 1. The "category" MUST be exactly one of: <%= JobBoards::Categorizer::CATEGORIES.join(', ') %>.
-2. If unsure, use "Other".
-3. The "tags" should be 1-5 technical keywords.
-4. Return ONLY valid JSON. No preamble, no explanation.
+2. The "tags" should be 1-5 technical keywords.
+
+Remote Analysis Rules:
+1. "is_remote": Set to true ONLY if the role is 100% remote. Set to false if it mentions "hybrid", "on-site", or "relocation required".
+2. "remote_nuance": A brief summary of the remote policy (e.g., "Worldwide", "US Only", "Hybrid - 3 days in office", "Digital Nomad Friendly").
+
+Salary Extraction Rules:
+1. "salary_min": The lowest annual salary mentioned (as a whole integer). Null if not found.
+2. "salary_max": The highest annual salary mentioned (as a whole integer). Null if not found.
+3. "currency": The currency code (e.g., "USD", "EUR", "GBP").
+
+Return ONLY valid JSON. No preamble, no explanation.
 
 Expected JSON Format:
-{"category": "Software Engineering", "tags": ["ruby", "rails"]}
+{
+  "category": "Software Engineering",
+  "tags": ["ruby", "rails"],
+  "is_remote": true,
+  "remote_nuance": "US Only",
+  "salary_min": 140000,
+  "salary_max": 180000,
+  "currency": "USD"
+}

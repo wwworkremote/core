@@ -27,7 +27,14 @@ module JobBoards
         if parsed
           @job_posting.update(
             tags: parsed['tags'],
-            data: @job_posting.data.merge('ai_category' => parsed['category'])
+            data: @job_posting.data.merge(
+              'ai_category' => parsed['category'],
+              'is_remote' => parsed['is_remote'],
+              'remote_nuance' => parsed['remote_nuance'],
+              'salary_min' => parsed['salary_min'],
+              'salary_max' => parsed['salary_max'],
+              'currency' => parsed['currency']
+            )
           )
         end
       else
