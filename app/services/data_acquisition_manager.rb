@@ -199,10 +199,15 @@ class DataAcquisitionManager
       return { success: false, error: 'Pipelines are globally paused.' }
     end
 
-    # Ensure source exists and track the start of sync
-    source = JobBoards::Source.find_or_create_by!(slug:) do |s|
-      s.name = config[:name]
+    # Ensure source exists with race condition handling
+    begin
+      source = JobBoards::Source.find_or_create_by!(slug:) do |s|
+        s.name = config[:name]
+      end
+    rescue ActiveRecord::RecordNotUnique
+      retry
     end
+
     source.update!(last_synced_at: Time.current)
 
     if config[:class] == Scraper::CrawlDiscoveryJob

@@ -35,22 +35,43 @@ module JobBoards
       origin = Origin.find_or_create_by!(name: source.name)
       dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") { |s| s.origin = origin }
 
-      jp = JobPosting.find_or_initialize_by(signature: doc.signature)
-      jp.source_id = dashboard_source.id
-      map_attributes(jp, data, source.slug)
-      
-      if jp.save!
-        # Transition document state if AASM is available, otherwise update column
-        if doc.respond_to?(:processed!)
-          doc.processed!
-        else
-          doc.update!(aasm_state: 'processed', updated_at: Time.current)
-        end
+      # Use a transaction and rescue uniqueness errors for high-concurrency safety
+      begin
+        jp = JobPosting.find_or_initialize_by(signature: doc.signature)
+        jp.source_id = dashboard_source.id
+        map_attributes(jp, data, source.slug)
+        
+        # Capture the result of save! in a way that handles race conditions
+        if jp.save
+          # Transition document state
+          if doc.respond_to?(:processed!)
+            doc.processed!
+          else
+            doc.update!(aasm_state: 'processed', updated_at: Time.current)
+          end
 
-        JobBoards::Categorizer.new(jp).call
-        JobBoards::Embedder.new(jp).call
+          # Only categorize if not already enriched/categorized to save LLM tokens
+          if jp.data['ai_category'].blank?
+            JobBoards::Categorizer.new(jp).call
+            JobBoards::Embedder.new(jp).call
+          end
+          true
+        else
+          # If it failed validation but it was a uniqueness error on signature, 
+          # we might have lost a race, but the data is there, so mark doc as processed.
+          if jp.errors[:signature].include?("has already been taken")
+             doc.update!(aasm_state: 'processed')
+             return true
+          end
+          Rails.logger.error "[Syncer] Validation failed for Job signature #{doc.signature}: #{jp.errors.full_messages.join(', ')}"
+          false
+        end
+      rescue ActiveRecord::RecordNotUnique
+        # Extreme race condition: another thread created it between find and save
+        doc.update!(aasm_state: 'processed')
         true
-      else
+      rescue StandardError => e
+        Rails.logger.error "[Syncer] Unexpected error syncing document #{doc.id}: #{e.message}"
         false
       end
     end

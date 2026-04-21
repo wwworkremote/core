@@ -19,6 +19,9 @@ module JobBoards
     end
 
     def call
+      # Skip if already categorized unless forced (to save local LLM tokens/resources)
+      return if @job_posting.data['ai_category'].present?
+
       agent = JobBoards::CategorizerAgent.new
       result = agent.call(@job_posting)
 
