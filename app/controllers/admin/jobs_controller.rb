@@ -80,8 +80,18 @@ module Admin
 
     def discard
       @job = SolidQueue::Job.find(params[:id])
+      
+      # If the job is claimed (in progress), we need to remove the claim record first
+      # to satisfy Solid Queue's integrity checks for discarding.
+      SolidQueue::ClaimedExecution.where(job_id: @job.id).destroy_all
+      
       @job.discard
-      flash[:notice] = "🚀 Job ##{@job.id} discarded."
+      flash[:notice] = "🚀 Job ##{@job.id} terminated and discarded."
+    rescue ActiveRecord::RecordNotFound
+      flash[:alert] = "Job not found."
+    rescue StandardError => e
+      flash[:alert] = "Failed to discard: #{e.message}"
+    ensure
       redirect_to admin_jobs_path
     end
 
