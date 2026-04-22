@@ -8,6 +8,30 @@ This project uses **RubyLLM 1.14.x** as a unified interface for AI providers.
 - **Persistence:** `LlmChat` and `LlmMessage` ActiveRecord models.
 - **Admin:** Managed via Rails Admin Namespace at `/admin`.
 
+## Ecosystem & Observability
+
+This project leverages several RubyLLM ecosystem projects for enhanced functionality and visibility:
+
+### Structured Data (`RubyLLM::Schema`)
+Used for defining precise JSON schemas for LLM structured outputs and function calling.
+- **Example:** Defining job categorization schemas.
+
+### Instrumentation (`RubyLLM::Instrumentation`)
+Exposes RubyLLM events via `ActiveSupport::Notifications`. Key events:
+- `complete_chat.ruby_llm`
+- `execute_tool.ruby_llm`
+- `embed_text.ruby_llm`
+
+### OpenTelemetry
+Full observability into LLM applications via `opentelemetry-instrumentation-ruby_llm`.
+- **Traces:** Chat completions and tool call flows.
+- **Metrics:** Token usage (input/output) and Step durations.
+- **Error Tracking:** Automatic recording of LLM-specific failures.
+
+To see these traces, check the **Automation** tab in the Admin dashboard or your configured OTLP backend.
+
+---
+
 ## Local Inference — llama.cpp
 
 The primary local model runs via a **native llama.cpp server** managed by `llama-ctl`.

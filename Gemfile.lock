@@ -540,6 +540,9 @@ GEM
       opentelemetry-instrumentation-base (~> 0.25)
     opentelemetry-instrumentation-ruby_kafka (0.25.0)
       opentelemetry-instrumentation-base (~> 0.25)
+    opentelemetry-instrumentation-ruby_llm (0.4.0)
+      opentelemetry-api (~> 1.0)
+      opentelemetry-instrumentation-base (~> 0.23)
     opentelemetry-instrumentation-sidekiq (0.29.0)
       opentelemetry-instrumentation-base (~> 0.25)
     opentelemetry-instrumentation-sinatra (0.30.0)
@@ -762,6 +765,9 @@ GEM
       marcel (~> 1)
       ruby_llm-schema (~> 0)
       zeitwerk (~> 2)
+    ruby_llm-instrumentation (0.3.1)
+      rails (>= 7.2.0)
+      ruby_llm
     ruby_llm-schema (0.3.0)
     rubyzip (3.2.2)
     safely_block (1.0.0)
@@ -916,6 +922,7 @@ DEPENDENCIES
   opentelemetry-api
   opentelemetry-exporter-otlp
   opentelemetry-instrumentation-all
+  opentelemetry-instrumentation-ruby_llm
   opentelemetry-sdk
   overcommit
   pagy
@@ -948,6 +955,8 @@ DEPENDENCIES
   rubocop-rubycw
   rubocop-thread_safety
   ruby_llm
+  ruby_llm-instrumentation
+  ruby_llm-schema
   selenium-webdriver
   shoulda-matchers
   simplecov
@@ -1161,6 +1170,7 @@ CHECKSUMS
   opentelemetry-instrumentation-resque (0.9.0) sha256=c79de5ed739ebe8acc9e13f0c69d6b2b81266806a3b3fec6cb6a8ef8151a0e05
   opentelemetry-instrumentation-restclient (0.28.0) sha256=749b76d46c85a78882d924ba2edeff408f50def33099a67d95d88ddc4fa10307
   opentelemetry-instrumentation-ruby_kafka (0.25.0) sha256=33ceccd5cef4f648e652fa45896d0b014da1a71b3a80f17064829ee5aa84e285
+  opentelemetry-instrumentation-ruby_llm (0.4.0) sha256=9c7b0460425c832f55421129bec180486e26b5b019948b8ac7d9597713d9e48a
   opentelemetry-instrumentation-sidekiq (0.29.0) sha256=b1d2a0cb9041a5e14239fe7c94d99e3dd07f870e2759460ab63592d7cdd8aadc
   opentelemetry-instrumentation-sinatra (0.30.0) sha256=b67301153420f43264a0c68cdb3ca5bd77467cf5054e57b83a2bf891aaaa0361
   opentelemetry-instrumentation-trilogy (0.68.0) sha256=24b31efdf21a08644ad26038b574f4b0876195b1502f3f64b1065eff3fe0f588
@@ -1235,6 +1245,7 @@ CHECKSUMS
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   ruby-vips (2.3.0) sha256=e685ec02c13969912debbd98019e50492e12989282da5f37d05f5471442f5374
   ruby_llm (1.14.1) sha256=7487d0f0bb9e86836d9233d656e10637370a6b22eb2555343c0a4c179ce7c500
+  ruby_llm-instrumentation (0.3.1) sha256=010d5968a4cd82e13f373b00326083544ddb3f74ab0d649b729b352fbc83d1b2
   ruby_llm-schema (0.3.0) sha256=a591edc5ca1b7f0304f0e2261de61ba4b3bea17be09f5cf7558153adfda3dec6
   rubyzip (3.2.2) sha256=c0ed99385f0625415c8f05bcae33fe649ed2952894a95ff8b08f26ca57ea5b3c
   safely_block (1.0.0) sha256=bea80e084e620adeada62fd98cf461bbb9888d40dc0f06d337df9d01e1a658e5

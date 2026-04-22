@@ -25,6 +25,7 @@ Rails.application.config.after_initialize do
       c.use 'OpenTelemetry::Instrumentation::Rails'
       c.use 'OpenTelemetry::Instrumentation::PG'
       c.use 'OpenTelemetry::Instrumentation::Faraday'
+      c.use 'OpenTelemetry::Instrumentation::RubyLLM'
     end
   rescue StandardError => e
     Rails.logger.warn "[OTel] Failed to initialize: #{e.message}"
