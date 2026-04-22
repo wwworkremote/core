@@ -66,8 +66,8 @@ erDiagram
     JobPosting }o--|| JobBoardsSource : "originated from"
     JobPosting ||--o{ TargetDomain : "targets"
     TargetDomain }o--|| Domain : "belongs to"
-    LlmChat ||--o{ LlmMessage : "contains"
-    LlmChat }o--|| Model : "uses"
+    LLMChat ||--o{ LLMMessage : "contains"
+    LLMChat }o--|| Model : "uses"
     EmailImportRecord ||--o{ JobBoardsDocument : "references"
 ```
 

@@ -32,7 +32,7 @@ class LLMChatsController < ApplicationController
 
   def destroy
     @llm_chat.destroy!
-    redirect_to llm_chats_path, notice: "Llmchat was successfully destroyed.", status: :see_other
+    redirect_to llm_chats_path, notice: "LLMchat was successfully destroyed.", status: :see_other
   end
 
   private

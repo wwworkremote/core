@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateLlmMessages < ActiveRecord::Migration[8.0]
+class CreateLLMMessages < ActiveRecord::Migration[8.0]
   def change
     create_table :llm_messages do |t|
       t.string :role, null: false

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddReferencesToLlmChatsToolCallsAndLlmMessages < ActiveRecord::Migration[8.0]
+class AddReferencesToLLMChatsToolCallsAndLLMMessages < ActiveRecord::Migration[8.0]
   def change
     add_reference :llm_chats, :model, foreign_key: true
     add_reference :tool_calls, :llm_message, null: true, foreign_key: true

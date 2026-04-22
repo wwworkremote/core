@@ -9,7 +9,7 @@ module Admin
       @failed_count = SolidQueue::FailedExecution.count
       
       # Correlate YAML schedule with actual executions
-      @scheduler_info = LLM::JobSchedulerInspector.call
+      @scheduler_info = ::LLM::JobSchedulerInspector.call
 
       # Recurring Tasks & Schedules
       @recurring_tasks = SolidQueue::RecurringTask.all

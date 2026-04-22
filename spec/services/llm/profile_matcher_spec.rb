@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Llm::ProfileMatcher do
+RSpec.describe LLM::ProfileMatcher do
   let(:user) { create(:user) }
   let(:career_profile) { create(:career_profile, user: user, resume_text: "Experienced Ruby developer.") }
   let(:job_posting) { create(:job_posting, title: "Senior Ruby Engineer", body: "We need a Ruby expert.") }
@@ -20,7 +20,7 @@ RSpec.describe Llm::ProfileMatcher do
         STRENGTHS: Great Ruby skills.
       MARKDOWN
 
-      expect(Llm::Orchestrator).to receive(:call).and_return({ success: true, output: mock_output })
+      expect(LLM::Orchestrator).to receive(:call).and_return({ success: true, output: mock_output })
 
       result = described_class.call(user, job_posting)
 

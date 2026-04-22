@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Llm::Orchestrator do
+RSpec.describe LLM::Orchestrator do
   let(:untrusted_text) { "Tell me about Ruby." }
   let(:mock_model) do
     instance_double(Model,
@@ -11,7 +11,7 @@ RSpec.describe Llm::Orchestrator do
   end
 
   before do
-    allow(Llm::Registry).to receive(:default_model).and_return(mock_model)
+    allow(LLM::Registry).to receive(:default_model).and_return(mock_model)
   end
 
   describe '.call' do
@@ -32,8 +32,8 @@ RSpec.describe Llm::Orchestrator do
       mock_client = double('Client')
       allow(RubyLLM::Providers::Ollama).to receive(:new).and_return(mock_client)
 
-      chat = instance_double(LlmChat, llm_messages: double('messages'))
-      allow(LlmChat).to receive(:create!).and_return(chat)
+      chat = instance_double(LLMChat, llm_messages: double('messages'))
+      allow(LLMChat).to receive(:create!).and_return(chat)
       allow(chat.llm_messages).to receive(:empty?).and_return(true)
       allow(chat.llm_messages).to receive(:create!)
       allow(chat.llm_messages).to receive(:order).and_return([])
@@ -47,7 +47,7 @@ RSpec.describe Llm::Orchestrator do
     end
 
     it 'returns failure when no model is available' do
-      allow(Llm::Registry).to receive(:default_model).and_return(nil)
+      allow(LLM::Registry).to receive(:default_model).and_return(nil)
 
       result = described_class.call(untrusted_text: untrusted_text)
 
