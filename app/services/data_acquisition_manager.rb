@@ -75,13 +75,13 @@ class DataAcquisitionManager
       type: 'Scraper'
     },
     'dice' => {
-      class: Scraper::CrawlDiscoveryJob,
+      class: Scraper::Dice::ApiClient,
       cooldown: 2.hours,
       name: 'Dice',
       type: 'Scraper'
     },
     'glassdoor' => {
-      class: Scraper::CrawlDiscoveryJob,
+      class: Scraper::Glassdoor::ApiClient,
       cooldown: 4.hours,
       name: 'Glassdoor',
       type: 'Scraper'
