@@ -73,6 +73,11 @@ module Admin
       redirect_to admin_jobs_path
     end
 
+    def details
+      @job = SolidQueue::Job.find(params[:id])
+      render layout: false
+    end
+
     private
 
     def calculate_latency

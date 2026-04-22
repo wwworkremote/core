@@ -169,7 +169,26 @@
         <tbody class="divide-y divide-rose-500/10 font-mono text-[10px]">
           <% @running_too_long.each do |claimed| %>
             <tr class="hover:bg-rose-500/[0.03]">
-              <td class="px-6 py-4 text-rose-300 font-bold">#<%= claimed.job_id %></td>
+              <td class="px-6 py-4">
+                <button onclick="job_details_modal_<%= claimed.job_id %>.showModal()" class="text-rose-300 font-bold hover:underline">
+                  #<%= claimed.job_id %>
+                </button>
+
+                <dialog id="job_details_modal_<%= claimed.job_id %>" class="modal">
+                  <div class="modal-box p-0 max-w-2xl border border-white/10 overflow-hidden shadow-2xl">
+                    <%= turbo_frame_tag "job_details_#{claimed.job_id}", src: details_admin_job_path(claimed.job_id), loading: :lazy do %>
+                      <div class="p-20 text-center">
+                        <span class="loading loading-spinner loading-lg text-primary"></span>
+                      </div>
+                    <% end %>
+                    <div class="modal-action p-4 bg-slate-900 border-t border-white/5 mt-0">
+                      <form method="dialog">
+                        <button class="btn btn-sm btn-ghost uppercase tracking-widest text-[10px]">Close_Inspector</button>
+                      </form>
+                    </div>
+                  </div>
+                </dialog>
+              </td>
               <td class="px-6 py-4 text-slate-300"><%= claimed.job.class_name %></td>
               <td class="px-6 py-4 text-right font-black text-rose-500 uppercase tracking-tighter">
                 <%= ((Time.current - claimed.created_at)/60).round(1) %> mins

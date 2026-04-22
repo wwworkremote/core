@@ -1,0 +1,47 @@
+<div class="p-6 bg-slate-900 text-slate-300 font-mono text-xs">
+  <div class="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+    <div>
+      <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">System_Job_Signature</div>
+      <div class="text-lg font-black text-white"><%= @job.class_name %></div>
+    </div>
+    <div class="text-right">
+      <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Queue_Placement</div>
+      <div class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 inline-block font-black"><%= @job.queue_name.upcase %></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-8 mb-8">
+    <div>
+      <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Execution_Metadata</div>
+      <div class="space-y-2">
+        <div class="flex justify-between">
+          <span class="opacity-50">Active_Job_ID:</span>
+          <span class="text-slate-400"><%= @job.active_job_id %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="opacity-50">Created_At:</span>
+          <span class="text-slate-400"><%= @job.created_at.strftime("%Y-%m-%d %H:%M:%S") %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="opacity-50">Priority:</span>
+          <span class="text-slate-400"><%= @job.priority %></span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Concurrency_Control</div>
+      <div class="p-3 bg-white/5 rounded border border-white/5 text-[10px]">
+        <%= @job.concurrency_key || "UNRESTRICTED_EXECUTION" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    <div>
+      <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Payload_Arguments</div>
+      <div class="p-4 bg-black/40 rounded-xl border border-white/5 max-h-[300px] overflow-y-auto">
+        <pre class="text-blue-300"><code><%= JSON.pretty_generate(JSON.parse(@job.arguments)) rescue @job.arguments %></code></pre>
+      </div>
+    </div>
+  </div>
+</div>

@@ -31,6 +31,9 @@ Rails.application.routes.draw do
         post :trigger
         post :prune
       end
+      member do
+        get :details
+      end
     end
     resources :companies, only: %i[index show] do
     resources :company_pipeline_steps, only: [:create]
