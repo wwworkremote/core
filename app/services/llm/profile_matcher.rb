@@ -54,6 +54,9 @@ module LLM
         [STRUCTURED_EXPERIENCE]
         #{experiences_context}
 
+        [TECHNICAL_EVIDENCE_GITHUB]
+        #{profile.github_context&.dig('synthesis') || 'No GitHub context available.'}
+
         [ATTACHED_DOCUMENTS]
         #{extra_documents}
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_20_005542) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_22_221755) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -114,6 +114,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_20_005542) do
     t.jsonb "contact_info"
     t.jsonb "location_info"
     t.vector "embedding", limit: 3584
+    t.string "github_url"
+    t.jsonb "github_context"
     t.index ["user_id"], name: "index_career_profiles_on_user_id"
   end
 

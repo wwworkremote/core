@@ -6,6 +6,8 @@
 #  contact_info     :jsonb
 #  embedding        :vector(3584)
 #  experience_level :string
+#  github_context   :jsonb
+#  github_url       :string
 #  goals            :text
 #  location_info    :jsonb
 #  resume_text      :text
