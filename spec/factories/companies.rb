@@ -2,12 +2,16 @@
 #
 # Table name: companies
 #
-#  id         :bigint           not null, primary key
-#  name       :string
-#  slug       :string
-#  status     :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id                 :bigint           not null, primary key
+#  disposition        :string
+#  glassdoor_data     :jsonb
+#  name               :string
+#  sentiment_score    :float
+#  slug               :string
+#  status             :string
+#  toxic_culture_flag :boolean
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
 #
 # Indexes
 #

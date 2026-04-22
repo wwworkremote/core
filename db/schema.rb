@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_22_221755) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_22_223825) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -125,6 +125,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_221755) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "glassdoor_data"
+    t.float "sentiment_score"
+    t.string "disposition"
+    t.boolean "toxic_culture_flag"
     t.index ["slug"], name: "index_companies_on_slug"
   end
 

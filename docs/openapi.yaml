@@ -1,0 +1,74 @@
+openapi: 3.1.0
+info:
+  title: WWWorkRemote Extension API
+  description: API for the WWWorkRemote Chrome extension to submit and enrich job postings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:3010/api/v0
+    description: Local development server
+paths:
+  /job_postings:
+    post:
+      summary: Create or Upsert a job posting
+      description: Ingests a new job from any board using a generated signature based on the URL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, target_url]
+              properties:
+                title:
+                  type: string
+                  example: "Senior Ruby on Rails Engineer"
+                company:
+                  type: string
+                  example: "Acme Corp"
+                location:
+                  type: string
+                  example: "Remote (Global)"
+                target_url:
+                  type: string
+                  format: uri
+                body:
+                  type: string
+                  description: Full job description text
+                data:
+                  type: object
+                  description: Arbitrary metadata from the board
+      responses:
+        '201':
+          description: Created or updated successfully
+        '422':
+          description: Validation error
+
+  /job_postings/{id}/enrich:
+    post:
+      summary: Enrich an existing job posting
+      description: Updates an existing record with rich context found via the browser extension.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                data:
+                  type: object
+                realign:
+                  type: boolean
+                  description: If true, re-triggers AI alignment analysis
+      responses:
+        '200':
+          description: Enriched successfully
+        '404':
+          description: Job not found

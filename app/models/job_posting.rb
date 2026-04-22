@@ -89,6 +89,10 @@ class JobPosting < ApplicationRecord
     end
   end
 
+  def company_record
+    @company_record ||= Company.find_by(name: company)
+  end
+
   # Real-time dashboard telemetry
   after_create_commit do
     broadcast_replace_to "system_telemetry", target: "synthesis_stats", partial: "home/telemetry_synthesis"

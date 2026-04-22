@@ -30,6 +30,7 @@ Today, WWWorkRemote is a high-performance, autonomous engine built on **Rails 8*
 We utilize a multi-source ingestion strategy:
 - **API Fetchers**: Direct integrations with Adzuna, LinkedIn, Indeed, Remotive, and HackerNews.
 - **Email Ingestion**: A unique local adapter that scans `~/.wwworkremote/` for `.eml` files, extracting canonical links from tracker-heavy emails.
+- **Ingestion Assistant**: A Chrome Extension for real-time rich enrichment and universal job submission from any board.
 
 ### 2. The "Captain Caveman" LLM Strategy
 We follow a strict "Local First, Frontier Fallback" rule:
@@ -61,14 +62,17 @@ Built on **Falcon**, our server operates in a single-process, fiber-based thread
 
 ```mermaid
 erDiagram
+    User ||--o{ UserJobPosting : "tracks"
+    User ||--o{ LLMChat : "owns"
+    User ||--|| CareerProfile : "has"
+    CareerProfile ||--o{ WorkExperience : "contains"
+    CareerProfile ||--o{ ActiveStorageAttachment : "has many resumes"
     JobBoardsSource ||--o{ JobBoardsQuery : "has"
     JobBoardsQuery ||--o{ JobBoardsDocument : "contains"
     JobPosting }o--|| JobBoardsSource : "originated from"
-    JobPosting ||--o{ TargetDomain : "targets"
-    TargetDomain }o--|| Domain : "belongs to"
+    JobPosting ||--o{ UserJobPosting : "referenced by"
     LLMChat ||--o{ LLMMessage : "contains"
     LLMChat }o--|| Model : "uses"
-    EmailImportRecord ||--o{ JobBoardsDocument : "references"
 ```
 
 ---
@@ -78,7 +82,10 @@ erDiagram
 ### Prerequisites
 - PostgreSQL 16+
 - llama.cpp server running on `localhost:8080`
-- Redis (for ActionCable/Solid Queue)
+- (Optional) OpenTelemetry Collector
+
+### Shareability & Pitch
+For the project vision, security audit findings, and development roadmap, see [docs/SHAREABILITY.md](docs/SHAREABILITY.md).
 
 ### Setup
 ```bash

@@ -145,44 +145,32 @@ content.js   ──UPDATE_DESCRIPTION──► background.js ──storage.set (
 
 ## API payload
 
-`POST /api/job_postings/:id/enrich`
+### 1. Enrich Existing Job
+`POST /api/v0/job_postings/:id/enrich`
+Used when triggered from the app via `?wwr_id=NNN`.
 
+### 2. Submit New Job (Universal)
+`POST /api/v0/job_postings`
+Used to ingest a job from any board, even if not already in the WWWorkRemote database.
+
+**Payload Structure (JSON):**
 ```json
 {
-  "id": "42",
-  "url": "https://jobs.lever.co/acme/senior-rails-engineer",
-  "title": "document.title",
-  "provider": "lever",
-  "html": "<live DOM snapshot, max 512 KB>",
-  "html_truncated": false,
-  "extracted": {
-    "title": "Senior Rails Engineer",
-    "company": "Acme Corp",
-    "location": "Remote — US",
-    "remote": true,
-    "employment_type": "FULL_TIME",
-    "experience": "5+ years",
-    "apply_url": "https://jobs.lever.co/acme/…/apply",
+  "title": "Senior Rails Engineer",
+  "company": "Acme Corp",
+  "location": "Remote",
+  "target_url": "https://example.com/job/123",
+  "body": "Full job description...",
+  "data": {
     "salary_min": 150000,
-    "salary_max": 190000,
-    "salary_currency": "USD",
-    "salary_unit": "YEAR",
-    "description_text": "…plain text reviewed/edited by user…",
-    "description_html": "…original HTML from page…",
-    "posted_at": "2026-04-01",
-    "valid_through": "2026-06-01",
-    "skills": "ruby, rails, postgresql, remote",
-    "education": null,
-    "qualifications": "…",
-    "responsibilities": "…",
-    "benefits": "…",
-    "_method": "json_ld",
-    "_confidence": "high"
+    "salary_max": 200000,
+    "provider": "generic",
+    "skills": ["ruby", "rails"]
   }
 }
 ```
 
-The `extracted` object contains user-reviewed data and should be preferred over re-running CSS extraction on the `html` field. See `PLAN.md` § B2 for the backend change required to consume it.
+The API uses the `target_url` to generate a unique `signature` and will upsert the record accordingly.
 
 ---
 

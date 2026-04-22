@@ -63,6 +63,60 @@
   </article>
 
   <aside class="space-y-8">
+    <% if @job_posting.company_record %>
+      <div class="card-neural p-8 border-l-4 <%= @job_posting.company_record.toxic_culture_flag ? 'border-l-rose-500 bg-rose-500/5' : 'border-l-emerald-500 bg-emerald-500/5' %> shadow-2xl">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex justify-between items-center text-white/40">
+          <span>Company_Intelligence</span>
+          <span class="text-[8px] opacity-40 font-mono">GLASSDOOR_AUDIT</span>
+        </h3>
+        
+        <div class="space-y-6">
+          <div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Current_Disposition</div>
+            <div class="text-lg font-black <%= @job_posting.company_record.toxic_culture_flag ? 'text-rose-400' : 'text-emerald-400' %> uppercase italic">
+              <%= @job_posting.company_record.disposition || "UNAUDITED" %>
+            </div>
+          </div>
+
+          <% if @job_posting.company_record.toxic_culture_flag %>
+            <div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-300 font-bold leading-relaxed">
+              <i class="bi bi-exclamation-octagon-fill mr-1 text-rose-500"></i> CRITICAL: HIGH_TOXICITY_SIGNALS_DETECTED
+            </div>
+          <% end %>
+
+          <% if audit = @job_posting.company_record.glassdoor_data&.dig('reputation_audit') %>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Core_Pros</div>
+                <ul class="text-[9px] space-y-1 text-slate-400 font-medium">
+                  <% Array(audit['top_pros']).first(3).each do |pro| %>
+                    <li class="flex gap-2">
+                      <span class="text-emerald-500 font-black">+</span>
+                      <span><%= pro %></span>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+              <div>
+                <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Core_Cons</div>
+                <ul class="text-[9px] space-y-1 text-slate-400 font-medium">
+                  <% Array(audit['top_cons']).first(3).each do |con| %>
+                    <li class="flex gap-2">
+                      <span class="text-rose-500 font-black">-</span>
+                      <span><%= con %></span>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-500 italic border-t border-white/5 pt-4 mt-4 leading-relaxed">
+              "<%= audit['summary'] %>"
+            </p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Personal Tracking -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
