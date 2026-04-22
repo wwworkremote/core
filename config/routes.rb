@@ -27,7 +27,10 @@ Rails.application.routes.draw do
     post 'toggle_pause' => 'dashboard#toggle_pause'
     get 'analytics' => 'analytics#index'
     resources :jobs, only: [:index] do
-      post :trigger, on: :collection
+      collection do
+        post :trigger
+        post :prune
+      end
     end
     resources :companies, only: %i[index show] do
     resources :company_pipeline_steps, only: [:create]

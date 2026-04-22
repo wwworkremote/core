@@ -25,19 +25,23 @@ module Admin
       # Queue Depletion Stats
       @throughput_per_min = calculate_throughput # jobs per minute
       @eta_minutes = @throughput_per_min > 0 ? (@ready_count / @throughput_per_min).round(1) : nil
-      
       @stalled_jobs = @last_runs.select { |_, last_run| last_run < 24.hours.ago }
+
+      # Claimed but running too long (e.g. > 30 mins)
+      @running_too_long = SolidQueue::ClaimedExecution.where(created_at: ..30.minutes.ago)
+                                                     .includes(:job)
+                                                     .order(created_at: :asc)
 
       # Grouping jobs by queue
       @queues = SolidQueue::Job.where(finished_at: nil).group(:queue_name).count
-      
+
       # Fetching failed jobs with error details
       @failed_jobs = SolidQueue::Job.joins(:failed_execution)
                                     .order(created_at: :desc)
                                     .limit(50)
 
       @recent_jobs = SolidQueue::Job.order(created_at: :desc).limit(50)
-    end
+      end
 
     def trigger
       task_id = params[:task_id]
@@ -59,6 +63,13 @@ module Admin
         flash[:alert] = "Task configuration not found for #{task_id} in #{Rails.env}."
       end
       
+      redirect_to admin_jobs_path
+    end
+
+    def prune
+      count = SolidQueue::Process.prunable.count
+      SolidQueue::Process.prunable.each(&:deregister)
+      flash[:notice] = "🚀 Pruned #{count} dead processes."
       redirect_to admin_jobs_path
     end
 

@@ -5,7 +5,10 @@
     <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Background Pipeline</h1>
     <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Solid Queue Execution Registry</p>
   </div>
-  <div>
+  <div class="flex gap-4">
+    <%= button_to prune_admin_jobs_path, method: :post, class: "btn btn-outline border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-[10px] font-black tracking-widest", data: { turbo_confirm: "Force prune all dead worker heartbeats?" } do %>
+      <i class="bi bi-scissors"></i> FORCE_PRUNE_DEAD
+    <% end %>
     <%= link_to "/jobs", class: "btn-neural !bg-slate-800 !text-white flex items-center gap-2", target: "_blank" do %>
       <i class="bi bi-box-arrow-up-right"></i> MISSION_CONTROL_DEEP_LINK
     <% end %>
@@ -144,6 +147,46 @@
     </div>
   <% end %>
 </div>
+
+<% if @running_too_long.any? %>
+  <div class="card-neural mb-12 border-rose-500/20 bg-rose-500/5">
+    <div class="p-4 border-b border-rose-500/10 flex justify-between items-center">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400">
+        Stalled_Pipeline_Executions
+      </h3>
+      <span class="badge badge-error badge-xs"><%= @running_too_long.count %> STALLED</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-rose-500/[0.02] border-b border-rose-500/10 text-[8px] font-black uppercase tracking-[0.2em] text-rose-500/50">
+          <tr>
+            <th class="px-6 py-3">Job ID</th>
+            <th class="px-6 py-3">Class</th>
+            <th class="px-6 py-3 text-right">Running For</th>
+            <th class="px-6 py-3 text-right">Started At</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-rose-500/10 font-mono text-[10px]">
+          <% @running_too_long.each do |claimed| %>
+            <tr class="hover:bg-rose-500/[0.03]">
+              <td class="px-6 py-4 text-rose-300 font-bold">#<%= claimed.job_id %></td>
+              <td class="px-6 py-4 text-slate-300"><%= claimed.job.class_name %></td>
+              <td class="px-6 py-4 text-right font-black text-rose-500 uppercase tracking-tighter">
+                <%= ((Time.current - claimed.created_at)/60).round(1) %> mins
+              </td>
+              <td class="px-6 py-4 text-right text-slate-500"><%= claimed.created_at.strftime("%H:%M:%S") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="p-4 bg-rose-500/5">
+      <p class="text-[9px] text-rose-400/60 uppercase tracking-widest text-center">
+        These jobs are claimed but have not reported completion. Use Mission Control or <strong>Force Prune</strong> to release them.
+      </p>
+    </div>
+  </div>
+<% end %>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
   <div class="lg:col-span-1 space-y-8">
