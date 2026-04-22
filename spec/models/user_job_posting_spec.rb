@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: user_job_postings
@@ -25,5 +27,22 @@
 require 'rails_helper'
 
 RSpec.describe UserJobPosting, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to belong_to(:user) }
+    it { is_expected.to belong_to(:job_posting) }
+  end
+
+  describe 'states' do
+    let(:user_job_posting) { UserJobPosting.new }
+
+    it 'starts in none state' do
+      expect(user_job_posting.status).to eq('none')
+    end
+
+    it 'can transition to favorited' do
+      user_job_posting.status = 'none'
+      expect(user_job_posting.favorite).to be true
+      expect(user_job_posting.status).to eq('favorited')
+    end
+  end
 end

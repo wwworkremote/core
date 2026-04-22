@@ -13,7 +13,7 @@ environment ENV.fetch('RAILS_ENV', 'development')
 
 pidfile ENV.fetch('PIDFILE', 'tmp/pids/server.pid')
 
-workers ENV.fetch('WEB_CONCURRENCY') { (ENV.fetch('RAILS_ENV', 'development') == 'development') ? 0 : 2 }
+workers ENV.fetch('WEB_CONCURRENCY') { ENV.fetch('RAILS_ENV', 'development') == 'development' ? 0 : 2 }
 
 preload_app!
 

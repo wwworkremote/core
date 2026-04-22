@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddExternalIdToWorkExperiences < ActiveRecord::Migration[8.0]
   def change
     add_column :work_experiences, :external_id, :string

@@ -57,12 +57,12 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # chrome-extension:// origins vary by installation; allow localhost for local dev.
     # For production use a specific allowlist.
-    origins /\Achrome-extension:\/\//
+    origins(%r{\Achrome-extension://})
 
     resource '/api/*',
-      headers: :any,
-      methods: [:get, :post, :options],
-      credentials: false
+             headers: :any,
+             methods: %i[get post options],
+             credentials: false
   end
 end
 ```
@@ -81,7 +81,7 @@ The current `enrich` action discards the structured `extracted` object sent by t
 ```ruby
 def enrich
   job_posting = JobPosting.find(params[:id])
-  extracted   = params[:extracted]&.to_h || {}
+  extracted   = params[:extracted].to_h
   provider    = params[:provider] || detect_provider(params[:url].to_s)
 
   # Prefer user-reviewed structured data over re-extraction
@@ -92,16 +92,19 @@ def enrich
     ).strip
   else
     job_data = JobFetchers::CanonicalJobExtractor.new(params[:html], params[:url], provider).call
-    markdown_body = job_data[:description].present? ?
-      ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass, github_flavored: true).strip : nil
+    markdown_body = if job_data[:description].present?
+  ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass, github_flavored: true).strip
+else
+  nil
+end
   end
 
-  return render json: { success: false, error: "No description found." }, status: :unprocessable_entity unless markdown_body
+  return render json: { success: false, error: 'No description found.' }, status: :unprocessable_entity unless markdown_body
 
   attrs = {
-    body:        markdown_body,
+    body: markdown_body,
     crawl_status: 'enriched',
-    enriched_at: Time.current,
+    enriched_at: Time.current
   }
   attrs[:title]   = extracted['title']   if extracted['title'].present?
   attrs[:company] = extracted['company'] if extracted['company'].present?

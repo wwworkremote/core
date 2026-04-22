@@ -7,28 +7,26 @@ ruby '4.0.2'
 
 gem 'rails', '~> 8.0.0'
 
-
 # Core / Data Acquisition
 gem 'aasm'
 gem 'active_median'
 gem 'after_commit_everywhere', '~> 1.0'
-gem 'ahoy_matey'
 gem 'ahoy_captain'
+gem 'ahoy_matey'
 gem 'amazing_print'
 gem 'annotaterb', '~> 4.10'
+gem 'yard', '~> 0.9'
 gem 'bcrypt', '~> 3.1.7'
 gem 'benchmark'
 # gem 'blorgh', path: 'blorgh'
 gem 'chartkick'
+gem 'docx'
 gem 'druuid'
 gem 'faraday'
 gem 'faraday-net_http_persistent'
 gem 'feedjira', '~> 4.0'
 gem 'ferrum'
 gem 'geocoder'
-gem 'maxmind-db'
-gem 'maxmind-geoip2'
-gem 'maxminddb'
 gem 'groupdate'
 gem 'heroicon'
 gem 'image_processing', '~> 1.2'
@@ -40,19 +38,22 @@ gem 'kamal'
 gem 'kaminari', '~> 1.2'
 gem 'lograge'
 gem 'mail', '~> 2.8'
+gem 'maxmind-db'
+gem 'maxminddb'
+gem 'maxmind-geoip2'
 gem 'meta-tags'
 gem 'mission_control-jobs'
 gem 'msgpack', '>= 1.7.0'
 gem 'neighbor'
 gem 'oj'
-gem 'pdf-reader'
-gem 'docx'
 gem 'opentelemetry-api'
 gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
+gem 'opentelemetry-instrumentation-ruby_llm'
 gem 'opentelemetry-sdk'
 gem 'pagy'
 gem 'paper_trail'
+gem 'pdf-reader'
 gem 'pg', '~> 1.1'
 gem 'pg_query', '>= 2'
 gem 'pg_search', '~> 2.3'
@@ -65,9 +66,8 @@ gem 'ransack'
 gem 'redcarpet'
 gem 'reverse_markdown'
 gem 'ruby_llm'
-gem 'ruby_llm-schema'
 gem 'ruby_llm-instrumentation'
-gem 'opentelemetry-instrumentation-ruby_llm'
+gem 'ruby_llm-schema'
 gem 'solid_cable'
 gem 'solid_cache'
 gem 'solid_queue'
@@ -116,12 +116,14 @@ end
 
 gem 'guard-rspec', '~> 4.7', group: :development
 
-gem 'standard', '~> 1.35', groups: %i[development test]
+gem 'fuubar', '~> 2.5', group: :test
+gem 'rails-controller-testing'
+gem 'standard', '~> 1.54.0', groups: %i[development test]
 
 gem 'tailwindcss-rails', '~> 4.4'
 
-gem "cuprite", "~> 0.17"
+gem 'cuprite', '~> 0.17'
 
-gem "listen", "~> 3.10"
+gem 'listen', '~> 3.10'
 
-gem "guard-livereload", "~> 2.5", group: :development
+gem 'guard-livereload', '~> 2.5', group: :development

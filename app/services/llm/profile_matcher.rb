@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 module LLM
+  # Service to match a User's career profile against a specific JobPosting.
+  # It leverages multi-document resume analysis and structured work experience.
   class ProfileMatcher
+    # Executes the deep alignment scan and preparation.
+    # @param user [User] The candidate being evaluated.
+    # @param job_posting [JobPosting] The opportunity to analyze.
+    # @return [Hash] Success status and structured analysis output.
     def self.call(user, job_posting)
       profile = user.career_profile
       

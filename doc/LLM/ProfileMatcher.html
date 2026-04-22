@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: LLM::ProfileMatcher
+  
+    &mdash; Documentation by YARD 0.9.43
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "LLM::ProfileMatcher";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../LLM.html" title="LLM (module)">LLM</a></span></span>
+     &raquo; 
+    <span class="title">ProfileMatcher</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: LLM::ProfileMatcher
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">LLM::ProfileMatcher</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/services/LLM/profile_matcher.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Service to match a User's career profile against a specific JobPosting.
+It leverages multi-document resume analysis and structured work experience.</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#call-class_method" title="call (class method)">.<strong>call</strong>(user, job_posting)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Executes the deep alignment scan and preparation.</p></div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="call-class_method">
+  
+    .<strong>call</strong>(user, job_posting)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Executes the deep alignment scan and preparation.</p>
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>user</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../User.html" title="User (class)">User</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The candidate being evaluated.</p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>job_posting</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../JobPosting.html" title="JobPosting (class)">JobPosting</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The opportunity to analyze.</p></div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Success status and structured analysis output.</p></div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/LLM/profile_matcher.rb', line 11</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='id identifier rubyid_job_posting'>job_posting</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_career_profile'>career_profile</span>
+  
+  <span class='comment'># Debug logging for incomplete profiles
+</span>  <span class='kw'>unless</span> <span class='id identifier rubyid_profile'>profile</span><span class='op'>&amp;.</span><span class='id identifier rubyid_resume_text'>resume_text</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> <span class='op'>||</span> <span class='id identifier rubyid_profile'>profile</span><span class='op'>&amp;.</span><span class='id identifier rubyid_work_experiences'>work_experiences</span><span class='op'>&amp;.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>||</span> <span class='id identifier rubyid_profile'>profile</span><span class='op'>&amp;.</span><span class='id identifier rubyid_resumes'>resumes</span><span class='op'>&amp;.</span><span class='id identifier rubyid_attached?'>attached?</span>
+    <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[ProfileMatcher] Profile incomplete for User #</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='tstring_end'>&quot;</span></span> \
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>resume_text: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='op'>&amp;.</span><span class='id identifier rubyid_resume_text'>resume_text</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span><span class='embexpr_end'>}</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span> \
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>work_experiences: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='op'>&amp;.</span><span class='id identifier rubyid_work_experiences'>work_experiences</span><span class='op'>&amp;.</span><span class='id identifier rubyid_any?'>any?</span><span class='embexpr_end'>}</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span> \
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>resumes_attached: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='op'>&amp;.</span><span class='id identifier rubyid_resumes'>resumes</span><span class='op'>&amp;.</span><span class='id identifier rubyid_attached?'>attached?</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Profile incomplete. Please set up your resume.</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_user_job'>user_job</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_user_job_postings'>user_job_postings</span><span class='period'>.</span><span class='id identifier rubyid_find_or_create_by!'>find_or_create_by!</span><span class='lparen'>(</span><span class='label'>job_posting:</span> <span class='id identifier rubyid_job_posting'>job_posting</span><span class='rparen'>)</span>
+
+  <span class='comment'># Build structured experience context
+</span>  <span class='id identifier rubyid_experiences_context'>experiences_context</span> <span class='op'>=</span> <span class='id identifier rubyid_profile'>profile</span><span class='period'>.</span><span class='id identifier rubyid_work_experiences'>work_experiences</span><span class='period'>.</span><span class='id identifier rubyid_order'>order</span><span class='lparen'>(</span><span class='label'>start_date:</span> <span class='symbol'>:desc</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_limit'>limit</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_exp'>exp</span><span class='op'>|</span>
+    <span class='id identifier rubyid_highlights'>highlights</span> <span class='op'>=</span> <span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_experience_highlights'>experience_highlights</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_h'>h</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>- [</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_h'>h</span><span class='period'>.</span><span class='id identifier rubyid_label'>label</span><span class='embexpr_end'>}</span><span class='tstring_content'>] </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_h'>h</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='heredoc_beg'>&lt;&lt;~EXP</span>
+<span class='tstring_content'>      ### </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'> at </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_company_name'>company_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      Dates: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_start_date'>start_date</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_end_date'>end_date</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Present</span><span class='tstring_end'>&#39;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      Summary: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_summary'>summary</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      Action: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_action'>action</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      Impact: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_impact'>impact</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>      Highlights:
+</span><span class='tstring_content'>      </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_highlights'>highlights</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='heredoc_end'>    EXP
+</span>  <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='comment'># Include multi-document resume content
+</span>  <span class='id identifier rubyid_extra_documents'>extra_documents</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../LLM.html" title="LLM (module)">LLM</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="DocumentProcessor.html" title="LLM::DocumentProcessor (class)">DocumentProcessor</a></span></span><span class='period'>.</span><span class='id identifier rubyid_extract_pdf_text_for_all'><span class='object_link'><a href="DocumentProcessor.html#extract_pdf_text_for_all-class_method" title="LLM::DocumentProcessor.extract_pdf_text_for_all (method)">extract_pdf_text_for_all</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_doc'>doc</span><span class='op'>|</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--- DOCUMENT: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_doc'>doc</span><span class='lbracket'>[</span><span class='symbol'>:filename</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> ---\n</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_doc'>doc</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_prompt'>prompt</span> <span class='op'>=</span> <span class='heredoc_beg'>&lt;&lt;~PROMPT</span>
+<span class='tstring_content'>    [SYSTEM_OBJECTIVE]
+</span><span class='tstring_content'>    Perform a deep semantic alignment scan between the following CANDIDATE_PROFILE and JOB_POSTING.
+</span><span class='tstring_content'>    You are a RUTHLESS CAREER ADVOCATE and INTERVIEW COACH. Your job is to identify PERFECT matches and prepare the user to win.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    [CANDIDATE_PROFILE]
+</span><span class='tstring_content'>    Tier: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='period'>.</span><span class='id identifier rubyid_experience_level'>experience_level</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>    Skills: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='period'>.</span><span class='id identifier rubyid_skills'>skills</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>    Goals: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='period'>.</span><span class='id identifier rubyid_goals'>goals</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>    
+</span><span class='tstring_content'>    [STRUCTURED_EXPERIENCE]
+</span><span class='tstring_content'>    </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_experiences_context'>experiences_context</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    [ATTACHED_DOCUMENTS]
+</span><span class='tstring_content'>    </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_extra_documents'>extra_documents</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    [JOB_POSTING]
+</span><span class='tstring_content'>    Title: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_job_posting'>job_posting</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>    Company: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_job_posting'>job_posting</span><span class='period'>.</span><span class='id identifier rubyid_company'>company</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>    Description: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_job_posting'>job_posting</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    [CRITICAL_EVALUATION_CRITERIA]
+</span><span class='tstring_content'>    1. **REMOTE_PURITY**: Is this truly remote? Penalize &#39;hybrid&#39; or &#39;occasional travel&#39;.
+</span><span class='tstring_content'>    2. **TECH_STACK_DENSITY**: How much Ruby/Rails focus is there? Reject &#39;full-stack&#39; if it&#39;s 90% React/Node.
+</span><span class='tstring_content'>    3. **SENIORITY_ALIGNMENT**: Does this role offer the autonomy expected for a </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_profile'>profile</span><span class='period'>.</span><span class='id identifier rubyid_experience_level'>experience_level</span><span class='embexpr_end'>}</span><span class='tstring_content'> level?
+</span><span class='tstring_content'>    4. **RED_FLAGS**: Identify signs of toxic culture, legacy tech debt, or unrealistic expectations.
+</span><span class='tstring_content'>
+</span><span class='tstring_content'>    [OUTPUT_FORMAT]
+</span><span class='tstring_content'>    1. **MATCH_CONFIDENCE**: (0-100%)
+</span><span class='tstring_content'>    2. **STRENGTHS**: Why this aligns with the user&#39;s stated goals.
+</span><span class='tstring_content'>    3. **WEAKNESSES**: Why the user might want to SKIP this opportunity.
+</span><span class='tstring_content'>    4. **RESUME_DELTA**: The exact technical bullet points to add/tweak if the user decides to apply.
+</span><span class='tstring_content'>    5. **INTERVIEW_PREP**: 3 custom technical questions they will likely ask, and the &#39;STAR&#39; method responses the user should give based on their experience.
+</span><span class='heredoc_end'>  PROMPT
+</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../LLM.html" title="LLM (module)">LLM</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Orchestrator.html" title="LLM::Orchestrator (class)">Orchestrator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Orchestrator.html#call-class_method" title="LLM::Orchestrator.call (method)">call</a></span></span><span class='lparen'>(</span>
+    <span class='label'>untrusted_text:</span> <span class='id identifier rubyid_prompt'>prompt</span><span class='comma'>,</span>
+    <span class='label'>system_rules:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>task_instructions:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Return a structured markdown analysis. Be honest, critical, and preparation-oriented.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:success</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:output</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_user_job'>user_job</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span><span class='label'>match_analysis:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:output</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    
+    <span class='comment'># Try to extract numerical score (e.g. 85%)
+</span>    <span class='id identifier rubyid_score_match'>score_match</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:output</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>MATCH_CONFIDENCE.*?(\d+)%</span><span class='regexp_end'>/i</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_score'>score</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_score_match'>score_match</span>
+      <span class='id identifier rubyid_score'>score</span> <span class='op'>=</span> <span class='id identifier rubyid_score_match'>score_match</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+      <span class='id identifier rubyid_user_job'>user_job</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span><span class='label'>priority_flag:</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_score'>score</span> <span class='op'>&gt;=</span> <span class='int'>80</span>
+    <span class='kw'>end</span>
+
+    <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>output:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:output</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>score:</span> <span class='id identifier rubyid_score'>score</span> <span class='rbrace'>}</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_error_msg'>error_msg</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>LLM returned empty response</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[ProfileMatcher] Failed for Job </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_job_posting'>job_posting</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_error_msg'>error_msg</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_error_msg'>error_msg</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Wed Apr 22 13:32:36 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.43 (ruby-4.0.2).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -13,6 +13,9 @@ class JobPosting < ApplicationRecord
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
 
+  has_many :user_job_postings, dependent: :destroy
+  has_many :users, through: :user_job_postings
+
   include AASM
   
   has_many :pipeline_steps, dependent: :destroy

@@ -17,7 +17,7 @@ end
 
 puts '== Seeding LLM Models =='
 LLM::Registry.sync
-puts " - Models synced from config/models.yml"
+puts ' - Models synced from config/models.yml'
 
 puts '== Seeding Admin User =='
 name = slug = ENV.fetch('ADMIN_NAME', 'admin')

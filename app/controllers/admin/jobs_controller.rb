@@ -41,21 +41,32 @@ module Admin
                                     .limit(50)
 
       @recent_jobs = SolidQueue::Job.order(created_at: :desc).limit(50)
-      end
+    end
 
     def trigger
       task_id = params[:task_id]
-      env_config = YAML.load_file(Rails.root.join('config/recurring.yml'))[Rails.env]
-      config = env_config[task_id] if env_config
+      
+      # Whitelist Task IDs to prevent Command Injection and RCE
+      all_configs = YAML.load_file(Rails.root.join('config/recurring.yml'))
+      allowed_tasks = (all_configs[Rails.env] || all_configs['development']).keys
+      
+      unless allowed_tasks.include?(task_id)
+        flash[:alert] = "Unauthorized or invalid task ID: #{task_id}"
+        return redirect_to admin_jobs_path
+      end
+
+      env_config = all_configs[Rails.env] || all_configs['development']
+      config = env_config[task_id]
       
       if config
         if config['class']
+          # Safe because task_id is now whitelisted from recurring.yml
           klass = config['class'].constantize
           args = config['args'] || []
           klass.perform_later(*args)
           flash[:notice] = "🚀 Triggered #{task_id} (#{config['class']})"
         elsif config['command']
-          # Execute command in background
+          # Safe because command string comes from static recurring.yml, not user input
           spawn("bin/rails runner '#{config['command']}'")
           flash[:notice] = "🚀 Spawned command for #{task_id}"
         end

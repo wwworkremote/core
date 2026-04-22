@@ -11,7 +11,7 @@ Rails.application.config.after_initialize do
   # or if we are on macOS and want to avoid the fork segfault
   # Also disable if explicitly requested
   next if ENV['SKIP_OTEL'] || (defined?(Puma) && Puma.respond_to?(:jruby?) && Puma.jruby?)
-  
+
   # MacOS Fork Safety: OpenTelemetry can crash if initialized before fork.
   # Solid Queue and Puma both fork.
   if RUBY_PLATFORM.include?('darwin') && !defined?(Puma) && !defined?(SolidQueue)

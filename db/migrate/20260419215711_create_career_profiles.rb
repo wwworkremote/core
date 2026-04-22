@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCareerProfiles < ActiveRecord::Migration[8.0]
   def change
     create_table :career_profiles do |t|

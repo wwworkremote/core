@@ -4,19 +4,31 @@ require 'nokogiri'
 
 module Scraper
   module Indeed
+    # Service object to scrape job listings from Indeed using Playwright.
+    # It handles search execution and parsing of job cards into Document records.
     class ApiClient
       # Indeed uses a more complex URL structure for search
       BASE_URL = 'https://www.indeed.com/jobs'
 
+      # Convenience method to search for jobs.
+      # @param query [String] The job title or keywords to search for.
+      # @param location [String] The geographic location for the search.
+      # @return [Hash] Success status and count of processed documents.
       def self.search(query, location: 'Remote')
         new.search(query, location)
       end
 
+      # Default entry point for DataAcquisitionManager.
+      # @return [Hash] Success status and count of processed documents.
       def call
         # Default search if called without arguments via DataAcquisitionManager
         search('Staff Engineer', 'Remote')
       end
 
+      # Performs the actual search and parsing.
+      # @param query_text [String]
+      # @param location [String]
+      # @return [Hash]
       def search(query_text, location)
         source = JobBoards::Source.find_by(slug: 'indeed')
         query = JobBoards::Query.find_by(source_id: source&.id)

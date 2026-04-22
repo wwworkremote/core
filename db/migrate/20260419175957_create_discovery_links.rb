@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateDiscoveryLinks < ActiveRecord::Migration[8.0]
   def change
     create_table :discovery_links do |t|

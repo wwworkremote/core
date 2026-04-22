@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: DataAcquisitionManager
+  
+    &mdash; Documentation by YARD 0.9.43
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "DataAcquisitionManager";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (D)</a> &raquo;
+    
+    
+    <span class="title">DataAcquisitionManager</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: DataAcquisitionManager
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">DataAcquisitionManager</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="ApiGuard.html" title="ApiGuard (module)">ApiGuard</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/services/data_acquisition_manager.rb
+</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="FETCHERS-constant" class="">FETCHERS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>adzuna</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Adzuna.html" title="Adzuna (module)">Adzuna</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Adzuna/Fetcher.html" title="Adzuna::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Adzuna</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>API</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>arbeitnow</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Arbeitnow.html" title="Arbeitnow (module)">Arbeitnow</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Arbeitnow/Fetcher.html" title="Arbeitnow::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>2</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Arbeitnow</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Feed</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>greenhouse</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Greenhouse.html" title="Greenhouse (module)">Greenhouse</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Greenhouse/Fetcher.html" title="Greenhouse::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Greenhouse</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>hackernews</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="HackerNews.html" title="HackerNews (module)">HackerNews</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="HackerNews/FetchLatestJobstories.html" title="HackerNews::FetchLatestJobstories (class)">FetchLatestJobstories</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>15</span><span class='period'>.</span><span class='id identifier rubyid_minutes'>minutes</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>HackerNews</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>API</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>jobicy</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Jobicy.html" title="Jobicy (module)">Jobicy</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Jobicy/Fetcher.html" title="Jobicy::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Jobicy</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Feed</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>lever</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Lever.html" title="Lever (module)">Lever</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Lever/Fetcher.html" title="Lever::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Lever</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>remotive</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Remotive.html" title="Remotive (module)">Remotive</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotive/Fetcher.html" title="Remotive::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>1</span><span class='period'>.</span><span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Remotive</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>API</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>wwr</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Wwr.html" title="Wwr (module)">Wwr</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Wwr/Fetcher.html" title="Wwr::Fetcher (class)">Fetcher</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>30</span><span class='period'>.</span><span class='id identifier rubyid_minutes'>minutes</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Wwr</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>yc</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Yc.html" title="Yc (module)">Yc</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Yc/Scraper.html" title="Yc::Scraper (class)">Scraper</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>YC</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cord</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>2</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Cord</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>linkedin</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/LinkedIn.html" title="Scraper::LinkedIn (module)">LinkedIn</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/LinkedIn/ApiClient.html" title="Scraper::LinkedIn::ApiClient (class)">ApiClient</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>1</span><span class='period'>.</span><span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>LinkedIn</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>indeed</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/Indeed.html" title="Scraper::Indeed (module)">Indeed</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/Indeed/ApiClient.html" title="Scraper::Indeed::ApiClient (class)">ApiClient</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>1</span><span class='period'>.</span><span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Indeed</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dice</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>2</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Dice</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>glassdoor</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Glassdoor</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>builtin</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuiltIn</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>remoteio</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Remote IO</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>remoteok</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>RemoteOK</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>flexjobs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FlexJobs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bestjobs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BestJobs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>echojobs</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>EchoJobs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>roberthalf</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>4</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Robert Half</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Scraper</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>email_indeed</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="EmailIngestion.html" title="EmailIngestion (module)">EmailIngestion</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="EmailIngestion/ImportJob.html" title="EmailIngestion::ImportJob (class)">ImportJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>1</span><span class='period'>.</span><span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Email (Indeed)</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Email</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>email_adzuna</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="EmailIngestion.html" title="EmailIngestion (module)">EmailIngestion</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="EmailIngestion/ImportJob.html" title="EmailIngestion::ImportJob (class)">ImportJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>1</span><span class='period'>.</span><span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Email (Adzuna)</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Email</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>email_linkedin</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='label'>class:</span> <span class='const'><span class='object_link'><a href="EmailIngestion.html" title="EmailIngestion (module)">EmailIngestion</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="EmailIngestion/ImportJob.html" title="EmailIngestion::ImportJob (class)">ImportJob</a></span></span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='int'>1</span><span class='period'>.</span><span class='id identifier rubyid_hour'>hour</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Email (LinkedIn)</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>type:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Email</span><span class='tstring_end'>&#39;</span></span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fetchers-class_method" title="fetchers (class method)">.<strong>fetchers</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-class_method" title="run (class method)">.<strong>run</strong>(slug, force: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run_all-class_method" title="run_all (class method)">.<strong>run_all</strong>(force: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#status-class_method" title="status (class method)">.<strong>status</strong>(slug)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="ApiGuard.html" title="ApiGuard (module)">ApiGuard</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="ApiGuard.html#can_fetch%3F-instance_method" title="ApiGuard#can_fetch? (method)">#can_fetch?</a></span>, <span class='object_link'><a href="ApiGuard.html#last_fetched_at-instance_method" title="ApiGuard#last_fetched_at (method)">#last_fetched_at</a></span>, <span class='object_link'><a href="ApiGuard.html#lock_source!-instance_method" title="ApiGuard#lock_source! (method)">#lock_source!</a></span>, <span class='object_link'><a href="ApiGuard.html#source_locked%3F-instance_method" title="ApiGuard#source_locked? (method)">#source_locked?</a></span>, <span class='object_link'><a href="ApiGuard.html#time_until_reset-instance_method" title="ApiGuard#time_until_reset (method)">#time_until_reset</a></span>, <span class='object_link'><a href="ApiGuard.html#unlock_source!-instance_method" title="ApiGuard#unlock_source! (method)">#unlock_source!</a></span>, <span class='object_link'><a href="ApiGuard.html#with_api_guard-instance_method" title="ApiGuard#with_api_guard (method)">#with_api_guard</a></span></p>
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="fetchers-class_method">
+  
+    .<strong>fetchers</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+153
+154
+155
+156
+157
+158
+159
+160
+161</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/data_acquisition_manager.rb', line 153</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_fetchers'>fetchers</span>
+  <span class='const'><span class='object_link'><a href="#FETCHERS-constant" title="DataAcquisitionManager::FETCHERS (constant)">FETCHERS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='id identifier rubyid_config'>config</span><span class='op'>|</span>
+    <span class='lbrace'>{</span>
+      <span class='label'>slug:</span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>cooldown:</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:cooldown</span><span class='rbracket'>]</span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run-class_method">
+  
+    .<strong>run</strong>(slug, force: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/data_acquisition_manager.rb', line 194</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='label'>force:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#FETCHERS-constant" title="DataAcquisitionManager::FETCHERS (constant)">FETCHERS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_slug'>slug</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>error:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Fetcher not found</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_config'>config</span>
+
+  <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="SystemSetting.html" title="SystemSetting (class)">SystemSetting</a></span></span><span class='period'>.</span><span class='id identifier rubyid_paused?'><span class='object_link'><a href="SystemSetting.html#paused%3F-class_method" title="SystemSetting.paused? (method)">paused?</a></span></span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_force'>force</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Pipelines are globally paused.</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Ensure source exists with race condition handling
+</span>  <span class='kw'>begin</span>
+    <span class='id identifier rubyid_source'>source</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="JobBoards.html" title="JobBoards (module)">JobBoards</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="JobBoards/Source.html" title="JobBoards::Source (class)">Source</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_or_create_by!'>find_or_create_by!</span><span class='lparen'>(</span><span class='label'>slug:</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span>
+      <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>rescue</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotUnique</span>
+    <span class='kw'>retry</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span><span class='label'>last_synced_at:</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span><span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="Scraper.html" title="Scraper (module)">Scraper</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scraper/CrawlDiscoveryJob.html" title="Scraper::CrawlDiscoveryJob (class)">CrawlDiscoveryJob</a></span></span>
+    <span class='comment'># For Scrapers, look for all active queries for this board
+</span>    <span class='id identifier rubyid_queries'>queries</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="BoardQuery.html" title="BoardQuery (class)">BoardQuery</a></span></span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>board_name:</span> <span class='id identifier rubyid_slug'>slug</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='rparen'>)</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_queries'>queries</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+      <span class='id identifier rubyid_queries'>queries</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_q'>q</span><span class='op'>|</span>
+        <span class='id identifier rubyid_url'>url</span> <span class='op'>=</span> <span class='id identifier rubyid_q'>q</span><span class='period'>.</span><span class='id identifier rubyid_build_url'>build_url</span> <span class='op'>||</span> <span class='id identifier rubyid_q'>q</span><span class='period'>.</span><span class='id identifier rubyid_query_params'>query_params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>start_url</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_selector'>selector</span> <span class='op'>=</span> <span class='id identifier rubyid_q'>q</span><span class='period'>.</span><span class='id identifier rubyid_query_params'>query_params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>selector</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a[href*=&quot;/job/&quot;]</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_perform_later'>perform_later</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='id identifier rubyid_url'>url</span><span class='comma'>,</span> <span class='id identifier rubyid_selector'>selector</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_url'>url</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+    <span class='kw'>else</span>
+      <span class='comment'># Fallback to a default search if no specific queries are defined
+</span>      <span class='id identifier rubyid_default_url'>default_url</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_slug'>slug</span>
+                   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cord</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://cord.com/search/jobs/software-developer</span><span class='tstring_end'>&#39;</span></span>
+                   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>linkedin</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://www.linkedin.com/jobs/search/?keywords=Software%20Engineer</span><span class='tstring_end'>&#39;</span></span>
+                   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>indeed</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://www.indeed.com/jobs?q=Software%20Engineer</span><span class='tstring_end'>&#39;</span></span>
+                   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>dice</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://www.dice.com/jobs?q=Staff%20Engineer&amp;location=Remote</span><span class='tstring_end'>&#39;</span></span>
+                   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>remoteok</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://remoteok.com/remote-ruby-jobs</span><span class='tstring_end'>&#39;</span></span>
+                   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>wwr</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://weworkremotely.com/categories/remote-programming-jobs</span><span class='tstring_end'>&#39;</span></span>
+                   <span class='kw'>else</span> <span class='kw'>nil</span>
+                   <span class='kw'>end</span>
+
+      <span class='kw'>if</span> <span class='id identifier rubyid_default_url'>default_url</span>
+        <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_perform_later'>perform_later</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='id identifier rubyid_default_url'>default_url</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a[href*=&quot;/job/&quot;]</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No active queries found for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_slug'>slug</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:perform_later</span><span class='rparen'>)</span>
+    <span class='comment'># For ActiveJobs (like ImportJob), check signature or use a standard pattern
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="EmailIngestion.html" title="EmailIngestion (module)">EmailIngestion</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="EmailIngestion/ImportJob.html" title="EmailIngestion::ImportJob (class)">ImportJob</a></span></span>
+      <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_perform_later'>perform_later</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>_</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_perform_later'>perform_later</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+  <span class='kw'>else</span>
+    <span class='comment'># For Service Objects
+</span>    <span class='id identifier rubyid_fetcher'>fetcher</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_method'>method</span> <span class='op'>=</span> <span class='id identifier rubyid_fetcher'>fetcher</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+
+    <span class='comment'># Detect if fetcher accepts &#39;force&#39; or &#39;source&#39; as keyword arguments
+</span>    <span class='id identifier rubyid_keyword_params'>keyword_params</span> <span class='op'>=</span> <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>key</span><span class='words_sep'> </span><span class='tstring_content'>keyrest</span><span class='words_sep'> </span><span class='tstring_content'>keyreq</span><span class='tstring_end'>]</span></span>
+
+    <span class='id identifier rubyid_call_args'>call_args</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_call_args'>call_args</span><span class='lbracket'>[</span><span class='symbol'>:force</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_force'>force</span> <span class='kw'>if</span> <span class='id identifier rubyid_method'>method</span><span class='period'>.</span><span class='id identifier rubyid_parameters'>parameters</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_p'>p</span><span class='op'>|</span> <span class='id identifier rubyid_p'>p</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:force</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_call_args'>call_args</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_slug'>slug</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>_</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='kw'>if</span> <span class='id identifier rubyid_slug'>slug</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>email_</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_method'>method</span><span class='period'>.</span><span class='id identifier rubyid_parameters'>parameters</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_p'>p</span><span class='op'>|</span> <span class='id identifier rubyid_p'>p</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:source</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_result_raw'>result_raw</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_call_args'>call_args</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+               <span class='id identifier rubyid_fetcher'>fetcher</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_call_args'>call_args</span><span class='rparen'>)</span>
+             <span class='kw'>else</span>
+               <span class='id identifier rubyid_fetcher'>fetcher</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+             <span class='kw'>end</span>
+
+    <span class='comment'># Normalize result to hash
+</span>    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_result_raw'>result_raw</span>
+             <span class='kw'>when</span> <span class='kw'>true</span> <span class='kw'>then</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+             <span class='kw'>when</span> <span class='kw'>false</span> <span class='kw'>then</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Fetcher reported failure</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span>
+             <span class='kw'>when</span> <span class='const'>Hash</span> <span class='kw'>then</span> <span class='id identifier rubyid_result_raw'>result_raw</span>
+             <span class='kw'>else</span> <span class='lbrace'>{</span> <span class='label'>success:</span> <span class='kw'>true</span> <span class='rbrace'>}</span> <span class='comment'># Assume success for other truthy values
+</span>             <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:success</span><span class='rbracket'>]</span>
+    <span class='comment'># Update ingestion time if postings were actually synced
+</span>    <span class='id identifier rubyid_syncer_result'>syncer_result</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="JobBoards.html" title="JobBoards (module)">JobBoards</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="JobBoards/Syncer.html" title="JobBoards::Syncer (class)">Syncer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="JobBoards/Syncer.html#call-instance_method" title="JobBoards::Syncer#call (method)">call</a></span></span>
+    <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_update!'>update!</span><span class='lparen'>(</span><span class='label'>last_ingested_at:</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_syncer_result'>syncer_result</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_result'>result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run_all-class_method">
+  
+    .<strong>run_all</strong>(force: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+186
+187
+188
+189
+190
+191
+192</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/data_acquisition_manager.rb', line 186</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_run_all'>run_all</span><span class='lparen'>(</span><span class='label'>force:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_results'>results</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='const'><span class='object_link'><a href="#FETCHERS-constant" title="DataAcquisitionManager::FETCHERS (constant)">FETCHERS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each_key'>each_key</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slug'>slug</span><span class='op'>|</span>
+    <span class='id identifier rubyid_results'>results</span><span class='lbracket'>[</span><span class='id identifier rubyid_slug'>slug</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='label'>force:</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_results'>results</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="status-class_method">
+  
+    .<strong>status</strong>(slug)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/data_acquisition_manager.rb', line 163</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_status'>status</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#FETCHERS-constant" title="DataAcquisitionManager::FETCHERS (constant)">FETCHERS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_slug'>slug</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_config'>config</span>
+
+  <span class='comment'># Use find_by instead of find_or_create to avoid writes in views/GET requests
+</span>  <span class='id identifier rubyid_source'>source</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="JobBoards.html" title="JobBoards (module)">JobBoards</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="JobBoards/Source.html" title="JobBoards::Source (class)">Source</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>slug:</span> <span class='id identifier rubyid_slug'>slug</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_guard'>guard</span> <span class='op'>=</span> <span class='const'>Object</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_extend'>extend</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="ApiGuard.html" title="ApiGuard (module)">ApiGuard</a></span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_last_fetched'>last_fetched</span> <span class='op'>=</span> <span class='id identifier rubyid_guard'>guard</span><span class='period'>.</span><span class='id identifier rubyid_last_fetched_at'>last_fetched_at</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_source'>source</span><span class='op'>&amp;.</span><span class='id identifier rubyid_last_synced_at'>last_synced_at</span>
+  <span class='id identifier rubyid_can_fetch'>can_fetch</span> <span class='op'>=</span> <span class='id identifier rubyid_guard'>guard</span><span class='period'>.</span><span class='id identifier rubyid_can_fetch?'>can_fetch?</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='label'>cooldown:</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:cooldown</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_time_until_reset'>time_until_reset</span> <span class='op'>=</span> <span class='id identifier rubyid_guard'>guard</span><span class='period'>.</span><span class='id identifier rubyid_time_until_reset'>time_until_reset</span><span class='lparen'>(</span><span class='id identifier rubyid_slug'>slug</span><span class='comma'>,</span> <span class='label'>cooldown:</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:cooldown</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>rescue</span> <span class='int'>0</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>slug:</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>last_fetched_at:</span> <span class='id identifier rubyid_last_fetched'>last_fetched</span><span class='comma'>,</span>
+    <span class='label'>last_ingested_at:</span> <span class='id identifier rubyid_source'>source</span><span class='op'>&amp;.</span><span class='id identifier rubyid_last_ingested_at'>last_ingested_at</span><span class='comma'>,</span>
+    <span class='label'>can_fetch:</span> <span class='op'>!</span><span class='op'>!</span><span class='id identifier rubyid_can_fetch'>can_fetch</span><span class='comma'>,</span>
+    <span class='label'>time_until_reset:</span> <span class='id identifier rubyid_time_until_reset'>time_until_reset</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+    <span class='label'>cooldown:</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:cooldown</span><span class='rbracket'>]</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Wed Apr 22 13:32:37 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.43 (ruby-4.0.2).
+</div>
+
+    </div>
+  </body>
+</html>

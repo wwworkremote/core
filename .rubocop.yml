@@ -93,6 +93,6 @@ ThreadSafety/DirChdir:
 Rails/DangerousColumnNames:
   Enabled: false # Many legacy migrations use :id explicitly for external IDs
 
-Style/OneClassPerFile:
-  Exclude:
-    - 'config/application.rb'
+# Style/OneClassPerFile:
+#   Exclude:
+#     - 'config/application.rb'

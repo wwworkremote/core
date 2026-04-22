@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateExperienceHighlights < ActiveRecord::Migration[8.0]
   def change
     create_table :experience_highlights do |t|

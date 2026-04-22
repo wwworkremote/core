@@ -22,18 +22,19 @@ class User < ApplicationRecord
 
   has_one :career_profile, dependent: :destroy
   has_many :user_job_postings, dependent: :destroy
+  has_many :job_postings, through: :user_job_postings
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
   has_many :company_pipeline_steps, dependent: :destroy
 
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
 
   before_validation :set_defaults
 
   def set_defaults
-    self.name ||= 'Admin'
+    self.name ||= "User #{SecureRandom.hex(4)}"
     self.slug ||= SecureRandom.hex(8)
   end
 end

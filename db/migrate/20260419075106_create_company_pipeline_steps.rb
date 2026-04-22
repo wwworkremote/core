@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCompanyPipelineSteps < ActiveRecord::Migration[8.0]
   def change
     create_table :company_pipeline_steps do |t|

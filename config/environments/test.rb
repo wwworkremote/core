@@ -14,7 +14,7 @@ Rails.application.configure do
   config.cache_store = :memory_store
   config.action_dispatch.show_exceptions = :none
   config.logger = Logger.new($stdout)
-  config.log_level = :debug
+  config.log_level = :warn
   config.hosts = ['.example.com', 'localhost', '127.0.0.1']
   config.action_controller.allow_forgery_protection = false
   config.active_storage.service = :test

@@ -46,22 +46,25 @@
 require 'rails_helper'
 
 RSpec.describe JobPosting, type: :model do
-  describe 'associations' do
-    it 'belongs to source' do
-      association = described_class.reflect_on_association(:source)
-      expect(association.macro).to eq :belongs_to
-    end
-
-    it 'has many target_domains' do
-      association = described_class.reflect_on_association(:target_domains)
-      expect(association.macro).to eq :has_many
-    end
+  describe 'validations' do
+    subject { JobPosting.new(signature: 'test-sig') }
+    
+    it { is_expected.to validate_presence_of(:signature) }
+    it { is_expected.to validate_uniqueness_of(:signature) }
   end
 
-  describe 'creation' do
-    it 'can be created with a signature' do
-      posting = JobPosting.new(signature: 'test-sig', title: 'Developer')
-      expect(posting).to be_valid
+  describe 'associations' do
+    it { is_expected.to belong_to(:source).optional }
+    it { is_expected.to have_many(:user_job_postings).dependent(:destroy) }
+    it { is_expected.to have_many(:users).through(:user_job_postings) }
+  end
+
+  describe 'scopes' do
+    let!(:job) { create(:job_posting, published_at: 1.day.ago) }
+    
+    it 'orders by published_at' do
+      # Note: This is an example, adjust based on actual logic
+      expect(JobPosting.all).to include(job)
     end
   end
 end

@@ -1,8 +1,15 @@
 # frozen_string_literal: true
 
+# Shared logic for rate limiting and circuit breaking across job board clients.
+# Uses Rails.cache (SolidCache) for distributed lock persistence.
 module ApiGuard
   extend ActiveSupport::Concern
 
+  # Executes a block within the protection of the API guard.
+  # @param source_slug [String] Unique identifier for the job board.
+  # @param cooldown [ActiveSupport::Duration] Interval between fetches.
+  # @param force [Boolean] Bypasses the cooldown (but not the circuit breaker lock).
+  # @return [Symbol, Object] :locked, :cooldown, or the block's return value.
   def with_api_guard(source_slug, cooldown: 15.minutes, force: false)
     return :locked if source_locked?(source_slug)
 

@@ -15,15 +15,15 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins(
-      /\Achrome-extension:\/\//,  # any installed Chrome extension
+      %r{\Achrome-extension://},  # any installed Chrome extension
       'http://localhost:3010',    # local development fetch (e.g. from the app itself)
       'http://127.0.0.1:3010'
     )
 
     resource '/api/*',
-      headers: :any,
-      methods: %i[get post options],
-      credentials: false,
-      max_age: 300
+             headers: :any,
+             methods: %i[get post options],
+             credentials: false,
+             max_age: 300
   end
 end

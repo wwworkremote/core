@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeCareerProfileEmbeddingLimit < ActiveRecord::Migration[8.0]
   def up
     safety_assured { change_column :career_profiles, :embedding, :vector, limit: 3584 }

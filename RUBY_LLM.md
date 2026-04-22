@@ -63,7 +63,7 @@ llama-ctl install && llama-ctl restart
 config.openai_api_base  = 'http://localhost:8080/v1'   # inference
 config.ollama_api_base  = 'http://localhost:8080/v1'   # embeddings
 config.openai_use_system_role = true                   # llama.cpp needs 'system' not 'developer'
-config.use_new_acts_as  = true
+config.use_new_acts_as = true
 ```
 
 The local model is registered with `provider: "ollama"` in `config/models.yml`.

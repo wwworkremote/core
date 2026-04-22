@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateBoardQueries < ActiveRecord::Migration[8.0]
   def change
     create_table :board_queries do |t|
