@@ -1,4 +1,4 @@
-module LlmMessagesHelper
+module LLMMessagesHelper
   def default_model_display_name
     "Default: #{RubyLLM.models.find(RubyLLM.config.default_model).label}"
   end

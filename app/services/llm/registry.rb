@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Llm
+module LLM
   class Registry
     CONFIG_PATH = Rails.root.join('config/models.yml')
 

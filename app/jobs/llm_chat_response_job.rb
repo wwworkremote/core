@@ -1,13 +1,13 @@
-class LlmChatResponseJob < ApplicationJob
+class LLMChatResponseJob < ApplicationJob
   heavyweight!
   idempotent! ->(chat_id, _content) { "chat/#{chat_id}" }
 
   def perform(llm_chat_id, content)
-    llm_chat = LlmChat.find(llm_chat_id)
+    llm_chat = LLMChat.find(llm_chat_id)
 
     # Use Orchestrator for guardrails, safety, and streaming.
     # Orchestrator now handles placeholder creation and internal streaming broadcasts.
-    result = Llm::Orchestrator.call(
+    result = LLM::Orchestrator.call(
       untrusted_text: content,
       chat: llm_chat,
       model: llm_chat.model,
@@ -21,7 +21,7 @@ class LlmChatResponseJob < ApplicationJob
       final_message = llm_chat.llm_messages.where(role: 'assistant').last
       final_message&.broadcast_replace_to "llm_chat_#{llm_chat.id}"
     else
-      Rails.logger.error "[LlmChatResponseJob] Orchestrator failed: #{result[:error]}"
+      Rails.logger.error "[LLMChatResponseJob] Orchestrator failed: #{result[:error]}"
     end
   end
 end

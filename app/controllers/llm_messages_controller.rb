@@ -1,11 +1,11 @@
-class LlmMessagesController < ApplicationController
+class LLMMessagesController < ApplicationController
   before_action :set_llm_chat
 
   def create
     content = params.dig(:llm_message, :content)
     if content.present?
       @llm_message = @llm_chat.llm_messages.create!(role: "user", content: content)
-      LlmChatResponseJob.perform_later(@llm_chat.id, content)
+      LLMChatResponseJob.perform_later(@llm_chat.id, content)
 
       respond_to do |format|
         format.turbo_stream
@@ -17,6 +17,6 @@ class LlmMessagesController < ApplicationController
   private
 
   def set_llm_chat
-    @llm_chat = LlmChat.find(params[:llm_chat_id])
+    @llm_chat = LLMChat.find(params[:llm_chat_id])
   end
 end

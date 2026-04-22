@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Llm
+module LLM
   class ArtifactGenerator
     def self.call(user, job_posting)
       new(user, job_posting).call
@@ -17,7 +17,7 @@ module Llm
 
       prompt = build_cover_letter_prompt
       
-      result = Llm::Orchestrator.call(
+      result = LLM::Orchestrator.call(
         untrusted_text: prompt,
         system_rules: "You are an elite technical career strategist and ghostwriter.",
         task_instructions: "Generate a bespoke, high-impact cover letter in markdown format."

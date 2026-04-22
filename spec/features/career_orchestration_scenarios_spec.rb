@@ -26,7 +26,7 @@ RSpec.describe 'The Career Orchestration Loop', type: :system do
     
     # Mock LLM Match Analysis
     mock_analysis = "MATCH_CONFIDENCE: 92%"
-    expect(Llm::Orchestrator).to receive(:call).at_least(:once).and_return({ success: true, output: mock_analysis })
+    expect(LLM::Orchestrator).to receive(:call).at_least(:once).and_return({ success: true, output: mock_analysis })
 
     # Use a very specific button matcher
     find('button', text: /RUN_ALIGNMENT_SCAN/i).click

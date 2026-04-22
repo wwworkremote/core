@@ -12,8 +12,8 @@
 ### 1. Implement Distributed Circuit Breaker for Rate Limiting
 - **Description**: Add a non-blocking locking mechanism to job fetchers to handle HTTP 429 errors gracefully.
 - **Acceptance Criteria**:
-  - `ApiGuard` enhanced with `lock_source!` and `source_locked?`.
-  - Shared `JobBoards::Client` trips the breaker on 429s.
+  - [x] `ApiGuard` enhanced with `lock_source!`, `unlock_source!`, and `source_locked?`.
+  - [x] Shared `JobBoards::Client` trips the breaker on 429s.
 - **Labels**: resilience, performance
 
 ### 2. Scale Job Board Discovery & Ingestion

@@ -16,7 +16,7 @@ puts '== Seeding Data Sources =='
 end
 
 puts '== Seeding LLM Models =='
-Llm::Registry.sync
+LLM::Registry.sync
 puts " - Models synced from config/models.yml"
 
 puts '== Seeding Admin User =='

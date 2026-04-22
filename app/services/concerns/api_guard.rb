@@ -30,6 +30,11 @@ module ApiGuard
     Rails.cache.write("api_guard:#{source_slug}:locked_until", duration.from_now)
   end
 
+  def unlock_source!(source_slug)
+    Rails.logger.info "[ApiGuard] 🔓 Unlocking #{source_slug}."
+    Rails.cache.delete("api_guard:#{source_slug}:locked_until")
+  end
+
   def source_locked?(source_slug)
     locked_until = Rails.cache.read("api_guard:#{source_slug}:locked_until")
     return false unless locked_until

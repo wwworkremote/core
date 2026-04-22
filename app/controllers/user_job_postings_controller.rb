@@ -44,7 +44,7 @@ class UserJobPostingsController < ApplicationController
     
     # We call this synchronously for now to provide immediate feedback, 
     # but could be moved to an ActiveJob if it takes too long.
-    result = Llm::ProfileMatcher.call(current_user, @job_posting)
+    result = LLM::ProfileMatcher.call(current_user, @job_posting)
     
     if result[:success]
       flash[:notice] = "AI alignment scan complete."
@@ -57,7 +57,7 @@ class UserJobPostingsController < ApplicationController
 
   def generate_artifacts
     @job_posting = JobPosting.find(params[:job_posting_id])
-    result = Llm::ArtifactGenerator.call(current_user, @job_posting)
+    result = LLM::ArtifactGenerator.call(current_user, @job_posting)
     
     if result[:success]
       flash[:notice] = "Bespoke application artifacts generated and appended to notes."

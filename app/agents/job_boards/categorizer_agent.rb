@@ -8,7 +8,7 @@ module JobBoards
 
     def call(job_posting)
       # We delegate to the orchestrator to wrap this agent in guardrails
-      Llm::Orchestrator.call(
+      LLM::Orchestrator.call(
         agent: self,
         untrusted_text: job_posting.body&.truncate(4000),
         schema: { 

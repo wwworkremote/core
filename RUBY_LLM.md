@@ -5,7 +5,7 @@ This project uses **RubyLLM 1.14.x** as a unified interface for AI providers.
 ## Architecture
 
 - **Gem:** `ruby_llm` (≥1.14)
-- **Persistence:** `LlmChat` and `LlmMessage` ActiveRecord models.
+- **Persistence:** `LLMChat` and `LLMMessage` ActiveRecord models.
 - **Admin:** Managed via Rails Admin Namespace at `/admin`.
 
 ## Ecosystem & Observability

@@ -1,4 +1,4 @@
-class Llm::BatchMatchJob < ApplicationJob
+class LLM::BatchMatchJob < ApplicationJob
   queue_as :default
   heavyweight!
   idempotent!
@@ -15,7 +15,7 @@ class Llm::BatchMatchJob < ApplicationJob
                         .limit(limit)
 
     targets.each do |job|
-      Llm::ProfileMatcher.call(admin_user, job)
+      LLM::ProfileMatcher.call(admin_user, job)
     end
   end
 end

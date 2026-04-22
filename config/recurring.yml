@@ -24,7 +24,7 @@ development:
     schedule: every hour at minute 12
 
   batch_ai_matching:
-    class: Llm::BatchMatchJob
+    class: LLM::BatchMatchJob
     schedule: every hour at minute 30
 
   active_link_monitoring:
@@ -65,7 +65,7 @@ production:
     schedule: every hour at minute 12
 
   batch_ai_matching:
-    class: Llm::BatchMatchJob
+    class: LLM::BatchMatchJob
     schedule: every hour at minute 30
 
   active_link_monitoring:

@@ -1,12 +1,12 @@
-class LlmChatsController < ApplicationController
+class LLMChatsController < ApplicationController
   before_action :set_llm_chat, only: [ :show, :destroy ]
 
   def index
-    @llm_chats = LlmChat.order(created_at: :desc)
+    @llm_chats = LLMChat.order(created_at: :desc)
   end
 
   def new
-    @llm_chat = LlmChat.new
+    @llm_chat = LLMChat.new
     @chat_models = available_chat_models
     @selected_model = params[:model] || @chat_models.first&.id
   end
@@ -16,9 +16,9 @@ class LlmChatsController < ApplicationController
     model_record = Model.find_by(id: params.dig(:llm_chat, :model_id))
 
     if prompt.present? && model_record
-      @llm_chat = LlmChat.create!(model: model_record)
+      @llm_chat = LLMChat.create!(model: model_record)
       @llm_chat.llm_messages.create!(role: "user", content: prompt)
-      LlmChatResponseJob.perform_later(@llm_chat.id, prompt)
+      LLMChatResponseJob.perform_later(@llm_chat.id, prompt)
 
       redirect_to @llm_chat, notice: "Neural link established."
     else
@@ -38,6 +38,6 @@ class LlmChatsController < ApplicationController
   private
 
   def set_llm_chat
-    @llm_chat = LlmChat.find(params[:id])
+    @llm_chat = LLMChat.find(params[:id])
   end
 end

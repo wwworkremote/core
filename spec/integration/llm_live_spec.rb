@@ -69,9 +69,9 @@ RSpec.describe 'llama.cpp live integration', :live do
 
   # ── Inference via Orchestrator ─────────────────────────────────────────────
 
-  describe Llm::Orchestrator do
+  describe LLM::Orchestrator do
     let(:local_model) do
-      model_id = Llm::Registry.default_model_id
+      model_id = LLM::Registry.default_model_id
       Model.find_or_create_by!(model_id: model_id) do |m|
         m.provider           = 'ollama'
         m.name               = 'Qwen 2.5 Coder 7B (Local)'

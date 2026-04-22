@@ -2,7 +2,7 @@
 
 require 'ostruct'
 
-module Llm
+module LLM
   class Orchestrator
     def self.call(...)
       new(...).call
@@ -15,7 +15,7 @@ module Llm
       @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : "You are a helpful assistant.")
       @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
       @schema = schema
-      @model = model || @chat&.model || agent_model || Llm::Registry.default_model
+      @model = model || @chat&.model || agent_model || LLM::Registry.default_model
       @metadata = metadata
     end
 
@@ -63,7 +63,7 @@ module Llm
     def execute_with_model(model, sanitized_text, span, &block)
       span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
 
-      chat = @chat || LlmChat.create!(model: model)
+      chat = @chat || LLMChat.create!(model: model)
 
       # If this is a new or empty chat, establish the context
       # If untrusted_text was provided and not yet in messages, add it as a user message

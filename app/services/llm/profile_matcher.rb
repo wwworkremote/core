@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Llm
+module LLM
   class ProfileMatcher
     def self.call(user, job_posting)
       profile = user.career_profile
@@ -53,7 +53,7 @@ module Llm
         4. **RESUME_DELTA**: The exact technical bullet points to add/tweak if the user decides to apply.
       PROMPT
 
-      result = Llm::Orchestrator.call(
+      result = LLM::Orchestrator.call(
         untrusted_text: prompt,
         system_rules: "You are a ruthless technical career advocate and expert Ruby negotiator.",
         task_instructions: "Return a structured markdown analysis. Be honest, critical, and efficient."
