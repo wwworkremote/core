@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       end
       member do
         get :details
+        post :discard
       end
     end
     resources :companies, only: %i[index show] do

@@ -1,12 +1,18 @@
+<%= turbo_frame_tag "job_details_#{@job.id}" do %>
 <div class="p-6 bg-slate-900 text-slate-300 font-mono text-xs">
   <div class="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
     <div>
       <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">System_Job_Signature</div>
       <div class="text-lg font-black text-white"><%= @job.class_name %></div>
     </div>
-    <div class="text-right">
-      <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Queue_Placement</div>
-      <div class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 inline-block font-black"><%= @job.queue_name.upcase %></div>
+    <div class="flex gap-4">
+      <div class="text-right">
+        <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Queue_Placement</div>
+        <div class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 inline-block font-black"><%= @job.queue_name.upcase %></div>
+      </div>
+      <%= button_to discard_admin_job_path(@job), method: :post, class: "btn btn-outline border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white btn-sm rounded-lg text-[10px] font-black tracking-widest", data: { turbo_confirm: "Discard this job? This will stop it from being retried, though the current worker process may continue until it finishes its current task." } do %>
+        <i class="bi bi-x-circle-fill"></i> TERMINATE
+      <% end %>
     </div>
   </div>
 
@@ -29,10 +35,27 @@
       </div>
     </div>
     <div>
-      <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Concurrency_Control</div>
-      <div class="p-3 bg-white/5 rounded border border-white/5 text-[10px]">
-        <%= @job.concurrency_key || "UNRESTRICTED_EXECUTION" %>
-      </div>
+      <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Worker_Process</div>
+      <% if claimed = SolidQueue::ClaimedExecution.find_by(job_id: @job.id) %>
+        <div class="p-3 bg-white/5 rounded border border-white/5 text-[10px]">
+          <div class="flex justify-between mb-1">
+            <span class="opacity-50 uppercase">PID:</span>
+            <span class="text-emerald-400 font-black"><%= claimed.process&.pid || "UNKNOWN" %></span>
+          </div>
+          <div class="flex justify-between mb-1">
+            <span class="opacity-50 uppercase">Hostname:</span>
+            <span class="text-slate-300 truncate ml-4"><%= claimed.process&.hostname %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="opacity-50 uppercase">Started:</span>
+            <span class="text-slate-400"><%= time_ago_in_words(claimed.created_at) %> ago</span>
+          </div>
+        </div>
+      <% else %>
+        <div class="p-3 bg-white/5 rounded border border-white/5 text-[10px] text-slate-600 italic uppercase">
+          Not_currently_claimed
+        </div>
+      <% end %>
     </div>
   </div>
 
@@ -45,3 +68,4 @@
     </div>
   </div>
 </div>
+<% end %>

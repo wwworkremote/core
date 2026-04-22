@@ -78,6 +78,13 @@ module Admin
       render layout: false
     end
 
+    def discard
+      @job = SolidQueue::Job.find(params[:id])
+      @job.discard
+      flash[:notice] = "🚀 Job ##{@job.id} discarded."
+      redirect_to admin_jobs_path
+    end
+
     private
 
     def calculate_latency
