@@ -72,6 +72,10 @@ module JobBoards
         'indeed'
       elsif url.include?('adzuna.com')
         'adzuna'
+      elsif url.include?('glassdoor.com')
+        'glassdoor'
+      elsif url.include?('dice.com')
+        'dice'
       else
         'generic'
       end

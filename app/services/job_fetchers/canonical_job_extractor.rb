@@ -18,12 +18,36 @@ module JobFetchers
         extract_linkedin
       when 'adzuna'
         extract_adzuna
+      when 'glassdoor'
+        extract_glassdoor
+      when 'dice'
+        extract_dice
       else
         extract_generic
       end
     end
 
     private
+
+    def extract_glassdoor
+      {
+        title: @doc.css('div.JobDetails_jobTitle__Rwpro').text.strip.presence || @doc.css('h1').first&.text&.strip,
+        company: @doc.css('div.JobDetails_companyName__ksNxn').first&.text&.strip,
+        location: @doc.css('div.JobDetails_location__mSAsu').first&.text&.strip,
+        description: @doc.css('div.JobDetails_jobDescriptionWrapper__j9vYp').inner_html.presence || @doc.css('.desc').inner_html,
+        url: @url
+      }
+    end
+
+    def extract_dice
+      {
+        title: @doc.css('h1#jobTitle').text.strip.presence || @doc.css('h1').first&.text&.strip,
+        company: @doc.css('a#companyDesignation').text.strip.presence || @doc.css('[data-cy="companyName"]').text.strip,
+        location: @doc.css('li.location').text.strip.presence || @doc.css('[data-cy="location"]').text.strip,
+        description: @doc.css('#jobDescription').inner_html.presence || @doc.css('.job-details').inner_html,
+        url: @url
+      }
+    end
 
     def extract_indeed
       {

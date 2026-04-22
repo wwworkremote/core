@@ -27,8 +27,8 @@ module Scraper
               when 'cord' then url.include?('/jobs/') && url =~ /\d+/
               when 'linkedin' then url.include?('/jobs/view/')
               when 'indeed' then url.include?('/rc/clk') || url.include?('/viewjob?jk=')
-              when 'dice' then url.include?('/job-detail/')
-              when 'glassdoor' then url.include?('/job-listing/') || url.include?('jl=')
+              when 'dice' then url.include?('/job-detail/') || url =~ /dice\.com\/job-detail/
+              when 'glassdoor' then url.include?('/job-listing/') || url.include?('jl=') || url =~ /glassdoor\.com\/job-listing/
               else url.include?('/job')
               end
             end
