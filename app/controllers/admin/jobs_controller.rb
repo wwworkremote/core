@@ -7,7 +7,7 @@ module Admin
       @ready_count = SolidQueue::ReadyExecution.count
       @blocked_count = SolidQueue::BlockedExecution.count
       @failed_count = SolidQueue::FailedExecution.count
-      
+
       # Correlate YAML schedule with actual executions
       @scheduler_info = ::LLM::JobSchedulerInspector.call
 
@@ -71,8 +71,8 @@ module Admin
     end
 
     def calculate_throughput
-      finished_last_hour = SolidQueue::Job.where(finished_at: 1.hour.ago..).count
-      (finished_last_hour / 60.0).round(2)
+      finished_last_5_min = SolidQueue::Job.where(finished_at: 5.minutes.ago..).count
+      (finished_last_5_min / 5.0).round(2)
     end
 
     def calculate_error_rate
