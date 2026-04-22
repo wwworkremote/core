@@ -245,6 +245,21 @@
 
   };
 
+  // ─── Null-safe object merge ────────────────────────────────────────────────
+  // Like Object.assign but skips null/undefined values so a null field in a
+  // higher-priority source never clobbers a real value from a lower source.
+
+  function mergeNonNull(target, ...sources) {
+    for (const src of sources) {
+      if (!src) continue;
+      for (const [k, v] of Object.entries(src)) {
+        if (v !== null && v !== undefined) target[k] = v;
+        else if (!(k in target))           target[k] = v; // keep first null as placeholder
+      }
+    }
+    return target;
+  }
+
   // ─── DOM helpers ───────────────────────────────────────────────────────────
 
   function pickText(doc, selectors) {
@@ -307,13 +322,30 @@
 
   const EXPANDERS = {
     linkedin: [
-      '.show-more-less-html__button--more',       // description expand (most common)
-      '.jobs-description__footer-button',          // alternate footer expand
+      '.show-more-less-html__button--more',
+      '.jobs-description__footer-button',
       'button[aria-label*="show more" i]',
     ],
     indeed: [
       '#ind-job-description-toggle button',
       '.ia-JobDetails-readMore button',
+    ],
+    greenhouse: [
+      'a[data-mapped="true"]',                    // "Read more" link on some listings
+      'button.expand-button',
+    ],
+    lever: [
+      '.content-wrapper button[data-qa="show-more"]',
+      'button[class*="show-more"]',
+    ],
+    workday: [
+      '[data-automation-id="expandButton"]',
+      'button[aria-label*="more" i]',
+    ],
+    wellfound: [
+      'button[data-test="read-more"]',
+      'button[class*="readMore"]',
+      'button[class*="ReadMore"]',
     ],
   };
 
@@ -340,24 +372,32 @@
     }
   }
 
-  // ─── Configurable API URL ──────────────────────────────────────────────────
-  // Reads from chrome.storage.local (set via extension popup).
-  // Falls back to localhost:3010 if nothing is saved.
+  // ─── Configurable API config ───────────────────────────────────────────────
+  // Reads apiUrl, apiEmail, apiPassword from chrome.storage.local (set via popup).
+  // Falls back to localhost:3010 with no auth if nothing is saved.
 
   const DEFAULT_API = 'http://localhost:3010';
 
-  async function getApiBase() {
+  async function getApiConfig() {
     return new Promise(resolve => {
       try {
-        chrome.storage.local.get('apiUrl', ({ apiUrl }) => {
-          const url = (apiUrl || DEFAULT_API).replace(/\/$/, '');
-          resolve(url);
+        chrome.storage.local.get(['apiUrl', 'apiEmail', 'apiPassword'], (cfg) => {
+          const base = (cfg.apiUrl || DEFAULT_API).replace(/\/$/, '');
+          let authHeader = null;
+          if (cfg.apiEmail && cfg.apiPassword) {
+            authHeader = 'Basic ' + btoa(`${cfg.apiEmail}:${cfg.apiPassword}`);
+          }
+          resolve({ base, authHeader });
         });
       } catch (_) {
-        // chrome.storage unavailable (e.g. in isolated test context)
-        resolve(DEFAULT_API);
+        resolve({ base: DEFAULT_API, authHeader: null });
       }
     });
+  }
+
+  // Legacy shim — keep callers that only need the URL working
+  async function getApiBase() {
+    return (await getApiConfig()).base;
   }
 
   // ─── Extraction chain ──────────────────────────────────────────────────────
@@ -490,8 +530,10 @@
       // Merge: JSON-LD is authoritative for structured fields.
       // CSS description fills in when JSON-LD has no description.
       // Meta fills remaining gaps.
+      // Null-safe: a null value in a higher-priority source never clobbers
+      // a real value from a lower-priority source.
       const base   = jsonLd || css || this.generic(doc);
-      const merged = { ...meta, ...css, ...jsonLd, ...base };
+      const merged = mergeNonNull({}, meta, css, jsonLd, base);
 
       if (!merged.description_html && css?.description_html) {
         merged.description_html = css.description_html;
@@ -822,37 +864,100 @@
     });
   }
 
-  // ─── Handle PANEL_SUBMIT from side panel (via background) ─────────────────
-  // The side panel holds user-edited data but has no access to the page DOM.
-  // This handler captures the live DOM and posts to the API with the edited data.
+  // ─── Message handlers (from background, relayed from side panel) ──────────
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (msg.type !== 'PANEL_SUBMIT') return;
-    handlePanelSubmit(msg.editedData, msg.wwrId)
-      .then(result => sendResponse(result))
-      .catch(err   => sendResponse({ ok: false, error: err.message }));
-    return true; // async response
+
+    // PANEL_SUBMIT: user clicked Submit in the panel — post to Rails API
+    if (msg.type === 'PANEL_SUBMIT') {
+      handlePanelSubmit(msg.editedData, msg.wwrId)
+        .then(result => sendResponse(result))
+        .catch(err   => sendResponse({ ok: false, error: err.message }));
+      return true;
+    }
+
+    // REEXTRACT: user clicked "Re-read page" or "Re-read description" in panel
+    if (msg.type === 'REEXTRACT') {
+      const descOnly = !!msg.descOnly;
+      LOG(descOnly ? 'Re-reading description only…' : 'Re-extracting full page…');
+      setStatus(descOnly ? '↺ Re-reading description…' : '↺ Re-reading page…', '#bd93f9');
+
+      previewExtraction().then(freshExtracted => {
+        cachedExtraction = freshExtracted;
+        if (descOnly) {
+          // Merge only description fields into existing panel state without clobbering edits
+          chrome.runtime.sendMessage({
+            type: 'UPDATE_DESCRIPTION',
+            description_text: freshExtracted.description_text,
+            description_html: freshExtracted.description_html,
+          });
+        } else {
+          notifyPanel(freshExtracted);
+        }
+        sendResponse({ ok: true });
+      }).catch(err => sendResponse({ ok: false, error: err.message }));
+      return true;
+    }
   });
 
+  // ─── SPA navigation staleness detection ───────────────────────────────────
+  // On SPAs (LinkedIn, Indeed), navigating to a new job does not reload the
+  // page. Intercept history.pushState so the panel can show a staleness banner.
+
+  const _originalPushState = history.pushState.bind(history);
+  history.pushState = function (...args) {
+    _originalPushState(...args);
+    markPanelStale();
+  };
+  window.addEventListener('popstate', markPanelStale);
+
+  function markPanelStale() {
+    const SESSION_KEY = 'wwr_panel_state';
+    chrome.storage.session.get(SESSION_KEY, data => {
+      const state = data?.[SESSION_KEY];
+      if (state && !state.stale) {
+        chrome.storage.session.set({ [SESSION_KEY]: { ...state, stale: true } });
+        setStatus('⚠ Page navigated — re-read or close', '#f1fa8c');
+        LOG_WARN('SPA navigation detected — panel data may be stale');
+      }
+    });
+  }
+
+  // Max HTML payload size — avoids hitting Rack's body limit on large SPAs
+  const HTML_MAX_BYTES = 512 * 1024; // 512 KB
+
   async function handlePanelSubmit(editedData, id) {
-    const apiBase = await getApiBase();
-    const htmlKb  = kbSize(document.body.innerHTML);
+    const { base: apiBase, authHeader } = await getApiConfig();
+
+    // Truncate DOM snapshot if oversized
+    let rawHtml = document.body.innerHTML;
+    let htmlTruncated = false;
+    if (new Blob([rawHtml]).size > HTML_MAX_BYTES) {
+      const enc = new TextEncoder();
+      const bytes = enc.encode(rawHtml);
+      rawHtml = new TextDecoder().decode(bytes.slice(0, HTML_MAX_BYTES));
+      htmlTruncated = true;
+    }
 
     LOG('Panel submit — editedData fields:', countFields(editedData),
       '| desc words:', wordCount(editedData.description_text),
-      '| html kb:', htmlKb,
+      '| html kb:', kbSize(rawHtml), htmlTruncated ? '(truncated)' : '',
       '| api:', apiBase);
 
     const payload = {
       id,
-      html:      document.body.innerHTML,   // fresh live DOM at submit time
+      html:      rawHtml,
+      html_truncated: htmlTruncated,
       url:       window.location.href,
       title:     document.title,
       provider:  provider ? provider.key : 'generic',
-      extracted: editedData,                // user-reviewed/edited structured data
+      extracted: editedData,
     };
 
     LOG(`POST → ${apiBase}/api/job_postings/${id}/enrich`);
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (authHeader) headers['Authorization'] = authHeader;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 20000);
@@ -860,7 +965,7 @@
     try {
       const response = await fetch(`${apiBase}/api/job_postings/${id}/enrich`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body:    JSON.stringify(payload),
         signal:  controller.signal,
       });

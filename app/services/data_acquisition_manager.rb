@@ -63,7 +63,7 @@ class DataAcquisitionManager
       type: 'Scraper'
     },
     'linkedin' => {
-      class: Scraper::CrawlDiscoveryJob,
+      class: Scraper::LinkedIn::ApiClient,
       cooldown: 1.hour,
       name: 'LinkedIn',
       type: 'Scraper'

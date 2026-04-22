@@ -3,7 +3,7 @@
 ## Backlog Audit
 - **Status**: Synchronized with active mass-scraping and AI-alignment features.
 - **Current Focus**: Scaling ingestion pipelines and refining personal career matching.
-- **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, and API-First Scraping Strategy.
+- **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, Robust Indeed/LinkedIn Scraping, and MacOS Fork Safety hardening.
 
 ---
 
@@ -19,8 +19,8 @@
 ### 2. Scale Job Board Discovery & Ingestion
 - **Description**: Scale the `Scraper::CrawlDiscoveryJob` to cover the full matrix of prioritized boards.
 - **Tasks**:
-  - [ ] Implement `Scraper::Indeed::ApiClient` (API-first).
-  - [ ] Implement `Scraper::LinkedIn::ApiClient` (API-first).
+  - [x] Implement `Scraper::Indeed::ApiClient` (Robust Scraping).
+  - [x] Implement `Scraper::LinkedIn::ApiClient` (Robust Scraping).
   - [ ] Add Glassdoor and Dice crawler patterns to `DiscoveryLink` filtering.
 - **Labels**: ingestion, scraper
 
