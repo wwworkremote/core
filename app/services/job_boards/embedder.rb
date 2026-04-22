@@ -20,7 +20,7 @@ module JobBoards
         req.headers['Content-Type'] = 'application/json'
         req.body = {
           input: input_text,
-          model: 'Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf' # Should match your local model
+          model: 'local' # Server alias — decoupled from GGUF filename
         }.to_json
       end
 
@@ -55,7 +55,7 @@ module JobBoards
         req.headers['Content-Type'] = 'application/json'
         req.body = {
           input: text,
-          model: 'Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf'
+          model: 'local'
         }.to_json
       end
 

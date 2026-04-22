@@ -42,6 +42,7 @@
 ---
 
 ## Recently Completed
+- [x] **Syncer Resilience**: Hardened `JobBoards::Syncer` with presence checks, generic mapper, and per-call document limits to prevent LLM starvation.
 - [x] **Unify Research UI**: Merged Admin pipeline tools into primary `JobPosting` and `Company` views.
 - [x] **Mass Ingestion Foundation**: Distributed `Scraper::Crawler` and `DiscoveryLink` architecture established.
 - [x] **Career Identity Hub**: Implemented editable job history and goals for personalized AI matching.
@@ -56,6 +57,16 @@
 - **Notification Engine**: Trigger email/Slack alerts when a "High Confidence Match" is ingested.
 - **Browser Farm**: Evaluate `Browserless.io` or similar if local Chromium becomes a resource bottleneck.
 - **Semantic Search (V2)**: Enable full-profile-to-database vector similarity search ("Find all jobs matching my entire resume").
+
+---
+
+## Operational Verification Checklist
+Smoke tests to confirm the running system is healthy after a restart or deploy.
+
+- [ ] **Email Ingestion**: Place a `.eml` in `~/.wwworkremote/indeed/` and run `bin/rake eml:scan`. Verify `EmailImportRecord` + `JobPosting` are created and `fetch_mode` is logged (static vs playwright).
+- [ ] **AI inference**: Run `ruby bin/verify_llm.rb` — all four checks must exit 0.
+- [ ] **Background queue**: Confirm Solid Queue dashboard at `/admin/jobs` shows workers active.
+- [ ] **Analytics**: Confirm `/admin/analytics` pipeline health charts render.
 
 ---
 

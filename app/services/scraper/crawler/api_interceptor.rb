@@ -9,15 +9,15 @@ module Scraper
       end
 
       def start_capturing
-        @page.on('response') do |response|
-          if response.request.resource_type == 'fetch' || response.request.resource_type == 'xhr'
+        @page.on('response', lambda { |response|
+          if %w[fetch xhr].include?(response.request.resource_type)
             @api_calls << {
               url: response.url,
               status: response.status,
               headers: response.headers
             }
           end
-        end
+        })
       end
 
       def captured_calls

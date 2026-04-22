@@ -109,6 +109,9 @@ PreCommit:
 
   RSpec:
     enabled: true
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test
 
   # Shell scripts
   ShellCheck:

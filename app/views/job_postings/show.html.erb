@@ -14,7 +14,7 @@
       <div class="absolute top-0 right-0 p-8 opacity-5">
         <%= heroicon "briefcase", options: { class: "w-32 h-32" } %>
       </div>
-      
+
       <div class="relative z-10">
         <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none"><%= @job_posting.title %></h1>
         <p class="text-xl font-bold text-secondary mb-8 tracking-widest uppercase">
@@ -36,9 +36,16 @@
 
     <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
       <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-base-content/30 mb-10 pb-4 border-b border-white/5">Position_Intelligence</h2>
-      
+
       <div class="prose-invert max-w-none text-sm font-medium leading-relaxed text-base-content/80">
-        <%= markdown(@job_posting.body) %>
+        <% if @job_posting.body.present? %>
+          <%= markdown(@job_posting.body) %>
+        <% else %>
+          <div class="bg-white/5 border border-dashed border-white/10 rounded-xl p-8 text-center">
+            <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">NO_DESCRIPTION_AVAILABLE</div>
+            <p class="text-[10px] text-slate-600 uppercase tracking-widest">ENRICHMENT_PENDING_OR_SOURCE_UNREACHABLE</p>
+          </div>
+        <% end %>
       </div>
 
       <% if @job_posting.target_url.present? %>
@@ -46,7 +53,7 @@
           <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" do %>
             INITIATE_APPLICATION_LINK
           <% end %>
-          
+
           <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] text-base-content/40 hover:text-white" do %>
             SOURCE_ORIGIN_VERIFY_&_ENRICH
           <% end %>
@@ -84,7 +91,7 @@
             <%= link_to "SETUP_PROFILE_FOR_MATCHING", edit_career_profile_path, class: "text-[8px] font-black text-slate-500 hover:text-white underline" %>
           <% end %>
         </div>
-        
+
         <div class="p-4 rounded-xl bg-white/5 border border-white/5 border-dashed">
           <% if user_job&.match_analysis.present? %>
             <div class="prose-invert text-[10px] leading-relaxed mb-6">
@@ -114,7 +121,7 @@
     <!-- Pipeline Control -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Research_Pipeline</h3>
-      
+
       <!-- Status Transitions -->
       <div class="flex flex-wrap gap-2 mb-8">
         <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
@@ -148,7 +155,7 @@
     <!-- Contact Manager -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Contact_Registry</h3>
-      
+
       <div class="space-y-4 mb-8">
         <% @job_posting.contacts.each do |contact| %>
           <div class="bg-base-300 p-4 rounded-xl relative group">
@@ -169,7 +176,7 @@
     <!-- Telemetry & Synthesis -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Operational_Telemetry</h3>
-      
+
       <div class="space-y-8">
         <div>
           <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-3">Neural_Category</div>

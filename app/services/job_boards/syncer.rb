@@ -4,11 +4,14 @@ require 'reverse_markdown'
 
 module JobBoards
   class Syncer
-    def call
+    def call(limit: 10)
       processed_count = 0
       sources_to_update = Set.new
+      pending_docs = JobBoards::Document.where(aasm_state: ['pending', nil]).limit(limit)
+      Rails.logger.info "[Syncer] Found #{pending_docs.count} pending documents (limited to #{limit})"
 
-      JobBoards::Document.where(aasm_state: ['pending', nil]).find_each do |doc|
+      pending_docs.find_each do |doc|
+        Rails.logger.info "[Syncer] Processing document #{doc.id} (signature: #{doc.signature[0..8]}...)"
         if sync_document(doc)
           processed_count += 1
           sources_to_update << doc.source_id
@@ -34,19 +37,19 @@ module JobBoards
 
       origin = Origin.find_or_create_by!(name: source.name)
       # Ensure the dashboard Source has a name for telemetry/UI visibility
-      dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") do |s| 
+      dashboard_source = ::Source.find_or_create_by!(signature: "#{source.slug}-default") do |s|
         s.origin = origin
         s.name = source.name # jsonb_accessor will put this in the event field
       end
 
       # Use a transaction and rescue uniqueness errors for high-concurrency safety
       begin
-        jp = JobPosting.find_or_initialize_by(signature: doc.signature)
-        jp.source_id = dashboard_source.id
-        map_attributes(jp, data, source.slug)
-        
+        job_posting = JobPosting.find_or_initialize_by(signature: doc.signature)
+        job_posting.source_id = dashboard_source.id
+        map_attributes(job_posting, data, source.slug)
+
         # Capture the result of save! in a way that handles race conditions
-        if jp.save
+        if job_posting.save
           # Transition document state
           if doc.respond_to?(:processed!)
             doc.processed!
@@ -55,19 +58,19 @@ module JobBoards
           end
 
           # Only categorize if not already enriched/categorized to save LLM tokens
-          if jp.data['ai_category'].blank?
-            JobBoards::Categorizer.new(jp).call
-            JobBoards::Embedder.new(jp).call
+          if job_posting.data['ai_category'].blank?
+            JobBoards::Categorizer.new(job_posting).call
+            JobBoards::Embedder.new(job_posting).call
           end
           true
         else
-          # If it failed validation but it was a uniqueness error on signature, 
+          # If it failed validation but it was a uniqueness error on signature,
           # we might have lost a race, but the data is there, so mark doc as processed.
-          if jp.errors[:signature].include?("has already been taken")
-             doc.update!(aasm_state: 'processed')
-             return true
+          if job_posting.errors[:signature].include?('has already been taken')
+            doc.update!(aasm_state: 'processed')
+            return true
           end
-          Rails.logger.error "[Syncer] Validation failed for Job signature #{doc.signature}: #{jp.errors.full_messages.join(', ')}"
+          Rails.logger.error "[Syncer] Validation failed for Job signature #{doc.signature}: #{job_posting.errors.full_messages.join(', ')}"
           false
         end
       rescue ActiveRecord::RecordNotUnique
@@ -80,91 +83,102 @@ module JobBoards
       end
     end
 
-    def map_attributes(jp, data, slug)
+    def map_attributes(job_posting, data, slug)
       case slug
       when 'hackernews'
-        jp.title        = data['title']
-        jp.body         = data['text']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.at(data['time'])
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['text'] if data['text'].present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.at(data['time']) if data['time']
       when 'arbeitnow'
-        jp.title        = data['title']
-        jp.body         = data['description']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.at(data['created_at'])
-        jp.company      = data['company_name']
-        jp.location     = data['location']
-        jp.tags         = data['tags']
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.at(data['created_at']) if data['created_at']
+        job_posting.company      = data['company_name']
+        job_posting.location     = data['location']
+        job_posting.tags         = data['tags']
       when 'adzuna'
-        jp.title        = data['title']
-        jp.body         = data['description']
-        jp.target_url   = data['redirect_url']
-        jp.published_at = Time.zone.parse(data['created'])
-        jp.company      = data.dig('company', 'display_name')
-        jp.location     = data.dig('location', 'display_name')
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['redirect_url'] if data['redirect_url'].present?
+        job_posting.published_at = Time.zone.parse(data['created']) if data['created']
+        job_posting.company      = data.dig('company', 'display_name')
+        job_posting.location     = data.dig('location', 'display_name')
       when 'remotive'
-        jp.title        = data['title']
-        jp.body         = data['description']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.parse(data['publication_date'])
-        jp.company      = data['company_name']
-        jp.location     = data['candidate_required_location']
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.parse(data['publication_date']) if data['publication_date']
+        job_posting.company      = data['company_name']
+        job_posting.location     = data['candidate_required_location']
       when 'wwr'
-        jp.title        = data['title']
-        jp.body         = data['content'] || data['summary']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.parse(data['published'])
-        jp.company      = parse_wwr_company(data['title'])
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['content'] || data['summary'] if (data['content'] || data['summary']).present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.parse(data['published']) if data['published']
+        job_posting.company      = parse_wwr_company(data['title']) if data['title']
       when 'remoteok'
-        jp.title        = data['position']
-        jp.body         = data['description']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.at(data['date'].to_i)
-        jp.company      = data['company']
-        jp.location     = data['location']
-        jp.tags         = data['tags']
+        job_posting.title        = data['position'] if data['position'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.at(data['date'].to_i) if data['date']
+        job_posting.company      = data['company']
+        job_posting.location     = data['location']
+        job_posting.tags         = data['tags']
       when 'jobicy'
-        jp.title        = data['jobTitle']
-        jp.body         = data['jobDescription']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.parse(data['pubDate']) rescue Time.zone.now
-        jp.company      = data['companyName']
-        jp.location     = data['jobGeo']
+        job_posting.title        = data['jobTitle'] if data['jobTitle'].present?
+        job_posting.body         = data['jobDescription'] if data['jobDescription'].present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.parse(data['pubDate']) rescue Time.zone.now
+        job_posting.company      = data['companyName']
+        job_posting.location     = data['jobGeo']
       when 'greenhouse'
-        jp.title        = data['title']
-        jp.body         = data['content']
-        jp.target_url   = data['absolute_url']
-        jp.published_at = Time.zone.parse(data['updated_at']) rescue Time.zone.now
-        jp.company      = data['company_name']
-        jp.location     = data.dig('location', 'name')
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['content'] if data['content'].present?
+        job_posting.target_url   = data['absolute_url'] if data['absolute_url'].present?
+        job_posting.published_at = Time.zone.parse(data['updated_at']) rescue Time.zone.now
+        job_posting.company      = data['company_name']
+        job_posting.location     = data.dig('location', 'name')
       when 'lever'
-        jp.title        = data['text']
-        jp.body         = data['description']
-        jp.target_url   = data['hostedUrl']
-        jp.published_at = Time.zone.at(data['createdAt'] / 1000) rescue Time.zone.now
-        jp.company      = data['site_slug']&.capitalize
-        jp.location     = data.dig('categories', 'location')
-        jp.tags         = Array(data.dig('categories', 'team'))
+        job_posting.title        = data['text'] if data['text'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['hostedUrl'] if data['hostedUrl'].present?
+        job_posting.published_at = Time.zone.at(data['createdAt'] / 1000) rescue Time.zone.now
+        job_posting.company      = data['site_slug']&.capitalize
+        job_posting.location     = data.dig('categories', 'location')
+        job_posting.tags         = Array(data.dig('categories', 'team'))
       when 'yc'
-        jp.title        = data['title']
-        jp.body         = data['description']
-        jp.target_url   = data['url']
-        jp.published_at = Time.zone.now
-        jp.company      = data['company']
-        jp.location     = data['location']
-        jp.tags         = Array(data['role_type'])
-      when 'email_ingestion'
-        jp.title        = data['title']
-        jp.body         = data['description']
-        jp.target_url   = data['canonical_url'] || data['url']
-        jp.published_at = Time.zone.parse(data['email_received_at']) rescue Time.zone.now
-        jp.company      = data['company']
-        jp.location     = data['location']
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['url'] if data['url'].present?
+        job_posting.published_at = Time.zone.now
+        job_posting.company      = data['company']
+        job_posting.location     = data['location']
+        job_posting.tags         = Array(data['role_type'])
+      when /^email/
+        job_posting.title        = data['title'] if data['title'].present?
+        job_posting.body         = data['description'] if data['description'].present?
+        job_posting.target_url   = data['canonical_url'] || data['url'] if (data['canonical_url'] || data['url']).present?
+        job_posting.published_at = Time.zone.parse(data['email_received_at']) rescue Time.zone.now
+        job_posting.company      = data['company']
+        job_posting.location     = data['location']
+      else
+        # Generic Mapper for all other sources (Cord, LinkedIn, Indeed, etc.)
+        job_posting.title        = (data['title'] || data['job_title'] || data['position']) if (data['title'] || data['job_title'] || data['position']).present?
+        job_posting.body         = (data['description'] || data['body'] || data['content']) if (data['description'] || data['body'] || data['content']).present?
+        job_posting.target_url   = (data['url'] || data['link'] || data['target_url'] || data['redirect_url']) if (data['url'] || data['link'] || data['target_url'] || data['redirect_url']).present?
+        job_posting.company      = (data['company'] || data['company_name'] || data['employer'])
+        job_posting.location     = (data['location'] || data['job_location'] || data['geo'])
       end
 
       # Preserve intersection data in the JobPosting payload
-      jp.data = data.merge('found_by_terms' => data['found_by_terms'])
-      jp.body = normalize_body(jp.body)
+      job_posting.data = data.merge('found_by_terms' => data['found_by_terms'])
+
+      # ONLY normalize and set body if we actually have one.
+      # This prevents overwriting an enriched body with nil during a re-sync.
+      new_body = normalize_body(job_posting.body)
+      job_posting.body = new_body if new_body.present?
     end
 
     def normalize_body(html)

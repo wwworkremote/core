@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative '../config/environment'
 require 'playwright'
 
 url = "https://www.indeed.com/jobs?q=Staff+Engineer&l=Remote&sc=0kf%3Aattr%28DSQF7%29%3B"
@@ -11,7 +12,7 @@ Playwright.create(playwright_cli_executable_path: Rails.root.join('node_modules'
     # Indeed is sensitive, use a real user agent
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     page = browser.new_page(userAgent: user_agent)
-    
+
     # Intercept responses
     callback = ->(response) {
       if response.request.resource_type == 'fetch' || response.request.resource_type == 'xhr'
@@ -33,8 +34,8 @@ Playwright.create(playwright_cli_executable_path: Rails.root.join('node_modules'
     page.on('response', callback)
 
     puts "Navigating to Indeed..."
-    page.goto(url, waitUntil: 'networkidle')
+    page.goto(url, waitUntil: 'domcontentloaded')
     puts "Page loaded. Waiting for background requests..."
-    sleep 15
+    sleep 30
   end
 end

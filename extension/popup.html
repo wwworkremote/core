@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WWWorkRemote</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      width: 260px;
+      margin: 0;
+      padding: 14px;
+      background: #282a36;
+      color: #f8f8f2;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .title {
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ff79c6;
+      margin-bottom: 10px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .label { color: #6272a4; }
+    .value { color: #50fa7b; }
+    .divider {
+      border: none;
+      border-top: 1px solid #44475a;
+      margin: 10px 0;
+    }
+    .note {
+      font-size: 10px;
+      color: #6272a4;
+      line-height: 1.5;
+    }
+    .board-list { margin: 6px 0 0 0; padding: 0; list-style: none; }
+    .board-list li { color: #f8f8f2; }
+    .board-list li::before { content: "› "; color: #bd93f9; }
+    .board-list li.dim { color: #6272a4; }
+    .board-list li.dim::before { color: #44475a; }
+
+    /* API URL config */
+    .api-section { margin-top: 2px; }
+    .api-label {
+      font-size: 10px;
+      color: #6272a4;
+      margin-bottom: 4px;
+    }
+    .api-input-row { display: flex; gap: 6px; align-items: center; }
+    #api-url {
+      flex: 1;
+      background: #1e2029;
+      border: 1px solid #44475a;
+      border-radius: 3px;
+      color: #f8f8f2;
+      font-family: monospace;
+      font-size: 10px;
+      padding: 4px 6px;
+      outline: none;
+    }
+    #api-url:focus { border-color: #bd93f9; }
+    #save-btn {
+      background: #44475a;
+      border: none;
+      border-radius: 3px;
+      color: #f8f8f2;
+      font-family: monospace;
+      font-size: 10px;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #save-btn:hover { background: #6272a4; }
+    #save-status {
+      font-size: 10px;
+      color: #50fa7b;
+      min-height: 14px;
+      margin-top: 4px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">Synthesis_Link</div>
+
+  <div class="row">
+    <span class="label">Status:</span>
+    <span class="value">Active</span>
+  </div>
+
+  <hr class="divider">
+
+  <div class="note">
+    Opens on any job URL containing
+    <span style="color:#f1fa8c;">?wwr_id=NNN</span>
+  </div>
+
+  <hr class="divider">
+
+  <div class="label" style="margin-bottom:4px;">Supported boards:</div>
+  <ul class="board-list">
+    <li>LinkedIn</li>
+    <li>Indeed</li>
+    <li>Adzuna</li>
+    <li>WeWorkRemotely</li>
+    <li>RemoteOK</li>
+    <li>Greenhouse</li>
+    <li>Lever</li>
+    <li>Workday</li>
+    <li>Ashby</li>
+    <li>SmartRecruiters</li>
+    <li>Wellfound</li>
+    <li class="dim">+ generic fallback</li>
+  </ul>
+
+  <hr class="divider">
+
+  <div class="api-section">
+    <div class="api-label">API endpoint:</div>
+    <div class="api-input-row">
+      <input type="text" id="api-url" placeholder="http://localhost:3010" spellcheck="false">
+      <button id="save-btn">SAVE</button>
+    </div>
+    <div id="save-status"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

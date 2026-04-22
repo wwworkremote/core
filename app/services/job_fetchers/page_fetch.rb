@@ -46,15 +46,18 @@ module JobFetchers
     end
 
     def fetch_with_playwright
-      Playwright.create(playwright_cli_executable_path: `which playwright`.strip) do |playwright|
+      playwright_path = Rails.root.join('node_modules/.bin/playwright').to_s
+      Playwright.create(playwright_cli_executable_path: playwright_path) do |playwright|
         playwright.chromium.launch(headless: true) do |browser|
-          page = browser.new_page(user_agent: USER_AGENT)
-          
+          context = browser.new_context(userAgent: USER_AGENT)
+          page = context.new_page
+
           # Optional: Intercept API calls if needed for specific providers
           interceptor = Scraper::Crawler::ApiInterceptor.new(page)
           interceptor.start_capturing
 
-          page.goto(@url, wait_until: 'networkidle')
+          page.goto(@url, waitUntil: 'domcontentloaded')
+          sleep 10 # Allow some time for background requests to settle
 
           # Wait for meaningful content
           begin
@@ -72,7 +75,7 @@ module JobFetchers
         end
       end
     rescue StandardError => e
-      Rails.logger.error "[PageFetch] Playwright fetch error for #{@url}: #{e.message}"
+      Rails.logger.error "[PageFetch] Playwright fetch error for #{@url}: #{e.message}\n#{e.backtrace.first(10).join("\n")}"
       nil
     end
   end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'ostruct'
+
 module Llm
   class Orchestrator
     def self.call(...)
@@ -19,10 +21,10 @@ module Llm
 
     def call(&block)
       tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
-      
+
       # Ensure all metadata keys are strings for OTel
       stringified_metadata = @metadata.transform_keys(&:to_s)
-      
+
       tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }.merge(stringified_metadata)) do |span|
         unless @model
           span.status = OpenTelemetry::Trace::Status.error("No model provided or found in registry")
@@ -60,9 +62,9 @@ module Llm
 
     def execute_with_model(model, sanitized_text, span, &block)
       span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
-      
+
       chat = @chat || LlmChat.create!(model: model)
-      
+
       # If this is a new or empty chat, establish the context
       # If untrusted_text was provided and not yet in messages, add it as a user message
       if chat.llm_messages.empty?
@@ -89,18 +91,18 @@ module Llm
         vertexai:  RubyLLM::Providers::VertexAI,
         xai:       RubyLLM::Providers::XAI
       }
-      
+
       provider_class = provider_map[model.provider.to_sym]
       raise "Unknown provider: #{model.provider}" unless provider_class
-      
+
       client = provider_class.new(RubyLLM.config)
-      
+
       # Wrap messages in OpenStruct to satisfy RubyLLM's expectation for .role and .content methods
       llm_messages = chat.llm_messages.order(:id).map do |m|
         OpenStruct.new(
-          role: m.role, 
-          content: m.content, 
-          tool_calls: nil, 
+          role: m.role,
+          content: m.content,
+          tool_calls: nil,
           tool_call_id: nil,
           thinking_text: nil,
           thinking_signature: nil
@@ -124,7 +126,7 @@ module Llm
 
       # Save the final response to the chat history
       chat.llm_messages.create!(role: 'assistant', content: full_output) if full_output.present?
-      
+
       span.add_event('received_llm_response')
       { success: true, model: model.model_id, output: full_output }
     end

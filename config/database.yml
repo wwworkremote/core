@@ -21,10 +21,10 @@ development:
 test:
   primary:
     <<: *default
-    database: wwworkremote_test
+    url: postgres://postgres:password@localhost:5432/wwworkremote_test
   replica:
     <<: *default
-    database: wwworkremote_test
+    url: postgres://postgres:password@localhost:5432/wwworkremote_test
     replica: true
 
 production:

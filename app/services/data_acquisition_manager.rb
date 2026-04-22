@@ -69,7 +69,7 @@ class DataAcquisitionManager
       type: 'Scraper'
     },
     'indeed' => {
-      class: Scraper::CrawlDiscoveryJob,
+      class: Scraper::Indeed::ApiClient,
       cooldown: 1.hour,
       name: 'Indeed',
       type: 'Scraper'
@@ -166,7 +166,7 @@ class DataAcquisitionManager
 
     # Use find_by instead of find_or_create to avoid writes in views/GET requests
     source = JobBoards::Source.find_by(slug: slug)
-    
+
     guard = Object.new.extend(ApiGuard)
     last_fetched = guard.last_fetched_at(slug) || source&.last_synced_at
     can_fetch = guard.can_fetch?(slug, cooldown: config[:cooldown])
@@ -194,7 +194,7 @@ class DataAcquisitionManager
   def self.run(slug, force: false)
     config = FETCHERS[slug]
     return { error: 'Fetcher not found' } unless config
-    
+
     if SystemSetting.paused? && !force
       return { success: false, error: 'Pipelines are globally paused.' }
     end
@@ -213,7 +213,7 @@ class DataAcquisitionManager
     if config[:class] == Scraper::CrawlDiscoveryJob
       # For Scrapers, look for all active queries for this board
       queries = BoardQuery.where(board_name: slug.downcase)
-      
+
       if queries.any?
         queries.each do |q|
           url = q.build_url || q.query_params['start_url']
@@ -232,7 +232,7 @@ class DataAcquisitionManager
                      when 'wwr' then 'https://weworkremotely.com/categories/remote-programming-jobs'
                      else nil
                      end
-        
+
         if default_url
           config[:class].perform_later(slug, default_url, 'a[href*="/job/"]')
           result = { success: true }
@@ -255,7 +255,7 @@ class DataAcquisitionManager
 
       # Detect if fetcher accepts 'force' or 'source' as keyword arguments
       keyword_params = %i[key keyrest keyreq]
-      
+
       call_args = {}
       call_args[:force] = force if method.parameters.any? { |p| p[1] == :force }
       call_args[:source] = slug.split('_').last if slug.start_with?('email_') && method.parameters.any? { |p| p[1] == :source }
@@ -265,7 +265,7 @@ class DataAcquisitionManager
                else
                  fetcher.call
                end
-      
+
       # Normalize result to hash
       result = case result_raw
                when true then { success: true }
@@ -280,7 +280,7 @@ class DataAcquisitionManager
       syncer_result = JobBoards::Syncer.new.call
       source.update!(last_ingested_at: Time.current) if syncer_result
     end
-    
+
     result
   end
 end

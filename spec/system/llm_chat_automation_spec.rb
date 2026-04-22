@@ -1,34 +1,28 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'capybara/rspec'
-require 'capybara/cuprite'
 
-Capybara.javascript_driver = :cuprite
-Capybara.register_driver(:cuprite) do |app|
-  Capybara::Cuprite::Driver.new(app, window_size: [1200, 800], browser_options: { 'no-sandbox': true })
-end
-
-RSpec.describe 'LLM Chat Automation', type: :system, js: true do
+# Live system spec — requires a running llama.cpp server and real browser.
+# Excluded from the normal suite. Run explicitly:
+#   bundle exec rspec spec/system/llm_chat_automation_spec.rb --tag live
+RSpec.describe 'LLM Chat Automation', type: :system, js: true, live: true do
   before do
     driven_by :cuprite
-    VCR.turn_off!(ignore_cassettes: true)
-    WebMock.allow_net_connect!
   end
 
   it 'completes a chat loop with the local model' do
     # 1. Initiate chat
     visit '/llm_chats/new'
-    
-    # Use the correct field name for model selection
-    select 'Local Qwen 2.5 Coder (llama.cpp)', from: 'llm_chat[model_id]'
-    
+
+    # Model name matches config/models.yml name field for the primary profile
+    select 'Qwen 2.5 Coder 7B (Local)', from: 'llm_chat[model_id]'
+
     fill_in 'llm_chat[prompt]', with: "What's the best thing about AI?"
     click_button 'Establish Neural Link'
 
     # Verify redirection to chat
     expect(page).to have_content('Neural link established.')
-    
+
     # 2. Wait for assistant response (streamed)
     expect(page).to have_selector('.chat-start .chat-bubble', wait: 30)
 
@@ -36,16 +30,12 @@ RSpec.describe 'LLM Chat Automation', type: :system, js: true do
     fill_in 'Describe your objective...', with: "Give me a single-sentence answer."
     click_button 'Send'
 
-    # Verify streaming follow-up
     expect(page).to have_selector('.chat-start .chat-bubble', count: 2, wait: 30)
-    
+
     # 4. Third interaction
     fill_in 'Describe your objective...', with: "Summarize that in one word."
     click_button 'Send'
 
-    # Final check
     expect(page).to have_selector('.chat-start .chat-bubble', count: 3, wait: 30)
-    
-    puts "SUCCESS: Chat interaction verified."
   end
 end

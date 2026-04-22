@@ -18,9 +18,10 @@ JobPosting.where(source_id: ::Source.where(signature: "#{source.slug}-default").
 
 puts "Fetching and categorizing #{jobstory_ids.count} jobs..."
 
-jobstory_ids.each do |id|
+jobstory_ids.each_with_index do |id, index|
+  puts "[#{index+1}/#{jobstory_ids.count}] Fetching jobstory #{id}..."
   # Run worker logic synchronously for immediate feedback
-  HackerNews::FetchJobstoryWorker.new.perform(id, source.id, query.id)
+  HackerNews::FetchJobstoryJob.new.perform(id, source.id, query.id)
 end
 
 # Now sync them to JobPosting (Syncer handles categorization of NEW records)
