@@ -22,6 +22,10 @@ module Admin
       @active_processes = SolidQueue::Process.all.order(last_heartbeat_at: :desc)
       @saturation = (@ready_count.to_f / (@active_processes.where(kind: "Worker").sum { |p| p.metadata["thread_pool_size"] || 0 }.to_f + 0.1) * 100).round(1)
       
+      # Queue Depletion Stats
+      @throughput_per_min = calculate_throughput # jobs per minute
+      @eta_minutes = @throughput_per_min > 0 ? (@ready_count / @throughput_per_min).round(1) : nil
+      
       @stalled_jobs = @last_runs.select { |_, last_run| last_run < 24.hours.ago }
 
       # Grouping jobs by queue

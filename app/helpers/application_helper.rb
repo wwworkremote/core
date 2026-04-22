@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  include Heroicon::Engine.helpers
+
   def markdown(text)
     return '' if text.blank?
 

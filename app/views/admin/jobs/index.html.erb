@@ -32,6 +32,48 @@
   </div>
 </div>
 
+<!-- Queue Depletion Intelligence -->
+<div class="card-neural mb-8 p-6 bg-blue-900/10 border border-blue-500/20">
+  <div class="flex items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400">
+        <i class="bi bi-hourglass-split text-2xl"></i>
+      </div>
+      <div>
+        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Queue_Depletion_Intelligence</h3>
+        <div class="flex items-center gap-6">
+          <div>
+            <span class="text-[8px] text-slate-500 uppercase font-black">Remaining_Jobs</span>
+            <div class="text-xl font-black text-white"><%= number_with_delimiter(@ready_count) %></div>
+          </div>
+          <div class="w-[1px] h-8 bg-white/10"></div>
+          <div>
+            <span class="text-[8px] text-slate-500 uppercase font-black">Current_Throughput</span>
+            <div class="text-xl font-black text-white"><%= @throughput_per_min %> <small class="text-[10px] opacity-40 uppercase">jobs/m</small></div>
+          </div>
+          <div class="w-[1px] h-8 bg-white/10"></div>
+          <div>
+            <span class="text-[8px] text-slate-500 uppercase font-black">ETA_To_Empty</span>
+            <div class="text-xl font-black text-emerald-400">
+              <% if @eta_minutes %>
+                <%= @eta_minutes > 60 ? "#{(@eta_minutes/60).round(1)} hours" : "#{@eta_minutes} mins" %>
+              <% else %>
+                INFINITY_OR_STALLED
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hidden md:block">
+      <div class="text-[8px] text-slate-500 uppercase font-black mb-1">Dynamic_depletion_rate</div>
+      <div class="h-2 w-48 bg-white/5 rounded-full overflow-hidden">
+        <div class="h-full bg-blue-500 animate-pulse" style="width: <%= [@saturation, 100].min %>%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
   <div class="card-neural p-4 text-center bg-white/5">
     <div class="text-xl font-black text-white mb-1"><%= number_with_delimiter(@ready_count) %></div>
