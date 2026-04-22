@@ -21,16 +21,16 @@
 - **Tasks**:
   - [x] Implement `Scraper::Indeed::ApiClient` (Robust Scraping).
   - [x] Implement `Scraper::LinkedIn::ApiClient` (Robust Scraping).
-  - [ ] Add Glassdoor and Dice crawler patterns to `DiscoveryLink` filtering.
+  - [x] Add Glassdoor and Dice crawler patterns to `DiscoveryLink` filtering.
 - **Labels**: ingestion, scraper
 
 ### 3. Deep AI Career Alignment (V2)
-- **Description**: Refine the `Llm::ProfileMatcher` to provide more granular, multi-stage analysis.
+- **Description**: Refine the `LLM::ProfileMatcher` to provide more granular, multi-stage analysis.
 - **Acceptance Criteria**:
-  - [ ] Support multi-document resume uploads (PDF/Docx).
-  - [ ] Add "Actionable Interview Prep" section to the match analysis.
-  - [ ] Enable "Career Comparison" to compare 3 job nodes against profile simultaneously.
-- **Labels**: ai, product
+  - [x] Support multi-document resume uploads (PDF/Docx) via `LLM::DocumentProcessor`.
+  - [x] Add "Actionable Interview Prep" section to the match analysis.
+  - [x] Enable "Career Comparison" to compare 3 job nodes against profile simultaneously.
+- **Labels**: ai, ux, profiles
 
 ### 4. Golden Signals & Behavioral Analytics Dashboard
 - **Description**: Move beyond simple sync timestamps to a full observability dashboard.

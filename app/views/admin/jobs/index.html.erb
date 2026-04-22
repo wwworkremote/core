@@ -51,68 +51,56 @@
   </div>
 </div>
 
-<!-- Recurring Schedule -->
-<div class="card-neural mb-12 overflow-hidden">
-  <div class="p-4 border-b border-white/5 bg-white/5">
-    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Recurring Task Schedule</h3>
-  </div>
-  <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse">
-      <thead class="bg-white/[0.02] border-b border-white/5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
-        <tr>
-          <th class="px-6 py-3">Task Key</th>
-          <th class="px-6 py-3 text-center">Health</th>
-          <th class="px-6 py-3">Schedule</th>
-          <th class="px-6 py-3 text-right">Last Run</th>
-          <th class="px-6 py-3 text-right">Next Run</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-white/5 font-mono text-[10px]">
-        <% @recurring_tasks.each do |task| %>
-          <% 
-            last_run = @last_runs[task.class_name]
-            is_stale = last_run && last_run < 2.hours.ago # Threshold for alert
-          %>
-          <tr class="group hover:bg-white/[0.03] transition-colors">
-            <td class="px-6 py-4">
-              <span class="text-primary font-bold"><%= task.key %></span>
-              <div class="text-[8px] text-slate-600 mt-0.5"><%= task.class_name %></div>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <% if last_run %>
-                <% if is_stale %>
-                   <span class="badge badge-warning badge-xs" title="Not seen in > 2 hours"></span>
-                <% else %>
-                   <span class="badge badge-success badge-xs"></span>
-                <% end %>
-              <% else %>
-                <span class="badge badge-ghost badge-xs opacity-20"></span>
-              <% end %>
-            </td>
-            <td class="px-6 py-4">
-              <span class="text-slate-500"><%= task.schedule %></span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span class="<%= is_stale ? 'text-rose-400' : 'text-slate-400' %>">
-                <%= last_run ? "#{time_ago_in_words(last_run)} ago" : "NEVER" %>
-              </span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <%
-                cron = Fugit::Cron.parse(task.schedule)
-                next_run = cron&.next_time&.to_t
-              %>
-              <% if next_run %>
-                <span class="text-emerald-500/80"><%= time_ago_in_words(next_run) %></span>
-              <% else %>
-                <span class="text-slate-600">--</span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+<!-- Task Orchestration -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+  <% [:utilities, :pipeline].each do |group| %>
+    <div class="card-neural overflow-hidden">
+      <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <%= group.to_s.gsub('_', ' ') %>_Registry
+        </h3>
+        <span class="badge badge-outline badge-xs opacity-50"><%= @scheduler_info[group].count %> TASKS</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-white/[0.02] border-b border-white/5 text-[8px] font-black uppercase tracking-[0.2em] text-slate-500">
+            <tr>
+              <th class="px-6 py-3">Identifier</th>
+              <th class="px-6 py-3">Schedule</th>
+              <th class="px-6 py-3 text-right">Last_Run</th>
+              <th class="px-6 py-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 font-mono text-[10px]">
+            <% @scheduler_info[group].each do |task| %>
+              <tr class="group hover:bg-white/[0.03] transition-colors">
+                <td class="px-6 py-4">
+                  <div class="text-white font-bold"><%= task[:id] %></div>
+                  <div class="text-[8px] text-slate-600 truncate max-w-[120px]"><%= task[:class_name] %></div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="text-slate-500"><%= task[:schedule] %></span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <% if task[:last_run] %>
+                    <div class="text-emerald-500/80"><%= time_ago_in_words(task[:last_run]) %> ago</div>
+                    <div class="text-[8px] text-slate-700 uppercase"><%= task[:status] %></div>
+                  <% else %>
+                    <span class="text-slate-700">NEVER</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <%= button_to trigger_admin_jobs_path(task_id: task[:id]), class: "btn btn-ghost btn-xs text-blue-500 hover:text-blue-400", data: { turbo_confirm: "Trigger #{task[:id]} now?" } do %>
+                    <i class="bi bi-play-fill"></i> RUN
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">

@@ -25,9 +25,10 @@ module Scraper
             job_links = all_links.select do |url|
               case @board_name.downcase
               when 'cord' then url.include?('/jobs/') && url =~ /\d+/
-              when 'linkedin' then url.include?('/jobs/view/') || url.include?('/jobs/search/')
-              when 'indeed' then url.include?('/rc/clk') || url.include?('/job/')
+              when 'linkedin' then url.include?('/jobs/view/')
+              when 'indeed' then url.include?('/rc/clk') || url.include?('/viewjob?jk=')
               when 'dice' then url.include?('/job-detail/')
+              when 'glassdoor' then url.include?('/job-listing/') || url.include?('jl=')
               else url.include?('/job')
               end
             end

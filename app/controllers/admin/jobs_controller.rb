@@ -8,6 +8,9 @@ module Admin
       @blocked_count = SolidQueue::BlockedExecution.count
       @failed_count = SolidQueue::FailedExecution.count
       
+      # Correlate YAML schedule with actual executions
+      @scheduler_info = LLM::JobSchedulerInspector.call
+
       # Recurring Tasks & Schedules
       @recurring_tasks = SolidQueue::RecurringTask.all
       @last_runs = calculate_last_runs
@@ -30,6 +33,29 @@ module Admin
                                     .limit(50)
 
       @recent_jobs = SolidQueue::Job.order(created_at: :desc).limit(50)
+    end
+
+    def trigger
+      task_id = params[:task_id]
+      env_config = YAML.load_file(Rails.root.join('config/recurring.yml'))[Rails.env]
+      config = env_config[task_id] if env_config
+      
+      if config
+        if config['class']
+          klass = config['class'].constantize
+          args = config['args'] || []
+          klass.perform_later(*args)
+          flash[:notice] = "🚀 Triggered #{task_id} (#{config['class']})"
+        elsif config['command']
+          # Execute command in background
+          spawn("bin/rails runner '#{config['command']}'")
+          flash[:notice] = "🚀 Spawned command for #{task_id}"
+        end
+      else
+        flash[:alert] = "Task configuration not found for #{task_id} in #{Rails.env}."
+      end
+      
+      redirect_to admin_jobs_path
     end
 
     private

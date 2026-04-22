@@ -27,6 +27,8 @@ class CareerProfile < ApplicationRecord
   has_many :work_experiences, dependent: :destroy
   has_many :experience_highlights, through: :work_experiences
 
+  has_many_attached :resumes
+
   has_neighbors :embedding
   
   accepts_nested_attributes_for :work_experiences, allow_destroy: true
