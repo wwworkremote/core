@@ -46,7 +46,7 @@ Last updated: 2026-04-22
 
 These require changes **outside** `extension/`. Read-only access confirmed; no changes made.
 
-### B1 — CORS configuration (likely not needed, but confirm)
+### B1 — CORS configuration ✅ Done
 
 **File:** `config/initializers/cors.rb`
 
@@ -67,7 +67,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 end
 ```
 
-### B2 — `enrich` action ignores `extracted` payload (HIGH VALUE)
+### B2 — `enrich` action ignores `extracted` payload ✅ Done
 
 **File:** `app/controllers/api/job_postings_controller.rb`
 
@@ -115,7 +115,7 @@ def enrich
 end
 ```
 
-### B3 — `detect_provider` only knows 3 boards
+### B3 — `detect_provider` only knows 3 boards ✅ Done
 
 **File:** `app/controllers/api/job_postings_controller.rb`
 

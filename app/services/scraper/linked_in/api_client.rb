@@ -34,14 +34,6 @@ module Scraper
         return { success: false, error: 'Fetch failed' } unless fetch_result
 
         data = parse_results(fetch_result[:content])
-        Rails.logger.info "[LinkedIn::ApiClient] Parsed #{data['results'].count} results from HTML"
-        
-        if data['results'].empty?
-          # Log a snippet of the HTML to debug why selectors failed
-          debug_path = Rails.root.join('tmp', "linkedin_debug_#{Time.now.to_i}.html")
-          File.write(debug_path, fetch_result[:content])
-          Rails.logger.warn "[LinkedIn::ApiClient] NO RESULTS. Full HTML saved to: #{debug_path}"
-        end
 
         processed_count = 0
         data['results'].each do |job_data|

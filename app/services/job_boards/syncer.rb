@@ -163,6 +163,11 @@ module JobBoards
         job_posting.published_at = Time.zone.parse(data['email_received_at']) rescue Time.zone.now
         job_posting.company      = data['company']
         job_posting.location     = data['location']
+      when 'indeed', 'linkedin'
+        job_posting.title        = data['jobTitle'] if data['jobTitle'].present?
+        job_posting.company      = data['companyName']
+        job_posting.location     = data['jobGeo']
+        job_posting.target_url   = data['url']
       else
         # Generic Mapper for all other sources (Cord, LinkedIn, Indeed, etc.)
         job_posting.title        = (data['title'] || data['job_title'] || data['position']) if (data['title'] || data['job_title'] || data['position']).present?
