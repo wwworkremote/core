@@ -92,11 +92,7 @@ def enrich
     ).strip
   else
     job_data = JobFetchers::CanonicalJobExtractor.new(params[:html], params[:url], provider).call
-    markdown_body = if job_data[:description].present?
-  ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass, github_flavored: true).strip
-else
-  nil
-end
+    markdown_body = (ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass, github_flavored: true).strip if job_data[:description].present?)
   end
 
   return render json: { success: false, error: 'No description found.' }, status: :unprocessable_entity unless markdown_body

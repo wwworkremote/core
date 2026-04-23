@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIntelligenceToCompanies < ActiveRecord::Migration[8.0]
   def change
     add_column :companies, :glassdoor_data, :jsonb

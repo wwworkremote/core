@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateInterviewLaboratory < ActiveRecord::Migration[8.0]
   def change
     create_table :interview_sessions do |t|

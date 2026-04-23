@@ -15,9 +15,9 @@ gem 'ahoy_captain'
 gem 'ahoy_matey'
 gem 'amazing_print'
 gem 'annotaterb', '~> 4.10'
-gem 'yard', '~> 0.9'
 gem 'bcrypt', '~> 3.1.7'
 gem 'benchmark'
+gem 'yard', '~> 0.9'
 # gem 'blorgh', path: 'blorgh'
 gem 'chartkick'
 gem 'docx'
@@ -52,7 +52,6 @@ gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
 gem 'opentelemetry-instrumentation-ruby_llm'
 gem 'opentelemetry-sdk'
-gem 'pagy'
 gem 'paper_trail'
 gem 'pdf-reader'
 gem 'pg', '~> 1.1'
@@ -83,7 +82,6 @@ group :development, :test do
   gem 'brakeman'
   gem 'byebug', platforms: %i[mri windows]
   gem 'capybara'
-  gem 'database_consistency', require: false
   gem 'debug', platforms: %i[mri windows]
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
@@ -111,24 +109,20 @@ group :development, :test do
 end
 
 group :development do
-  gem 'rack-mini-profiler'
-  gem 'flog', require: false
-  gem 'reek', require: false
   gem 'database_consistency', require: false
+  gem 'flog', require: false
+  gem 'rack-mini-profiler'
+  gem 'reek', require: false
+  gem 'guard-rspec', '~> 4.7'
+  gem 'guard-livereload', '~> 2.5'
+  gem 'listen', '~> 3.10'
 end
 
-gem 'simplecov', require: false, group: :test
-
-gem 'guard-rspec', '~> 4.7', group: :development
-
-gem 'fuubar', '~> 2.5', group: :test
-gem 'rails-controller-testing'
-gem 'standard', '~> 1.54.0', groups: %i[development test]
+group :test do
+  gem 'simplecov', require: false
+  gem 'fuubar', '~> 2.5'
+  gem 'rails-controller-testing'
+end
 
 gem 'tailwindcss-rails', '~> 4.4'
-
 gem 'cuprite', '~> 0.17'
-
-gem 'listen', '~> 3.10'
-
-gem 'guard-livereload', '~> 2.5', group: :development
