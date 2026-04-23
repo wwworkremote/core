@@ -11,6 +11,25 @@ class JobPosting < ApplicationRecord
   belongs_to :source, optional: true
   belongs_to :company, optional: true
 
+  # Legacy string access, backed by company_name column
+  alias_attribute :company_legacy, :company_name
+
+  # Allow existing code to use .company as a string without shadowing association
+  def company=(val)
+    if val.is_a?(String)
+      self.company_name = val
+    else
+      super(val)
+    end
+  end
+
+  def company
+    return super if super.is_a?(Company)
+    company_name
+  end
+
+  self.ignored_columns += ["company"]
+
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
 
