@@ -18,7 +18,6 @@ gem 'annotaterb', '~> 4.10'
 gem 'bcrypt', '~> 3.1.7'
 gem 'benchmark'
 gem 'yard', '~> 0.9'
-# gem 'blorgh', path: 'blorgh'
 gem 'chartkick'
 gem 'docx'
 gem 'druuid'
@@ -46,12 +45,12 @@ gem 'mission_control-jobs'
 gem 'msgpack', '>= 1.7.0'
 gem 'neighbor'
 gem 'oj'
-gem 'pagy'
 gem 'opentelemetry-api'
 gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
 gem 'opentelemetry-instrumentation-ruby_llm'
 gem 'opentelemetry-sdk'
+gem 'pagy'
 gem 'paper_trail'
 gem 'pdf-reader'
 gem 'pg', '~> 1.1'
@@ -111,18 +110,18 @@ end
 group :development do
   gem 'database_consistency', require: false
   gem 'flog', require: false
+  gem 'guard-livereload', '~> 2.5'
+  gem 'guard-rspec', '~> 4.7'
+  gem 'listen', '~> 3.10'
   gem 'rack-mini-profiler'
   gem 'reek', require: false
-  gem 'guard-rspec', '~> 4.7'
-  gem 'guard-livereload', '~> 2.5'
-  gem 'listen', '~> 3.10'
 end
 
 group :test do
-  gem 'simplecov', require: false
   gem 'fuubar', '~> 2.5'
   gem 'rails-controller-testing'
+  gem 'simplecov', require: false
 end
 
-gem 'tailwindcss-rails', '~> 4.4'
 gem 'cuprite', '~> 0.17'
+gem 'tailwindcss-rails', '~> 4.4'

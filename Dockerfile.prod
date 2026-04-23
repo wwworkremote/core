@@ -18,7 +18,6 @@ RUN apt-get update -qq && \
   apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev nodejs yarn pkg-config curl
 
 COPY Gemfile Gemfile.lock ./
-# COPY blorgh ./blorgh
 RUN bundle install && \
   rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 

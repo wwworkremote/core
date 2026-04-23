@@ -11,7 +11,6 @@ PreCommit:
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
-      - 'blorgh/**/*'
       - 'spec/**/*'
 
   # Basic Info
@@ -42,7 +41,6 @@ PreCommit:
       - '**/db/schema.rb'
       - 'node_modules/**/*'
       - 'vendor/**/*'
-      - 'blorgh/**/*'
       - 'spec/**/*'
 
   EndOfLine:
@@ -78,7 +76,6 @@ PreCommit:
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
-      - 'blorgh/**/*'
 
   Brakeman:
     enabled: true
@@ -91,21 +88,18 @@ PreCommit:
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
-      - 'blorgh/**/*'
 
   Reek:
     enabled: false
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
-      - 'blorgh/**/*'
 
   Fasterer:
     enabled: false
     exclude:
       - 'node_modules/**/*'
       - 'vendor/**/*'
-      - 'blorgh/**/*'
 
   RSpec:
     enabled: true
