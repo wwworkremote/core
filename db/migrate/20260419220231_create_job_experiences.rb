@@ -8,7 +8,7 @@ class CreateJobExperiences < ActiveRecord::Migration[8.0]
       t.string :company
       t.date :start_date
       t.date :end_date
-      t.boolean :current
+      t.boolean :current, default: false, null: false
       t.text :description
 
       t.timestamps

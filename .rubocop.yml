@@ -84,6 +84,8 @@ Naming/FileName:
   Exclude:
     - '**/CHANGELOG.md'
     - '**/README.md'
+    - '**/*.md'
+    - 'node_modules/**/*'
 
 Rails/DangerousColumnNames:
   Enabled: false # Many legacy migrations use :id explicitly for external IDs

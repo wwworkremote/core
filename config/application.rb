@@ -57,7 +57,8 @@ module WwworkRemote
         # Add OTel context for trace-log correlation
         trace_id: OpenTelemetry::Trace.current_span.context.trace_id.unpack1('H*'),
         span_id: OpenTelemetry::Trace.current_span.context.span_id.unpack1('H*')
-      }.compact.to_json + "\n"
+      }.compact.to_json
+      "#{json}\n"
     end
 
     # Lograge configuration for OTel-friendly structured request logs

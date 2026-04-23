@@ -17,7 +17,6 @@ gem 'amazing_print'
 gem 'annotaterb', '~> 4.10'
 gem 'bcrypt', '~> 3.1.7'
 gem 'benchmark'
-gem 'yard', '~> 0.9'
 gem 'chartkick'
 gem 'docx'
 gem 'druuid'
@@ -75,6 +74,7 @@ gem 'thruster'
 gem 'turbo_power'
 gem 'turbo-rails'
 gem 'tzinfo-data', platforms: %i[windows jruby]
+gem 'yard', '~> 0.9'
 
 # Development & Testing
 group :development, :test do

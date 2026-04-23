@@ -5,7 +5,7 @@ class CreateBoardQueries < ActiveRecord::Migration[8.0]
     create_table :board_queries do |t|
       t.string :board_name
       t.text :terms
-      t.boolean :remote
+      t.boolean :remote, default: false, null: false
       t.integer :priority
       t.json :query_params
 
