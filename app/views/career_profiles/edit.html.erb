@@ -19,12 +19,18 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <%= f.label :experience_level, "Experience Level", class: "label text-[10px] font-black uppercase tracking-widest text-slate-500" %>
-          <%= f.select :experience_level, ["Junior", "Mid", "Senior", "Staff", "Principal", "Lead"], {}, class: "select select-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
+          <%= f.select :experience_level, ["Junior", "Mid", "Senior", "Staff", "Principal", "Lead"], {}, class: :select, class: "select select-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
         </div>
         <div>
           <%= f.label :skills, "Primary Skills (Comma separated)", class: "label text-[10px] font-black uppercase tracking-widest text-slate-500" %>
           <%= f.text_field :skills, placeholder: "Ruby, Rails, Postgres, AWS...", class: "input input-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
         </div>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :github_url, "GitHub Profile URL", class: "label text-[10px] font-black uppercase tracking-widest text-slate-500" %>
+        <%= f.text_field :github_url, placeholder: "https://github.com/your-username", class: "input input-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
+        <p class="text-[9px] text-slate-600 uppercase tracking-widest pl-2">Links your technical evidence (repos/readmes) to AI matching.</p>
       </div>
     </div>
 

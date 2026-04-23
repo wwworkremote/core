@@ -20,6 +20,8 @@ class JobPosting < ApplicationRecord
   
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
+  has_many :interview_sessions, dependent: :destroy
+  has_many :interview_tasks, dependent: :destroy
 
   aasm column: :status do
     state :none, initial: true

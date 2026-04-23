@@ -5,7 +5,7 @@ require 'faraday'
 module LLM
   # Service to extract and summarize technical context from a user's GitHub profile.
   # It builds a technical proof profile used by the ProfileMatcher for deep alignment.
-  class GitHubProcessor
+  class GithubProcessor
     GITHUB_API = "https://api.github.com"
 
     def self.call(profile)

@@ -25,6 +25,16 @@ class CareerProfilesController < ApplicationController
     end
   end
 
+  def sync_github
+    result = LLM::GithubProcessor.call(@career_profile)
+    if result[:success]
+      flash[:notice] = "🚀 GitHub technical evidence synchronized successfully."
+    else
+      flash[:alert] = "Failed to sync GitHub: #{result[:error]}"
+    end
+    redirect_to career_profile_path
+  end
+
   private
 
   def set_career_profile
@@ -33,7 +43,7 @@ class CareerProfilesController < ApplicationController
 
   def career_profile_params
     params.require(:career_profile).permit(
-      :resume_text, :goals, :skills, :experience_level,
+      :resume_text, :goals, :skills, :experience_level, :github_url,
       job_experiences_attributes: [:id, :title, :company, :start_date, :end_date, :current, :description, :_destroy]
     )
   end

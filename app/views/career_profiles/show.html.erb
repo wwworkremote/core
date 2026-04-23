@@ -13,6 +13,11 @@
       <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Leveraged by AI for deep job matching.</p>
     </div>
     <div class="flex gap-4">
+      <% if @career_profile.github_url.present? %>
+        <%= button_to sync_github_career_profile_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-blue-400 hover:border-blue-400/50" do %>
+          <i class="bi bi-github mr-2"></i> SYNC_GITHUB_EVIDENCE
+        <% end %>
+      <% end %>
       <%= button_to "SYNC_FROM_YAML", career_profile_path(sync: true), method: :patch, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-primary hover:border-primary/50" %>
       <%= button_to "SYNC_NEURAL_VECTORS", career_profile_path(embed: true), method: :patch, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-accent hover:border-accent/50" %>
       <%= link_to "RECONFIGURE_PROFILE", edit_career_profile_path, class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
@@ -95,6 +100,32 @@
           </div>
         </div>
       </div>
+
+      <% if @career_profile.github_context.present? %>
+        <div class="card-neural p-8 border-l-4 border-l-blue-500 bg-blue-500/5 shadow-2xl">
+          <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex justify-between items-center text-white/40">
+            <span>GitHub_Intelligence</span>
+            <span class="text-[8px] opacity-40 font-mono">TECHNICAL_PROOF</span>
+          </h3>
+          
+          <div class="space-y-6">
+            <div class="prose-invert text-[11px] leading-relaxed">
+              <%= markdown(@career_profile.github_context['synthesis']) %>
+            </div>
+            
+            <div class="pt-4 border-t border-white/5">
+              <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Analyzed_Repositories</div>
+              <div class="flex flex-wrap gap-2">
+                <% Array(@career_profile.github_context['repos']).each do |repo| %>
+                  <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[9px] font-mono text-slate-400">
+                    <%= repo['name'] %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
 
       <div class="card-neural p-8">
         <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Match_Intelligence</h3>

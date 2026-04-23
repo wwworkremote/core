@@ -20,7 +20,7 @@ module Scraper
         source = JobBoards::Source.find_or_create_by!(slug: 'glassdoor') { |s| s.name = 'Glassdoor' }
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        params = { sc.keyword: keywords, locT: "C", locId: location }
+        params = { 'sc.keyword' => keywords, 'locT' => 'C', 'locId' => location }
         url = "https://www.glassdoor.com/Job/jobs.htm?suggestCount=0&suggestChosen=false&clickSource=searchBtn&typedKeyword=#{keywords}&locT=R&locId=110&jobType="
         
         Rails.logger.info "[Glassdoor::ApiClient] Fetching: #{url}"

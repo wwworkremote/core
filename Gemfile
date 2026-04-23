@@ -46,6 +46,7 @@ gem 'mission_control-jobs'
 gem 'msgpack', '>= 1.7.0'
 gem 'neighbor'
 gem 'oj'
+gem 'pagy'
 gem 'opentelemetry-api'
 gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
@@ -104,7 +105,6 @@ group :development, :test do
   gem 'rubocop-thread_safety', require: false
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
-  gem 'simplecov', require: false
   gem 'strong_migrations'
   gem 'vcr'
   gem 'webmock'
@@ -112,7 +112,12 @@ end
 
 group :development do
   gem 'rack-mini-profiler'
+  gem 'flog', require: false
+  gem 'reek', require: false
+  gem 'database_consistency', require: false
 end
+
+gem 'simplecov', require: false, group: :test
 
 gem 'guard-rspec', '~> 4.7', group: :development
 

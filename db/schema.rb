@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_22_223825) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_23_005144) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -129,6 +129,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_223825) do
     t.float "sentiment_score"
     t.string "disposition"
     t.boolean "toxic_culture_flag"
+    t.index ["name"], name: "index_companies_on_name", unique: true
     t.index ["slug"], name: "index_companies_on_slug"
   end
 
@@ -253,6 +254,43 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_223825) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["id"], name: "index_hacker_news_v0_jobstories_on_id", unique: true
+  end
+
+  create_table "interview_questions", force: :cascade do |t|
+    t.bigint "interview_session_id", null: false
+    t.text "question_text"
+    t.text "answer_text"
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["interview_session_id"], name: "index_interview_questions_on_interview_session_id"
+  end
+
+  create_table "interview_sessions", force: :cascade do |t|
+    t.bigint "job_posting_id", null: false
+    t.bigint "user_id", null: false
+    t.string "session_type"
+    t.datetime "scheduled_at"
+    t.string "vibe"
+    t.text "notes"
+    t.text "feedback"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_posting_id"], name: "index_interview_sessions_on_job_posting_id"
+    t.index ["user_id"], name: "index_interview_sessions_on_user_id"
+  end
+
+  create_table "interview_tasks", force: :cascade do |t|
+    t.bigint "job_posting_id", null: false
+    t.bigint "user_id", null: false
+    t.string "title"
+    t.text "description"
+    t.datetime "due_at"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_posting_id"], name: "index_interview_tasks_on_job_posting_id"
+    t.index ["user_id"], name: "index_interview_tasks_on_user_id"
   end
 
   create_table "job_boards_documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -681,6 +719,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_223825) do
   add_foreign_key "contacts", "job_postings"
   add_foreign_key "contacts", "users"
   add_foreign_key "experience_highlights", "work_experiences"
+  add_foreign_key "interview_questions", "interview_sessions"
+  add_foreign_key "interview_sessions", "job_postings"
+  add_foreign_key "interview_sessions", "users"
+  add_foreign_key "interview_tasks", "job_postings"
+  add_foreign_key "interview_tasks", "users"
   add_foreign_key "job_experiences", "career_profiles"
   add_foreign_key "job_postings", "sources"
   add_foreign_key "llm_chats", "models"

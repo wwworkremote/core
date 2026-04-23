@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
-# This file is copied to spec/ when you run 'rails generate rspec:install'
+# frozen_string_literal: true
+
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter 'app/controllers/concerns/authenticatable.rb'
+  add_group 'LLM Services', 'app/services/LLM'
+  add_group 'Scrapers', 'app/services/scraper'
+end
+
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)

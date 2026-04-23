@@ -183,7 +183,11 @@ Rails.application.routes.draw do
       post :generate_artifacts
     end
   end
-  resource :career_profile, only: %i[show edit update]
+  resource :career_profile, only: %i[show edit update] do
+    member do
+      post :sync_github
+    end
+  end
   get 'companies/index'
   get 'companies/show'
   get 'company_pipeline_steps/create'
@@ -218,6 +222,11 @@ Rails.application.routes.draw do
     resources :job_postings, only: %i[index show] do
       resources :pipeline_steps, only: [:create]
       resources :contacts, only: %i[create destroy]
+      resources :interview_sessions, only: [:create]
+      resources :interview_tasks, only: [:create]
+    end
+    resources :interview_sessions, only: [] do
+      resources :interview_questions, only: [:create]
     end
     resources :sources, only: %i[index show]
     resources :queries, only: %i[index show]
