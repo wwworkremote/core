@@ -16,7 +16,7 @@ RSpec.describe Remotive::Fetcher, type: :service do
 
     it 'fetches remote jobs and stores them as documents' do
       expect {
-        service.call
+        service.call(force: true)
       }.to change(JobBoards::Document, :count)
 
       doc = JobBoards::Document.last
@@ -24,8 +24,8 @@ RSpec.describe Remotive::Fetcher, type: :service do
 
       expect(doc.source_id).to eq(source.id)
       expect(data).to have_key('id')
+      expect(data).to have_key('company_name')
       expect(data).to have_key('title')
-      expect(data).to have_key('url')
     end
 
     it 'is idempotent and does not create duplicate documents' do

@@ -31,3 +31,5 @@ data/*.xml
 !/app/assets/builds/.keep
 coverage/
 node_modules/
+data/maxmind/
+

@@ -25,7 +25,7 @@ RSpec.describe Adzuna::Fetcher, type: :service do
 
     it 'fetches JSON jobs and stores them as documents' do
       expect {
-        service.call
+        service.call(force: true)
       }.to change(JobBoards::Document, :count)
 
       doc = JobBoards::Document.last
@@ -37,10 +37,10 @@ RSpec.describe Adzuna::Fetcher, type: :service do
     end
 
     it 'is idempotent' do
-      service.call
+      service.call(force: true)
       initial_count = JobBoards::Document.count
 
-      service.call
+      service.call(force: true)
       expect(JobBoards::Document.count).to eq(initial_count)
     end
   end

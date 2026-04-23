@@ -9,6 +9,7 @@ class JobPosting < ApplicationRecord
 
   has_paper_trail
   belongs_to :source, optional: true
+  belongs_to :company, optional: true
 
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains

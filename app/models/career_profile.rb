@@ -29,11 +29,15 @@
 class CareerProfile < ApplicationRecord
   belongs_to :user
   has_many :work_experiences, dependent: :destroy
+  has_many :job_experiences, dependent: :destroy
   has_many :experience_highlights, through: :work_experiences
 
   has_many_attached :resumes
 
   has_neighbors :embedding
+
+  validates :user_id, presence: true
+  validates :github_url, format: { with: %r{\Ahttps?://(www\.)?github\.com/[a-zA-Z0-9_-]+\z}, message: "must be a valid GitHub URL" }, allow_blank: true
 
   accepts_nested_attributes_for :work_experiences, allow_destroy: true
 end

@@ -49,7 +49,7 @@ module WwworkRemote
     # Use structured JSON logging for OTel-friendly logs and disable ANSI colors
     config.colorize_logging = false
     config.log_formatter = proc do |severity, datetime, progname, msg|
-      {
+      log_entry = {
         level: severity,
         time: datetime.iso8601(3),
         progname: progname,
@@ -58,7 +58,7 @@ module WwworkRemote
         trace_id: OpenTelemetry::Trace.current_span.context.trace_id.unpack1('H*'),
         span_id: OpenTelemetry::Trace.current_span.context.span_id.unpack1('H*')
       }.compact.to_json
-      "#{json}\n"
+      "#{log_entry}\n"
     end
 
     # Lograge configuration for OTel-friendly structured request logs

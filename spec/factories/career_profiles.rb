@@ -28,7 +28,7 @@
 #
 FactoryBot.define do
   factory :career_profile do
-    user { nil }
+    user
     resume_text { 'MyText' }
     goals { 'MyText' }
     skills { 'MyText' }

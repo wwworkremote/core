@@ -15,23 +15,23 @@ RSpec.describe Wwr::Fetcher, type: :service do
 
     it 'fetches RSS jobs and stores them as documents' do
       expect {
-        service.call
+        service.call(force: true)
       }.to change(JobBoards::Document, :count)
 
       doc = JobBoards::Document.last
       data = JSON.parse(doc.document)
 
       expect(doc.source_id).to eq(source.id)
-      expect(data).to have_key('title')
       expect(data).to have_key('url')
+      expect(data).to have_key('title')
       expect(data).to have_key('entry_id')
     end
 
     it 'is idempotent' do
-      service.call
+      service.call(force: true)
       initial_count = JobBoards::Document.count
 
-      service.call
+      service.call(force: true)
       expect(JobBoards::Document.count).to eq(initial_count)
     end
   end

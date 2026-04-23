@@ -26,6 +26,9 @@ class Company < ApplicationRecord
   has_many :company_pipeline_steps, dependent: :destroy
   has_many :job_postings, dependent: :nullify
 
+  validates :name, presence: true, uniqueness: true
+  validates :slug, presence: true, uniqueness: true
+
   aasm column: :status do
     state :none, initial: true
     state :favorited, :archived

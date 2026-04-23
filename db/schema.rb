@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_23_005144) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_23_144128) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -361,9 +361,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_005144) do
     t.string "status"
     t.datetime "enriched_at"
     t.string "crawl_status"
+    t.bigint "company_id"
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["company", "published_at"], name: "index_job_postings_on_company_and_published_at", order: { published_at: :desc }
     t.index ["company"], name: "index_job_postings_on_company"
+    t.index ["company_id"], name: "index_job_postings_on_company_id"
     t.index ["data"], name: "index_job_postings_on_data", opclass: :jsonb_path_ops, using: :gin
     t.index ["external_id"], name: "index_job_postings_on_external_id"
     t.index ["location"], name: "index_job_postings_on_location"
@@ -725,6 +727,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_005144) do
   add_foreign_key "interview_tasks", "job_postings"
   add_foreign_key "interview_tasks", "users"
   add_foreign_key "job_experiences", "career_profiles"
+  add_foreign_key "job_postings", "companies"
   add_foreign_key "job_postings", "sources"
   add_foreign_key "llm_chats", "models"
   add_foreign_key "llm_messages", "llm_chats"
