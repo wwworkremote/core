@@ -228,6 +228,9 @@ Rails.application.routes.draw do
     resources :interview_sessions, only: [] do
       resources :interview_questions, only: [:create]
     end
+
+    resources :tasks, only: %i[index create update destroy]
+
     resources :sources, only: %i[index show]
     resources :queries, only: %i[index show]
     resources :documents, only: %i[index show destroy]

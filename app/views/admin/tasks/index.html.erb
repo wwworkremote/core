@@ -1,0 +1,78 @@
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <header class="mb-12 flex justify-between items-end">
+    <div>
+      <div class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-3 flex items-center gap-3">
+        <span>Global_Pipeline</span>
+        <i class="bi bi-chevron-right text-[8px]"></i>
+        <span class="text-white">Mission_Control</span>
+      </div>
+      <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none">Mission Control</h1>
+      <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-2">Active task orchestration across all job nodes.</p>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <!-- Actionable Queue (Pending) -->
+    <div class="space-y-6">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-primary pb-4 border-b border-primary/20 flex justify-between items-center">
+        <span>Actionable_Queue</span>
+        <span class="badge badge-primary badge-sm font-black"><%= @pending_tasks.count %></span>
+      </h3>
+      
+      <div class="space-y-4">
+        <% @pending_tasks.each do |task| %>
+          <div class="card-neural p-6 border-l-2 border-l-primary/30">
+            <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">
+              DUE: <%= task.due_at&.strftime("%Y_%m_%d") || "TBD" %>
+            </div>
+            <h4 class="text-sm font-black text-white uppercase leading-tight mb-2"><%= task.title %></h4>
+            <p class="text-[10px] text-slate-400 font-medium mb-4 italic">
+              @ <%= link_to task.job_posting.company, task.job_posting, class: "text-primary hover:underline" %>
+            </p>
+            <%= button_to "ACTIVATE_NODE", admin_task_path(task, status: 'in_progress'), method: :patch, class: "w-full py-1.5 rounded-lg bg-primary/10 text-primary text-[8px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Active Execution (In Progress) -->
+    <div class="space-y-6">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-accent pb-4 border-b border-accent/20 flex justify-between items-center">
+        <span>Active_Execution</span>
+        <span class="badge badge-accent badge-sm font-black"><%= @in_progress_tasks.count %></span>
+      </h3>
+
+      <div class="space-y-4">
+        <% @in_progress_tasks.each do |task| %>
+          <div class="card-neural p-6 border-l-2 border-l-accent shadow-[0_0_15px_rgba(0,255,200,0.05)]">
+            <h4 class="text-sm font-black text-white uppercase leading-tight mb-2"><%= task.title %></h4>
+            <p class="text-[10px] text-slate-400 font-medium mb-4">
+              @ <%= link_to task.job_posting.company, task.job_posting, class: "text-accent hover:underline" %>
+            </p>
+            <div class="flex gap-2">
+              <%= button_to "SYNCHRONIZE", admin_task_path(task, status: 'completed'), method: :patch, class: "flex-1 py-1.5 rounded-lg bg-accent/20 text-accent text-[8px] font-black uppercase tracking-widest hover:bg-accent hover:text-base-100 transition-all" %>
+              <%= button_to "BLOCK", admin_task_path(task, status: 'blocked'), method: :patch, class: "py-1.5 px-3 rounded-lg bg-white/5 text-slate-500 text-[8px] font-black uppercase" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Result Log (Completed) -->
+    <div class="space-y-6 opacity-60">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 pb-4 border-b border-white/5 flex justify-between items-center">
+        <span>History_Log</span>
+        <span class="text-[8px] font-black uppercase">RECENT_SUCCESS</span>
+      </h3>
+
+      <div class="space-y-4">
+        <% @completed_tasks.each do |task| %>
+          <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+            <h4 class="text-[10px] font-bold text-slate-400 uppercase line-through"><%= task.title %></h4>
+            <div class="text-[8px] text-slate-600 mt-1 uppercase"><%= task.job_posting.company %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
