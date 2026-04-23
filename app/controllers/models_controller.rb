@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModelsController < ApplicationController
   def index
     @models = available_chat_models
@@ -9,6 +11,6 @@ class ModelsController < ApplicationController
 
   def refresh
     Model.refresh!
-    redirect_to models_path, notice: "Models refreshed successfully"
+    redirect_to models_path, notice: 'Models refreshed successfully'
   end
 end

@@ -17,7 +17,7 @@ class JobPosting < ApplicationRecord
   has_many :users, through: :user_job_postings
 
   include AASM
-  
+
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
   has_many :interview_sessions, dependent: :destroy
@@ -28,23 +28,23 @@ class JobPosting < ApplicationRecord
     state :favorited, :applied, :interview, :offered, :archived
 
     event :favorite do
-      transitions from: [:none, :archived], to: :favorited
+      transitions from: %i[none archived], to: :favorited
     end
 
     event :apply do
-      transitions from: [:favorited, :interview], to: :applied
+      transitions from: %i[favorited interview], to: :applied
     end
 
     event :interview do
-      transitions from: [:favorited, :applied], to: :interview
+      transitions from: %i[favorited applied], to: :interview
     end
 
     event :offer do
-      transitions from: [:favorited, :applied, :interview], to: :offered
+      transitions from: %i[favorited applied interview], to: :offered
     end
 
     event :archive do
-      transitions from: [:favorited, :applied, :interview, :offered], to: :archived
+      transitions from: %i[favorited applied interview offered], to: :archived
     end
   end
 
@@ -92,13 +92,15 @@ class JobPosting < ApplicationRecord
   end
 
   def company_record
-    @company_record ||= Company.find_by(name: company)
+    return @company_record if defined?(@company_record)
+
+    @company_record = Company.find_by(name: company)
   end
 
   # Real-time dashboard telemetry
   after_create_commit do
-    broadcast_replace_to "system_telemetry", target: "synthesis_stats", partial: "home/telemetry_synthesis"
-    broadcast_prepend_to "admin_live_feed", target: "live_ingestion", partial: "admin/dashboard/live_feed/job_posting", locals: { job_posting: self }
+    broadcast_replace_to 'system_telemetry', target: 'synthesis_stats', partial: 'home/telemetry_synthesis'
+    broadcast_prepend_to 'admin_live_feed', target: 'live_ingestion', partial: 'admin/dashboard/live_feed/job_posting', locals: { job_posting: self }
   end
 
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source

@@ -177,7 +177,7 @@ class DataAcquisitionManager
       name: config[:name],
       last_fetched_at: last_fetched,
       last_ingested_at: source&.last_ingested_at,
-      can_fetch: !!can_fetch,
+      can_fetch: !can_fetch.nil?,
       time_until_reset: time_until_reset || 0,
       cooldown: config[:cooldown]
     }
@@ -195,9 +195,7 @@ class DataAcquisitionManager
     config = FETCHERS[slug]
     return { error: 'Fetcher not found' } unless config
 
-    if SystemSetting.paused? && !force
-      return { success: false, error: 'Pipelines are globally paused.' }
-    end
+    return { success: false, error: 'Pipelines are globally paused.' } if SystemSetting.paused? && !force
 
     # Ensure source exists with race condition handling
     begin
@@ -224,14 +222,13 @@ class DataAcquisitionManager
       else
         # Fallback to a default search if no specific queries are defined
         default_url = case slug
-                     when 'cord' then 'https://cord.com/search/jobs/software-developer'
-                     when 'linkedin' then 'https://www.linkedin.com/jobs/search/?keywords=Software%20Engineer'
-                     when 'indeed' then 'https://www.indeed.com/jobs?q=Software%20Engineer'
-                     when 'dice' then 'https://www.dice.com/jobs?q=Staff%20Engineer&location=Remote'
-                     when 'remoteok' then 'https://remoteok.com/remote-ruby-jobs'
-                     when 'wwr' then 'https://weworkremotely.com/categories/remote-programming-jobs'
-                     else nil
-                     end
+                      when 'cord' then 'https://cord.com/search/jobs/software-developer'
+                      when 'linkedin' then 'https://www.linkedin.com/jobs/search/?keywords=Software%20Engineer'
+                      when 'indeed' then 'https://www.indeed.com/jobs?q=Software%20Engineer'
+                      when 'dice' then 'https://www.dice.com/jobs?q=Staff%20Engineer&location=Remote'
+                      when 'remoteok' then 'https://remoteok.com/remote-ruby-jobs'
+                      when 'wwr' then 'https://weworkremotely.com/categories/remote-programming-jobs'
+                      end
 
         if default_url
           config[:class].perform_later(slug, default_url, 'a[href*="/job/"]')
@@ -254,17 +251,16 @@ class DataAcquisitionManager
       method = fetcher.method(:call)
 
       # Detect if fetcher accepts 'force' or 'source' as keyword arguments
-      keyword_params = %i[key keyrest keyreq]
 
       call_args = {}
       call_args[:force] = force if method.parameters.any? { |p| p[1] == :force }
       call_args[:source] = slug.split('_').last if slug.start_with?('email_') && method.parameters.any? { |p| p[1] == :source }
 
       result_raw = if call_args.any?
-                 fetcher.call(**call_args)
-               else
-                 fetcher.call
-               end
+                     fetcher.call(**call_args)
+                   else
+                     fetcher.call
+                   end
 
       # Normalize result to hash
       result = case result_raw

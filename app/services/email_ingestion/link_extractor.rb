@@ -11,9 +11,9 @@ module EmailIngestion
     # Adzuna: https://www.adzuna.com/details/...
 
     JOB_LINK_PATTERNS = {
-      'indeed' => /indeed\.com\/(rc\/clk|job|jobs|viewjob)/i,
-      'linkedin' => /linkedin\.com\/(jobs\/view|comm\/jobs\/view)/i,
-      'adzuna' => /adzuna\.com\/details/i
+      'indeed' => %r{indeed\.com/(rc/clk|job|jobs|viewjob)}i,
+      'linkedin' => %r{linkedin\.com/(jobs/view|comm/jobs/view)}i,
+      'adzuna' => %r{adzuna\.com/details}i
     }.freeze
 
     NOISE_PATTERNS = [
@@ -26,8 +26,8 @@ module EmailIngestion
       /fb\.com/i,
       /twitter\.com/i,
       /instagram\.com/i,
-      /linkedin\.com\/company/i,
-      /linkedin\.com\/in\//i
+      %r{linkedin\.com/company}i,
+      %r{linkedin\.com/in/}i
     ].freeze
 
     def initialize(parsed_email, source_provider)
@@ -39,14 +39,12 @@ module EmailIngestion
       urls = []
 
       # Extract from text body
-      if @parsed_email[:text_body]
-        urls += URI.extract(@parsed_email[:text_body], %w[http https])
-      end
+      urls += URI.extract(@parsed_email[:text_body], %w[http https]) if @parsed_email[:text_body]
 
       # Extract from HTML body
       if @parsed_email[:html_body]
         doc = Nokogiri::HTML(@parsed_email[:html_body])
-        urls += doc.css('a').map { |a| a['href'] }.compact
+        urls += doc.css('a').filter_map { |a| a['href'] }
       end
 
       clean_urls(urls)
@@ -55,21 +53,19 @@ module EmailIngestion
     private
 
     def clean_urls(urls)
-      urls.map do |url|
-        begin
-          uri = URI.parse(url.to_s.strip)
-          next unless %w[http https].include?(uri.scheme)
+      urls.filter_map do |url|
+        uri = URI.parse(url.to_s.strip)
+        next unless %w[http https].include?(uri.scheme)
 
-          # Remove fragments
-          uri.fragment = nil
+        # Remove fragments
+        uri.fragment = nil
 
-          # Special handling for tracked/redirect links if we can identify them
-          # For now, just normalize the URL string
-          uri.to_s
-        rescue URI::InvalidURIError
-          nil
-        end
-      end.compact.uniq.select { |url| candidate_job_link?(url) }
+        # Special handling for tracked/redirect links if we can identify them
+        # For now, just normalize the URL string
+        uri.to_s
+      rescue URI::InvalidURIError
+        nil
+      end.uniq.select { |url| candidate_job_link?(url) }
     end
 
     def candidate_job_link?(url)

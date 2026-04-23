@@ -58,7 +58,7 @@ module JobBoards
       else
         job.update!(crawl_status: 'enrichment_failed_no_content')
       end
-    rescue => e
+    rescue StandardError => e
       job.update!(crawl_status: 'enrichment_error')
       Rails.logger.error "[ContentEnrichment] Failed for Job ##{job.id}: #{e.message}"
     end

@@ -13,20 +13,20 @@ module LLM
     end
 
     def call
-      return { success: false, error: "Profile incomplete" } unless @profile&.work_experiences&.any?
+      return { success: false, error: 'Profile incomplete' } unless @profile&.work_experiences&.any?
 
       prompt = build_cover_letter_prompt
-      
+
       result = LLM::Orchestrator.call(
         untrusted_text: prompt,
-        system_rules: "You are an elite technical career strategist and ghostwriter.",
-        task_instructions: "Generate a bespoke, high-impact cover letter in markdown format."
+        system_rules: 'You are an elite technical career strategist and ghostwriter.',
+        task_instructions: 'Generate a bespoke, high-impact cover letter in markdown format.'
       )
 
       if result[:success]
         # Attach the generated artifact to the user's job record
         user_job = @user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
-        # We can store this in a new field or just return it for now. 
+        # We can store this in a new field or just return it for now.
         # I will store it in notes or a dedicated field if we add one.
         user_job.update!(notes: "#{user_job.notes}\n\n### [GENERATED_COVER_LETTER]\n#{result[:output]}")
         { success: true, output: result[:output] }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: board_queries
@@ -13,6 +15,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe BoardQuery, type: :model do
+RSpec.describe BoardQuery do
   pending "add some examples to (or delete) #{__FILE__}"
 end

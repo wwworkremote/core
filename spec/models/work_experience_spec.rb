@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: work_experiences
@@ -31,6 +33,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe WorkExperience, type: :model do
+RSpec.describe WorkExperience do
   pending "add some examples to (or delete) #{__FILE__}"
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: pipeline_steps
@@ -25,11 +27,11 @@
 class PipelineStep < ApplicationRecord
   belongs_to :job_posting
   belongs_to :user, optional: true
-  
+
   has_many_attached :artifacts
 
   # Optional link and note fields to capture pipeline activity
   # Status: favorited, applied, interview, offered, archived, noted
-  
+
   validates :status, presence: true
 end

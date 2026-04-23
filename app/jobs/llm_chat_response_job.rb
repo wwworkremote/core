@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LLMChatResponseJob < ApplicationJob
   heavyweight!
   idempotent! ->(chat_id, _content) { "chat/#{chat_id}" }
@@ -11,7 +13,7 @@ class LLMChatResponseJob < ApplicationJob
       untrusted_text: content,
       chat: llm_chat,
       model: llm_chat.model,
-      system_rules: "You are a helpful assistant.",
+      system_rules: 'You are a helpful assistant.',
       task_instructions: "Respond to the user's message based on our conversation history.",
       metadata: { llm_chat_id: llm_chat.id }
     )

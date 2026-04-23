@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: discovery_links
@@ -16,8 +18,8 @@
 #
 FactoryBot.define do
   factory :discovery_link do
-    board_name { "MyString" }
-    url { "MyString" }
-    status { "MyString" }
+    board_name { 'MyString' }
+    url { 'MyString' }
+    status { 'MyString' }
   end
 end

@@ -12,14 +12,14 @@ module LLM
       @untrusted_text = untrusted_text
       @chat = chat
       @agent = agent
-      @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : "You are a helpful assistant.")
-      @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
+      @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : 'You are a helpful assistant.')
+      @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : 'Process the data.')
       @schema = schema
       @model = model || @chat&.model || agent_model || LLM::Registry.default_model
       @metadata = metadata
     end
 
-    def call(&block)
+    def call(&)
       tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
 
       # Ensure all metadata keys are strings for OTel
@@ -27,8 +27,8 @@ module LLM
 
       tracer.in_span('orchestrate_llm_call', attributes: { 'app.llm.model' => @model&.model_id }.merge(stringified_metadata)) do |span|
         unless @model
-          span.status = OpenTelemetry::Trace::Status.error("No model provided or found in registry")
-          return format_failure("No model provided or found in registry")
+          span.status = OpenTelemetry::Trace::Status.error('No model provided or found in registry')
+          return format_failure('No model provided or found in registry')
         end
 
         # 1. Inbound Guardrails
@@ -40,11 +40,11 @@ module LLM
 
         # 2. Execution (No fallback/escalation for local-only)
         begin
-          execute_with_model(@model, guardrail_result.sanitized_text, span, &block)
+          execute_with_model(@model, guardrail_result.sanitized_text, span, &)
         rescue ActiveRecord::ConnectionTimeoutError => e
           Rails.logger.error "[Orchestrator] Database connection timeout: #{e.message}. Pool is likely exhausted."
           span.status = OpenTelemetry::Trace::Status.error("DB Connection Timeout: #{e.message}")
-          format_failure("Database connection timeout. Please try again later.")
+          format_failure('Database connection timeout. Please try again later.')
         rescue StandardError => e
           Rails.logger.error "[Orchestrator] Model (#{@model.model_id}) execution failed: #{e.message}."
           span.status = OpenTelemetry::Trace::Status.error(e.message)
@@ -60,7 +60,7 @@ module LLM
       ::Model.find_by(model_id: @agent.model_id)
     end
 
-    def execute_with_model(model, sanitized_text, span, &block)
+    def execute_with_model(model, sanitized_text, span, &)
       span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
 
       chat = @chat || LLMChat.create!(model: model)
@@ -78,18 +78,18 @@ module LLM
       # Correct RubyLLM registry resolution
       provider_map = {
         anthropic: RubyLLM::Providers::Anthropic,
-        azure:     RubyLLM::Providers::Azure,
-        bedrock:   RubyLLM::Providers::Bedrock,
-        deepseek:  RubyLLM::Providers::DeepSeek,
-        gemini:    RubyLLM::Providers::Gemini,
-        gpustack:  RubyLLM::Providers::GPUStack,
-        mistral:   RubyLLM::Providers::Mistral,
-        ollama:    RubyLLM::Providers::Ollama,
-        openai:    RubyLLM::Providers::OpenAI,
+        azure: RubyLLM::Providers::Azure,
+        bedrock: RubyLLM::Providers::Bedrock,
+        deepseek: RubyLLM::Providers::DeepSeek,
+        gemini: RubyLLM::Providers::Gemini,
+        gpustack: RubyLLM::Providers::GPUStack,
+        mistral: RubyLLM::Providers::Mistral,
+        ollama: RubyLLM::Providers::Ollama,
+        openai: RubyLLM::Providers::OpenAI,
         openrouter: RubyLLM::Providers::OpenRouter,
         perplexity: RubyLLM::Providers::Perplexity,
-        vertexai:  RubyLLM::Providers::VertexAI,
-        xai:       RubyLLM::Providers::XAI
+        vertexai: RubyLLM::Providers::VertexAI,
+        xai: RubyLLM::Providers::XAI
       }
 
       provider_class = provider_map[model.provider.to_sym]
@@ -109,7 +109,7 @@ module LLM
         )
       end
 
-      full_output = String.new
+      full_output = +''
 
       # Use the native complete pattern to stream content directly
       client.complete(

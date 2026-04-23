@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: board_queries
@@ -21,8 +23,6 @@ class BoardQuery < ApplicationRecord
     when 'indeed' then build_indeed_url
     when 'dice' then build_dice_url
     when 'remoteok' then build_remoteok_url
-    else
-      nil
     end
   end
 
@@ -30,12 +30,12 @@ class BoardQuery < ApplicationRecord
     # ... existing cord logic ...
     keyword = terms.first
     base_slug = keyword.parameterize
-    
+
     filters = [
       { a: 'sortBy', l: 'Responsiveness', v: 'response_rate' },
       { a: 'keyword', l: keyword, v: keyword }
     ]
-    
+
     if query_params['remote']
       filters << { a: 'remote', l: ' Remote', v: 'remote' }
       filters << { a: 'remoteLocationCountries', l: " #{query_params['country']}", v: query_params['country'] } if query_params['country'].present?
@@ -43,7 +43,7 @@ class BoardQuery < ApplicationRecord
 
     Array(query_params['seniority']).each { |s| filters << { a: 'seniority', l: " #{s.capitalize}", v: s.downcase } }
     filters << { a: 'salary', l: "Min: £#{query_params['min_salary'].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, '\1,')}", v: query_params['min_salary'].to_i } if query_params['min_salary'].present?
-    
+
     query = { filters: filters.to_json, v: { label: 'Positions', value: 'listing' }.to_json, resultType: 'all' }
     "https://cord.com/search/jobs/#{base_slug}?#{query.to_query}"
   end

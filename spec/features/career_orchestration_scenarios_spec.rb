@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'The Career Orchestration Loop', type: :system do
   let(:admin_user) { User.find_by(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com')) || create(:user) }
-  let!(:job_posting) { create(:job_posting, title: "Staff Ruby on Rails Engineer", body: "Deep Ruby and Rails expertise required.") }
+  let!(:job_posting) { create(:job_posting, title: 'Staff Ruby on Rails Engineer', body: 'Deep Ruby and Rails expertise required.') }
 
   before do
     driven_by :cuprite
@@ -16,16 +16,16 @@ RSpec.describe 'The Career Orchestration Loop', type: :system do
     # 1. Identity Synchronization
     visit career_profile_path
     click_button 'SYNC_FROM_YAML'
-    
+
     # Verify sync by checking for content that should be in the DB after sync
     expect(WorkExperience.count).to be > 0
     expect(page).to have_content(/Career Profile/i)
 
     # 2. Strategic Analysis
     visit job_posting_path(job_posting)
-    
+
     # Mock LLM Match Analysis
-    mock_analysis = "MATCH_CONFIDENCE: 92%"
+    mock_analysis = 'MATCH_CONFIDENCE: 92%'
     expect(LLM::Orchestrator).to receive(:call).at_least(:once).and_return({ success: true, output: mock_analysis })
 
     # Use a very specific button matcher
@@ -37,7 +37,5 @@ RSpec.describe 'The Career Orchestration Loop', type: :system do
     visit root_path
     expect(page).to have_content(job_posting.title)
     expect(page).to have_content(/HIGH_CONFIDENCE/i)
-
-    puts "SCENARIO_SUCCESS: Career Orchestration Loop verified."
   end
 end

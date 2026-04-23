@@ -13,7 +13,7 @@ module Admin
     def destroy
       @document = JobBoards::Document.find(params[:id])
       @document.destroy
-      redirect_to admin_documents_path, notice: "Document was successfully deleted."
+      redirect_to admin_documents_path, notice: 'Document was successfully deleted.'
     end
   end
 end

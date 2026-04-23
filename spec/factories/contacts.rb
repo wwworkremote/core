@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: contacts
@@ -25,11 +27,11 @@
 #
 FactoryBot.define do
   factory :contact do
-    name { "MyString" }
-    email { "MyString" }
-    phone { "MyString" }
-    role { "MyString" }
-    relationship_type { "MyString" }
+    name { 'MyString' }
+    email { 'MyString' }
+    phone { 'MyString' }
+    role { 'MyString' }
+    relationship_type { 'MyString' }
     job_posting { nil }
   end
 end

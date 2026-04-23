@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
@@ -17,9 +19,9 @@
 #
 FactoryBot.define do
   factory :user do
-    name { "Test User" }
+    name { 'Test User' }
     email { "test-#{SecureRandom.hex(4)}@example.com" }
-    password { "password" }
+    password { 'password' }
     slug { SecureRandom.hex(8) }
   end
 end

@@ -3,7 +3,7 @@
 class InterviewSession < ApplicationRecord
   belongs_to :job_posting
   belongs_to :user
-  
+
   has_many :interview_questions, dependent: :destroy
   has_many_attached :artifacts
 

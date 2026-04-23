@@ -3,7 +3,7 @@
 class InterviewTask < ApplicationRecord
   belongs_to :job_posting
   belongs_to :user
-  
+
   has_many_attached :artifacts
 
   validates :title, presence: true

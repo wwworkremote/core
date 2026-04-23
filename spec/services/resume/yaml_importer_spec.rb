@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe Resume::YamlImporter do
   let(:user) { create(:user) }
-  let(:base_path) { Rails.root.join('spec', 'fixtures', 'resume') }
+  let(:base_path) { Rails.root.join('spec/fixtures/resume') }
 
   before do
     stub_const('Resume::YamlImporter::BASE_PATH', base_path.to_s)
     FileUtils.mkdir_p(base_path.join('positions'))
-    
+
     # Mock profile.yml
     File.write(base_path.join('profile.yml'), {
       'name' => 'Mike Hall',
@@ -43,7 +43,7 @@ RSpec.describe Resume::YamlImporter do
       user.reload
       expect(user.name).to eq('Mike Hall')
       expect(user.career_profile.location_info['display']).to eq('Chicago, IL')
-      
+
       exp = user.career_profile.work_experiences.first
       expect(exp.company_name).to eq('ActiveCampaign')
       expect(exp.start_date).to eq(Date.new(2018, 9, 1))

@@ -3,7 +3,7 @@
 module Resume
   class SemanticMatchFinder
     def self.call(career_profile, limit: 10)
-      return [] unless career_profile.embedding.present?
+      return [] if career_profile.embedding.blank?
 
       # Find nearest neighbors in JobPosting
       JobPosting.where.not(embedding: nil)

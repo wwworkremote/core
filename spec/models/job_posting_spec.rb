@@ -45,10 +45,10 @@
 #
 require 'rails_helper'
 
-RSpec.describe JobPosting, type: :model do
+RSpec.describe JobPosting do
   describe 'validations' do
-    subject { JobPosting.new(signature: 'test-sig') }
-    
+    subject { described_class.new(signature: 'test-sig') }
+
     it { is_expected.to validate_presence_of(:signature) }
     it { is_expected.to validate_uniqueness_of(:signature) }
   end
@@ -61,10 +61,10 @@ RSpec.describe JobPosting, type: :model do
 
   describe 'scopes' do
     let!(:job) { create(:job_posting, published_at: 1.day.ago) }
-    
+
     it 'orders by published_at' do
-      # Note: This is an example, adjust based on actual logic
-      expect(JobPosting.all).to include(job)
+      # NOTE: This is an example, adjust based on actual logic
+      expect(described_class.all).to include(job)
     end
   end
 end

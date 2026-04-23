@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: models
@@ -27,5 +29,6 @@
 #
 class Model < ApplicationRecord
   include ::RubyLLM::ActiveRecord::ActsAs
+
   acts_as_model chats: :llm_chats, chats_foreign_key: :model_id
 end

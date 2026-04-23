@@ -2,8 +2,8 @@
 
 class DataFetchersController < ApplicationController
   def index
-    @fetcher_statuses = DataAcquisitionManager.fetchers.each_with_object({}) do |f, hash|
-      hash[f[:slug]] = DataAcquisitionManager.status(f[:slug])
+    @fetcher_statuses = DataAcquisitionManager.fetchers.to_h do |f|
+      [f[:slug], DataAcquisitionManager.status(f[:slug])]
     end
   end
 
@@ -30,7 +30,7 @@ class DataFetchersController < ApplicationController
   def run_all_by_type
     type = params[:type]
     fetchers = DataAcquisitionManager.fetchers.select { |f| DataAcquisitionManager::FETCHERS[f[:slug]][:type] == type }
-    
+
     begin
       fetchers.each do |f|
         DataAcquisitionManager.run(f[:slug], force: false)

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'RubyLLM Chat Interface', type: :request do
+RSpec.describe 'RubyLLM Chat Interface' do
   let(:email) { ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com') }
   let(:password) { ENV.fetch('ADMIN_PASSWORD', 'password') }
   let(:auth_headers) { { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(email, password) } }

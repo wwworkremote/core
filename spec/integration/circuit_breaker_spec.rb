@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Distributed Circuit Breaker Integration', type: :request do
+RSpec.describe 'Distributed Circuit Breaker Integration' do
   include ApiGuard
 
   let(:source_slug) { 'lever' }

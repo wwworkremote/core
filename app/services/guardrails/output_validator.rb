@@ -20,9 +20,7 @@ module Guardrails
 
       # 1. Pattern check for prompt injection leakage
       FORBIDDEN_PATTERNS.each do |pattern|
-        if @output.match?(pattern)
-          findings << "Forbidden pattern detected in output: #{pattern.source}"
-        end
+        findings << "Forbidden pattern detected in output: #{pattern.source}" if @output.match?(pattern)
       end
 
       # 2. JSON validation if schema provided
@@ -31,9 +29,7 @@ module Guardrails
           parsed = JSON.parse(@output.match(/\{.*\}/m)&.[](0) || '')
           # Basic structural check for this implementation
           @schema.each do |key, type|
-            unless parsed[key].is_a?(type)
-              findings << "Schema violation: expected #{key} to be #{type}"
-            end
+            findings << "Schema violation: expected #{key} to be #{type}" unless parsed[key].is_a?(type)
           end
         rescue StandardError => e
           findings << "JSON parse/validation error: #{e.message}"

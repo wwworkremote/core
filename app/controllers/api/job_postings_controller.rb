@@ -20,21 +20,19 @@ module Api
           job_data = JobFetchers::CanonicalJobExtractor.new(
             params[:html], params[:url], provider
           ).call
-          job_data[:description].present? ?
-            ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass, github_flavored: true).strip
-            : nil
+          ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass, github_flavored: true).strip if job_data[:description].present?
         end
 
-      unless markdown_body.present?
+      if markdown_body.blank?
         return render json: { success: false, error: 'No description found in captured content.' },
-                      status: :unprocessable_entity
+                      status: :unprocessable_content
       end
 
       # ── Column-mapped fields ─────────────────────────────────────────────────
       attrs = {
-        body:         markdown_body,
+        body: markdown_body,
         crawl_status: 'enriched',
-        enriched_at:  Time.current,
+        enriched_at: Time.current
       }
 
       attrs[:title]        = extracted['title']    if extracted['title'].present?
@@ -45,7 +43,7 @@ module Api
 
       if extracted['skills'].present?
         raw = extracted['skills']
-        attrs[:tags] = raw.is_a?(Array) ? raw : raw.split(/\s*,\s*/).map(&:strip).reject(&:blank?)
+        attrs[:tags] = raw.is_a?(Array) ? raw : raw.split(/\s*,\s*/).map(&:strip).compact_blank
       end
 
       # ── JSONB data fields ────────────────────────────────────────────────────

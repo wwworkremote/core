@@ -22,7 +22,7 @@ module EmailIngestion
     def move_to(subdir)
       return unless File.exist?(@file_path)
 
-      base_dir = File.dirname(File.dirname(@file_path))
+      base_dir = File.dirname(@file_path, 2)
       target_dir = File.join(base_dir, subdir, @source)
       FileUtils.mkdir_p(target_dir)
 

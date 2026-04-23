@@ -4,7 +4,7 @@ require 'yaml'
 
 module Resume
   class YamlImporter
-    BASE_PATH = "/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume"
+    BASE_PATH = '/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume'
 
     def self.call(user)
       new(user).call
@@ -27,7 +27,7 @@ module Resume
     private
 
     def import_profile
-      data = load_yaml("profile.yml")
+      data = load_yaml('profile.yml')
       return unless data
 
       @user.update!(name: data['name'])
@@ -38,12 +38,12 @@ module Resume
     end
 
     def import_positions
-      Dir.glob(File.join(BASE_PATH, "positions", "*.yml")).each do |file|
+      Dir.glob(File.join(BASE_PATH, 'positions', '*.yml')).each do |file|
         data = YAML.load_file(file)
         next unless data
 
-        external_id = data['id'] || File.basename(file, ".yml")
-        
+        external_id = data['id'] || File.basename(file, '.yml')
+
         exp = @profile.work_experiences.find_or_initialize_by(external_id: external_id)
         exp.update!(
           company_name: data.dig('company', 'name'),
@@ -73,17 +73,13 @@ module Resume
 
     def parse_date(str)
       return nil if str.blank? || str.downcase == 'present'
-      
+
       # Handle "September 2018"
       begin
         Date.parse(str)
       rescue Date::Error
         # Fallback for year only or other formats
-        if str =~ /^\d{4}$/
-          Date.new(str.to_i, 1, 1)
-        else
-          nil
-        end
+        Date.new(str.to_i, 1, 1) if /^\d{4}$/.match?(str)
       end
     end
 

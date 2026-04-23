@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: llm_chats
@@ -17,5 +19,6 @@
 #
 class LLMChat < ApplicationRecord
   include ::RubyLLM::ActiveRecord::ActsAs
+
   acts_as_chat messages: :llm_messages, messages_foreign_key: :llm_chat_id
 end

@@ -18,17 +18,11 @@ module EmailIngestion
           req.headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         end
 
-        if [301, 302, 303, 307, 308].include?(response.status)
-          location = response.headers['location']
-          if location
-            # Resolve relative URLs
-            resolved_url = URI.join(resolved_url, location).to_s
-          else
-            break
-          end
-        else
-          break
-        end
+        break unless [301, 302, 303, 307, 308].include?(response.status)
+        location = response.headers['location']
+        break unless location
+        # Resolve relative URLs
+        resolved_url = URI.join(resolved_url, location).to_s
       rescue StandardError => e
         Rails.logger.error "[CanonicalUrlResolver] Error resolving #{@url}: #{e.message}"
         break

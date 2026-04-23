@@ -3,7 +3,7 @@
 class CompanyPipelineStepsController < ApplicationController
   def create
     @company = Company.find(params[:company_id])
-    
+
     if params[:status].present?
       # Whitelist AASM events to prevent dangerous send
       allowed_events = %w[favorite archive]
@@ -15,6 +15,6 @@ class CompanyPipelineStepsController < ApplicationController
       @company.add_pipeline_note(params[:note], link: params[:link])
     end
 
-    redirect_to admin_company_path(@company), notice: "Activity logged."
+    redirect_to admin_company_path(@company), notice: 'Activity logged.'
   end
 end

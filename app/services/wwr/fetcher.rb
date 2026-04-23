@@ -6,6 +6,7 @@ require 'feedjira'
 module Wwr
   class Fetcher
     include ApiGuard
+
     RSS_URL = 'https://weworkremotely.com/remote-jobs.rss'
 
     def call(force: false)

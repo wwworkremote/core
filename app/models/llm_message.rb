@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: llm_messages
@@ -34,6 +36,7 @@
 #
 class LLMMessage < ApplicationRecord
   include ::RubyLLM::ActiveRecord::ActsAs
+
   acts_as_message chat: :llm_chat, chat_foreign_key: :llm_chat_id, tool_calls_foreign_key: :llm_message_id
   has_many_attached :attachments
 
@@ -41,7 +44,7 @@ class LLMMessage < ApplicationRecord
 
   def broadcast_append_chunk(content)
     broadcast_append_to "llm_chat_#{llm_chat_id}",
-      target: "llm_message_#{id}_content",
-      content: ERB::Util.html_escape(content.to_s)
+                        target: "llm_message_#{id}_content",
+                        content: ERB::Util.html_escape(content.to_s)
   end
 end

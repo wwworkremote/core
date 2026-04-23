@@ -11,7 +11,6 @@ class PagesController < ApplicationController
     end
   end
 
-  private
 
   # VALID_PAGES is used for reference
 end

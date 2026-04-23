@@ -10,14 +10,14 @@ module LLM
     # @return [Hash] Success status and structured analysis output.
     def self.call(user, job_posting)
       profile = user.career_profile
-      
+
       # Debug logging for incomplete profiles
       unless profile&.resume_text.present? || profile&.work_experiences&.any? || profile&.resumes&.attached?
         Rails.logger.warn "[ProfileMatcher] Profile incomplete for User ##{user.id}: " \
                           "resume_text: #{profile&.resume_text.present?}, " \
                           "work_experiences: #{profile&.work_experiences&.any?}, " \
                           "resumes_attached: #{profile&.resumes&.attached?}"
-        return { success: false, error: "Profile incomplete. Please set up your resume." }
+        return { success: false, error: 'Profile incomplete. Please set up your resume.' }
       end
 
       user_job = user.user_job_postings.find_or_create_by!(job_posting: job_posting)
@@ -50,7 +50,7 @@ module LLM
         Tier: #{profile.experience_level}
         Skills: #{profile.skills}
         Goals: #{profile.goals}
-        
+
         [STRUCTURED_EXPERIENCE]
         #{experiences_context}
 
@@ -81,13 +81,13 @@ module LLM
 
       result = LLM::Orchestrator.call(
         untrusted_text: prompt,
-        system_rules: "You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach.",
-        task_instructions: "Return a structured markdown analysis. Be honest, critical, and preparation-oriented."
+        system_rules: 'You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach.',
+        task_instructions: 'Return a structured markdown analysis. Be honest, critical, and preparation-oriented.'
       )
 
       if result[:success] && result[:output].present?
         user_job.update!(match_analysis: result[:output])
-        
+
         # Try to extract numerical score (e.g. 85%)
         score_match = result[:output].match(/MATCH_CONFIDENCE.*?(\d+)%/i)
         score = 0
@@ -98,7 +98,7 @@ module LLM
 
         { success: true, output: result[:output], score: score }
       else
-        error_msg = result[:error] || "LLM returned empty response"
+        error_msg = result[:error] || 'LLM returned empty response'
         Rails.logger.error "[ProfileMatcher] Failed for Job #{job_posting.id}: #{error_msg}"
         { success: false, error: error_msg }
       end

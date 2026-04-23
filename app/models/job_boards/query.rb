@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: job_boards_queries
@@ -13,7 +15,9 @@
 #
 #  index_job_boards_queries_on_source_id  (source_id)
 #
-class JobBoards::Query < ApplicationRecord
-  belongs_to :job_boards_source, class_name: 'JobBoards::Source', foreign_key: 'source_id'
-  has_many :job_boards_documents, class_name: 'JobBoards::Document', foreign_key: 'job_boards_query_id', dependent: :destroy
+module JobBoards
+  class Query < ApplicationRecord
+    belongs_to :job_boards_source, class_name: 'JobBoards::Source', foreign_key: 'source_id'
+    has_many :job_boards_documents, class_name: 'JobBoards::Document', foreign_key: 'job_boards_query_id', dependent: :destroy
+  end
 end

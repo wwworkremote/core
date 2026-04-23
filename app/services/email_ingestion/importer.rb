@@ -19,7 +19,7 @@ module EmailIngestion
         rake = Rake::Application.new
         Rake.application = rake
         Rake::Task.define_task(:environment)
-        load Rails.root.join('lib', 'tasks', 'eml.rake')
+        load Rails.root.join('lib/tasks/eml.rake')
         rake['eml:scan_source'].invoke(source)
 
       end
@@ -63,8 +63,6 @@ module EmailIngestion
       end
     end
 
-    private
-
     def process_job_link(job_link, parsed_email)
       # a. Resolve Canonical URL
       canonical_url = EmailIngestion::CanonicalUrlResolver.new(job_link).call
@@ -100,14 +98,12 @@ module EmailIngestion
       )
 
       doc = JobBoards::Document.find_or_initialize_by(signature: signature)
-      if doc.new_record?
-        doc.source_id = source.id
-        doc.job_boards_query_id = query.id
-        doc.document = enriched_data.to_json
-        unless doc.save
-          Rails.logger.error "[EmailIngestion::Importer] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}"
-        end
-      end
+      return unless doc.new_record?
+      doc.source_id = source.id
+      doc.job_boards_query_id = query.id
+      doc.document = enriched_data.to_json
+      return if doc.save
+      Rails.logger.error "[EmailIngestion::Importer] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}"
     end
   end
 end

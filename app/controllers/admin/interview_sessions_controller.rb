@@ -8,7 +8,7 @@ module Admin
       @session.user = current_user
 
       if @session.save
-        redirect_to @job_posting, notice: "🚀 Interview session initialized in the Laboratory."
+        redirect_to @job_posting, notice: '🚀 Interview session initialized in the Laboratory.'
       else
         redirect_to @job_posting, alert: "Failed to initialize session: #{@session.errors.full_messages.join(', ')}"
       end

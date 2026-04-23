@@ -14,7 +14,7 @@ module LLM
     end
 
     def call
-      return { success: false, error: "No feedback provided." } if @raw_feedback.blank?
+      return { success: false, error: 'No feedback provided.' } if @raw_feedback.blank?
 
       prompt = <<~PROMPT
         [SYSTEM_OBJECTIVE]
@@ -45,8 +45,8 @@ module LLM
 
       result = LLM::Orchestrator.call(
         untrusted_text: prompt,
-        system_rules: "You are a ruthless corporate culture auditor. You prioritize candidate well-being over corporate PR.",
-        task_instructions: "Return JSON only. Be clinical and accurate."
+        system_rules: 'You are a ruthless corporate culture auditor. You prioritize candidate well-being over corporate PR.',
+        task_instructions: 'Return JSON only. Be clinical and accurate.'
       )
 
       if result[:success]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: user_job_postings
@@ -33,23 +35,23 @@ class UserJobPosting < ApplicationRecord
     state :favorited, :applied, :interview, :offered, :archived
 
     event :favorite do
-      transitions from: [:none, :archived], to: :favorited
+      transitions from: %i[none archived], to: :favorited
     end
 
     event :apply do
-      transitions from: [:favorited, :interview], to: :applied
+      transitions from: %i[favorited interview], to: :applied
     end
 
     event :interview do
-      transitions from: [:favorited, :applied], to: :interview
+      transitions from: %i[favorited applied], to: :interview
     end
 
     event :offer do
-      transitions from: [:favorited, :applied, :interview], to: :offered
+      transitions from: %i[favorited applied interview], to: :offered
     end
 
     event :archive do
-      transitions from: [:favorited, :applied, :interview, :offered], to: :archived
+      transitions from: %i[favorited applied interview offered], to: :archived
     end
   end
 end

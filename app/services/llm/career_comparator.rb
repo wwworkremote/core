@@ -13,8 +13,8 @@ module LLM
     end
 
     def call
-      return { success: false, error: "Need at least 2 jobs to compare." } if @job_postings.count < 2
-      
+      return { success: false, error: 'Need at least 2 jobs to compare.' } if @job_postings.count < 2
+
       prompt = <<~PROMPT
         [SYSTEM_OBJECTIVE]
         Perform a comparative semantic analysis between the candidate's profile and several potential job opportunities.
@@ -40,8 +40,8 @@ module LLM
 
       LLM::Orchestrator.call(
         untrusted_text: prompt,
-        system_rules: "You are a strategic career consultant and game-theory expert in technical hiring.",
-        task_instructions: "Return a sharp, comparative analysis in markdown."
+        system_rules: 'You are a strategic career consultant and game-theory expert in technical hiring.',
+        task_instructions: 'Return a sharp, comparative analysis in markdown.'
       )
     end
 

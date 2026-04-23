@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'LLM Models loading', type: :model do
+RSpec.describe 'LLM Models loading' do
   it 'can load LLMChat' do
     expect { LLMChat }.not_to raise_error
   end

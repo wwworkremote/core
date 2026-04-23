@@ -15,7 +15,7 @@ RSpec.describe HackerNews::Backfill, type: :service do
 
     it 'fetches historic jobs from Algolia and stores them as documents' do
       expect {
-        service.call(before_timestamp: 1772468371)
+        service.call(before_timestamp: 1_772_468_371)
       }.to change(JobBoards::Document, :count)
 
       doc = JobBoards::Document.last

@@ -39,13 +39,12 @@ module Scraper
         data['results'].each do |job_data|
           signature = Digest::SHA256.hexdigest("linkedin-#{job_data['external_id']}")
           doc = JobBoards::Document.find_or_initialize_by(signature: signature)
-          if doc.new_record?
-            doc.source_id = source&.id
-            doc.job_boards_query_id = query&.id
-            doc.document = job_data.to_json
-            doc.save!
-            processed_count += 1
-          end
+          next unless doc.new_record?
+          doc.source_id = source&.id
+          doc.job_boards_query_id = query&.id
+          doc.document = job_data.to_json
+          doc.save!
+          processed_count += 1
         end
 
         { success: true, count: processed_count }
@@ -64,7 +63,7 @@ module Scraper
 
           href = title_link['href']
           job_id = href.match(%r{/view/(\w+-\w+|(\d+))})&.[](0)&.split('-')&.last || href.match(%r{view/(\d+)})&.[](1)
-          
+
           # If we can't get a clean numeric ID, use a hash of the href
           job_id ||= Digest::MD5.hexdigest(href)[0..10]
 

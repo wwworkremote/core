@@ -11,8 +11,8 @@ module JobBoards
       LLM::Orchestrator.call(
         agent: self,
         untrusted_text: job_posting.body&.truncate(4000),
-        schema: { 
-          'category' => String, 
+        schema: {
+          'category' => String,
           'tags' => Array,
           'is_remote' => :boolean,
           'remote_nuance' => String,

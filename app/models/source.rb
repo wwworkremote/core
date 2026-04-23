@@ -10,7 +10,7 @@ class Source < ApplicationRecord
   jsonb_accessor :payload, url: :string
 
   # Real-time dashboard telemetry
-  after_create_commit -> { broadcast_replace_to "system_telemetry", target: "source_stats", partial: "home/telemetry_ingestion" }
+  after_create_commit -> { broadcast_replace_to 'system_telemetry', target: 'source_stats', partial: 'home/telemetry_ingestion' }
 
   def self.ransackable_attributes(_auth_object = nil)
     %w[id name signature created_at updated_at origin_id]

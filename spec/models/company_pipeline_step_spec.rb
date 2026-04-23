@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: company_pipeline_steps
@@ -23,6 +25,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe CompanyPipelineStep, type: :model do
+RSpec.describe CompanyPipelineStep do
   pending "add some examples to (or delete) #{__FILE__}"
 end

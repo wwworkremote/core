@@ -3,6 +3,7 @@
 module HackerNews
   class FetchJobstoryJob < ApplicationJob
     include ApiGuard
+
     queue_as :default
 
     def perform(jobstory_id, source_id = nil, query_id = nil)
@@ -29,9 +30,7 @@ module HackerNews
         doc.source_id = source_id
         doc.job_boards_query_id = query_id
         doc.document = data.to_json
-        unless doc.save
-          Rails.logger.error "[HackerNews::FetchJobstoryJob] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}"
-        end
+        Rails.logger.error "[HackerNews::FetchJobstoryJob] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}" unless doc.save
       end
 
       # Trigger sync after fetch

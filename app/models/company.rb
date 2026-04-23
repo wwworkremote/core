@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: companies
@@ -29,7 +31,7 @@ class Company < ApplicationRecord
     state :favorited, :archived
 
     event :favorite do
-      transitions from: [:none, :archived], to: :favorited
+      transitions from: %i[none archived], to: :favorited
     end
 
     event :archive do

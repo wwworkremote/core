@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
   def available_chat_models
     if Model.any?
       # Prioritize "ollama" provider at the top
-      Model.all.order(Arel.sql("CASE WHEN provider = 'ollama' THEN 0 ELSE 1 END"), :name)
+      Model.order(Arel.sql("CASE WHEN provider = 'ollama' THEN 0 ELSE 1 END"), :name)
     else
       RubyLLM.models.chat_models.all
              .sort_by { |model| [model.provider == :ollama ? 0 : 1, model.name.to_s] }

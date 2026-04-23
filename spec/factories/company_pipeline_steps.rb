@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: company_pipeline_steps
@@ -24,8 +26,8 @@
 FactoryBot.define do
   factory :company_pipeline_step do
     company { nil }
-    status { "MyString" }
-    note { "MyText" }
-    link { "MyString" }
+    status { 'MyString' }
+    note { 'MyText' }
+    link { 'MyString' }
   end
 end

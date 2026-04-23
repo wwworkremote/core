@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: job_boards_documents
@@ -17,11 +19,12 @@
 #  index_job_boards_documents_on_signature            (signature) UNIQUE
 #  index_job_boards_documents_on_source_id            (source_id)
 #
-class JobBoards::Document < ApplicationRecord
-  belongs_to :job_boards_source, class_name: 'JobBoards::Source', foreign_key: 'source_id'
-  belongs_to :job_boards_query, class_name: 'JobBoards::Query', foreign_key: 'job_boards_query_id'
+module JobBoards
+  class Document < ApplicationRecord
+    belongs_to :job_boards_source, class_name: 'JobBoards::Source', foreign_key: 'source_id'
+    belongs_to :job_boards_query, class_name: 'JobBoards::Query'
 
-  validates :signature, presence: true, uniqueness: true
-  validates :source_id, presence: true
-  validates :job_boards_query_id, presence: true
+    validates :signature, presence: true, uniqueness: true
+    validates :source_id, presence: true
+  end
 end

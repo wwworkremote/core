@@ -6,7 +6,7 @@ module Scraper
   module Glassdoor
     # Service to deep-scrape Glassdoor job listings and associated company intelligence.
     class ApiClient
-      BASE_URL = "https://www.glassdoor.com/Job/jobs.htm"
+      BASE_URL = 'https://www.glassdoor.com/Job/jobs.htm'
 
       def self.search(keywords, location: 'Remote')
         new.search(keywords, location)
@@ -20,17 +20,17 @@ module Scraper
         source = JobBoards::Source.find_or_create_by!(slug: 'glassdoor') { |s| s.name = 'Glassdoor' }
         query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
-        params = { 'sc.keyword' => keywords, 'locT' => 'C', 'locId' => location }
+        { 'sc.keyword' => keywords, 'locT' => 'C', 'locId' => location }
         url = "https://www.glassdoor.com/Job/jobs.htm?suggestCount=0&suggestChosen=false&clickSource=searchBtn&typedKeyword=#{keywords}&locT=R&locId=110&jobType="
-        
+
         Rails.logger.info "[Glassdoor::ApiClient] Fetching: #{url}"
-        
+
         # Using Playwright for full page render
         fetch_result = JobFetchers::PageFetch.new(url).call
         return { success: false, error: 'Fetch failed' } unless fetch_result
 
         data = parse_results(fetch_result[:content])
-        
+
         processed_count = 0
         data['results'].each do |job_data|
           # Create/Update Document
@@ -65,7 +65,7 @@ module Scraper
             'companyName' => card.css('[data-test="employer-short-name"]').text.strip,
             'jobGeo' => card.css('[data-test="location"]').text.strip,
             'rating' => card.css('[data-test="rating"]').text.strip,
-            'url' => "https://www.glassdoor.com" + card.css('a[data-test="job-link"]').first['href'],
+            'url' => "https://www.glassdoor.com#{card.css('a[data-test="job-link"]').first['href']}",
             'external_id' => external_id,
             'found_by_terms' => nil
           }

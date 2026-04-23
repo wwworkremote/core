@@ -3,32 +3,30 @@
 class CareerProfilesController < ApplicationController
   before_action :set_career_profile
 
-  def show
-  end
+  def show; end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if params[:sync]
       Resume::YamlImporter.call(current_user)
       Resume::ProfileEmbedder.new(@career_profile).call
-      redirect_to career_profile_path, notice: "Career profile synchronized and embedded successfully."
+      redirect_to career_profile_path, notice: 'Career profile synchronized and embedded successfully.'
     elsif params[:embed]
       Resume::ProfileEmbedder.new(@career_profile).call
-      redirect_to career_profile_path, notice: "Neural vectors synchronized successfully."
+      redirect_to career_profile_path, notice: 'Neural vectors synchronized successfully.'
     elsif @career_profile.update(career_profile_params)
       Resume::ProfileEmbedder.new(@career_profile).call
-      redirect_to career_profile_path, notice: "Career profile updated and embedded successfully."
+      redirect_to career_profile_path, notice: 'Career profile updated and embedded successfully.'
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   def sync_github
     result = LLM::GithubProcessor.call(@career_profile)
     if result[:success]
-      flash[:notice] = "🚀 GitHub technical evidence synchronized successfully."
+      flash[:notice] = '🚀 GitHub technical evidence synchronized successfully.'
     else
       flash[:alert] = "Failed to sync GitHub: #{result[:error]}"
     end
@@ -42,9 +40,9 @@ class CareerProfilesController < ApplicationController
   end
 
   def career_profile_params
-    params.require(:career_profile).permit(
-      :resume_text, :goals, :skills, :experience_level, :github_url,
-      job_experiences_attributes: [:id, :title, :company, :start_date, :end_date, :current, :description, :_destroy]
+    params.expect(
+      career_profile: [:resume_text, :goals, :skills, :experience_level, :github_url,
+                       { job_experiences_attributes: %i[id title company start_date end_date current description _destroy] }]
     )
   end
 end

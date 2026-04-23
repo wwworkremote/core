@@ -3,7 +3,7 @@
 module Scraper
   class Enricher
     def self.call(job_posting)
-      return unless job_posting.target_url.present?
+      return if job_posting.target_url.blank?
       enrich_posting(job_posting)
     end
 
@@ -20,19 +20,17 @@ module Scraper
       end
     end
 
-    private
-
     def self.extract_cord_job(discovery_link)
-      listing_id = discovery_link.url.match(/jobs\/(\d+)/)&.[](1)
+      listing_id = discovery_link.url.match(%r{jobs/(\d+)})&.[](1)
       return extract_generic_job(discovery_link) unless listing_id
 
       api_url = "https://cord.com/api/v2/public/position/#{listing_id}"
       response = Faraday.get(api_url)
-      
+
       if response.success?
         json = JSON.parse(response.body)
         data = json['data']
-        
+
         JobPosting.create!(
           title: data['position'],
           company: data['companyName'],

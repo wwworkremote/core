@@ -1,21 +1,25 @@
-class LLM::BatchMatchJob < ApplicationJob
-  queue_as :default
-  heavyweight!
-  idempotent!
+# frozen_string_literal: true
 
-  def perform(limit: 50)
-    return if SystemSetting.paused?
-    admin_user = User.find_by!(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com'))
-    return unless admin_user.career_profile&.resume_text.present?
+module LLM
+  class BatchMatchJob < ApplicationJob
+    queue_as :default
+    heavyweight!
+    idempotent!
 
-    # Target: High-priority roles not yet analyzed, prioritized by newest arrival
-    targets = JobPosting.where("title ILIKE ANY (ARRAY[?])", ['%ruby%', '%rails%', '%staff%', '%principal%'])
-                        .where.not(id: UserJobPosting.where(user: admin_user).select(:job_posting_id))
-                        .order(created_at: :desc)
-                        .limit(limit)
+    def perform(limit: 50)
+      return if SystemSetting.paused?
+      admin_user = User.find_by!(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com'))
+      return if admin_user.career_profile&.resume_text.blank?
 
-    targets.each do |job|
-      LLM::ProfileMatcher.call(admin_user, job)
+      # Target: High-priority roles not yet analyzed, prioritized by newest arrival
+      targets = JobPosting.where('title ILIKE ANY (ARRAY[?])', ['%ruby%', '%rails%', '%staff%', '%principal%'])
+                          .where.not(id: UserJobPosting.where(user: admin_user).select(:job_posting_id))
+                          .order(created_at: :desc)
+                          .limit(limit)
+
+      targets.each do |job|
+        LLM::ProfileMatcher.call(admin_user, job)
+      end
     end
   end
 end

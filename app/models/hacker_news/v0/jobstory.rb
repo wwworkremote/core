@@ -23,6 +23,7 @@ module HackerNews
   module V0
     class Jobstory < ApplicationRecord
       include PgSearch::Model
+
       multisearchable against: %i[title text]
 
       self.primary_key = :id

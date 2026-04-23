@@ -26,14 +26,14 @@
 #
 require 'rails_helper'
 
-RSpec.describe UserJobPosting, type: :model do
+RSpec.describe UserJobPosting do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:job_posting) }
   end
 
   describe 'states' do
-    let(:user_job_posting) { UserJobPosting.new }
+    let(:user_job_posting) { described_class.new }
 
     it 'starts in none state' do
       expect(user_job_posting.status).to eq('none')

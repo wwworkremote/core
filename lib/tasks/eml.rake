@@ -35,7 +35,7 @@ namespace :eml do
   end
 
   desc 'Process a single .eml file'
-  task :process_file, [:file_path, :source] => :environment do |_, args|
+  task :process_file, %i[file_path source] => :environment do |_, args|
     file_path = args[:file_path]
     source = args[:source]
 

@@ -20,4 +20,3 @@ task create_user: :environment do
     .create_with(name: 'Mike Hall', email: 'mike@just3ws.com')
     .find_or_create_by(slug: 'mike.hall')
 end
-

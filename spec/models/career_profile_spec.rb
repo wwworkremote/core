@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: career_profiles
@@ -26,6 +28,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe CareerProfile, type: :model do
+RSpec.describe CareerProfile do
   pending "add some examples to (or delete) #{__FILE__}"
 end

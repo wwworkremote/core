@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "OutboundLinks", type: :request do
-  describe "GET /index" do
+RSpec.describe 'OutboundLinks' do
+  describe 'GET /index' do
     pending "add some examples (or delete) #{__FILE__}"
   end
 end

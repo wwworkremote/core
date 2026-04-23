@@ -51,9 +51,9 @@ RSpec.describe 'Job Ingestion to AI Alignment Flow' do
     page_fetch_double = instance_double(JobFetchers::PageFetch)
     allow(JobFetchers::PageFetch).to receive(:new).with(job.target_url).and_return(page_fetch_double)
     allow(page_fetch_double).to receive(:call).and_return({
-      final_url: job.target_url,
-      content: "<html><body><h1>#{job.title}</h1><div class='description'>#{document_data[:description]}</div></body></html>"
-    })
+                                                            final_url: job.target_url,
+                                                            content: "<html><body><h1>#{job.title}</h1><div class='description'>#{document_data[:description]}</div></body></html>"
+                                                          })
 
     JobBoards::ContentEnrichmentJob.new.send(:enrich_job, job)
 

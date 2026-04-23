@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: system_settings
@@ -14,6 +16,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe SystemSetting, type: :model do
+RSpec.describe SystemSetting do
   pending "add some examples to (or delete) #{__FILE__}"
 end

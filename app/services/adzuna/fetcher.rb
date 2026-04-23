@@ -5,6 +5,7 @@ require 'digest'
 module Adzuna
   class Fetcher
     include ApiGuard
+
     BASE_URL = 'https://api.adzuna.com/v1/api/jobs/us/search/1'
 
     def call(force: false)

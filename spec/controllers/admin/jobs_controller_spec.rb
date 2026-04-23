@@ -2,13 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe Admin::JobsController, type: :controller do
+RSpec.describe Admin::JobsController do
   let(:admin) { User.create!(email: 'admin@example.com', password: 'password') }
 
   before do
     # Mock authentication logic since it's a controller spec
-    allow(controller).to receive(:authenticate_admin).and_return(true)
-    allow(controller).to receive(:current_user).and_return(admin)
+    allow(controller).to receive_messages(authenticate_admin: true, current_user: admin)
   end
 
   describe 'GET #index' do

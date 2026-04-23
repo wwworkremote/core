@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: user_job_postings
@@ -26,7 +28,7 @@ FactoryBot.define do
   factory :user_job_posting do
     user { nil }
     job_posting { nil }
-    status { "MyString" }
-    notes { "MyText" }
+    status { 'MyString' }
+    notes { 'MyText' }
   end
 end

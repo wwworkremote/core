@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: job_experiences
@@ -24,11 +26,11 @@
 FactoryBot.define do
   factory :job_experience do
     career_profile { nil }
-    title { "MyString" }
-    company { "MyString" }
-    start_date { "2026-04-19" }
-    end_date { "2026-04-19" }
+    title { 'MyString' }
+    company { 'MyString' }
+    start_date { '2026-04-19' }
+    end_date { '2026-04-19' }
     current { false }
-    description { "MyText" }
+    description { 'MyText' }
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: career_profiles
@@ -27,9 +29,9 @@
 FactoryBot.define do
   factory :career_profile do
     user { nil }
-    resume_text { "MyText" }
-    goals { "MyText" }
-    skills { "MyText" }
-    experience_level { "MyString" }
+    resume_text { 'MyText' }
+    goals { 'MyText' }
+    skills { 'MyText' }
+    experience_level { 'MyString' }
   end
 end

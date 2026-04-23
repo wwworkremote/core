@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: companies
@@ -20,8 +22,8 @@
 #
 FactoryBot.define do
   factory :company do
-    name { "MyString" }
-    slug { "MyString" }
-    status { "MyString" }
+    name { 'MyString' }
+    slug { 'MyString' }
+    status { 'MyString' }
   end
 end

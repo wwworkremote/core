@@ -37,9 +37,9 @@ module Guardrails
       end
 
       # Density check
-      if @text.length > 100 && score > 0
+      if @text.length > 100 && score.positive?
         density = score.to_f / @text.length
-        findings << "High instruction density detected" if density > 0.5
+        findings << 'High instruction density detected' if density > 0.5
       end
 
       { score: score, findings: findings }

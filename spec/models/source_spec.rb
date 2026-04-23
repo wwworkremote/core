@@ -25,7 +25,7 @@
 #
 require 'rails_helper'
 
-RSpec.describe Source, type: :model do
+RSpec.describe Source do
   describe 'associations' do
     it 'belongs to origin' do
       association = described_class.reflect_on_association(:origin)

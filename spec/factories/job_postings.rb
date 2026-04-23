@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: job_postings
@@ -43,10 +45,10 @@
 #
 FactoryBot.define do
   factory :job_posting do
-    title { "Software Engineer" }
-    company { "Tech Corp" }
-    target_url { "https://example.com/jobs/1" }
-    body { "Job description goes here." }
+    title { 'Software Engineer' }
+    company { 'Tech Corp' }
+    target_url { 'https://example.com/jobs/1' }
+    body { 'Job description goes here.' }
     signature { SecureRandom.hex(16) }
   end
 end

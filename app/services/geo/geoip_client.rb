@@ -36,13 +36,13 @@ module Geo
     end
 
     def self.env_value(key)
-      value = ENV[key]
+      value = ENV.fetch(key, nil)
       return value if value.present?
 
       alias_key = ENV_ALIASES.fetch(key)
       return nil unless alias_key
 
-      aliased = ENV[alias_key]
+      aliased = ENV.fetch(alias_key, nil)
       aliased.presence
     end
 

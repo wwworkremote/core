@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: career_profiles
@@ -32,6 +34,6 @@ class CareerProfile < ApplicationRecord
   has_many_attached :resumes
 
   has_neighbors :embedding
-  
+
   accepts_nested_attributes_for :work_experiences, allow_destroy: true
 end

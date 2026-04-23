@@ -10,7 +10,7 @@ module Resume
 
     def call
       return unless enabled?
-      
+
       # Construct structured text for the embedding
       input_text = build_profile_text
 
@@ -30,7 +30,7 @@ module Resume
           @career_profile.update!(embedding: embedding)
           true
         else
-          Rails.logger.error "[ProfileEmbedder] No embedding found in response"
+          Rails.logger.error '[ProfileEmbedder] No embedding found in response'
           false
         end
       else

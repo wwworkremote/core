@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: discovery_links
@@ -16,6 +18,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe DiscoveryLink, type: :model do
+RSpec.describe DiscoveryLink do
   pending "add some examples to (or delete) #{__FILE__}"
 end

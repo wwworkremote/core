@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: board_queries
@@ -13,10 +15,10 @@
 #
 FactoryBot.define do
   factory :board_query do
-    board_name { "MyString" }
-    terms { "MyText" }
+    board_name { 'MyString' }
+    terms { 'MyText' }
     remote { false }
     priority { 1 }
-    query_params { "" }
+    query_params { '' }
   end
 end

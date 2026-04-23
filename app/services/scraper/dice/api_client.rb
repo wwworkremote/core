@@ -7,7 +7,7 @@ module Scraper
     # Service to scrape job listings from Dice.com.
     # Uses Playwright to handle client-side rendering and search parameters.
     class ApiClient
-      BASE_URL = "https://www.dice.com/jobs"
+      BASE_URL = 'https://www.dice.com/jobs'
 
       def self.search(keywords, location: 'Remote')
         new.search(keywords, location)
@@ -25,14 +25,14 @@ module Scraper
         # Build the Dice search URL
         params = { q: keywords, l: location, countryCode: 'US', radius: 30, radiusUnit: 'mi', page: 1, pageSize: 20 }
         url = "#{BASE_URL}?#{params.to_query}"
-        
+
         Rails.logger.info "[Dice::ApiClient] Fetching: #{url}"
-        
+
         fetch_result = JobFetchers::PageFetch.new(url).call
         return { success: false, error: 'Fetch failed' } unless fetch_result
 
         data = parse_results(fetch_result[:content])
-        
+
         processed_count = 0
         data['results'].each do |job_data|
           signature = Digest::SHA256.hexdigest("dice-#{job_data['external_id']}")

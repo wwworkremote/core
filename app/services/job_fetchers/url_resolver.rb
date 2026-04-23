@@ -24,10 +24,10 @@ module JobFetchers
     def resolve_linkedin
       # Convert tracking/short URLs to canonical job view
       # Pattern: https://www.linkedin.com/jobs/view/123456789
-      if @url =~ /jobs\/view\/(\d+)/
-        "https://www.linkedin.com/jobs/view/#{$1}"
-      elsif @url =~ /comm\/jobs\/view\/(\d+)/
-        "https://www.linkedin.com/jobs/view/#{$1}"
+      if @url =~ %r{jobs/view/(\d+)}
+        "https://www.linkedin.com/jobs/view/#{::Regexp.last_match(1)}"
+      elsif @url =~ %r{comm/jobs/view/(\d+)}
+        "https://www.linkedin.com/jobs/view/#{::Regexp.last_match(1)}"
       else
         @url
       end
@@ -36,7 +36,7 @@ module JobFetchers
     def resolve_indeed
       # Pattern: https://www.indeed.com/viewjob?jk=abcdef12345
       if @url =~ /jk=([a-zA-Z0-9]+)/
-        "https://www.indeed.com/viewjob?jk=#{$1}"
+        "https://www.indeed.com/viewjob?jk=#{::Regexp.last_match(1)}"
       else
         @url
       end
@@ -49,14 +49,13 @@ module JobFetchers
 
     def resolve_generic
       # Follow redirects to get the final destination
-      begin
-        response = Faraday.head(@url) do |req|
-          req.options.timeout = 5
-        end
-        response.headers['location'] || @url
-      rescue StandardError
-        @url
+
+      response = Faraday.head(@url) do |req|
+        req.options.timeout = 5
       end
+      response.headers['location'] || @url
+    rescue StandardError
+      @url
     end
   end
 end

@@ -5,6 +5,7 @@ require 'digest'
 module Remotive
   class Fetcher
     include ApiGuard
+
     API_URL = 'https://remotive.com/api/remote-jobs'
 
     def call(force: false)

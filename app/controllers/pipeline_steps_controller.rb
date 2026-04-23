@@ -3,7 +3,7 @@
 class PipelineStepsController < ApplicationController
   def create
     @job_posting = JobPosting.find(params[:job_posting_id])
-    
+
     # Handle status transitions or manual notes
     if params[:status].present?
       # Whitelist AASM events to prevent dangerous send
@@ -11,7 +11,7 @@ class PipelineStepsController < ApplicationController
       if allowed_events.include?(params[:status])
         @job_posting.send("#{params[:status]}!")
         @job_posting.pipeline_steps.create!(
-          status: params[:status], 
+          status: params[:status],
           note: "Status changed to #{params[:status]}",
           user: current_user
         )
@@ -26,6 +26,6 @@ class PipelineStepsController < ApplicationController
       )
     end
 
-    redirect_to admin_job_posting_path(@job_posting), notice: "Activity logged."
+    redirect_to admin_job_posting_path(@job_posting), notice: 'Activity logged.'
   end
 end

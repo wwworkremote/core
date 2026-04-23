@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: system_settings
@@ -14,7 +16,7 @@
 #
 FactoryBot.define do
   factory :system_setting do
-    key { "MyString" }
-    value { "MyString" }
+    key { 'MyString' }
+    value { 'MyString' }
   end
 end

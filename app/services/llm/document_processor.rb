@@ -32,17 +32,17 @@ module LLM
     end
 
     def self.extract_pdf_text_for_all(career_profile)
-      career_profile.resumes.map do |resume|
+      career_profile.resumes.filter_map do |resume|
         {
           filename: resume.filename.to_s,
           content: extract_text(resume)
         }
-      end.compact
+      end
     end
 
     def self.extract_docx_text(path)
       doc = Docx::Document.open(path)
-      doc.paragraphs.map(&:to_s).join("\n")
+      doc.paragraphs.join("\n")
     end
   end
 end

@@ -14,7 +14,7 @@ require 'net/http'
 #
 # For CI pre-flight use bin/verify_llm.rb instead (no Rails boot required).
 
-LLAMA_BASE = (ENV.fetch('OLLAMA_API_BASE', 'http://127.0.0.1:8080/v1')).sub(%r{/v1/?$}, '').freeze
+LLAMA_BASE = ENV.fetch('OLLAMA_API_BASE', 'http://127.0.0.1:8080/v1').sub(%r{/v1/?$}, '').freeze
 
 RSpec.describe 'llama.cpp live integration', :live do
   # ── Server sanity ──────────────────────────────────────────────────────────
@@ -25,17 +25,17 @@ RSpec.describe 'llama.cpp live integration', :live do
       res = Net::HTTP.get_response(uri)
       expect(res.code).to eq('200')
       body = JSON.parse(res.body)
-      expect(body['status']).to be_in(%w[ok loading\ model])
+      expect(body['status']).to be_in(['ok', 'loading model'])
     end
 
     it "exposes 'local' as a model alias at /v1/models" do
       uri = URI("#{LLAMA_BASE}/v1/models")
       res = Net::HTTP.get_response(uri)
       expect(res.code).to eq('200')
-      ids = JSON.parse(res.body).dig('data')&.map { |m| m['id'] }
-      expect(ids).to include('local'), \
-        "Expected 'local' alias. Got: #{ids.inspect}\n" \
-        "Fix: ensure llama-server is started with --alias local (llama-ctl restart)"
+      ids = JSON.parse(res.body)['data']&.pluck('id')
+      expect(ids).to include('local'),
+                     "Expected 'local' alias. Got: #{ids.inspect}\n" \
+                     'Fix: ensure llama-server is started with --alias local (llama-ctl restart)'
     end
   end
 
@@ -45,12 +45,12 @@ RSpec.describe 'llama.cpp live integration', :live do
     describe '.embed_text' do
       it 'returns a float vector for a plain-text input' do
         vector = described_class.embed_text('Senior Rails Engineer, remote, competitive salary')
-        expect(vector).to be_an(Array), \
-          "Expected Array, got #{vector.inspect[0, 80]}. " \
-          "Fix: ensure server started with --embeddings (llama-ctl restart)"
+        expect(vector).to be_an(Array),
+                          "Expected Array, got #{vector.inspect[0, 80]}. " \
+                          'Fix: ensure server started with --embeddings (llama-ctl restart)'
         expect(vector).not_to be_empty
         expect(vector.first).to be_a(Numeric)
-        expect(vector.length).to be > 100  # any reasonable embedding model is > 100-dim
+        expect(vector.length).to be > 100 # any reasonable embedding model is > 100-dim
       end
 
       it 'returns different vectors for semantically different inputs' do
@@ -83,9 +83,9 @@ RSpec.describe 'llama.cpp live integration', :live do
 
     it 'returns a successful response for a simple prompt', :aggregate_failures do
       result = described_class.call(
-        untrusted_text:    'Respond with exactly the token INFERENCE_OK and nothing else.',
-        model:             local_model,
-        system_rules:      'You are a test assistant. Follow instructions exactly.',
+        untrusted_text: 'Respond with exactly the token INFERENCE_OK and nothing else.',
+        model: local_model,
+        system_rules: 'You are a test assistant. Follow instructions exactly.',
         task_instructions: ''
       )
       expect(result[:success]).to be(true), "Inference failed: #{result[:error]}"
