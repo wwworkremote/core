@@ -38,7 +38,7 @@
 #                                    model GET    /models/:id(.:format)                                                                             models#show
 #                               admin_root GET    /admin(.:format)                                                                                  admin/dashboard#index
 #                       admin_toggle_pause POST   /admin/toggle_pause(.:format)                                                                     admin/dashboard#toggle_pause
-#                          admin_analytics GET    /admin/analytics(.:format)                                                                        admin/analytics#index
+#                      admin_observability GET    /admin/observability(.:format)                                                                    admin/observability#index
 #                       trigger_admin_jobs POST   /admin/jobs/trigger(.:format)                                                                     admin/jobs#trigger
 #                         prune_admin_jobs POST   /admin/jobs/prune(.:format)                                                                       admin/jobs#prune
 #                        details_admin_job GET    /admin/jobs/:id/details(.:format)                                                                 admin/jobs#details

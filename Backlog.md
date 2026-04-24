@@ -35,43 +35,77 @@
 ### 4. Golden Signals & Behavioral Analytics Dashboard
 - **Description**: Move beyond simple sync timestamps to a full observability dashboard.
 - **Tasks**:
-  - [ ] Implement Latency (Duration), Traffic (Volume), Errors, and Saturation charts in Admin.
-  - [ ] Build "Behavioral Intelligence" dashboard for Ahoy event flow.
+  - [x] Implement Latency (Duration), Traffic (Volume), Errors, and Saturation charts in Admin.
+  - [x] Build "Behavioral Intelligence" dashboard for Ahoy event flow.
 - **Labels**: monitoring, analytics
 
 ---
 
-## Recently Completed
-- [x] **Syncer Resilience**: Hardened `JobBoards::Syncer` with presence checks, generic mapper, and per-call document limits to prevent LLM starvation.
-- [x] **Unify Research UI**: Merged Admin pipeline tools into primary `JobPosting` and `Company` views.
-- [x] **Mass Ingestion Foundation**: Distributed `Scraper::Crawler` and `DiscoveryLink` architecture established.
-- [x] **Career Identity Hub**: Implemented editable job history and goals for personalized AI matching.
-- [x] **API-First Scraping**: Built `ApiInterceptor` to bypass HTML scraping via browser-internal endpoints (Cord.com proven).
-- [x] **Pipeline Health SLOs**: Status/Sync/Ingest tracking added to the orchestration dashboard.
-- [x] **Simple Auth & Solid Migration**: Dropped Redis/Devise for a lean PostgreSQL-only stack.
+## Backlog Decisions (ADR)
+
+### ADR 001: Audit Strategy - PaperTrail vs Rails Event Store
+- **Context**: Need for record versioning and auditing, specifically for AI-generated categorization.
+- **Decision**: Remove Rails Event Store (RES) and utilize **PaperTrail**.
+- **Rationale**: PaperTrail is simpler for field-level auditing and the current data flow doesn't justify full event-sourcing.
+- **Status**: Implemented.
+
+### ADR 002: Ultimate Stack Consolidation
+- **Context**: Infrastructure was overly complex for a single-user tool.
+- **Decision**: Shift to "Solid" stack (`solid_queue`, `solid_cache`, `solid_cable`), remove Redis, and simplify authentication (HTTP Basic + User model).
+- **Rationale**: Reduced memory footprint, simplified local setup, and improved data integrity.
+- **Status**: Implemented.
+
+### ADR 003: Distributed Circuit Breaker for Rate Limiting
+- **Context**: Susceptibility to HTTP 429 rate limits in fetchers.
+- **Decision**: Implement a **Distributed Circuit Breaker** using `Rails.cache` (backed by PostgreSQL).
+- **Rationale**: Prevents hammering external APIs, improves resource efficiency by not blocking worker threads.
+- **Status**: Implemented.
 
 ---
 
-## Future Enhancements
-- **Serialization**: Adopt `alba` for `api/v0/` if complexity increases.
-- **Notification Engine**: Trigger email/Slack alerts when a "High Confidence Match" is ingested.
-- **Browser Farm**: Evaluate `Browserless.io` or similar if local Chromium becomes a resource bottleneck.
-- **Semantic Search (V2)**: Enable full-profile-to-database vector similarity search ("Find all jobs matching my entire resume").
+## Backlog Tasks (Consolidated)
+
+### Phase 1: Robustness & Security
+- [ ] **Fix Brakeman security vulnerabilities**:
+  - Whitelist `task_id` in `Admin::JobsController` to prevent command injection.
+  - Whitelist AASM events in pipeline controllers to prevent dangerous `send`.
+  - Whitelist class names in `Admin::JobsController` to prevent RCE via `constantize`.
+- [ ] **Complete Spec Audit**: Ensure 100% coverage for all models, controllers, and services.
+- [x] **Enable Bullet**: Catch N+1 queries in development early.
+
+### Phase 2: One-Command Setup
+- [ ] **Refactor bin/setup**: Ensure idempotency and verify `playwright` + `llama.cpp` server connectivity.
+- [ ] **Create README_COMMUNITY.md**: Provide simple "Quick Start" instructions for contributors.
+
+### Phase 3: Community & Insights
+- [ ] **Define CONTRIBUTING.md**: Establish the "Virtuous Loop" (RSpec -> RuboCop -> Brakeman).
+- [ ] **Document Crawler API**: Simplify adding new job board integration.
+- [ ] **Advanced Captain Dashboards**: Add `ahoy_captain` for deeper shared analytics insights.
+
+---
+
+## Recently Completed
+- [x] **Syncer Resilience**: Hardened `JobBoards::Syncer` with generic mappers.
+- [x] **Unify Research UI**: Merged Admin tools into primary `JobPosting`/`Company` views.
+- [x] **Mass Ingestion Foundation**: Distributed `Scraper::Crawler` established.
+- [x] **Career Identity Hub**: implemented job history and goals.
+- [x] **API-First Scraping**: Built `ApiInterceptor` for Playwright-based discovery.
+- [x] **Simple Auth & Solid Migration**: Dropped Redis/Devise for lean PostgreSQL stack.
 
 ---
 
 ## Operational Verification Checklist
-Smoke tests to confirm the running system is healthy after a restart or deploy.
+Smoke tests to confirm the running system is healthy.
 
-- [ ] **Email Ingestion**: Place a `.eml` in `~/.wwworkremote/indeed/` and run `bin/rake eml:scan`. Verify `EmailImportRecord` + `JobPosting` are created and `fetch_mode` is logged (static vs playwright).
-- [ ] **AI inference**: Run `ruby bin/verify_llm.rb` — all four checks must exit 0.
-- [ ] **Background queue**: Confirm Solid Queue dashboard at `/admin/jobs` shows workers active.
-- [ ] **Analytics**: Confirm `/admin/analytics` pipeline health charts render.
+- [ ] **Email Ingestion**: Place a `.eml` in `~/.wwworkremote/indeed/` and run `bin/rake eml:scan`.
+- [ ] **AI inference**: Run `ruby bin/verify_llm.rb`.
+- [ ] **Background queue**: Confirm Solid Queue dashboard at `/jobs`.
+- [ ] **Analytics**: Confirm `/admin/observability` charts render.
 
 ---
 
 ## Guardrails
 - **Job Idempotency**: All new workers must prove safe duplicate execution.
 - **LLM Boundaries**: No LLM calls in web requests; must use `AsyncJobAdapter`.
-- **Crawler Politeness**: Respect `robots.txt` and implement randomized jitter on browser sessions.
-- **Data Privacy**: Profile and Match data must remain strictly isolated to the authenticated user.
+- **Crawler Politeness**: Respect `robots.txt` and implement randomized jitter.
+- **Data Privacy**: Profile data must remain isolated to the authenticated user.
