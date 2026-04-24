@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ApplicationJob < ActiveJob::Base
+  # Enforce transaction-safe job enqueuing per SolidQueue skill best practices
+  self.enqueue_after_transaction_commit = true
+
   before_perform do |job|
     if SystemSetting.paused?
       Rails.logger.info "[PauseSignal] Job #{job.class.name} (#{job.job_id}) cancelled due to global pause."

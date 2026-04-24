@@ -205,7 +205,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: 'dashboard#index'
     post 'toggle_pause' => 'dashboard#toggle_pause'
-    get 'analytics' => 'analytics#index'
+    get 'observability' => 'observability#index'
     resources :jobs, only: [:index] do
       collection do
         post :trigger
