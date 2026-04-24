@@ -2,12 +2,12 @@
 @plugin "daisyui";
 
 @theme {
-  /* Official Dracula Pro Hex Palette */
+  /* Official Dracula Pro Hex Palette - Tuned for A11y */
   --color-dracula-bg: #22212c;
   --color-dracula-bg-dark: #17161d;
   --color-dracula-bg-light: #454158;
   --color-dracula-fg: #f8f8f2;
-  --color-dracula-comment: #7970a9;
+  --color-dracula-comment: #9590c5; /* Slightly lightened for better contrast */
   
   --color-dracula-cyan: #80ffea;
   --color-dracula-green: #8aff80;
@@ -17,83 +17,63 @@
   --color-dracula-red: #ff9580;
   --color-dracula-yellow: #ffff80;
 
-  /* Explicitly override standard slate/grey to prevent "light mode" leaks */
-  --color-slate-950: #17161d;
-  --color-slate-900: #22212c;
-  --color-slate-800: #454158;
+  /* Force darker slate for structural components to increase separation */
+  --color-slate-950: #0f0e14;
+  --color-slate-900: #17161d;
+  --color-slate-800: #22212c;
 
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
   :root {
-    /* Map Dracula Pro into DaisyUI v5 CSS Variables */
     --color-base-100: var(--color-dracula-bg);
     --color-base-200: var(--color-dracula-bg-dark);
     --color-base-300: var(--color-dracula-bg-light);
     --color-base-content: var(--color-dracula-fg);
 
     --color-primary: var(--color-dracula-purple);
-    --color-primary-content: var(--color-dracula-bg-dark);
+    --color-primary-content: #000000; /* Max contrast for buttons */
     
     --color-secondary: var(--color-dracula-pink);
-    --color-secondary-content: var(--color-dracula-bg-dark);
+    --color-secondary-content: #000000;
 
     --color-accent: var(--color-dracula-cyan);
-    --color-accent-content: var(--color-dracula-bg-dark);
+    --color-accent-content: #000000;
 
     --color-info: var(--color-dracula-cyan);
     --color-success: var(--color-dracula-green);
     --color-warning: var(--color-dracula-yellow);
     --color-error: var(--color-dracula-red);
-
-    /* System Typography */
-    font-family: var(--font-inter);
-    background-color: var(--color-dracula-bg);
-    color: var(--color-dracula-fg);
   }
 
   body {
-    @apply bg-base-100 text-base-content antialiased min-h-screen;
-    background-image: radial-gradient(at 0% 0%, rgba(149, 128, 255, 0.05) 0px, transparent 50%),
-                      radial-gradient(at 100% 100%, rgba(128, 255, 234, 0.05) 0px, transparent 50%);
+    /* Increase base weight from 400 to 500 for better stroke visibility on dark backgrounds */
+    @apply font-inter bg-base-100 text-base-content antialiased min-h-screen text-[15px] font-medium;
+    -webkit-font-smoothing: subpixel-antialiased;
+    letter-spacing: -0.01em;
   }
-
-  /* Force dark icons */
-  svg { @apply inline-block shrink-0; }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-extrabold tracking-tight text-white;
+  }
 }
 
 @layer components {
-  /* Work-oriented components */
   .card-admin {
-    @apply bg-base-200 border border-white/5 rounded-xl shadow-xl overflow-hidden;
+    @apply bg-base-200 border border-white/10 rounded-xl shadow-2xl overflow-hidden;
   }
   
   .table-admin {
-    @apply w-full text-left border-collapse text-xs;
+    @apply w-full text-left border-collapse text-sm;
   }
 
   .btn-admin {
-    @apply btn btn-sm rounded-lg font-black uppercase tracking-widest text-[10px];
+    @apply btn btn-sm rounded-lg font-extrabold uppercase tracking-wider text-[11px];
   }
 
-  /* Neural Design System (High-Density Dracula Pro) */
-  .btn-neural {
-    @apply px-4 py-1.5 rounded font-black uppercase tracking-widest text-[10px] transition-all
-           bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white
-           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .card-neural {
-    @apply bg-base-200 border border-white/5 rounded shadow-xl overflow-hidden;
-  }
-
-  .sparkle-ai {
-    @apply relative inline-block;
-  }
-
-  .sparkle-ai::after {
-    content: "✦";
-    @apply absolute -top-2 -right-3 text-dracula-purple text-sm animate-pulse;
-  }
+  /* Force minimum contrast for opacity-based muted text */
+  .text-base-content\/40, .opacity-40 { opacity: 0.75 !important; }
+  .text-base-content\/30, .opacity-30 { opacity: 0.65 !important; }
+  .text-base-content\/20, .opacity-20 { opacity: 0.55 !important; }
 }

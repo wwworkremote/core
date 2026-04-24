@@ -1,73 +1,73 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Observability_Center</h1>
-    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Golden Signals & Behavioral Intelligence Registry</p>
+    <h1 class="text-4xl font-black text-white mb-2 uppercase italic tracking-tight">Observability_Center</h1>
+    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Golden Signals & Behavioral Intelligence Registry</p>
   </div>
 </div>
 
 <!-- Golden Signals: System Health -->
-<section class="mb-16">
-  <div class="flex items-center gap-4 mb-8 opacity-20">
-    <h2 class="text-[10px] font-black uppercase tracking-[0.4em]">Grid_Performance_Telemetry</h2>
+<section class="mb-20">
+  <div class="flex items-center gap-4 mb-8 opacity-30">
+    <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">Grid_Performance_Telemetry</h2>
     <div class="h-px flex-1 bg-white/20"></div>
   </div>
 
-  <div class="stats stats-vertical lg:stats-horizontal w-full bg-base-200 shadow-2xl border border-white/5 mb-8">
-    <div class="stat">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">LATENCY_AVG</div>
-      <div class="stat-value text-primary text-3xl font-black"><%= @latency_avg %>s</div>
-      <div class="stat-desc font-bold text-[9px] uppercase tracking-tighter opacity-30 mt-1">Sync_To_Enrich</div>
+  <div class="stats stats-vertical lg:stats-horizontal w-full bg-base-200 shadow-2xl border border-white/10 mb-10">
+    <div class="stat p-8">
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">LATENCY_AVG</div>
+      <div class="stat-value text-primary text-4xl font-black tracking-tighter"><%= @latency_avg %>s</div>
+      <div class="stat-desc font-bold text-[10px] uppercase tracking-tighter text-slate-400 mt-2">Sync_To_Enrich</div>
     </div>
     
-    <div class="stat">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">TRAFFIC_DAILY</div>
-      <div class="stat-value text-secondary text-3xl font-black"><%= @traffic_daily %></div>
-      <div class="stat-desc font-bold text-[9px] uppercase tracking-tighter opacity-30 mt-1">Signals_Ingested</div>
+    <div class="stat p-8">
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">TRAFFIC_DAILY</div>
+      <div class="stat-value text-dracula-pink text-4xl font-black tracking-tighter"><%= @traffic_daily %></div>
+      <div class="stat-desc font-bold text-[10px] uppercase tracking-tighter text-slate-400 mt-2">Signals_Ingested</div>
     </div>
     
-    <div class="stat">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">ERROR_RATE</div>
-      <div class="stat-value text-error text-3xl font-black"><%= @error_rate %>%</div>
-      <div class="stat-desc font-bold text-[9px] uppercase tracking-tighter opacity-30 mt-1 text-error/50">Failed_Executions</div>
+    <div class="stat p-8">
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">ERROR_RATE</div>
+      <div class="stat-value text-dracula-red text-4xl font-black tracking-tighter"><%= @error_rate %>%</div>
+      <div class="stat-desc font-bold text-[10px] uppercase tracking-tighter text-dracula-red mt-2">Failed_Executions</div>
     </div>
 
-    <div class="stat border-none!">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">SATURATION</div>
-      <div class="stat-value text-accent text-3xl font-black"><%= @saturation %>%</div>
-      <div class="stat-desc font-bold text-[9px] uppercase tracking-tighter opacity-30 mt-1">Worker_Utilization</div>
+    <div class="stat p-8 border-none!">
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">SATURATION</div>
+      <div class="stat-value text-dracula-cyan text-4xl font-black tracking-tighter"><%= @saturation %>%</div>
+      <div class="stat-desc font-bold text-[10px] uppercase tracking-tighter text-slate-400 mt-2">Worker_Utilization</div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <div class="card bg-base-200 border border-white/5 shadow-xl">
-      <div class="card-body p-8">
-        <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-6 flex justify-between items-center">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div class="card bg-base-200 border border-white/10 shadow-xl">
+      <div class="card-body p-10">
+        <h3 class="card-title text-xs font-black uppercase tracking-widest text-slate-400 mb-8 flex justify-between items-center">
           <span>Signal_Flow_Velocity</span>
-          <span class="text-[8px] badge badge-outline border-white/10 opacity-30">7D_WINDOW</span>
+          <span class="text-[9px] badge badge-outline border-white/20 text-slate-500">7D_WINDOW</span>
         </h3>
         <%= line_chart charts_data_pipeline_health_path,
-            height: "220px",
+            height: "250px",
             colors: ["#9580FF"],
             library: { 
               scales: { 
-                y: { grid: { color: "rgba(255,255,255,0.03)" }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } },
-                x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } }
+                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } },
+                x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } }
               },
               plugins: { legend: { display: false } }
             } %>
       </div>
     </div>
 
-    <div class="card bg-base-200 border border-white/5 shadow-xl">
-      <div class="card-body p-8">
-        <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-6">Pipeline_Funnel_Conversion</h3>
+    <div class="card bg-base-200 border border-white/10 shadow-xl">
+      <div class="card-body p-10">
+        <h3 class="card-title text-xs font-black uppercase tracking-widest text-slate-400 mb-8">Pipeline_Funnel_Conversion</h3>
         <%= bar_chart charts_data_pipeline_funnel_path,
-            height: "220px",
+            height: "250px",
             colors: ["#80FFEA"],
             library: { 
               scales: { 
-                x: { grid: { color: "rgba(255,255,255,0.03)" }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } },
-                y: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } }
+                x: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } },
+                y: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } }
               },
               plugins: { legend: { display: false } }
             } %>
@@ -78,60 +78,60 @@
 
 <!-- Behavioral Intelligence -->
 <section>
-  <div class="flex items-center gap-4 mb-8 opacity-20">
-    <h2 class="text-[10px] font-black uppercase tracking-[0.4em]">User_Behavioral_Analytics</h2>
+  <div class="flex items-center gap-4 mb-8 opacity-30">
+    <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">User_Behavioral_Analytics</h2>
     <div class="h-px flex-1 bg-white/20"></div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <div class="card bg-base-200 border border-white/5 shadow-xl col-span-2">
-      <div class="card-body p-8">
-        <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-6 flex justify-between items-center">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <div class="card bg-base-200 border border-white/10 shadow-xl lg:col-span-2">
+      <div class="card-body p-10">
+        <h3 class="card-title text-xs font-black uppercase tracking-widest text-slate-400 mb-8 flex justify-between items-center">
           <span>Interaction_Volume_Scan</span>
-          <span class="text-[8px] badge badge-primary font-black px-2">LIVE_SESSIONS: <%= @total_visits %></span>
+          <span class="text-[9px] badge badge-primary font-black px-3 py-2 uppercase">Live_Node_Traffic</span>
         </h3>
         <%= area_chart charts_data_behavior_visits_path,
-            height: "250px",
+            height: "280px",
             colors: ["#8AFF80"],
             library: { 
               scales: { 
-                y: { grid: { color: "rgba(255,255,255,0.03)" }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } },
-                x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 9, weight: 'bold' } } }
+                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } },
+                x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } }
               },
               plugins: { legend: { display: false } }
             } %>
       </div>
     </div>
 
-    <div class="space-y-8">
-      <div class="card bg-base-200 border border-white/5 shadow-xl">
-        <div class="card-body p-6">
-          <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-6 pb-2 border-b border-white/5 flex items-center gap-2">
-            <%= heroicon "globe-alt", options: { class: "w-3 h-3" } %> Top_Entry_Origins
+    <div class="space-y-10">
+      <div class="card bg-base-200 border border-white/10 shadow-xl">
+        <div class="card-body p-8">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-6 pb-3 border-b border-white/5 flex items-center gap-2">
+            <%= heroicon "globe-alt", options: { class: "w-4 h-4" } %> TOP_ENTRY_ORIGINS
           </h3>
-          <ul class="space-y-4">
+          <ul class="space-y-5">
             <% @top_referrers.each do |ref, count| %>
               <li class="flex items-center justify-between group">
-                <span class="text-[10px] font-bold text-slate-400 group-hover:text-primary transition-colors truncate max-w-[150px]">
-                  <%= ref.present? ? ref.gsub(%r{https?://}, '') : 'Direct_Node' %>
+                <span class="text-[11px] font-bold text-slate-300 group-hover:text-primary transition-colors truncate max-w-[150px]">
+                  <%= ref.present? ? ref.gsub(%r{https?://}, '') : 'Direct_Registry_Node' %>
                 </span>
-                <span class="text-[10px] font-black text-slate-600 font-mono"><%= count %></span>
+                <span class="text-xs font-black text-slate-500 font-mono"><%= count %></span>
               </li>
             <% end %>
           </ul>
         </div>
       </div>
 
-      <div class="card bg-base-200 border border-white/5 shadow-xl">
-        <div class="card-body p-6">
-          <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-6 pb-2 border-b border-white/5 flex items-center gap-2">
-            <%= heroicon "magnifying-glass", options: { class: "w-3 h-3" } %> Neural_Search_Vectors
+      <div class="card bg-base-200 border border-white/10 shadow-xl">
+        <div class="card-body p-8">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-6 pb-3 border-b border-white/5 flex items-center gap-2">
+            <%= heroicon "magnifying-glass", options: { class: "w-4 h-4" } %> NEURAL_SEARCH_VECTORS
           </h3>
-          <ul class="space-y-4">
+          <ul class="space-y-5">
             <% @top_job_searches.each do |query, count| %>
               <li class="flex items-center justify-between group">
-                <span class="text-[10px] font-bold text-slate-400 group-hover:text-secondary transition-colors italic">"<%= query %>"</span>
-                <span class="text-[10px] font-black text-slate-600 font-mono"><%= count %></span>
+                <span class="text-[11px] font-bold text-slate-300 group-hover:text-secondary transition-colors italic">"<%= query %>"</span>
+                <span class="text-xs font-black text-slate-500 font-mono"><%= count %></span>
               </li>
             <% end %>
           </ul>

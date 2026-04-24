@@ -1,53 +1,53 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase italic">System_Administration</h1>
-    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Direct control over the core database registry</p>
+    <h1 class="text-4xl font-black text-white mb-2 uppercase italic tracking-tight">System_Administration</h1>
+    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Direct control over the core database registry</p>
   </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
-  <div class="stats bg-base-200 border border-white/5 shadow-xl">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
+  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Job_Signals</div>
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Job_Signals</div>
       <div class="stat-value text-primary text-5xl font-black tracking-tighter"><%= @job_postings_count %></div>
       <div class="stat-actions mt-6">
-        <%= link_to admin_job_postings_path, class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-[9px] w-full" do %>
+        <%= link_to admin_job_postings_path, class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
           MANAGE_POSTINGS
         <% end %>
       </div>
     </div>
   </div>
 
-  <div class="stats bg-base-200 border border-white/5 shadow-xl">
+  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Managed_Entities</div>
-      <div class="stat-value text-blue-400 text-5xl font-black tracking-tighter"><%= Company.count %></div>
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Managed_Entities</div>
+      <div class="stat-value text-dracula-cyan text-5xl font-black tracking-tighter"><%= Company.count %></div>
       <div class="stat-actions mt-6">
-        <%= link_to admin_companies_path, class: "btn btn-ghost border-white/10 btn-sm rounded-lg font-black tracking-widest text-[9px] w-full" do %>
+        <%= link_to admin_companies_path, class: "btn btn-ghost border-white/20 btn-sm rounded-lg font-black tracking-widest text-xs w-full" do %>
           ENTITY_CONTROL
         <% end %>
       </div>
     </div>
   </div>
 
-  <div class="stats bg-base-200 border border-white/5 shadow-xl">
+  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Raw_Corpus</div>
-      <div class="stat-value text-emerald-400 text-5xl font-black tracking-tighter"><%= @sources_count %></div>
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Raw_Corpus</div>
+      <div class="stat-value text-dracula-green text-5xl font-black tracking-tighter"><%= @sources_count %></div>
       <div class="stat-actions mt-6">
-        <button disabled class="btn btn-disabled btn-sm rounded-lg font-black tracking-widest text-[9px] w-full opacity-30">
+        <button disabled class="btn btn-disabled btn-sm rounded-lg font-black tracking-widest text-xs w-full opacity-40">
           DOC_VIEW_LOCKED
         </button>
       </div>
     </div>
   </div>
 
-  <div class="stats bg-base-200 border border-white/5 shadow-xl">
+  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Active_Nodes</div>
-      <div class="stat-value text-violet-400 text-5xl font-black tracking-tighter"><%= @active_fetchers_count %></div>
+      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Active_Nodes</div>
+      <div class="stat-value text-dracula-pink text-5xl font-black tracking-tighter"><%= @active_fetchers_count %></div>
       <div class="stat-actions mt-6">
-        <%= link_to data_fetchers_path, class: "btn btn-ghost border-white/10 btn-sm rounded-lg font-black tracking-widest text-[9px] w-full" do %>
+        <%= link_to data_fetchers_path, class: "btn btn-ghost border-white/20 btn-sm rounded-lg font-black tracking-widest text-xs w-full" do %>
           INGESTION_CONTROL
         <% end %>
       </div>
@@ -55,14 +55,14 @@
   </div>
 </div>
 
-<article class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
-  <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Administration_Protocol</h2>
-  <div class="prose max-w-none text-sm font-medium text-base-content/60 leading-relaxed">
-    <p>Welcome to the native Rails administration layer. This environment utilizes **DaisyUI 5** and **Tailwind 4** to provide a direct, low-overhead interface for system curation.</p>
-    <ul class="list-disc pl-5 space-y-2 mt-4 text-xs font-bold uppercase tracking-widest text-base-content/40">
-      <li>Strict semantic markup following industry admin standards</li>
-      <li>Official Dracula Pro palette integration (#22212C / #F8F8F2)</li>
-      <li>Zero legacy asset dependencies</li>
+<article class="bg-base-200 border border-white/10 rounded-2xl p-10 shadow-2xl">
+  <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-8 pb-4 border-b border-white/10">Administration_Protocol</h2>
+  <div class="prose max-w-none text-sm font-semibold text-slate-300 leading-relaxed">
+    <p>This administrative environment is tuned for high-density legibility and **A11y compliance**. All metrics use the official **Dracula Pro** palette with reinforced font weights for maximum stroke visibility.</p>
+    <ul class="list-disc pl-5 space-y-3 mt-6 text-xs font-black uppercase tracking-widest text-slate-400">
+      <li>Subpixel-antialiased typography for sharp technical data</li>
+      <li>Official Dracula Pro palette with verified contrast ratios</li>
+      <li>Functional, high-contrast UI components for daily operations</li>
     </ul>
   </div>
 </article>
