@@ -60,6 +60,11 @@ module JobBoards
           job_posting.status = 'ignored' unless company.ingestion_enabled?
         end
 
+        # Apply Quality Filter
+        unless JobBoards::QualityFilter.new(job_posting).useful?
+          job_posting.status = 'ignored'
+        end
+
         # Capture the result of save! in a way that handles race conditions
         if job_posting.save
           # Transition document state

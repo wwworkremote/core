@@ -54,6 +54,17 @@ module JobBoards
         end
       end
 
+      # 5. Check for low-quality postings that should be ignored
+      JobPosting.where.not(status: 'ignored').find_each do |jp|
+        unless JobBoards::QualityFilter.new(jp).useful?
+          stats[:missing_category] += 1 # Borrowing this counter or we could add a new one
+          if @fix && stats[:fixed] < @limit
+            jp.update!(status: 'ignored')
+            stats[:fixed] += 1
+          end
+        end
+      end
+
       stats
     end
   end
