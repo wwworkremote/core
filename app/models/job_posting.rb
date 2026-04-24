@@ -45,14 +45,25 @@ class JobPosting < ApplicationRecord
 
   aasm column: :status do
     state :none, initial: true
-    state :favorited, :applied, :interview, :offered, :archived, :ignored
+    state :favorited, :applied, :interview, :offered, :archived, :ignored, :purged
 
     event :favorite do
-      transitions from: %i[none archived ignored], to: :favorited
+      transitions from: %i[none archived ignored purged], to: :favorited
     end
 
     event :ignore do
       transitions from: %i[none], to: :ignored
+    end
+
+    event :purge do
+      after do
+        update!(embedding: nil) # Instant removal from neural search
+      end
+      transitions from: %i[none favorited archived ignored], to: :purged
+    end
+
+    event :restore do
+      transitions from: :purged, to: :none
     end
 
     event :apply do

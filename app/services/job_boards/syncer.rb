@@ -45,6 +45,13 @@ module JobBoards
       # Use a transaction and rescue uniqueness errors for high-concurrency safety
       begin
         job_posting = JobPosting.find_or_initialize_by(signature: doc.signature)
+        
+        # Shield: If user has manually purged this, do not reactivate it
+        if job_posting.status == 'purged'
+          doc.update!(aasm_state: 'processed')
+          return true
+        end
+
         job_posting.source_id = dashboard_source.id
         map_attributes(job_posting, data, source.slug)
 

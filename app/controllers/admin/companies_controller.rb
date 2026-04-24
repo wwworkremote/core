@@ -18,8 +18,15 @@ module Admin
     def toggle_ingestion
       @company = Company.find(params[:id])
       @company.update!(ingestion_enabled: !@company.ingestion_enabled)
-      
-      message = @company.ingestion_enabled ? "Ingestion resumed for #{@company.name}." : "Ingestion disabled for #{@company.name}."
+
+      if !@company.ingestion_enabled?
+        # Cascade: Purge all existing jobs for this company
+        @company.job_postings.where.not(status: 'purged').find_each(&:purge!)
+        message = "Ingestion disabled for #{@company.name} and all existing postings have been purged."
+      else
+        message = "Ingestion resumed for #{@company.name}."
+      end
+
       redirect_back fallback_location: admin_companies_path, notice: message
     end
   end

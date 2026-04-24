@@ -222,7 +222,14 @@ Rails.application.routes.draw do
       end
       resources :company_pipeline_steps, only: [:create]
     end
-    resources :job_postings, only: %i[index show] do
+    resources :job_postings, only: %i[index show update destroy] do
+      member do
+        post :purge
+        post :restore
+      end
+      collection do
+        post :bulk_action
+      end
       resources :pipeline_steps, only: [:create]
       resources :contacts, only: %i[create destroy]
       resources :interview_sessions, only: [:create]
