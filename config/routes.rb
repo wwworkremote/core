@@ -217,6 +217,9 @@ Rails.application.routes.draw do
       end
     end
     resources :companies, only: %i[index show] do
+      member do
+        post :toggle_ingestion
+      end
       resources :company_pipeline_steps, only: [:create]
     end
     resources :job_postings, only: %i[index show] do

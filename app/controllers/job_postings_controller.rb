@@ -7,8 +7,9 @@ class JobPostingsController < ApplicationController
     @source_id = params[:source_id]
 
     @job_postings = JobPosting.recent.includes(source: :origin)
+    @job_postings = @job_postings.where.not(status: 'ignored') unless params[:status] == 'ignored'
 
-    @job_postings = @job_postings.where(company: @company) if @company.present?
+    @job_postings = @job_postings.where(company_name: @company) if @company.present?
     @job_postings = @job_postings.where(source_id: @source_id) if @source_id.present?
     @job_postings = @job_postings.search(@query) if @query.present?
 

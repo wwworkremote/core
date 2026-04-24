@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
   <div class="stats bg-base-200 border border-white/5 shadow-xl">
     <div class="stat p-8">
       <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Job_Signals</div>
@@ -13,6 +13,18 @@
       <div class="stat-actions mt-6">
         <%= link_to admin_job_postings_path, class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-[9px] w-full" do %>
           MANAGE_POSTINGS
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats bg-base-200 border border-white/5 shadow-xl">
+    <div class="stat p-8">
+      <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Managed_Entities</div>
+      <div class="stat-value text-blue-400 text-5xl font-black tracking-tighter"><%= Company.count %></div>
+      <div class="stat-actions mt-6">
+        <%= link_to admin_companies_path, class: "btn btn-ghost border-white/10 btn-sm rounded-lg font-black tracking-widest text-[9px] w-full" do %>
+          ENTITY_CONTROL
         <% end %>
       </div>
     </div>

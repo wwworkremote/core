@@ -45,10 +45,14 @@ class JobPosting < ApplicationRecord
 
   aasm column: :status do
     state :none, initial: true
-    state :favorited, :applied, :interview, :offered, :archived
+    state :favorited, :applied, :interview, :offered, :archived, :ignored
 
     event :favorite do
-      transitions from: %i[none archived], to: :favorited
+      transitions from: %i[none archived ignored], to: :favorited
+    end
+
+    event :ignore do
+      transitions from: %i[none], to: :ignored
     end
 
     event :apply do

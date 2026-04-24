@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_24_015023) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_24_144603) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -129,6 +129,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_24_015023) do
     t.float "sentiment_score"
     t.string "disposition"
     t.boolean "toxic_culture_flag"
+    t.boolean "ingestion_enabled", default: true, null: false
     t.index ["name"], name: "index_companies_on_name", unique: true
     t.index ["slug"], name: "index_companies_on_slug"
   end
@@ -715,40 +716,3 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_24_015023) do
     t.index ["career_profile_id"], name: "index_work_experiences_on_career_profile_id"
     t.index ["external_id"], name: "index_work_experiences_on_external_id"
   end
-
-  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "career_profiles", "users"
-  add_foreign_key "company_pipeline_steps", "companies"
-  add_foreign_key "company_pipeline_steps", "users"
-  add_foreign_key "contacts", "job_postings"
-  add_foreign_key "contacts", "users"
-  add_foreign_key "experience_highlights", "work_experiences"
-  add_foreign_key "interview_questions", "interview_sessions"
-  add_foreign_key "interview_sessions", "job_postings"
-  add_foreign_key "interview_sessions", "users"
-  add_foreign_key "interview_tasks", "job_postings"
-  add_foreign_key "interview_tasks", "users"
-  add_foreign_key "job_experiences", "career_profiles"
-  add_foreign_key "job_postings", "companies"
-  add_foreign_key "job_postings", "sources"
-  add_foreign_key "llm_chats", "models"
-  add_foreign_key "llm_messages", "llm_chats"
-  add_foreign_key "llm_messages", "models"
-  add_foreign_key "llm_messages", "tool_calls"
-  add_foreign_key "pipeline_steps", "job_postings"
-  add_foreign_key "pipeline_steps", "users"
-  add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "sources", "origins"
-  add_foreign_key "target_domains", "domains"
-  add_foreign_key "target_domains", "job_postings"
-  add_foreign_key "tool_calls", "llm_messages"
-  add_foreign_key "user_job_postings", "job_postings"
-  add_foreign_key "user_job_postings", "users"
-  add_foreign_key "work_experiences", "career_profiles"
-end
