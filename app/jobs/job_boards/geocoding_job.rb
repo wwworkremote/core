@@ -22,9 +22,10 @@ module JobBoards
           result = results.first
           job_posting.update_columns(
             latitude: result.latitude,
-            longitude: result.longitude
+            longitude: result.longitude,
+            country_code: result.country_code&.upcase
           )
-          Rails.logger.info "[GeocodingJob] Successfully geocoded Job #{job_posting_id}: #{job_posting.location}"
+          Rails.logger.info "[GeocodingJob] Successfully geocoded Job #{job_posting_id}: #{job_posting.location} (#{result.country_code})"
         end
       rescue Geocoder::OverQueryLimitError, Geocoder::RequestDenied
         lock_source!('geocoding', duration: 1.hour)

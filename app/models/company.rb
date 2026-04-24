@@ -7,6 +7,7 @@
 #  id                 :bigint           not null, primary key
 #  disposition        :string
 #  glassdoor_data     :jsonb
+#  ingestion_enabled  :boolean          default(TRUE), not null
 #  name               :string
 #  sentiment_score    :float
 #  slug               :string

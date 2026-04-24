@@ -4,13 +4,14 @@
 #
 # Table name: users
 #
-#  id              :bigint           not null, primary key
-#  email           :string           default(""), not null
-#  name            :string           not null
-#  password_digest :string
-#  slug            :string           not null
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id                  :bigint           not null, primary key
+#  email               :string           default(""), not null
+#  name                :string           not null
+#  password_digest     :string
+#  preferred_countries :text             default([]), is an Array
+#  slug                :string           not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
 #
 # Indexes
 #

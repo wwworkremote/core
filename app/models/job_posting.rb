@@ -166,6 +166,7 @@ end
 #  id                 :bigint           not null, primary key
 #  body               :string
 #  company_name       :string
+#  country_code       :string
 #  crawl_status       :string
 #  data               :jsonb            not null
 #  embedding          :vector(3584)
@@ -193,6 +194,7 @@ end
 #  index_job_postings_on_company_id                     (company_id)
 #  index_job_postings_on_company_name                   (company_name)
 #  index_job_postings_on_company_name_and_published_at  (company_name,published_at DESC)
+#  index_job_postings_on_country_code                   (country_code)
 #  index_job_postings_on_data                           (data) USING gin
 #  index_job_postings_on_external_id                    (external_id)
 #  index_job_postings_on_location                       (location)
