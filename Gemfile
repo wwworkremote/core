@@ -79,6 +79,7 @@ gem 'yard', '~> 0.9'
 # Development & Testing
 group :development, :test do
   gem 'brakeman'
+  gem 'bullet'
   gem 'bundler-audit', require: false
   gem 'byebug', platforms: %i[mri windows]
   gem 'capybara'

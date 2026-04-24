@@ -25,5 +25,9 @@ Rails.application.configure do
 
   config.after_initialize do
     Ahoy.geocode = false
+
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.raise = true # Raise an error if an N+1 query is detected
   end
 end
