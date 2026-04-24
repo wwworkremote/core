@@ -6,7 +6,7 @@
 #
 #  id                 :bigint           not null, primary key
 #  body               :string
-#  company            :string
+#  company_name       :string
 #  crawl_status       :string
 #  data               :jsonb            not null
 #  embedding          :vector(3584)
@@ -22,25 +22,29 @@
 #  title              :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  company_id         :bigint
 #  external_author_id :string
 #  external_id        :string
 #  source_id          :bigint
 #
 # Indexes
 #
-#  index_job_postings_on_body                        (body) USING gin
-#  index_job_postings_on_company                     (company)
-#  index_job_postings_on_company_and_published_at    (company,published_at DESC)
-#  index_job_postings_on_data                        (data) USING gin
-#  index_job_postings_on_external_id                 (external_id)
-#  index_job_postings_on_location                    (location)
-#  index_job_postings_on_published_at                (published_at)
-#  index_job_postings_on_source_id                   (source_id)
-#  index_job_postings_on_source_id_and_published_at  (source_id,published_at DESC)
-#  index_job_postings_on_title                       (title) USING gin
+#  index_job_postings_on_body                           (body) USING gin
+#  index_job_postings_on_company_and_published_at       (company,published_at DESC)
+#  index_job_postings_on_company_id                     (company_id)
+#  index_job_postings_on_company_name                   (company_name)
+#  index_job_postings_on_company_name_and_published_at  (company_name,published_at DESC)
+#  index_job_postings_on_data                           (data) USING gin
+#  index_job_postings_on_external_id                    (external_id)
+#  index_job_postings_on_location                       (location)
+#  index_job_postings_on_published_at                   (published_at)
+#  index_job_postings_on_signature                      (signature) UNIQUE
+#  index_job_postings_on_source_id_and_published_at     (source_id,published_at DESC)
+#  index_job_postings_on_title                          (title) USING gin
 #
 # Foreign Keys
 #
+#  fk_rails_...  (company_id => companies.id)
 #  fk_rails_...  (source_id => sources.id)
 #
 FactoryBot.define do

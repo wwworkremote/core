@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_23_161300) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_24_015023) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -301,6 +301,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_161300) do
     t.string "signature"
     t.integer "source_id", null: false
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["aasm_state"], name: "index_job_boards_documents_on_aasm_state"
     t.index ["job_boards_query_id"], name: "index_job_boards_documents_on_job_boards_query_id"
     t.index ["signature"], name: "index_job_boards_documents_on_signature", unique: true
     t.index ["source_id"], name: "index_job_boards_documents_on_source_id"
@@ -365,7 +366,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_161300) do
     t.string "company_name"
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["company", "published_at"], name: "index_job_postings_on_company_and_published_at", order: { published_at: :desc }
-    t.index ["company"], name: "index_job_postings_on_company"
     t.index ["company_id"], name: "index_job_postings_on_company_id"
     t.index ["company_name", "published_at"], name: "index_job_postings_on_company_name_and_published_at", order: { published_at: :desc }
     t.index ["company_name"], name: "index_job_postings_on_company_name"
@@ -373,8 +373,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_161300) do
     t.index ["external_id"], name: "index_job_postings_on_external_id"
     t.index ["location"], name: "index_job_postings_on_location"
     t.index ["published_at"], name: "index_job_postings_on_published_at"
+    t.index ["signature"], name: "index_job_postings_on_signature", unique: true
     t.index ["source_id", "published_at"], name: "index_job_postings_on_source_id_and_published_at", order: { published_at: :desc }
-    t.index ["source_id"], name: "index_job_postings_on_source_id"
     t.index ["title"], name: "index_job_postings_on_title", opclass: :gin_trgm_ops, using: :gin
   end
 

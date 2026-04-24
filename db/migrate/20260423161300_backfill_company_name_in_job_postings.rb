@@ -4,6 +4,8 @@ class BackfillCompanyNameInJobPostings < ActiveRecord::Migration[8.0]
   disable_ddl_transaction!
 
   def up
+    return unless column_exists?(:job_postings, :company_name) && column_exists?(:job_postings, :company)
+
     # Use raw SQL to bypass ActiveRecord column ignoring
     safety_assured do
       execute <<-SQL
@@ -13,6 +15,8 @@ class BackfillCompanyNameInJobPostings < ActiveRecord::Migration[8.0]
   end
 
   def down
+    return unless column_exists?(:job_postings, :company_name)
+
     execute <<-SQL
       UPDATE job_postings SET company_name = NULL;
     SQL

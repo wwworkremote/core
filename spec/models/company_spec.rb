@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: companies
+#
+#  id                 :bigint           not null, primary key
+#  disposition        :string
+#  glassdoor_data     :jsonb
+#  name               :string
+#  sentiment_score    :float
+#  slug               :string
+#  status             :string
+#  toxic_culture_flag :boolean
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+# Indexes
+#
+#  index_companies_on_name  (name) UNIQUE
+#  index_companies_on_slug  (slug)
+#
 require 'rails_helper'
 
 RSpec.describe Company, type: :model do
