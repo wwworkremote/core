@@ -7,9 +7,9 @@ RSpec.describe 'Mission Control - Jobs' do
   let(:password) { ENV.fetch('ADMIN_PASSWORD', 'password') }
   let(:auth_headers) { { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(email, password) } }
 
-  describe 'GET /jobs' do
+  describe 'GET /mounts/jobs' do
     it 'loads the background jobs dashboard' do
-      get '/jobs', headers: auth_headers
+      get '/mounts/jobs', headers: auth_headers
       expect(response).to have_http_status(:success).or have_http_status(:found)
 
       if response.status == 302

@@ -1,4 +1,50 @@
-<div>
-  <h1 class="font-bold text-4xl">Companies#index</h1>
-  <p>Find me in app/views/companies/index.html.erb</p>
+<% content_for :title, "Companies | WWWorkRemote" %>
+
+<div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="flex items-center gap-3">
+    <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
+    <i class="bi bi-chevron-right text-[8px]"></i>
+    <span class="text-white">Entity_Market_Registry</span>
+  </div>
+</div>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+  <div>
+    <h1 class="text-4xl font-black text-white mb-2 uppercase italic tracking-tight">Managed_Entities</h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Aggregated data nodes for remote-first organizations.</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
+  <% @companies.each do |company| %>
+    <%= link_to company_path(company), class: "group" do %>
+      <div class="bg-base-200 border border-white/5 rounded-2xl p-8 h-full shadow-2xl transition-all hover:border-primary/50 hover:translate-y-[-4px] relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1">Entity_Node_<%= company.id %></div>
+          <h3 class="text-xl font-black text-white group-hover:text-primary transition-colors uppercase truncate mb-6"><%= company.name %></h3>
+
+          <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+            <div class="flex flex-col">
+              <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Active_Signals</span>
+              <span class="text-lg font-black text-white"><%= company.job_postings_count %></span>
+            </div>
+
+            <% if company.toxic_culture_flag %>
+              <div class="badge badge-error gap-1 text-[8px] font-black uppercase tracking-tighter">
+                <i class="bi bi-exclamation-triangle"></i> TOXICITY_ALERT
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+          <%= heroicon "building-office", options: { class: "w-16 h-16" } %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="flex justify-center mt-12 pb-20">
+  <%= paginate @companies %>
 </div>

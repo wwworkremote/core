@@ -66,3 +66,41 @@
     </ul>
   </div>
 </article>
+
+<div class="mt-16">
+  <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-8 pb-4 border-b border-white/10">System_Mounts</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="card-admin p-8 flex flex-col justify-between">
+      <div>
+        <div class="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Database_Intelligence</div>
+        <h3 class="text-xl font-black mb-4 italic uppercase">PgHero_Node</h3>
+        <p class="text-xs text-slate-500 font-bold leading-relaxed mb-6">Real-time query analysis and database health monitoring.</p>
+      </div>
+      <%= link_to "/mounts/pghero", class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
+        ACCESS_PGHERO
+      <% end %>
+    </div>
+
+    <div class="card-admin p-8 flex flex-col justify-between">
+      <div>
+        <div class="text-[10px] font-black text-secondary uppercase tracking-widest mb-2">Job_Orchestration</div>
+        <h3 class="text-xl font-black mb-4 italic uppercase">Mission_Control</h3>
+        <p class="text-xs text-slate-500 font-bold leading-relaxed mb-6">Solid Queue supervisor for monitoring and managing background workers.</p>
+      </div>
+      <%= link_to "/mounts/jobs", class: "btn btn-secondary btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
+        ACCESS_JOBS
+      <% end %>
+    </div>
+
+    <div class="card-admin p-8 flex flex-col justify-between">
+      <div>
+        <div class="text-[10px] font-black text-accent uppercase tracking-widest mb-2">Behavioral_Telemetry</div>
+        <h3 class="text-xl font-black mb-4 italic uppercase">Ahoy_Captain</h3>
+        <p class="text-xs text-slate-500 font-bold leading-relaxed mb-6">Visual analytics for visits, events, and user conversion funnels.</p>
+      </div>
+      <%= link_to "/mounts/analytics", class: "btn btn-accent btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
+        ACCESS_ANALYTICS
+      <% end %>
+    </div>
+  </div>
+</div>

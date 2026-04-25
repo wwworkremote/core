@@ -303,7 +303,10 @@ Rails.application.routes.draw do
     # ... other api routes ...
   end
 
-  mount PgHero::Engine, at: 'pghero'
-  mount MissionControl::Jobs::Engine, at: '/jobs'
+  scope :mounts do
+    mount PgHero::Engine, at: 'pghero'
+    mount MissionControl::Jobs::Engine, at: 'jobs'
+    mount AhoyCaptain::Engine, at: 'analytics'
+  end
   get '/pages/*page' => 'pages#show'
 end
