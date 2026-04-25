@@ -7,7 +7,8 @@ require 'pagy'
 class Pagy
   # ahoy_captain and others expect Pagy::Frontend
   Frontend = NumericHelpers unless defined?(Frontend)
-  
-  # Just in case some gems expect Pagy::Backend
+
+  # ahoy_captain expects Pagy::Backend
+  # In Pagy 43, Method is the module defining the #pagy method
   Backend = Method unless defined?(Backend)
 end
