@@ -28,7 +28,7 @@
 #
 require 'rails_helper'
 
-RSpec.describe CareerProfile, type: :model do
+RSpec.describe CareerProfile do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_many(:work_experiences).dependent(:destroy) }

@@ -23,7 +23,7 @@
 #
 require 'rails_helper'
 
-RSpec.describe Company, type: :model do
+RSpec.describe Company do
   describe 'associations' do
     it { is_expected.to have_many(:job_postings) }
     it { is_expected.to have_many(:company_pipeline_steps).dependent(:destroy) }
@@ -37,7 +37,7 @@ RSpec.describe Company, type: :model do
   end
 
   describe 'states' do
-    let(:company) { Company.new(name: 'Test Corp', slug: 'test-corp') }
+    let(:company) { described_class.new(name: 'Test Corp', slug: 'test-corp') }
 
     it 'starts in none state' do
       expect(company.status).to eq('none')

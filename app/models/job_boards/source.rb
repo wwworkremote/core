@@ -18,16 +18,14 @@
 #
 #  index_job_boards_sources_on_slug  (slug) UNIQUE
 #
-module JobBoards
-  class Source < ApplicationRecord
-    has_many :job_boards_queries, class_name: 'JobBoards::Query', dependent: :destroy
-    has_many :job_boards_documents, class_name: 'JobBoards::Document', dependent: :destroy
+class JobBoards::Source < ApplicationRecord
+  has_many :job_boards_queries, class_name: 'JobBoards::Query', dependent: :destroy
+  has_many :job_boards_documents, class_name: 'JobBoards::Document', dependent: :destroy
 
-    validates :name, presence: true
-    validates :slug, presence: true, uniqueness: true
+  validates :name, presence: true
+  validates :slug, presence: true, uniqueness: true
 
-    def self.ransackable_attributes(_auth_object = nil)
-      %w[id name slug created_at updated_at]
-    end
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[id name slug created_at updated_at]
   end
 end

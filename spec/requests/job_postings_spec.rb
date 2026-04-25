@@ -5,7 +5,10 @@ require 'rails_helper'
 RSpec.describe 'Job Postings' do
   let(:origin) { Origin.find_or_create_by!(name: 'Test Origin') }
   let(:source) { Source.find_or_create_by!(signature: 'test-source', origin: origin) }
-  let!(:job) { JobPosting.create!(signature: 'test-1', title: 'Ruby Developer', company: 'Acme', published_at: Time.zone.now, source: source) }
+  let!(:job) {
+    JobPosting.create!(signature: 'test-1', title: 'Ruby Developer', company: 'Acme', published_at: Time.zone.now,
+                       source: source)
+  }
 
   describe 'GET /job_postings' do
     it 'returns a success response' do

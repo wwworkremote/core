@@ -26,7 +26,7 @@
 #
 require 'rails_helper'
 
-RSpec.describe PipelineStep, type: :model do
+RSpec.describe PipelineStep do
   describe 'associations' do
     it { is_expected.to belong_to(:job_posting) }
     it { is_expected.to belong_to(:user).optional }

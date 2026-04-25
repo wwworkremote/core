@@ -17,7 +17,7 @@ class RebuildAndCleanupIndexes < ActiveRecord::Migration[8.0]
     add_index :job_postings, :company_name, algorithm: :concurrently
 
     remove_index :job_postings, name: 'index_job_postings_on_company_name_and_published_at', if_exists: true
-    add_index :job_postings, [:company_name, :published_at], order: { published_at: :desc }, algorithm: :concurrently
+    add_index :job_postings, %i[company_name published_at], order: { published_at: :desc }, algorithm: :concurrently
 
     # 2. Remove Redundant Indexes
     # Covered by index_job_postings_on_company_and_published_at
@@ -27,9 +27,11 @@ class RebuildAndCleanupIndexes < ActiveRecord::Migration[8.0]
 
     # 3. Add Suggested/Missing Indexes
     # Signature is frequently used for lookups and uniqueness checks
-    add_index :job_postings, :signature, algorithm: :concurrently, unique: true unless index_exists?(:job_postings, :signature)
+    add_index :job_postings, :signature, algorithm: :concurrently, unique: true unless index_exists?(:job_postings,
+                                                                                                     :signature)
 
     # Resolve slow queries on JobBoards::Document state filtering
-    add_index :job_boards_documents, :aasm_state, algorithm: :concurrently unless index_exists?(:job_boards_documents, :aasm_state)
+    add_index :job_boards_documents, :aasm_state, algorithm: :concurrently unless index_exists?(:job_boards_documents,
+                                                                                                :aasm_state)
   end
 end

@@ -1,19 +1,15 @@
 # frozen_string_literal: true
 
-module Api
-  module V0
-    class SourcesController < ApiController
-      def index
-        page = params.fetch('page', 1)
+class Api::V0::SourcesController < ApiController
+  def index
+    page = params.fetch('page', 1)
 
-        render json: Source.order(id: :desc).page(page).without_count
-      end
+    render json: Source.order(id: :desc).page(page).without_count
+  end
 
-      def show
-        id = params[:id]
+  def show
+    id = params[:id]
 
-        render json: Source.find(id)
-      end
-    end
+    render json: Source.find(id)
   end
 end

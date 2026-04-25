@@ -19,7 +19,7 @@ class JobPosting < ApplicationRecord
     if val.is_a?(String)
       self.company_name = val
     else
-      super(val)
+      super
     end
   end
 
@@ -28,7 +28,7 @@ class JobPosting < ApplicationRecord
     company_name
   end
 
-  self.ignored_columns += ["company"]
+  self.ignored_columns += ['company']
 
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
@@ -89,7 +89,9 @@ class JobPosting < ApplicationRecord
 
   geocoded_by :location
   # after_validation :geocode, if: ->(obj) { obj.location.present? && obj.location_changed? }
-  after_commit :enqueue_geocoding, on: %i[create update], if: -> { location.present? && (saved_change_to_location? || latitude.nil?) }
+  after_commit :enqueue_geocoding, on: %i[create update], if: lambda {
+    location.present? && (saved_change_to_location? || latitude.nil?)
+  }
 
   scope :recent, -> { order(published_at: :desc) }
 
@@ -135,7 +137,8 @@ class JobPosting < ApplicationRecord
   # Real-time dashboard telemetry
   after_create_commit do
     broadcast_replace_to 'system_telemetry', target: 'synthesis_stats', partial: 'home/telemetry_synthesis'
-    broadcast_prepend_to 'admin_live_feed', target: 'live_ingestion', partial: 'admin/dashboard/live_feed/job_posting', locals: { job_posting: self }
+    broadcast_prepend_to 'admin_live_feed', target: 'live_ingestion', partial: 'admin/dashboard/live_feed/job_posting',
+                                            locals: { job_posting: self }
   end
 
   # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source

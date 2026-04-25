@@ -19,14 +19,10 @@
 #
 #  index_hacker_news_v0_jobstories_on_id  (id) UNIQUE
 #
-module HackerNews
-  module V0
-    class Jobstory < ApplicationRecord
-      include PgSearch::Model
+class HackerNews::V0::Jobstory < ApplicationRecord
+  include PgSearch::Model
 
-      multisearchable against: %i[title text]
+  multisearchable against: %i[title text]
 
-      self.primary_key = :id
-    end
-  end
+  self.primary_key = :id
 end

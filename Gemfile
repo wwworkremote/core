@@ -92,8 +92,8 @@ group :development, :test do
   gem 'overcommit'
   gem 'packwerk', require: false
   gem 'pghero'
-  gem 'rails-erd', require: false
   gem 'rails_best_practices', require: false
+  gem 'rails-erd', require: false
   gem 'rspec-rails'
   gem 'rubocop', require: false
   gem 'rubocop-capybara', require: false
@@ -115,13 +115,16 @@ group :development, :test do
 end
 
 group :development do
+  gem 'coverband', require: false
   gem 'database_consistency', require: false
+  gem 'debride', require: false
   gem 'flog', require: false
   gem 'guard-livereload', '~> 2.5'
   gem 'guard-rspec', '~> 4.7'
   gem 'listen', '~> 3.10'
   gem 'rack-mini-profiler'
   gem 'reek', require: false
+  gem 'traceroute'
 end
 
 group :test do

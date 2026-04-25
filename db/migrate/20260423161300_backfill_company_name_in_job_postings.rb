@@ -8,7 +8,7 @@ class BackfillCompanyNameInJobPostings < ActiveRecord::Migration[8.0]
 
     # Use raw SQL to bypass ActiveRecord column ignoring
     safety_assured do
-      execute <<-SQL
+      execute <<~SQL.squish
         UPDATE job_postings SET company_name = company WHERE company_name IS NULL;
       SQL
     end
@@ -17,7 +17,7 @@ class BackfillCompanyNameInJobPostings < ActiveRecord::Migration[8.0]
   def down
     return unless column_exists?(:job_postings, :company_name)
 
-    execute <<-SQL
+    execute <<~SQL.squish
       UPDATE job_postings SET company_name = NULL;
     SQL
   end

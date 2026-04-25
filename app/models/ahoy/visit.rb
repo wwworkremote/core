@@ -36,11 +36,9 @@
 #  index_ahoy_visits_on_user_id      (user_id)
 #  index_ahoy_visits_on_visit_token  (visit_token) UNIQUE
 #
-module Ahoy
-  class Visit < ApplicationRecord
-    self.table_name = 'ahoy_visits'
+class Ahoy::Visit < ApplicationRecord
+  self.table_name = 'ahoy_visits'
 
-    has_many :events, class_name: 'Ahoy::Event'
-    belongs_to :user, optional: true
-  end
+  has_many :events, class_name: 'Ahoy::Event'
+  belongs_to :user, optional: true
 end

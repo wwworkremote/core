@@ -38,11 +38,17 @@ class BoardQuery < ApplicationRecord
 
     if query_params['remote']
       filters << { a: 'remote', l: ' Remote', v: 'remote' }
-      filters << { a: 'remoteLocationCountries', l: " #{query_params['country']}", v: query_params['country'] } if query_params['country'].present?
+      if query_params['country'].present?
+        filters << { a: 'remoteLocationCountries', l: " #{query_params['country']}",
+                     v: query_params['country'] }
+      end
     end
 
     Array(query_params['seniority']).each { |s| filters << { a: 'seniority', l: " #{s.capitalize}", v: s.downcase } }
-    filters << { a: 'salary', l: "Min: £#{query_params['min_salary'].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, '\1,')}", v: query_params['min_salary'].to_i } if query_params['min_salary'].present?
+    if query_params['min_salary'].present?
+      filters << { a: 'salary', l: "Min: £#{query_params['min_salary'].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, '\1,')}",
+                   v: query_params['min_salary'].to_i }
+    end
 
     query = { filters: filters.to_json, v: { label: 'Positions', value: 'listing' }.to_json, resultType: 'all' }
     "https://cord.com/search/jobs/#{base_slug}?#{query.to_query}"

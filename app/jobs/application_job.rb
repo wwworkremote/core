@@ -22,11 +22,10 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def check_cancellation!
-    if SystemSetting.job_cancelled?(job_id)
-      Rails.logger.info "[CancelSignal] Job #{self.class.name} (#{job_id}) terminating mid-performance."
-      SystemSetting.clear_job_cancellation!(job_id)
-      throw :abort
-    end
+    return unless SystemSetting.job_cancelled?(job_id)
+    Rails.logger.info "[CancelSignal] Job #{self.class.name} (#{job_id}) terminating mid-performance."
+    SystemSetting.clear_job_cancellation!(job_id)
+    throw :abort
   end
 
   # Solid Queue Concurrency Helpers

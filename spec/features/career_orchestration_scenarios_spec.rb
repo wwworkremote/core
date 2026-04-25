@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe 'The Career Orchestration Loop', type: :system do
   let(:admin_user) { User.find_by(email: ENV.fetch('ADMIN_EMAIL', 'mike@just3ws.com')) || create(:user) }
-  let!(:job_posting) { create(:job_posting, title: 'Staff Ruby on Rails Engineer', body: 'Deep Ruby and Rails expertise required.') }
+  let!(:job_posting) {
+    create(:job_posting, title: 'Staff Ruby on Rails Engineer', body: 'Deep Ruby and Rails expertise required.')
+  }
 
   before do
     driven_by :cuprite

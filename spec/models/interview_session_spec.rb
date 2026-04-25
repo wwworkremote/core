@@ -27,7 +27,7 @@
 #
 require 'rails_helper'
 
-RSpec.describe InterviewSession, type: :model do
+RSpec.describe InterviewSession do
   describe 'associations' do
     it { is_expected.to belong_to(:job_posting) }
     it { is_expected.to belong_to(:user) }

@@ -35,9 +35,9 @@ RSpec.describe Quality::InsightIngester do
 
     it 'marks old insights as inactive' do
       SystemInsight.create!(tool: :rubocop, message: 'Old', file_path: 'app/models/user.rb', active: true)
-      
+
       described_class.ingest_rubocop(json_report)
-      
+
       expect(SystemInsight.where(message: 'Old').first.active).to be false
     end
   end

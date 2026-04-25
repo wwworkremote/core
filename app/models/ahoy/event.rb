@@ -18,13 +18,11 @@
 #  index_ahoy_events_on_user_id        (user_id)
 #  index_ahoy_events_on_visit_id       (visit_id)
 #
-module Ahoy
-  class Event < ApplicationRecord
-    include Ahoy::QueryMethods
+class Ahoy::Event < ApplicationRecord
+  include Ahoy::QueryMethods
 
-    self.table_name = 'ahoy_events'
+  self.table_name = 'ahoy_events'
 
-    belongs_to :visit
-    belongs_to :user, optional: true
-  end
+  belongs_to :visit
+  belongs_to :user, optional: true
 end

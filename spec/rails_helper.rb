@@ -15,7 +15,9 @@ require File.expand_path('../config/environment', __dir__)
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 
 # STRICT GUARD: Never allow tests to touch the development database
-abort("\nFATAL ERROR: Attempted to run tests against the development database. \nExecution halted to prevent data loss. \nCheck your RAILS_ENV or database.yml configuration.\n") if ActiveRecord::Base.connection_db_config.name == 'development' || ActiveRecord::Base.connection.current_database == 'wwworkremote_development'
+if ActiveRecord::Base.connection_db_config.name == 'development' || ActiveRecord::Base.connection.current_database == 'wwworkremote_development'
+  abort("\nFATAL ERROR: Attempted to run tests against the development database. \nExecution halted to prevent data loss. \nCheck your RAILS_ENV or database.yml configuration.\n")
+end
 
 require 'rspec/rails'
 

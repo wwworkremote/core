@@ -4,8 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Deep AI Career Alignment (V2)' do
   let(:user) { User.create!(email: 'tester@example.com', name: 'Tester', password: 'password') }
-  let(:job1) { JobPosting.create!(title: 'Ruby Engineer', company: 'RemoteCo', body: 'We love Ruby and Rails.', signature: 'job1') }
-  let(:job2) { JobPosting.create!(title: 'Rails Architect', company: 'BigCorp', body: 'Legacy systems, 10% Rails.', signature: 'job2') }
+  let(:job1) {
+    JobPosting.create!(title: 'Ruby Engineer', company: 'RemoteCo', body: 'We love Ruby and Rails.', signature: 'job1')
+  }
+  let(:job2) {
+    JobPosting.create!(title: 'Rails Architect', company: 'BigCorp', body: 'Legacy systems, 10% Rails.',
+                       signature: 'job2')
+  }
 
   describe LLM::DocumentProcessor do
     it 'extracts text from attachments' do

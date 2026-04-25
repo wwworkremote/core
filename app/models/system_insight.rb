@@ -3,19 +3,19 @@
 class SystemInsight < ApplicationRecord
   has_neighbors :embedding # For vector similarity searches
 
-  enum :tool, { 
-    rubocop: 0, 
-    reek: 1, 
-    brakeman: 2, 
-    rails_best_practices: 3, 
-    flay: 4, 
-    packwerk: 5 
+  enum :tool, {
+    rubocop: 0,
+    reek: 1,
+    brakeman: 2,
+    rails_best_practices: 3,
+    flay: 4,
+    packwerk: 5
   }
 
-  enum :severity, { 
-    advisory: 0, 
-    warning: 1, 
-    critical: 2 
+  enum :severity, {
+    advisory: 0,
+    warning: 1,
+    critical: 2
   }
 
   validates :message, presence: true

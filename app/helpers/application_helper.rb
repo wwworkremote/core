@@ -9,7 +9,8 @@ module ApplicationHelper
     options = {
       filter_html: true,
       hard_wrap: true,
-      link_attributes: { target: '_blank', rel: 'noopener noreferrer', class: 'text-violet-400 hover:text-violet-300 underline underline-offset-4' }
+      link_attributes: { target: '_blank', rel: 'noopener noreferrer',
+                         class: 'text-violet-400 hover:text-violet-300 underline underline-offset-4' }
     }
 
     extensions = {

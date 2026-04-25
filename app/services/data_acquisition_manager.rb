@@ -254,7 +254,9 @@ class DataAcquisitionManager
 
       call_args = {}
       call_args[:force] = force if method.parameters.any? { |p| p[1] == :force }
-      call_args[:source] = slug.split('_').last if slug.start_with?('email_') && method.parameters.any? { |p| p[1] == :source }
+      call_args[:source] = slug.split('_').last if slug.start_with?('email_') && method.parameters.any? { |p|
+        p[1] == :source
+      }
 
       result_raw = if call_args.any?
                      fetcher.call(**call_args)

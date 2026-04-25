@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-module EmailIngestion
-  class ScanJob < ApplicationJob
-    queue_as :light
+class EmailIngestion::ScanJob < ApplicationJob
+  queue_as :light
 
-    def perform
-      EmailIngestion::Scanner.new.call
-    end
+  def perform
+    EmailIngestion::Scanner.new.call
   end
 end

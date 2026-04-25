@@ -17,11 +17,9 @@
 #  index_hacker_news_items_on_schema  (schema)
 #  index_hacker_news_items_on_state   (state)
 #
-module HackerNews
-  class Item < ApplicationRecord
-    self.primary_key = :id
+class HackerNews::Item < ApplicationRecord
+  self.primary_key = :id
 
-    enum :schema, { unknown: 0, job: 1, story: 2, comment: 3, poll: 4, pollopt: 5 }
-    enum :state, { pending: 0, ignore: 1 }
-  end
+  enum :schema, { unknown: 0, job: 1, story: 2, comment: 3, poll: 4, pollopt: 5 }
+  enum :state, { pending: 0, ignore: 1 }
 end
