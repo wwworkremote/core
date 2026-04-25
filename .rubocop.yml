@@ -41,21 +41,70 @@ AllCops:
     - 'vendor/**/*'
     - '.git/**/*'
 
-# Department-wide disables for high-level control
-Metrics:
-  Enabled: false
-
-Layout:
+# --- Rails 8 Specifics ---
+Rails/ActiveRecordCallbacksOrder:
   Enabled: true
 
-# Customizations and specific overrides
+Rails/UniqueValidationWithoutIndex:
+  Enabled: true
+
+# --- Metrics (Balanced for High Quality) ---
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/BlockLength:
+  Exclude:
+    - 'config/routes.rb'
+    - 'config/environments/*.rb'
+    - 'spec/**/*'
+    - 'lib/tasks/*.rake'
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/ModuleLength:
+  Max: 100
+
+Metrics/ParameterLists:
+  Max: 5
+
+# --- RSpec Standards ---
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 10 # Allow more flexibility in complex integration specs
+
+RSpec/ExampleLength:
+  Max: 15
+
+RSpec/NestedGroups:
+  Max: 5
+
+# --- Style and Layout ---
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'config/initializers/*'
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  SafeAutoCorrect: true
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+# --- Overrides from existing config ---
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
 Layout/EmptyLines:
-  Enabled: false
-
-Layout/LineLength:
   Enabled: false
 
 Lint/Debugger:
@@ -75,18 +124,6 @@ Naming/FileName:
     - '**/*.md'
     - 'node_modules/**/*'
 
-RSpec:
-  Enabled: true
-
-RSpec/ContextWording:
-  Enabled: false
-
-RSpec/MultipleExpectations:
-  Max: 10 # Allow more flexibility in complex integration specs
-
-Rails:
-  Enabled: true
-
 Rails/Output:
   Enabled: false
 
@@ -95,13 +132,6 @@ Rails/I18nLocaleTexts:
 
 Rails/DangerousColumnNames:
   Enabled: false
-
-Style/Documentation:
-  Enabled: false
-
-Style/FrozenStringLiteralComment:
-  Enabled: true
-  SafeAutoCorrect: true
 
 Style/BlockDelimiters:
   Enabled: false

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_24_180221) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_25_134031) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -632,6 +632,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_24_180221) do
     t.index ["origin_id"], name: "index_sources_on_origin_id"
     t.index ["payload"], name: "index_sources_on_payload", opclass: :jsonb_path_ops, using: :gin
     t.index ["signature"], name: "index_sources_on_signature", unique: true
+  end
+
+  create_table "system_insights", force: :cascade do |t|
+    t.integer "tool"
+    t.integer "severity"
+    t.text "message"
+    t.string "file_path"
+    t.integer "line_number"
+    t.text "context"
+    t.boolean "active", default: true
+    t.vector "embedding", limit: 3584
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_system_insights_on_active"
+    t.index ["file_path"], name: "index_system_insights_on_file_path"
   end
 
   create_table "system_settings", force: :cascade do |t|

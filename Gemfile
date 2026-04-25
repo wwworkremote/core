@@ -87,8 +87,13 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'faker'
+  gem 'flay', require: false
+  gem 'i18n-tasks', require: false
   gem 'overcommit'
+  gem 'packwerk', require: false
   gem 'pghero'
+  gem 'rails-erd', require: false
+  gem 'rails_best_practices', require: false
   gem 'rspec-rails'
   gem 'rubocop', require: false
   gem 'rubocop-capybara', require: false
@@ -101,6 +106,7 @@ group :development, :test do
   gem 'rubocop-rspec_rails', require: false
   gem 'rubocop-rubycw', require: false
   gem 'rubocop-thread_safety', require: false
+  gem 'ruby-graphviz', require: false
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'strong_migrations'
