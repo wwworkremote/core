@@ -18,21 +18,21 @@ class SystemSetting < ApplicationRecord
   validates :key, presence: true, uniqueness: true
 
   def self.paused?
-    find_by(key: 'pipelines_paused')&.value == 'true'
+    find_by(key: "pipelines_paused")&.value == "true"
   end
 
   def self.pause!
-    find_or_create_by!(key: 'pipelines_paused').update!(value: 'true')
+    find_or_create_by!(key: "pipelines_paused").update!(value: "true")
   end
 
   def self.resume!
-    find_or_create_by!(key: 'pipelines_paused').update!(value: 'false')
+    find_or_create_by!(key: "pipelines_paused").update!(value: "false")
   end
 
   def self.cancel_job!(job_id)
     ids = cancelled_job_ids
     ids << job_id.to_s
-    find_or_create_by!(key: 'cancelled_job_ids').update!(value: ids.uniq.join(','))
+    find_or_create_by!(key: "cancelled_job_ids").update!(value: ids.uniq.join(","))
   end
 
   def self.job_cancelled?(job_id)
@@ -42,10 +42,10 @@ class SystemSetting < ApplicationRecord
   def self.clear_job_cancellation!(job_id)
     ids = cancelled_job_ids
     ids.delete(job_id.to_s)
-    find_or_create_by!(key: 'cancelled_job_ids').update!(value: ids.join(','))
+    find_or_create_by!(key: "cancelled_job_ids").update!(value: ids.join(","))
   end
 
   def self.cancelled_job_ids
-    find_by(key: 'cancelled_job_ids')&.value&.split(',') || []
+    find_by(key: "cancelled_job_ids")&.value&.split(",") || []
   end
 end

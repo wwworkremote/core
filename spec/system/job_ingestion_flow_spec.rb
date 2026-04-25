@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'Job Ingestion to AI Alignment Flow' do
-  let(:source) { JobBoards::Source.find_or_create_by!(slug: 'test-board') { |s| s.name = 'Test Board' } }
+RSpec.describe "Job Ingestion to AI Alignment Flow" do
+  let(:source) { JobBoards::Source.find_or_create_by!(slug: "test-board") { |s| s.name = "Test Board" } }
   let(:query) { JobBoards::Query.find_or_create_by!(source_id: source.id) }
-  let(:doc_signature) { 'test-job-123' }
+  let(:doc_signature) { "test-job-123" }
   let(:document_data) do
     {
-      title: 'Senior Ruby Engineer',
-      description: 'We are looking for a Rubyist who loves testing.',
-      url: 'https://example.com/jobs/123',
-      company: 'Test Corp',
-      location: 'Remote',
+      title: "Senior Ruby Engineer",
+      description: "We are looking for a Rubyist who loves testing.",
+      url: "https://example.com/jobs/123",
+      company: "Test Corp",
+      location: "Remote",
       created_at: Time.current.to_i
     }
   end
@@ -23,14 +23,14 @@ RSpec.describe 'Job Ingestion to AI Alignment Flow' do
     allow(JobBoards::Embedder).to receive(:new).and_return(double(call: true))
   end
 
-  it 'processes a new document all the way to a job posting' do
+  it "processes a new document all the way to a job posting" do
     # 1. Create a raw document
     doc = JobBoards::Document.create!(
       source_id: source.id,
       job_boards_query_id: query.id,
       signature: doc_signature,
       document: document_data.to_json,
-      aasm_state: 'pending'
+      aasm_state: "pending"
     )
 
     # 2. Run the Syncer
@@ -39,11 +39,11 @@ RSpec.describe 'Job Ingestion to AI Alignment Flow' do
 
     # 3. Verify the JobPosting attributes
     job = JobPosting.last
-    expect(job.title).to eq('Senior Ruby Engineer')
-    expect(job.company_name).to eq('Test Corp')
+    expect(job.title).to eq("Senior Ruby Engineer")
+    expect(job.company_name).to eq("Test Corp")
 
     # 4. Verify Document state changed
-    expect(doc.reload.aasm_state).to eq('processed')
+    expect(doc.reload.aasm_state).to eq("processed")
 
     # 5. Run Enrichment manually
     allow(JobFetchers::UrlResolver).to receive(:resolve).and_return(job.target_url)
@@ -58,8 +58,8 @@ RSpec.describe 'Job Ingestion to AI Alignment Flow' do
     JobBoards::ContentEnrichmentJob.new.send(:enrich_job, job)
 
     job.reload
-    expect(job.crawl_status).to eq('enriched')
-    expect(job.body).to include('We are looking for a Rubyist')
+    expect(job.crawl_status).to eq("enriched")
+    expect(job.body).to include("We are looking for a Rubyist")
     expect(job.enriched_at).to be_present
   end
 end

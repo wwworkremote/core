@@ -9,7 +9,7 @@ class DataFetchersController < ApplicationController
 
   def run
     slug = params[:slug]
-    force = params[:force] == 'true'
+    force = params[:force] == "true"
 
     begin
       result = DataAcquisitionManager.run(slug, force:)
@@ -45,13 +45,13 @@ class DataFetchersController < ApplicationController
 
   def audit
     JobBoards::AuditJob.perform_later
-    flash[:notice] = 'Audit and repair job has been enqueued.'
+    flash[:notice] = "Audit and repair job has been enqueued."
     redirect_to data_fetchers_path
   end
 
   def enrich
     JobBoards::ContentEnrichmentJob.perform_later
-    flash[:notice] = 'Content enrichment pipeline triggered.'
+    flash[:notice] = "Content enrichment pipeline triggered."
     redirect_to data_fetchers_path
   end
 end

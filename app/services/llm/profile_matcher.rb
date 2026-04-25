@@ -16,7 +16,7 @@ class LLM::ProfileMatcher
                         "resume_text: #{profile&.resume_text.present?}, " \
                         "work_experiences: #{profile&.work_experiences&.any?}, " \
                         "resumes_attached: #{profile&.resumes&.attached?}"
-      return { success: false, error: 'Profile incomplete. Please set up your resume.' }
+      return { success: false, error: "Profile incomplete. Please set up your resume." }
     end
 
     user_job = user.user_job_postings.find_or_create_by!(job_posting: job_posting)
@@ -80,8 +80,8 @@ class LLM::ProfileMatcher
 
     result = LLM::Orchestrator.call(
       untrusted_text: prompt,
-      system_rules: 'You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach.',
-      task_instructions: 'Return a structured markdown analysis. Be honest, critical, and preparation-oriented.'
+      system_rules: "You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach.",
+      task_instructions: "Return a structured markdown analysis. Be honest, critical, and preparation-oriented."
     )
 
     if result[:success] && result[:output].present?
@@ -97,7 +97,7 @@ class LLM::ProfileMatcher
 
       { success: true, output: result[:output], score: score }
     else
-      error_msg = result[:error] || 'LLM returned empty response'
+      error_msg = result[:error] || "LLM returned empty response"
       Rails.logger.error "[ProfileMatcher] Failed for Job #{job_posting.id}: #{error_msg}"
       { success: false, error: error_msg }
     end

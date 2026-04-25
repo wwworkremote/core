@@ -2,7 +2,7 @@
 
 class Charts::Data::JobPostingsController < DataController
   def index
-    @days = Integer(params['days'] || 1)
+    @days = Integer(params["days"] || 1)
     @days = 1 unless @days.positive?
 
     # Use created_at for velocity monitoring since published_at can be missing or stale
@@ -19,8 +19,8 @@ class Charts::Data::JobPostingsController < DataController
     )
 
     @corpus = job_postings.each_with_object({ names: [], descriptions: [] }) do |jp, c|
-      c[:names] << jp.first.to_s.gsub(/\s\+/, ' ').downcase.strip
-      c[:descriptions] << jp.last.to_s.gsub(/\s\+/, ' ').downcase.strip
+      c[:names] << jp.first.to_s.gsub(/\s\+/, " ").downcase.strip
+      c[:descriptions] << jp.last.to_s.gsub(/\s\+/, " ").downcase.strip
     end
 
     render json: @corpus.as_json

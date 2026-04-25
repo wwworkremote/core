@@ -2,9 +2,9 @@
 
 class CompaniesController < ApplicationController
   def index
-    @companies = Company.select('companies.*, count(job_postings.id) as job_postings_count')
+    @companies = Company.select("companies.*, count(job_postings.id) as job_postings_count")
                         .left_joins(:job_postings)
-                        .group('companies.id')
+                        .group("companies.id")
                         .order(job_postings_count: :desc, name: :asc)
                         .page(params[:page]).per(24)
   end

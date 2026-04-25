@@ -1,28 +1,28 @@
 # frozen_string_literal: true
 
 
-require 'simplecov'
-SimpleCov.start 'rails' do
-  add_filter 'app/controllers/concerns/authenticatable.rb'
-  add_group 'LLM Services', 'app/services/LLM'
-  add_group 'Scrapers', 'app/services/scraper'
+require "simplecov"
+SimpleCov.start "rails" do
+  add_filter "app/controllers/concerns/authenticatable.rb"
+  add_group "LLM Services", "app/services/LLM"
+  add_group "Scrapers", "app/services/scraper"
 end
 
-require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../config/environment', __dir__)
+require "spec_helper"
+ENV["RAILS_ENV"] ||= "test"
+require File.expand_path("../config/environment", __dir__)
 # Prevent database truncation if the environment is production
-abort('The Rails environment is running in production mode!') if Rails.env.production?
+abort("The Rails environment is running in production mode!") if Rails.env.production?
 
 # STRICT GUARD: Never allow tests to touch the development database
-if ActiveRecord::Base.connection_db_config.name == 'development' || ActiveRecord::Base.connection.current_database == 'wwworkremote_development'
+if ActiveRecord::Base.connection_db_config.name == "development" || ActiveRecord::Base.connection.current_database == "wwworkremote_development"
   abort("\nFATAL ERROR: Attempted to run tests against the development database. \nExecution halted to prevent data loss. \nCheck your RAILS_ENV or database.yml configuration.\n")
 end
 
-require 'rspec/rails'
+require "rspec/rails"
 
-require 'webmock/rspec'
-require 'capybara/cuprite'
+require "webmock/rspec"
+require "capybara/cuprite"
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -30,7 +30,7 @@ Capybara.javascript_driver = :cuprite
 Capybara.register_driver(:cuprite) do |app|
   Capybara::Cuprite::Driver.new(app,
                                 window_size: [1200, 800],
-                                browser_options: { 'no-sandbox': true },
+                                browser_options: { "no-sandbox": true },
                                 process_timeout: 60,
                                 timeout: 60,
                                 pending_connection_errors: false,
@@ -51,7 +51,7 @@ end
 # require only the support files necessary.
 #
 # Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
-Dir[File.join(__dir__, 'support/**/*.rb')].each { |f| require f }
+Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -61,10 +61,10 @@ rescue ActiveRecord::PendingMigrationError
   exit 1
 end
 RSpec.configure do |config|
-  config.example_status_persistence_file_path = 'tmp/rspec_failures.txt'
+  config.example_status_persistence_file_path = "tmp/rspec_failures.txt"
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
-    Rails.root.join('spec/fixtures')
+    Rails.root.join("spec/fixtures")
   ]
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -78,15 +78,15 @@ RSpec.configure do |config|
     # Stub Geocoder
     Geocoder.configure(lookup: :test, ip_lookup: :test)
     Geocoder::Lookup::Test.add_stub(
-      'Worldwide', [
+      "Worldwide", [
         {
-          'latitude' => 0.0,
-          'longitude' => 0.0,
-          'address' => 'Worldwide',
-          'state' => 'Worldwide',
-          'state_code' => 'WW',
-          'country' => 'Worldwide',
-          'country_code' => 'WW'
+          "latitude" => 0.0,
+          "longitude" => 0.0,
+          "address" => "Worldwide",
+          "state" => "Worldwide",
+          "state_code" => "WW",
+          "country" => "Worldwide",
+          "country_code" => "WW"
         }
       ]
     )

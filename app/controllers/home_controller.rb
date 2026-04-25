@@ -9,14 +9,14 @@ class HomeController < ApplicationController
 
     @priority_inbox = current_user.user_job_postings.includes(:job_posting).where(priority_flag: true,
                                                                                   status: [
-                                                                                    'none', nil
+                                                                                    "none", nil
                                                                                   ]).limit(6)
 
     @latest_jobs = JobPosting.recent.limit(6)
 
     # Efficiently aggregate stats by Origin name
     @source_stats = Origin.joins(sources: :job_postings)
-                          .group('origins.name')
+                          .group("origins.name")
                           .count
                           .map { |name, count| { name: name, count: count } }
                           .sort_by { |s| -s[:count] }

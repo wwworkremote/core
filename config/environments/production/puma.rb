@@ -1,10 +1,10 @@
 #!/usr/bin/env puma
 # frozen_string_literal: true
 
-environment 'production'
+environment "production"
 
-app_dir = '/home/deploy/projects/wwworkremote/core/current'
-shared_dir = '/home/deploy/projects/wwworkremote/core/shared'
+app_dir = "/home/deploy/projects/wwworkremote/core/current"
+shared_dir = "/home/deploy/projects/wwworkremote/core/shared"
 
 bind "unix://#{shared_dir}/sockets/puma.sock"
 pidfile "#{shared_dir}/pids/puma.pid"

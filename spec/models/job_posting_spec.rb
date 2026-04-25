@@ -49,26 +49,26 @@
 #  fk_rails_...  (company_id => companies.id)
 #  fk_rails_...  (source_id => sources.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe JobPosting do
-  describe 'validations' do
-    subject { described_class.new(signature: 'test-sig') }
+  describe "validations" do
+    subject { described_class.new(signature: "test-sig") }
 
     it { is_expected.to validate_presence_of(:signature) }
     it { is_expected.to validate_uniqueness_of(:signature) }
   end
 
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:source).optional }
     it { is_expected.to have_many(:user_job_postings).dependent(:destroy) }
     it { is_expected.to have_many(:users).through(:user_job_postings) }
   end
 
-  describe 'scopes' do
+  describe "scopes" do
     let!(:job) { create(:job_posting, published_at: 1.day.ago) }
 
-    it 'orders by published_at' do
+    it "orders by published_at" do
       # NOTE: This is an example, adjust based on actual logic
       expect(described_class.all).to include(job)
     end

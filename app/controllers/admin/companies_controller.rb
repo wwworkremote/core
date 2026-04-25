@@ -2,9 +2,9 @@
 
 class Admin::CompaniesController < Admin::ApplicationController
   def index
-    @companies = Company.select('companies.*, count(job_postings.id) as job_postings_count')
+    @companies = Company.select("companies.*, count(job_postings.id) as job_postings_count")
                         .left_joins(:job_postings)
-                        .group('companies.id')
+                        .group("companies.id")
                         .order(job_postings_count: :desc, name: :asc)
                         .page(params[:page]).per(50)
   end
@@ -22,7 +22,7 @@ class Admin::CompaniesController < Admin::ApplicationController
       message = "Ingestion resumed for #{@company.name}."
     else
       # Cascade: Purge all existing jobs for this company
-      @company.job_postings.where.not(status: 'purged').find_each(&:purge!)
+      @company.job_postings.where.not(status: "purged").find_each(&:purge!)
       message = "Ingestion disabled for #{@company.name} and all existing postings have been purged."
     end
 

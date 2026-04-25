@@ -3,7 +3,7 @@
 class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
   def change
     postgres =
-      ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
     if postgres
       create_table(:event_store_events_in_streams, id: :bigserial, force: false) do |t|
         t.string      :stream,      null: false

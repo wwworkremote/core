@@ -37,6 +37,6 @@ class User < ApplicationRecord
   def set_defaults
     self.name ||= "User #{SecureRandom.hex(4)}"
     self.slug ||= SecureRandom.hex(8)
-    self.preferred_countries = ['US'] if preferred_countries.blank?
+    self.preferred_countries = ["US"] if preferred_countries.blank?
   end
 end

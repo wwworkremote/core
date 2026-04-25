@@ -32,17 +32,17 @@ class ApplicationJob < ActiveJob::Base
 
   def self.heavyweight!
     job_class = name
-    limits_concurrency to: 2, group: 'heavyweight', key: ->(*_args) { job_class }
+    limits_concurrency to: 2, group: "heavyweight", key: ->(*_args) { job_class }
   end
 
   def self.mediumweight!
     job_class = name
-    limits_concurrency to: 5, group: 'mediumweight', key: ->(*_args) { job_class }
+    limits_concurrency to: 5, group: "mediumweight", key: ->(*_args) { job_class }
   end
 
   def self.lightweight!
     job_class = name
-    limits_concurrency to: 20, group: 'lightweight', key: ->(*_args) { job_class }
+    limits_concurrency to: 20, group: "lightweight", key: ->(*_args) { job_class }
   end
 
   # Ensures only one instance of this job with these arguments can be enqueued or running

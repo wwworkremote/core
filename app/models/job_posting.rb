@@ -28,7 +28,7 @@ class JobPosting < ApplicationRecord
     company_name
   end
 
-  self.ignored_columns += ['company']
+  self.ignored_columns += ["company"]
 
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
@@ -84,7 +84,7 @@ class JobPosting < ApplicationRecord
   end
 
   def add_pipeline_note(note, link: nil)
-    pipeline_steps.create!(status: 'noted', note: note, link: link)
+    pipeline_steps.create!(status: "noted", note: note, link: link)
   end
 
   geocoded_by :location
@@ -97,9 +97,9 @@ class JobPosting < ApplicationRecord
 
   # Advanced full-text search
   pg_search_scope :search,
-                  against: { title: 'A', body: 'B' },
+                  against: { title: "A", body: "B" },
                   using: {
-                    tsearch: { prefix: true, dictionary: 'english' },
+                    tsearch: { prefix: true, dictionary: "english" },
                     trigram: { threshold: 0.1 }
                   }
 
@@ -107,7 +107,7 @@ class JobPosting < ApplicationRecord
     embedding = JobBoards::Embedder.embed_text(query_text)
     return none if embedding.blank?
 
-    nearest_neighbors(:embedding, embedding, distance: 'cosine').limit(limit)
+    nearest_neighbors(:embedding, embedding, distance: "cosine").limit(limit)
   end
 
   def self.ransackable_attributes(_auth_object = nil)
@@ -136,8 +136,8 @@ class JobPosting < ApplicationRecord
 
   # Real-time dashboard telemetry
   after_create_commit do
-    broadcast_replace_to 'system_telemetry', target: 'synthesis_stats', partial: 'home/telemetry_synthesis'
-    broadcast_prepend_to 'admin_live_feed', target: 'live_ingestion', partial: 'admin/dashboard/live_feed/job_posting',
+    broadcast_replace_to "system_telemetry", target: "synthesis_stats", partial: "home/telemetry_synthesis"
+    broadcast_prepend_to "admin_live_feed", target: "live_ingestion", partial: "admin/dashboard/live_feed/job_posting",
                                             locals: { job_posting: self }
   end
 

@@ -22,7 +22,7 @@
 FactoryBot.define do
   factory :experience_highlight do
     work_experience { nil }
-    label { 'MyString' }
-    text { 'MyText' }
+    label { "MyString" }
+    text { "MyText" }
   end
 end

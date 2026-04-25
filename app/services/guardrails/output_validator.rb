@@ -25,7 +25,7 @@ class Guardrails::OutputValidator
     # 2. JSON validation if schema provided
     if @schema
       begin
-        parsed = JSON.parse(@output.match(/\{.*\}/m)&.[](0) || '')
+        parsed = JSON.parse(@output.match(/\{.*\}/m)&.[](0) || "")
         # Basic structural check for this implementation
         @schema.each do |key, type|
           findings << "Schema violation: expected #{key} to be #{type}" unless parsed[key].is_a?(type)

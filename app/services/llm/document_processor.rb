@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'pdf-reader'
-require 'docx'
+require "pdf-reader"
+require "docx"
 
 class LLM::DocumentProcessor
   def self.extract_text(attachment)
@@ -11,9 +11,9 @@ class LLM::DocumentProcessor
 
     blob.open do |file|
       case blob.content_type
-      when 'application/pdf'
+      when "application/pdf"
         extract_pdf_text(file.path)
-      when 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      when "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         extract_docx_text(file.path)
       else
         # Fallback for plain text or unknown

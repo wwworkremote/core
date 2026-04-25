@@ -5,7 +5,7 @@ class Quality::ContextBuilder
   # This is intended to be injected into LLM prompts.
   def self.architectural_constraints_for(file_paths)
     insights = SystemInsight.active.where(file_path: Array(file_paths))
-    return '' if insights.empty?
+    return "" if insights.empty?
 
     sections = insights.group_by(&:tool).map do |tool, tool_insights|
       header = "### [#{tool.upcase}] Architectural Constraints"
@@ -29,6 +29,6 @@ class Quality::ContextBuilder
   def self.semantic_constraints_for(query_text, limit: 5)
     # This requires the embedding to be populated
     # SystemInsight.nearest_neighbors(:embedding, embedding, distance: "cosine").limit(limit)
-    ''
+    ""
   end
 end

@@ -6,17 +6,17 @@ class RebuildAndCleanupIndexes < ActiveRecord::Migration[8.0]
   def change
     # 1. Rebuild Invalid Indexes
     # Companies
-    remove_index :companies, name: 'index_companies_on_name', if_exists: true
+    remove_index :companies, name: "index_companies_on_name", if_exists: true
     add_index :companies, :name, unique: true, algorithm: :concurrently
 
     # JobPostings
-    remove_index :job_postings, name: 'index_job_postings_on_company_id', if_exists: true
+    remove_index :job_postings, name: "index_job_postings_on_company_id", if_exists: true
     add_index :job_postings, :company_id, algorithm: :concurrently
 
-    remove_index :job_postings, name: 'index_job_postings_on_company_name', if_exists: true
+    remove_index :job_postings, name: "index_job_postings_on_company_name", if_exists: true
     add_index :job_postings, :company_name, algorithm: :concurrently
 
-    remove_index :job_postings, name: 'index_job_postings_on_company_name_and_published_at', if_exists: true
+    remove_index :job_postings, name: "index_job_postings_on_company_name_and_published_at", if_exists: true
     add_index :job_postings, %i[company_name published_at], order: { published_at: :desc }, algorithm: :concurrently
 
     # 2. Remove Redundant Indexes

@@ -23,18 +23,18 @@ class LLMChatsController < ApplicationController
 
     if prompt.present? && model_record
       @llm_chat = LLMChat.create!(model: model_record)
-      @llm_chat.llm_messages.create!(role: 'user', content: prompt)
+      @llm_chat.llm_messages.create!(role: "user", content: prompt)
       LLMChatResponseJob.perform_later(@llm_chat.id, prompt)
 
-      redirect_to @llm_chat, notice: 'Neural link established.'
+      redirect_to @llm_chat, notice: "Neural link established."
     else
-      redirect_to new_llm_chat_path, alert: 'Invalid model or empty prompt.'
+      redirect_to new_llm_chat_path, alert: "Invalid model or empty prompt."
     end
   end
 
   def destroy
     @llm_chat.destroy!
-    redirect_to llm_chats_path, notice: 'LLMchat was successfully destroyed.', status: :see_other
+    redirect_to llm_chats_path, notice: "LLMchat was successfully destroyed.", status: :see_other
   end
 
   private

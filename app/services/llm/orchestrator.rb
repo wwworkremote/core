@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'ostruct'
+require "ostruct"
 
 class LLM::Orchestrator
   def self.call(...)
@@ -12,30 +12,30 @@ class LLM::Orchestrator
     @untrusted_text = untrusted_text
     @chat = chat
     @agent = agent
-    @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : 'You are a helpful assistant.')
-    @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : 'Process the data.')
+    @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : "You are a helpful assistant.")
+    @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
     @schema = schema
     @model = model || @chat&.model || agent_model || LLM::Registry.default_model
     @metadata = metadata
   end
 
   def call(&)
-    tracer = OpenTelemetry.tracer_provider.tracer('llm_orchestrator')
+    tracer = OpenTelemetry.tracer_provider.tracer("llm_orchestrator")
 
     # Ensure all metadata keys are strings for OTel
     stringified_metadata = @metadata.transform_keys(&:to_s)
 
-    tracer.in_span('orchestrate_llm_call',
-                   attributes: { 'app.llm.model' => @model&.model_id }.merge(stringified_metadata)) do |span|
+    tracer.in_span("orchestrate_llm_call",
+                   attributes: { "app.llm.model" => @model&.model_id }.merge(stringified_metadata)) do |span|
       unless @model
-        span.status = OpenTelemetry::Trace::Status.error('No model provided or found in registry')
-        return format_failure('No model provided or found in registry')
+        span.status = OpenTelemetry::Trace::Status.error("No model provided or found in registry")
+        return format_failure("No model provided or found in registry")
       end
 
       # 1. Inbound Guardrails
       guardrail_result = Guardrails::Pipeline.call(@untrusted_text)
       unless guardrail_result.allowed?
-        span.set_attribute('app.guardrails.disposition', 'blocked')
+        span.set_attribute("app.guardrails.disposition", "blocked")
         return format_failure("Blocked by guardrails: #{guardrail_result.findings.join(', ')}")
       end
 
@@ -45,7 +45,7 @@ class LLM::Orchestrator
       rescue ActiveRecord::ConnectionTimeoutError => e
         Rails.logger.error "[Orchestrator] Database connection timeout: #{e.message}. Pool is likely exhausted."
         span.status = OpenTelemetry::Trace::Status.error("DB Connection Timeout: #{e.message}")
-        format_failure('Database connection timeout. Please try again later.')
+        format_failure("Database connection timeout. Please try again later.")
       rescue StandardError => e
         Rails.logger.error "[Orchestrator] Model (#{@model.model_id}) execution failed: #{e.message}."
         span.status = OpenTelemetry::Trace::Status.error(e.message)
@@ -62,16 +62,16 @@ class LLM::Orchestrator
   end
 
   def execute_with_model(model, sanitized_text, span, &)
-    span.add_event('sending_llm_request', attributes: { 'model' => model.model_id })
+    span.add_event("sending_llm_request", attributes: { "model" => model.model_id })
 
     chat = @chat || LLMChat.create!(model: model)
 
     # If this is a new or empty chat, establish the context
     # If untrusted_text was provided and not yet in messages, add it as a user message
     if chat.llm_messages.empty?
-      chat.llm_messages.create!(role: 'system', content: @system_rules) if @system_rules.present?
-      chat.llm_messages.create!(role: 'user', content: "#{sanitized_text}\n\n#{@task_instructions}")
-    elsif sanitized_text.present? && chat.llm_messages.where(role: 'user').last&.content != sanitized_text
+      chat.llm_messages.create!(role: "system", content: @system_rules) if @system_rules.present?
+      chat.llm_messages.create!(role: "user", content: "#{sanitized_text}\n\n#{@task_instructions}")
+    elsif sanitized_text.present? && chat.llm_messages.where(role: "user").last&.content != sanitized_text
       # Optional: Add the latest prompt if it is different from the last message
       # In most chat loops, the user message is already added before the job is enqueued.
     end
@@ -110,7 +110,7 @@ class LLM::Orchestrator
       )
     end
 
-    full_output = +''
+    full_output = +""
 
     # Use the native complete pattern to stream content directly
     client.complete(
@@ -126,9 +126,9 @@ class LLM::Orchestrator
     end
 
     # Save the final response to the chat history
-    chat.llm_messages.create!(role: 'assistant', content: full_output) if full_output.present?
+    chat.llm_messages.create!(role: "assistant", content: full_output) if full_output.present?
 
-    span.add_event('received_llm_response')
+    span.add_event("received_llm_response")
     { success: true, model: model.model_id, output: full_output }
   end
 

@@ -19,8 +19,8 @@ class Admin::JobsController < Admin::ApplicationController
     @throughput = calculate_throughput # jobs per minute (last hour)
     @error_rate = calculate_error_rate # % of failed vs total finished (last hour)
     @active_processes = SolidQueue::Process.order(last_heartbeat_at: :desc)
-    @saturation = (@ready_count.to_f / (@active_processes.where(kind: 'Worker').sum { |p|
-      p.metadata['thread_pool_size'] || 0
+    @saturation = (@ready_count.to_f / (@active_processes.where(kind: "Worker").sum { |p|
+      p.metadata["thread_pool_size"] || 0
     }.to_f + 0.1) * 100).round(1)
 
     # Queue Depletion Stats
@@ -48,28 +48,28 @@ class Admin::JobsController < Admin::ApplicationController
     task_id = params[:task_id]
 
     # Whitelist Task IDs to prevent Command Injection and RCE
-    all_configs = YAML.load_file(Rails.root.join('config/recurring.yml'))
-    allowed_tasks = (all_configs[Rails.env] || all_configs['development']).keys
+    all_configs = YAML.load_file(Rails.root.join("config/recurring.yml"))
+    allowed_tasks = (all_configs[Rails.env] || all_configs["development"]).keys
 
     unless allowed_tasks.include?(task_id)
       flash[:alert] = "Unauthorized or invalid task ID: #{task_id}"
       return redirect_to admin_jobs_path
     end
 
-    env_config = all_configs[Rails.env] || all_configs['development']
+    env_config = all_configs[Rails.env] || all_configs["development"]
     config = env_config[task_id]
 
     if config
-      if config['class']
+      if config["class"]
         # Safe because task_id is now whitelisted from recurring.yml
-        klass = config['class'].constantize
-        args = config['args'] || []
+        klass = config["class"].constantize
+        args = config["args"] || []
         klass.perform_later(*args)
         flash[:notice] = "🚀 Triggered #{task_id} (#{config['class']})"
-      elsif config['command']
+      elsif config["command"]
         # Safe because command string comes from static recurring.yml, not user input
         # Using Rails.root to ensure the correct binary is used
-        rails_path = Rails.root.join('bin/rails').to_s
+        rails_path = Rails.root.join("bin/rails").to_s
         spawn("RAILS_ENV=#{Rails.env} #{rails_path} runner '#{config['command']}'")
         flash[:notice] = "🚀 Spawned command for #{task_id}"
       end
@@ -102,7 +102,7 @@ class Admin::JobsController < Admin::ApplicationController
     @job.discard
     flash[:notice] = "🚀 Job ##{@job.id} terminated and discarded."
   rescue ActiveRecord::RecordNotFound
-    flash[:alert] = 'Job not found.'
+    flash[:alert] = "Job not found."
   rescue StandardError => e
     flash[:alert] = "Failed to discard: #{e.message}"
   ensure
@@ -120,7 +120,7 @@ class Admin::JobsController < Admin::ApplicationController
 
     flash[:notice] = "🚀 Job ##{@job.id} signalled for mid-performance cancellation and discarded."
   rescue ActiveRecord::RecordNotFound
-    flash[:alert] = 'Job not found.'
+    flash[:alert] = "Job not found."
   rescue StandardError => e
     flash[:alert] = "Failed to cancel: #{e.message}"
   ensure

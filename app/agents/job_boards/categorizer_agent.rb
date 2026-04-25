@@ -11,15 +11,15 @@ class JobBoards::CategorizerAgent < RubyLLM::Agent
       agent: self,
       untrusted_text: job_posting.body&.truncate(4000),
       schema: {
-        'category' => String,
-        'tags' => Array,
-        'is_remote' => :boolean,
-        'remote_nuance' => String,
-        'salary_min' => :integer,
-        'salary_max' => :integer,
-        'currency' => String
+        "category" => String,
+        "tags" => Array,
+        "is_remote" => :boolean,
+        "remote_nuance" => String,
+        "salary_min" => :integer,
+        "salary_max" => :integer,
+        "currency" => String
       },
-      metadata: { 'job_posting_id' => job_posting.id }
+      metadata: { "job_posting_id" => job_posting.id }
     )
   end
 end

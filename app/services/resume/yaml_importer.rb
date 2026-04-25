@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'yaml'
+require "yaml"
 
 class Resume::YamlImporter
-  DEFAULT_BASE_PATH = '/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume'
+  DEFAULT_BASE_PATH = "/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume"
   attr_reader :base_path
 
   def self.call(user, base_path: nil)
@@ -28,52 +28,52 @@ class Resume::YamlImporter
   private
 
   def import_profile
-    data = load_yaml('profile.yml')
+    data = load_yaml("profile.yml")
     return unless data
 
-    @user.update!(name: data['name'])
+    @user.update!(name: data["name"])
     @profile.update!(
-      contact_info: data['contact'],
-      location_info: data['location']
+      contact_info: data["contact"],
+      location_info: data["location"]
     )
   end
 
   def import_positions
-    Dir.glob(File.join(@base_path, 'positions', '*.yml')).each do |file|
+    Dir.glob(File.join(@base_path, "positions", "*.yml")).each do |file|
       data = YAML.load_file(file)
       next unless data
 
-      external_id = data['id'] || File.basename(file, '.yml')
+      external_id = data["id"] || File.basename(file, ".yml")
 
       exp = @profile.work_experiences.find_or_initialize_by(external_id: external_id)
       exp.update!(
-        company_name: data.dig('company', 'name'),
-        location: data.dig('company', 'location'),
-        title: data['title'],
-        employment_type: data['type'],
-        start_date: parse_date(data['start_date']),
-        end_date: parse_date(data['end_date']),
-        context: data['context'],
-        description: data['description'],
-        summary: data['summary'],
-        action: data['action'],
-        impact: data['impact'],
-        scope: data['scope']
+        company_name: data.dig("company", "name"),
+        location: data.dig("company", "location"),
+        title: data["title"],
+        employment_type: data["type"],
+        start_date: parse_date(data["start_date"]),
+        end_date: parse_date(data["end_date"]),
+        context: data["context"],
+        description: data["description"],
+        summary: data["summary"],
+        action: data["action"],
+        impact: data["impact"],
+        scope: data["scope"]
       )
 
       # Import Highlights
       exp.experience_highlights.destroy_all
-      Array(data['highlights']).each do |h|
+      Array(data["highlights"]).each do |h|
         exp.experience_highlights.create!(
-          label: h['label'],
-          text: h['text']
+          label: h["label"],
+          text: h["text"]
         )
       end
     end
   end
 
   def parse_date(str)
-    return nil if str.blank? || str.downcase == 'present'
+    return nil if str.blank? || str.downcase == "present"
 
     # Handle "September 2018"
     begin

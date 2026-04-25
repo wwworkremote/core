@@ -3,8 +3,8 @@
 class UserJobPostingsController < ApplicationController
   def index
     @user_job_postings = current_user.user_job_postings.includes(:job_posting).order(created_at: :desc)
-    @favorites = @user_job_postings.where(status: 'favorited')
-    @applied = @user_job_postings.where(status: 'applied')
+    @favorites = @user_job_postings.where(status: "favorited")
+    @applied = @user_job_postings.where(status: "applied")
   end
 
   def create
@@ -23,19 +23,19 @@ class UserJobPostingsController < ApplicationController
       )
     end
 
-    redirect_back_or_to(job_posting_path(@job_posting), notice: 'Job status updated.')
+    redirect_back_or_to(job_posting_path(@job_posting), notice: "Job status updated.")
   end
 
   def update
     @user_job_posting = current_user.user_job_postings.find(params[:id])
     return unless @user_job_posting.update(user_job_posting_params)
-    redirect_back_or_to(user_job_postings_path, notice: 'Job record updated.')
+    redirect_back_or_to(user_job_postings_path, notice: "Job record updated.")
   end
 
   def destroy
     @user_job_posting = current_user.user_job_postings.find(params[:id])
     @user_job_posting.destroy
-    redirect_back_or_to(user_job_postings_path, notice: 'Job removed from your list.')
+    redirect_back_or_to(user_job_postings_path, notice: "Job removed from your list.")
   end
 
   def analyze_match
@@ -46,7 +46,7 @@ class UserJobPostingsController < ApplicationController
     result = LLM::ProfileMatcher.call(current_user, @job_posting)
 
     if result[:success]
-      flash[:notice] = 'AI alignment scan complete.'
+      flash[:notice] = "AI alignment scan complete."
     else
       flash[:alert] = "Scan failed: #{result[:error]}"
     end
@@ -59,7 +59,7 @@ class UserJobPostingsController < ApplicationController
     result = LLM::ArtifactGenerator.call(current_user, @job_posting)
 
     if result[:success]
-      flash[:notice] = 'Bespoke application artifacts generated and appended to notes.'
+      flash[:notice] = "Bespoke application artifacts generated and appended to notes."
     else
       flash[:alert] = "Generation failed: #{result[:error]}"
     end

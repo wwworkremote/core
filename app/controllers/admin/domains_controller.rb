@@ -13,6 +13,6 @@ class Admin::DomainsController < Admin::ApplicationController
   def destroy
     @domain = Domain.find(params[:id])
     @domain.destroy
-    redirect_to admin_domains_path, notice: 'Domain was successfully deleted.'
+    redirect_to admin_domains_path, notice: "Domain was successfully deleted."
   end
 end

@@ -12,14 +12,14 @@ class LLM::ArtifactGenerator
   end
 
   def call
-    return { success: false, error: 'Profile incomplete' } unless @profile&.work_experiences&.any?
+    return { success: false, error: "Profile incomplete" } unless @profile&.work_experiences&.any?
 
     prompt = build_cover_letter_prompt
 
     result = LLM::Orchestrator.call(
       untrusted_text: prompt,
-      system_rules: 'You are an elite technical career strategist and ghostwriter.',
-      task_instructions: 'Generate a bespoke, high-impact cover letter in markdown format.'
+      system_rules: "You are an elite technical career strategist and ghostwriter.",
+      task_instructions: "Generate a bespoke, high-impact cover letter in markdown format."
     )
 
     if result[:success]

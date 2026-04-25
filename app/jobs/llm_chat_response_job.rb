@@ -14,14 +14,14 @@ class LLMChatResponseJob < ApplicationJob
       untrusted_text: content,
       chat: llm_chat,
       model: llm_chat.model,
-      system_rules: 'You are a helpful assistant.',
+      system_rules: "You are a helpful assistant.",
       task_instructions: "Respond to the user's message based on our conversation history.",
       metadata: { llm_chat_id: llm_chat.id }
     )
 
     if result[:success]
       # After streaming is complete, replace the entire message with the fully rendered markdown version
-      final_message = llm_chat.llm_messages.where(role: 'assistant').last
+      final_message = llm_chat.llm_messages.where(role: "assistant").last
       final_message&.broadcast_replace_to "llm_chat_#{llm_chat.id}"
     else
       Rails.logger.error "[LLMChatResponseJob] Orchestrator failed: #{result[:error]}"

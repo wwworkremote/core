@@ -26,8 +26,8 @@
 FactoryBot.define do
   factory :company_pipeline_step do
     company { nil }
-    status { 'MyString' }
-    note { 'MyText' }
-    link { 'MyString' }
+    status { "MyString" }
+    note { "MyText" }
+    link { "MyString" }
   end
 end

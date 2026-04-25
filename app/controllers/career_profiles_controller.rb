@@ -11,13 +11,13 @@ class CareerProfilesController < ApplicationController
     if params[:sync]
       Resume::YamlImporter.call(current_user)
       Resume::EmbeddingJob.perform_later(@career_profile.id)
-      redirect_to career_profile_path, notice: 'Career profile synchronization initiated.'
+      redirect_to career_profile_path, notice: "Career profile synchronization initiated."
     elsif params[:embed]
       Resume::EmbeddingJob.perform_later(@career_profile.id)
-      redirect_to career_profile_path, notice: 'Neural vector synthesis initiated.'
+      redirect_to career_profile_path, notice: "Neural vector synthesis initiated."
     elsif @career_profile.update(career_profile_params)
       Resume::EmbeddingJob.perform_later(@career_profile.id)
-      redirect_to career_profile_path, notice: 'Career profile updated and synthesis initiated.'
+      redirect_to career_profile_path, notice: "Career profile updated and synthesis initiated."
     else
       render :edit, status: :unprocessable_content
     end
@@ -26,7 +26,7 @@ class CareerProfilesController < ApplicationController
   def sync_github
     result = LLM::GithubProcessor.call(@career_profile)
     if result[:success]
-      flash[:notice] = '🚀 GitHub technical evidence synchronized successfully.'
+      flash[:notice] = "🚀 GitHub technical evidence synchronized successfully."
     else
       flash[:alert] = "Failed to sync GitHub: #{result[:error]}"
     end

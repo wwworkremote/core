@@ -5,9 +5,9 @@ class PagesController < ApplicationController
 
   def show
     case params[:page]
-    when 'about' then render 'pages/about'
+    when "about" then render "pages/about"
     else
-      render file: 'public/404.html', status: :not_found, layout: false
+      render file: "public/404.html", status: :not_found, layout: false
     end
   end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pagy'
+require "pagy"
 
 # Pagy 43.5.1 Compatibility Layer for gems expecting Pagy 9.x/Older
 # Pagy 43+ changed its internal structure significantly.

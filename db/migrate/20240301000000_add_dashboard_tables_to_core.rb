@@ -4,7 +4,7 @@ class AddDashboardTablesToCore < ActiveRecord::Migration[7.1]
   def change
     # Extensions (already mostly enabled in core/db/migrate/20220728223111_enable_extensions.rb)
     # But ensuring citext for dashboard columns
-    enable_extension 'citext' unless extension_enabled?('citext')
+    enable_extension "citext" unless extension_enabled?("citext")
 
     create_table :origins do |t|
       t.citext :name

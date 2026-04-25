@@ -21,7 +21,7 @@ RSpec.configure do |config|
   end
 
   # Skip :live specs unless explicitly opted in.
-  unless ENV['RUN_LIVE_SPECS'] == '1' || RSpec.configuration.filter_manager.inclusions.rules[:live]
+  unless ENV["RUN_LIVE_SPECS"] == "1" || RSpec.configuration.filter_manager.inclusions.rules[:live]
     config.filter_run_excluding live: true
   end
 end

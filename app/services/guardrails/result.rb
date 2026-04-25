@@ -3,7 +3,7 @@
 class Guardrails::Result
   attr_reader :allowed, :risk_level, :findings, :sanitized_text, :disposition
 
-  def initialize(allowed:, risk_level: 'low', findings: [], sanitized_text: nil, disposition: 'allow')
+  def initialize(allowed:, risk_level: "low", findings: [], sanitized_text: nil, disposition: "allow")
     @allowed = allowed
     @risk_level = risk_level
     @findings = findings
@@ -16,10 +16,10 @@ class Guardrails::Result
   end
 
   def high_risk?
-    @risk_level == 'high'
+    @risk_level == "high"
   end
 
   def blocked?
-    @disposition == 'block'
+    @disposition == "block"
   end
 end

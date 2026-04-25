@@ -22,7 +22,7 @@ class Guardrails::Pipeline
     classification = Guardrails::RiskClassifier.new(score, findings).call
 
     Guardrails::Result.new(
-      allowed: classification[:disposition] != 'block',
+      allowed: classification[:disposition] != "block",
       risk_level: classification[:risk_level],
       findings: findings,
       sanitized_text: sanitized_text,

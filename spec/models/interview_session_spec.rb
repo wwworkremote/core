@@ -25,24 +25,24 @@
 #  fk_rails_...  (job_posting_id => job_postings.id)
 #  fk_rails_...  (user_id => users.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe InterviewSession do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:job_posting) }
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_many(:interview_questions).dependent(:destroy) }
     it { is_expected.to have_many_attached(:artifacts) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to validate_presence_of(:session_type) }
     it { is_expected.to validate_presence_of(:scheduled_at) }
   end
 
-  describe 'constants' do
-    it 'defines SESSION_TYPES' do
-      expect(described_class::SESSION_TYPES).to include('Technical')
+  describe "constants" do
+    it "defines SESSION_TYPES" do
+      expect(described_class::SESSION_TYPES).to include("Technical")
     end
   end
 end

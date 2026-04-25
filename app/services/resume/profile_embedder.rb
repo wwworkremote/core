@@ -14,22 +14,22 @@ class Resume::ProfileEmbedder
     input_text = build_profile_text
 
     response = Faraday.post(API_URL) do |req|
-      req.headers['Content-Type'] = 'application/json'
+      req.headers["Content-Type"] = "application/json"
       req.body = {
         input: input_text,
-        model: 'Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf'
+        model: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf"
       }.to_json
     end
 
     if response.success?
       data = JSON.parse(response.body)
-      embedding = data.dig('data', 0, 'embedding') || data['embedding']
+      embedding = data.dig("data", 0, "embedding") || data["embedding"]
 
       if embedding
         @career_profile.update!(embedding: embedding)
         true
       else
-        Rails.logger.error '[ProfileEmbedder] No embedding found in response'
+        Rails.logger.error "[ProfileEmbedder] No embedding found in response"
         false
       end
     else
@@ -58,6 +58,6 @@ class Resume::ProfileEmbedder
   end
 
   def enabled?
-    ENV['ENABLE_EMBEDDINGS'] != 'false'
+    ENV["ENABLE_EMBEDDINGS"] != "false"
   end
 end

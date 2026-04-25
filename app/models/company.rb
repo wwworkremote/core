@@ -44,6 +44,6 @@ class Company < ApplicationRecord
   end
 
   def add_pipeline_note(note, link: nil)
-    company_pipeline_steps.create!(status: 'noted', note: note, link: link)
+    company_pipeline_steps.create!(status: "noted", note: note, link: link)
   end
 end

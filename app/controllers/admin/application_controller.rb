@@ -5,5 +5,5 @@ class Admin::ApplicationController < ApplicationController
   # and the Basic Auth logic.
 
   # We can add admin-specific layout or helpers here if needed
-  layout 'application'
+  layout "application"
 end

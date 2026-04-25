@@ -21,10 +21,10 @@ class Admin::DashboardController < Admin::ApplicationController
   def toggle_pause
     if SystemSetting.paused?
       SystemSetting.resume!
-      flash[:notice] = 'Pipelines resumed.'
+      flash[:notice] = "Pipelines resumed."
     else
       SystemSetting.pause!
-      flash[:alert] = 'Emergency Brake Engaged: Pipelines paused.'
+      flash[:alert] = "Emergency Brake Engaged: Pipelines paused."
     end
     redirect_to admin_root_path
   end

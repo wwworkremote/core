@@ -6,17 +6,17 @@ class Guardrails::Normalizer
   end
 
   def call
-    return '' if @text.blank?
+    return "" if @text.blank?
 
     # 1. Normalize encoding
-    normalized = @text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+    normalized = @text.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
 
     # 2. Replace null bytes with space (to prevent joining words)
-    normalized.tr!("\u0000", ' ')
+    normalized.tr!("\u0000", " ")
 
     # 3. Collapse pathological whitespace
     # First collapse spaces
-    normalized.gsub!(/[ \t]{2,}/, ' ')
+    normalized.gsub!(/[ \t]{2,}/, " ")
 
     # Then collapse excessive newlines (more than 2 -> 2)
     normalized.gsub!(/\n{3,}/, "\n\n")

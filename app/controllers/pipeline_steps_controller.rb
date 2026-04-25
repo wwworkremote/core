@@ -18,7 +18,7 @@ class PipelineStepsController < ApplicationController
       end
     elsif params[:note].present?
       @job_posting.pipeline_steps.create!(
-        status: 'noted',
+        status: "noted",
         note: params[:note],
         link: params[:link],
         artifacts: params[:artifacts],
@@ -26,6 +26,6 @@ class PipelineStepsController < ApplicationController
       )
     end
 
-    redirect_to admin_job_posting_path(@job_posting), notice: 'Activity logged.'
+    redirect_to admin_job_posting_path(@job_posting), notice: "Activity logged."
   end
 end

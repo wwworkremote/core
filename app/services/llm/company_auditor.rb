@@ -13,7 +13,7 @@ class LLM::CompanyAuditor
   end
 
   def call
-    return { success: false, error: 'No feedback provided.' } if @raw_feedback.blank?
+    return { success: false, error: "No feedback provided." } if @raw_feedback.blank?
 
     prompt = <<~PROMPT
       [SYSTEM_OBJECTIVE]
@@ -44,20 +44,20 @@ class LLM::CompanyAuditor
 
     result = LLM::Orchestrator.call(
       untrusted_text: prompt,
-      system_rules: 'You are a ruthless corporate culture auditor. You prioritize candidate well-being over corporate PR.',
-      task_instructions: 'Return JSON only. Be clinical and accurate.'
+      system_rules: "You are a ruthless corporate culture auditor. You prioritize candidate well-being over corporate PR.",
+      task_instructions: "Return JSON only. Be clinical and accurate."
     )
 
     if result[:success]
       parsed = JSON.parse(result[:output].match(/\{.*\}/m)[0]) rescue nil
       if parsed
         @company.update!(
-          disposition: parsed['disposition'],
-          sentiment_score: parsed['sentiment_score'],
-          toxic_culture_flag: parsed['toxic_culture_flag'],
+          disposition: parsed["disposition"],
+          sentiment_score: parsed["sentiment_score"],
+          toxic_culture_flag: parsed["toxic_culture_flag"],
           glassdoor_data: @company.glassdoor_data.to_h.merge(
-            'reputation_audit' => parsed,
-            'audited_at' => Time.current
+            "reputation_audit" => parsed,
+            "audited_at" => Time.current
           )
         )
       end

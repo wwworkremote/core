@@ -15,6 +15,6 @@ class CompanyPipelineStepsController < ApplicationController
       @company.add_pipeline_note(params[:note], link: params[:link])
     end
 
-    redirect_to admin_company_path(@company), notice: 'Activity logged.'
+    redirect_to admin_company_path(@company), notice: "Activity logged."
   end
 end

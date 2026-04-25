@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'HackerNews Live Contract', type: :request do
-  it 'fetches valid jobstory IDs from HackerNews', :live do
+RSpec.describe "HackerNews Live Contract", type: :request do
+  it "fetches valid jobstory IDs from HackerNews", :live do
     VCR.turned_off do
       WebMock.allow_net_connect!
 
-      response = Faraday.get('https://hacker-news.firebaseio.com/v0/jobstories.json')
+      response = Faraday.get("https://hacker-news.firebaseio.com/v0/jobstories.json")
       expect(response.status).to eq(200)
 
       ids = JSON.parse(response.body)
@@ -20,9 +20,9 @@ RSpec.describe 'HackerNews Live Contract', type: :request do
       expect(item_response.status).to eq(200)
 
       item = JSON.parse(item_response.body)
-      expect(item['id']).to eq(item_id)
-      expect(item['type']).to eq('job')
-      expect(item['title']).to be_present
+      expect(item["id"]).to eq(item_id)
+      expect(item["type"]).to eq("job")
+      expect(item["title"]).to be_present
 
       WebMock.disable_net_connect!
     end

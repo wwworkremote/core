@@ -24,25 +24,25 @@
 #  fk_rails_...  (job_posting_id => job_postings.id)
 #  fk_rails_...  (user_id => users.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe UserJobPosting do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:job_posting) }
   end
 
-  describe 'states' do
+  describe "states" do
     let(:user_job_posting) { described_class.new }
 
-    it 'starts in none state' do
-      expect(user_job_posting.status).to eq('none')
+    it "starts in none state" do
+      expect(user_job_posting.status).to eq("none")
     end
 
-    it 'can transition to favorited' do
-      user_job_posting.status = 'none'
+    it "can transition to favorited" do
+      user_job_posting.status = "none"
       expect(user_job_posting.favorite).to be true
-      expect(user_job_posting.status).to eq('favorited')
+      expect(user_job_posting.status).to eq("favorited")
     end
   end
 end

@@ -37,7 +37,11 @@ class CareerProfile < ApplicationRecord
   has_neighbors :embedding
 
   validates :github_url,
-            format: { with: %r{\Ahttps?://(www\.)?github\.com/[a-zA-Z0-9_-]+\z}, message: 'must be a valid GitHub URL' }, allow_blank: true
+            format: {
+              with: %r{\Ahttps?://(www\.)?github\.com/[a-zA-Z0-9_-]+\z},
+              message: "must be a valid GitHub URL"
+            },
+            allow_blank: true
 
   accepts_nested_attributes_for :work_experiences, allow_destroy: true
 end

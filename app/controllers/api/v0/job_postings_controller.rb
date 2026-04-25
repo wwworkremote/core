@@ -2,7 +2,7 @@
 
 class Api::V0::JobPostingsController < ApiController
   def index
-    page = params.fetch('page', 1)
+    page = params.fetch("page", 1)
 
     render json: JobPosting.order(id: :desc).page(page).without_count
   end
@@ -34,7 +34,7 @@ class Api::V0::JobPostingsController < ApiController
   def enrich
     job = JobPosting.find(params[:id])
 
-    if job.update(enrich_params.merge(crawl_status: 'enriched', enriched_at: Time.current))
+    if job.update(enrich_params.merge(crawl_status: "enriched", enriched_at: Time.current))
       # Optionally trigger re-alignment if body changed significantly
       LLM::ProfileMatcher.call(User.first, job) if params[:realign]
 

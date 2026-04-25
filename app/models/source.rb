@@ -11,7 +11,7 @@ class Source < ApplicationRecord
 
   # Real-time dashboard telemetry
   after_create_commit lambda {
-    broadcast_replace_to 'system_telemetry', target: 'source_stats', partial: 'home/telemetry_ingestion'
+    broadcast_replace_to "system_telemetry", target: "source_stats", partial: "home/telemetry_ingestion"
   }
 
   def self.ransackable_attributes(_auth_object = nil)

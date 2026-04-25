@@ -34,17 +34,17 @@
 FactoryBot.define do
   factory :work_experience do
     career_profile { nil }
-    company_name { 'MyString' }
-    location { 'MyString' }
-    title { 'MyString' }
-    employment_type { 'MyString' }
-    start_date { '2026-04-19' }
-    end_date { '2026-04-19' }
-    context { 'MyText' }
-    description { 'MyText' }
-    summary { 'MyText' }
-    action { 'MyText' }
-    impact { 'MyText' }
-    scope { '' }
+    company_name { "MyString" }
+    location { "MyString" }
+    title { "MyString" }
+    employment_type { "MyString" }
+    start_date { "2026-04-19" }
+    end_date { "2026-04-19" }
+    context { "MyText" }
+    description { "MyText" }
+    summary { "MyText" }
+    action { "MyText" }
+    impact { "MyText" }
+    scope { "" }
   end
 end

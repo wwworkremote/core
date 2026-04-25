@@ -60,8 +60,8 @@ llama-ctl install && llama-ctl restart
 ## RubyLLM Configuration (`config/initializers/00_ruby_llm.rb`)
 
 ```ruby
-config.openai_api_base  = 'http://localhost:8080/v1'   # inference
-config.ollama_api_base  = 'http://localhost:8080/v1'   # embeddings
+config.openai_api_base  = "http://localhost:8080/v1"   # inference
+config.ollama_api_base  = "http://localhost:8080/v1"   # embeddings
 config.openai_use_system_role = true                   # llama.cpp needs 'system' not 'developer'
 config.use_new_acts_as = true
 ```

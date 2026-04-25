@@ -1,26 +1,26 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-source = JobBoards::Source.find_by(slug: 'hackernews')
+source = JobBoards::Source.find_by(slug: "hackernews")
 query = JobBoards::Query.find_by(source_id: source.id)
 
-require 'digest'
-require 'faraday'
-require 'faraday/retry'
-require 'faraday/net_http_persistent'
+require "digest"
+require "faraday"
+require "faraday/retry"
+require "faraday/net_http_persistent"
 
 retry_options = { max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 3, max_interval: 900 }
 
 client = Faraday.new do |f|
   f.adapter(:net_http_persistent, pool_size: 5) { |http| http.idle_timeout = 100 }
   f.request(:retry, retry_options)
-  f.headers[:user_agent] = 'WWWorkRemote::HackerNews/1.0'
-  f.url_prefix = 'https://hacker-news.firebaseio.com'
-  f.path_prefix = 'v0'
-  f.headers[:accept] = 'application/json; charset=utf-8'
+  f.headers[:user_agent] = "WWWorkRemote::HackerNews/1.0"
+  f.url_prefix = "https://hacker-news.firebaseio.com"
+  f.path_prefix = "v0"
+  f.headers[:accept] = "application/json; charset=utf-8"
 end
 
-jobstories = client.get('jobstories.json')
+jobstories = client.get("jobstories.json")
 item_ids = JSON.parse(jobstories.body)
 
 documents = []

@@ -29,9 +29,9 @@
 FactoryBot.define do
   factory :career_profile do
     user
-    resume_text { 'MyText' }
-    goals { 'MyText' }
-    skills { 'MyText' }
-    experience_level { 'MyString' }
+    resume_text { "MyText" }
+    goals { "MyText" }
+    skills { "MyText" }
+    experience_level { "MyString" }
   end
 end

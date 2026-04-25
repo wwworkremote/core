@@ -12,8 +12,8 @@ class Api::JobPostingsController < ApplicationController
     # Prefer the user-reviewed plain text from the extension panel; fall back
     # to re-running CanonicalJobExtractor on the raw HTML snapshot.
     markdown_body =
-      if extracted['description_text'].present?
-        source = extracted['description_html'].presence || extracted['description_text']
+      if extracted["description_text"].present?
+        source = extracted["description_html"].presence || extracted["description_text"]
         ReverseMarkdown.convert(source, unknown_tags: :bypass, github_flavored: true).strip
       else
         job_data = JobFetchers::CanonicalJobExtractor.new(
@@ -26,25 +26,25 @@ class Api::JobPostingsController < ApplicationController
       end
 
     if markdown_body.blank?
-      return render json: { success: false, error: 'No description found in captured content.' },
+      return render json: { success: false, error: "No description found in captured content." },
                     status: :unprocessable_content
     end
 
     # ── Column-mapped fields ─────────────────────────────────────────────────
     attrs = {
       body: markdown_body,
-      crawl_status: 'enriched',
+      crawl_status: "enriched",
       enriched_at: Time.current
     }
 
-    attrs[:title]        = extracted['title']    if extracted['title'].present?
-    attrs[:company]      = extracted['company']  if extracted['company'].present?
-    attrs[:location]     = extracted['location'] if extracted['location'].present?
-    attrs[:target_url]   = extracted['apply_url'] if extracted['apply_url'].present?
-    attrs[:published_at] = parse_date(extracted['posted_at']) if extracted['posted_at'].present?
+    attrs[:title]        = extracted["title"]    if extracted["title"].present?
+    attrs[:company]      = extracted["company"]  if extracted["company"].present?
+    attrs[:location]     = extracted["location"] if extracted["location"].present?
+    attrs[:target_url]   = extracted["apply_url"] if extracted["apply_url"].present?
+    attrs[:published_at] = parse_date(extracted["posted_at"]) if extracted["posted_at"].present?
 
-    if extracted['skills'].present?
-      raw = extracted['skills']
+    if extracted["skills"].present?
+      raw = extracted["skills"]
       attrs[:tags] = raw.is_a?(Array) ? raw : raw.split(/\s*,\s*/).map(&:strip).compact_blank
     end
 
@@ -77,20 +77,20 @@ class Api::JobPostingsController < ApplicationController
   # URL detection for legacy callers that do not send the field.
   def detect_provider(url)
     url_lower = url.downcase
-    if    url_lower.include?('linkedin.com')       then 'linkedin'
-    elsif url_lower.include?('indeed.com')         then 'indeed'
-    elsif url_lower.include?('adzuna.com')         then 'adzuna'
-    elsif url_lower.include?('greenhouse.io')      then 'greenhouse'
-    elsif url_lower.include?('lever.co')           then 'lever'
-    elsif url_lower.include?('workday.com') ||
-          url_lower.include?('myworkdayjobs.com')  then 'workday'
-    elsif url_lower.include?('ashby.com') ||
-          url_lower.include?('ashbyhq.com')        then 'ashby'
-    elsif url_lower.include?('smartrecruiters.com') then 'smartrecruiters'
-    elsif url_lower.include?('wellfound.com')      then 'wellfound'
-    elsif url_lower.include?('weworkremotely.com') then 'weworkremotely'
-    elsif url_lower.include?('remoteok.com')       then 'remoteok'
-    else 'generic'
+    if    url_lower.include?("linkedin.com")       then "linkedin"
+    elsif url_lower.include?("indeed.com")         then "indeed"
+    elsif url_lower.include?("adzuna.com")         then "adzuna"
+    elsif url_lower.include?("greenhouse.io")      then "greenhouse"
+    elsif url_lower.include?("lever.co")           then "lever"
+    elsif url_lower.include?("workday.com") ||
+          url_lower.include?("myworkdayjobs.com")  then "workday"
+    elsif url_lower.include?("ashby.com") ||
+          url_lower.include?("ashbyhq.com")        then "ashby"
+    elsif url_lower.include?("smartrecruiters.com") then "smartrecruiters"
+    elsif url_lower.include?("wellfound.com")      then "wellfound"
+    elsif url_lower.include?("weworkremotely.com") then "weworkremotely"
+    elsif url_lower.include?("remoteok.com")       then "remoteok"
+    else "generic"
     end
   end
 

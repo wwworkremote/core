@@ -27,7 +27,7 @@
 FactoryBot.define do
   factory :pipeline_step do
     job_posting { nil }
-    status { 'MyString' }
-    notes { 'MyText' }
+    status { "MyString" }
+    notes { "MyText" }
   end
 end

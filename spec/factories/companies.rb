@@ -25,6 +25,6 @@ FactoryBot.define do
   factory :company do
     name { "Company #{SecureRandom.hex(4)}" }
     slug { "company-#{SecureRandom.hex(4)}" }
-    status { 'none' }
+    status { "none" }
   end
 end

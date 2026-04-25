@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'WWR Live Contract', type: :request do
+RSpec.describe "WWR Live Contract", type: :request do
   # We use :live tag to bypass VCR if configured to do so,
   # or we manually disable VCR for this spec.
 
-  it 'fetches a valid RSS feed from We Work Remotely', :live do
+  it "fetches a valid RSS feed from We Work Remotely", :live do
     VCR.turned_off do
       WebMock.allow_net_connect!
 
-      response = Faraday.get('https://weworkremotely.com/remote-jobs.rss')
+      response = Faraday.get("https://weworkremotely.com/remote-jobs.rss")
       expect(response.status).to eq(200)
 
       feed = Feedjira.parse(response.body)
