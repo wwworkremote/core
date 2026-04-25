@@ -214,6 +214,7 @@ Rails.application.routes.draw do
       member do
         get :details
         post :discard
+        post :cancel
       end
     end
     resources :companies, only: %i[index show] do

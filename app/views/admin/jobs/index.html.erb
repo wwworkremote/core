@@ -164,6 +164,7 @@
             <th class="px-6 py-3">Class</th>
             <th class="px-6 py-3 text-right">Running For</th>
             <th class="px-6 py-3 text-right">Started At</th>
+            <th class="px-6 py-3 text-center">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-rose-500/10 font-mono text-[10px]">
@@ -194,6 +195,11 @@
                 <%= ((Time.current - claimed.created_at)/60).round(1) %> mins
               </td>
               <td class="px-6 py-4 text-right text-slate-500"><%= claimed.created_at.strftime("%H:%M:%S") %></td>
+              <td class="px-6 py-4 text-center">
+                <%= button_to cancel_admin_job_path(claimed.job_id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", data: { turbo_confirm: "Signal mid-performance cancellation for Job ##{claimed.job_id}?" } do %>
+                  <i class="bi bi-stop-circle"></i> CANCEL
+                <% end %>
+              </td>
             </tr>
           <% end %>
         </tbody>
@@ -309,6 +315,13 @@
                   </td>
                   <td class="px-6 py-4 text-right text-slate-600">
                     <%= job.created_at ? time_ago_in_words(job.created_at) : 'N/A' %>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <% unless job.finished? %>
+                      <%= button_to cancel_admin_job_path(job.id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", title: "Cancel Job", data: { turbo_confirm: "Signal mid-performance cancellation for Job ##{job.id}?" } do %>
+                        <i class="bi bi-stop-circle text-lg"></i>
+                      <% end %>
+                    <% end %>
                   </td>
                 </tr>
               <% end %>

@@ -108,6 +108,24 @@ module Admin
       redirect_to admin_jobs_path
     end
 
+    def cancel
+      @job = SolidQueue::Job.find(params[:id])
+      # Signal mid-performance cancellation for heavy jobs
+      SystemSetting.cancel_job!(@job.active_job_id)
+      
+      # Also discard it so it doesn't stay in the queue
+      SolidQueue::ClaimedExecution.where(job_id: @job.id).destroy_all
+      @job.discard
+      
+      flash[:notice] = "🚀 Job ##{@job.id} signalled for mid-performance cancellation and discarded."
+    rescue ActiveRecord::RecordNotFound
+      flash[:alert] = 'Job not found.'
+    rescue StandardError => e
+      flash[:alert] = "Failed to cancel: #{e.message}"
+    ensure
+      redirect_to admin_jobs_path
+    end
+
     private
 
     def calculate_latency

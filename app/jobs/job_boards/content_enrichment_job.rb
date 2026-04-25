@@ -17,6 +17,7 @@ module JobBoards
                           .limit(limit)
 
       targets.each do |job|
+        check_cancellation!
         enrich_job(job)
         # Small sleep to prevent aggressive bot detection when doing batches
         sleep(rand(2..5))

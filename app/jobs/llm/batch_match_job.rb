@@ -18,6 +18,7 @@ module LLM
                           .limit(limit)
 
       targets.each do |job|
+        check_cancellation!
         LLM::ProfileMatcher.call(admin_user, job)
       end
     end

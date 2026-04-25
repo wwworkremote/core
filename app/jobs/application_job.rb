@@ -9,6 +9,24 @@ class ApplicationJob < ActiveJob::Base
       Rails.logger.info "[PauseSignal] Job #{job.class.name} (#{job.job_id}) cancelled due to global pause."
       throw :abort
     end
+
+    if SystemSetting.job_cancelled?(job.job_id)
+      Rails.logger.info "[CancelSignal] Job #{job.class.name} (#{job.job_id}) aborted via user request."
+      SystemSetting.clear_job_cancellation!(job.job_id)
+      throw :abort
+    end
+  end
+
+  after_perform do |job|
+    SystemSetting.clear_job_cancellation!(job.job_id)
+  end
+
+  def check_cancellation!
+    if SystemSetting.job_cancelled?(job_id)
+      Rails.logger.info "[CancelSignal] Job #{self.class.name} (#{job_id}) terminating mid-performance."
+      SystemSetting.clear_job_cancellation!(job_id)
+      throw :abort
+    end
   end
 
   # Solid Queue Concurrency Helpers
