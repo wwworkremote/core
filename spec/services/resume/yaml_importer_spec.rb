@@ -36,7 +36,7 @@ RSpec.describe Resume::YamlImporter do
   describe '.call' do
     it 'imports profile and positions correctly' do
       expect {
-        described_class.call(user)
+        described_class.call(user, base_path: base_path.to_s)
       }.to change(WorkExperience, :count).by(1)
        .and change(ExperienceHighlight, :count).by(1)
 

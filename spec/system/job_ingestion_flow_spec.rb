@@ -40,7 +40,7 @@ RSpec.describe 'Job Ingestion to AI Alignment Flow' do
     # 3. Verify the JobPosting attributes
     job = JobPosting.last
     expect(job.title).to eq('Senior Ruby Engineer')
-    expect(job.company).to eq('Test Corp')
+    expect(job.company_name).to eq('Test Corp')
 
     # 4. Verify Document state changed
     expect(doc.reload.aasm_state).to eq('processed')

@@ -2,7 +2,7 @@
 
 module Scraper
   class CrawlDiscoveryJob < ApplicationJob
-    queue_as :default
+    queue_as :light
     mediumweight!
     idempotent! ->(board, url, _) { "crawl/#{board}/#{url}" }
 

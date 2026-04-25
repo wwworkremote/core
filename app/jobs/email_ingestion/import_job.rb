@@ -2,7 +2,7 @@
 
 module EmailIngestion
   class ImportJob < ApplicationJob
-    queue_as :default
+    queue_as :light
     mediumweight!
     idempotent! ->(source) { "email_import/#{source}" }
 

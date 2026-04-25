@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SyncDashboardJob < ApplicationJob
-  queue_as :default
+  queue_as :light
   lightweight!
   idempotent!
 

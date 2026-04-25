@@ -7,7 +7,7 @@ class JobPostingsController < ApplicationController
     @source_id = params[:source_id]
 
     @job_postings = JobPosting.recent.includes(source: :origin)
-    @job_postings = @job_postings.where.not(status: ['ignored', 'purged']) unless params[:status].present?
+    @job_postings = @job_postings.where.not(status: %w[ignored purged]) if params[:status].blank?
 
     @job_postings = @job_postings.where(company_name: @company) if @company.present?
     @job_postings = @job_postings.where(source_id: @source_id) if @source_id.present?
@@ -17,7 +17,7 @@ class JobPostingsController < ApplicationController
   end
 
   def show
-    @job_posting = JobPosting.includes(:source, :pipeline_steps, :contacts, versions: :item).find(params[:id])
+    @job_posting = JobPosting.includes(:contacts).find(params[:id])
     ahoy.track 'Viewed Job Posting', job_posting_id: @job_posting.id, title: @job_posting.title
   end
 end

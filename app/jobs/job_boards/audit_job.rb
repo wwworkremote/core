@@ -2,7 +2,7 @@
 
 module JobBoards
   class AuditJob < ApplicationJob
-    queue_as :default
+    queue_as :light
 
     def perform(limit: 100)
       stats = Auditor.new(fix: true, limit: limit).call

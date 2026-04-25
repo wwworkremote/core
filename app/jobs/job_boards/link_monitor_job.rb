@@ -2,7 +2,7 @@
 
 module JobBoards
   class LinkMonitorJob < ApplicationJob
-    queue_as :default
+    queue_as :light
     lightweight!
     idempotent!
 

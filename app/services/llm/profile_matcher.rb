@@ -23,7 +23,7 @@ module LLM
       user_job = user.user_job_postings.find_or_create_by!(job_posting: job_posting)
 
       # Build structured experience context
-      experiences_context = profile.work_experiences.order(start_date: :desc).limit(10).map do |exp|
+      experiences_context = profile.work_experiences.includes(:experience_highlights).order(start_date: :desc).limit(10).map do |exp|
         highlights = exp.experience_highlights.map { |h| "- [#{h.label}] #{h.text}" }.join("\n")
         <<~EXP
           ### #{exp.title} at #{exp.company_name}

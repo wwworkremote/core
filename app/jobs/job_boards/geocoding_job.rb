@@ -4,7 +4,7 @@ module JobBoards
   class GeocodingJob < ApplicationJob
     include ApiGuard
 
-    queue_as :default
+    queue_as :light
     lightweight!
     idempotent! ->(id) { "geocoding/#{id}" }
 
@@ -20,7 +20,7 @@ module JobBoards
 
         if results.present?
           result = results.first
-          job_posting.update_columns(
+          job_posting.update!(
             latitude: result.latitude,
             longitude: result.longitude,
             country_code: result.country_code&.upcase

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class EmailImportJob < ApplicationJob
-  queue_as :default
+  queue_as :light
 
   def perform(record_id)
     record = EmailImportRecord.find(record_id)

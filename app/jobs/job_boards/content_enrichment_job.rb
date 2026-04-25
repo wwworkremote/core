@@ -2,7 +2,7 @@
 
 module JobBoards
   class ContentEnrichmentJob < ApplicationJob
-    queue_as :default
+    queue_as :light
     mediumweight!
     idempotent!
 

@@ -2,7 +2,7 @@
 
 module LLM
   class BatchMatchJob < ApplicationJob
-    queue_as :default
+    queue_as :heavy
     heavyweight!
     idempotent!
 

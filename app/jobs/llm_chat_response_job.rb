@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class LLMChatResponseJob < ApplicationJob
+  queue_as :heavy
   heavyweight!
   idempotent! ->(chat_id, _content) { "chat/#{chat_id}" }
 

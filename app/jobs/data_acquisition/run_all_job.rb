@@ -2,7 +2,7 @@
 
 module DataAcquisition
   class RunAllJob < ApplicationJob
-    queue_as :default
+    queue_as :light
     mediumweight!
     idempotent!
 

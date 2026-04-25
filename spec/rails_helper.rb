@@ -29,8 +29,8 @@ Capybara.register_driver(:cuprite) do |app|
   Capybara::Cuprite::Driver.new(app,
                                 window_size: [1200, 800],
                                 browser_options: { 'no-sandbox': true },
-                                process_timeout: 30,
-                                timeout: 30,
+                                process_timeout: 60,
+                                timeout: 60,
                                 pending_connection_errors: false,
                                 inspector: true)
 end

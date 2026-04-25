@@ -2,7 +2,7 @@
 
 module Scraper
   class DiscoveryConsumerJob < ApplicationJob
-    queue_as :default
+    queue_as :light
     mediumweight!
 
     def perform

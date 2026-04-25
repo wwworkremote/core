@@ -17,7 +17,7 @@ RSpec.describe JobBoards::Syncer, type: :service do
       candidate_required_location: 'Worldwide'
     }
   end
-  let!(:document) do
+  let(:document) do
     JobBoards::Document.create!(
       signature: 'remotive-123',
       source_id: source.id,
@@ -28,17 +28,19 @@ RSpec.describe JobBoards::Syncer, type: :service do
 
   describe '#call' do
     it 'creates a JobPosting from a JobBoards::Document' do
+      document # Ensure document exists
       expect {
         service.call
       }.to change(JobPosting, :count).by(1)
 
       posting = JobPosting.last
       expect(posting.title).to eq('Ruby Developer')
-      expect(posting.company).to eq('Acme Corp')
+      expect(posting.company_name).to eq('Acme Corp')
       expect(posting.signature).to eq('remotive-123')
     end
 
     it 'is idempotent' do
+      document # Ensure document exists
       service.call
       expect {
         service.call

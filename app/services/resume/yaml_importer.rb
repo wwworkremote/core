@@ -4,15 +4,17 @@ require 'yaml'
 
 module Resume
   class YamlImporter
-    BASE_PATH = '/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume'
+    DEFAULT_BASE_PATH = '/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume'
+    attr_reader :base_path
 
-    def self.call(user)
-      new(user).call
+    def self.call(user, base_path: nil)
+      new(user, base_path: base_path).call
     end
 
-    def initialize(user)
+    def initialize(user, base_path: nil)
       @user = user
       @profile = user.career_profile || user.create_career_profile!
+      @base_path = base_path || DEFAULT_BASE_PATH
     end
 
     def call
@@ -38,7 +40,7 @@ module Resume
     end
 
     def import_positions
-      Dir.glob(File.join(BASE_PATH, 'positions', '*.yml')).each do |file|
+      Dir.glob(File.join(@base_path, 'positions', '*.yml')).each do |file|
         data = YAML.load_file(file)
         next unless data
 
@@ -84,7 +86,7 @@ module Resume
     end
 
     def load_yaml(filename)
-      path = File.join(BASE_PATH, filename)
+      path = File.join(@base_path, filename)
       return nil unless File.exist?(path)
       YAML.load_file(path)
     end
