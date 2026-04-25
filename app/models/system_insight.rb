@@ -23,7 +23,15 @@ class SystemInsight < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
+  after_create_commit :enqueue_embedding
+
   def self.for_file(path)
     where(file_path: path, active: true)
+  end
+
+  private
+
+  def enqueue_embedding
+    Quality::InsightEmbeddingJob.perform_later(id)
   end
 end

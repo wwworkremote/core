@@ -12,8 +12,10 @@ class LLM::Orchestrator
     @untrusted_text = untrusted_text
     @chat = chat
     @agent = agent
-    @system_rules = system_rules || (agent.respond_to?(:system_instructions) ? agent.system_instructions : "You are a helpful assistant.")
-    @task_instructions = task_instructions || (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
+    @system_rules = system_rules ||
+                    (agent.respond_to?(:system_instructions) ? agent.system_instructions : "You are a helpful assistant.")
+    @task_instructions = task_instructions ||
+                         (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
     @schema = schema
     @model = model || @chat&.model || agent_model || LLM::Registry.default_model
     @metadata = metadata

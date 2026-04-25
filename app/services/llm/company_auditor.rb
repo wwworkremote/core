@@ -44,7 +44,8 @@ class LLM::CompanyAuditor
 
     result = LLM::Orchestrator.call(
       untrusted_text: prompt,
-      system_rules: "You are a ruthless corporate culture auditor. You prioritize candidate well-being over corporate PR.",
+      system_rules: "You are a ruthless corporate culture auditor. " \
+                    "You prioritize candidate well-being over corporate PR.",
       task_instructions: "Return JSON only. Be clinical and accurate."
     )
 

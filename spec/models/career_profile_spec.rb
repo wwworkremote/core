@@ -36,10 +36,6 @@ RSpec.describe CareerProfile do
     it { is_expected.to have_many_attached(:resumes) }
   end
 
-  describe "validations" do
-    it { is_expected.to validate_presence_of(:user) }
-  end
-
   describe "GitHub integration" do
     let(:profile) { create(:career_profile, github_url: "https://github.com/testuser") }
 

@@ -12,15 +12,18 @@ class UserJobPostingsController < ApplicationController
     @user_job_posting = current_user.user_job_postings.find_or_initialize_by(job_posting: @job_posting)
 
     if params[:status].present?
-      @user_job_posting.status = params[:status]
-      @user_job_posting.save!
+      # Whitelist AASM events for UserJobPosting
+      allowed_events = %w[favorite apply interview offer archive]
+      if allowed_events.include?(params[:status])
+        @user_job_posting.send("#{params[:status]}!")
 
-      # Log to pipeline as well
-      current_user.pipeline_steps.create!(
-        job_posting: @job_posting,
-        status: params[:status],
-        note: "User marked as #{params[:status]}"
-      )
+        # Log to pipeline as well
+        current_user.pipeline_steps.create!(
+          job_posting: @job_posting,
+          status: params[:status],
+          note: "User marked as #{params[:status]}"
+        )
+      end
     end
 
     redirect_back_or_to(job_posting_path(@job_posting), notice: "Job status updated.")

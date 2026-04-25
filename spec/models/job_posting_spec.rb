@@ -65,12 +65,18 @@ RSpec.describe JobPosting do
     it { is_expected.to have_many(:users).through(:user_job_postings) }
   end
 
-  describe "scopes" do
-    let!(:job) { create(:job_posting, published_at: 1.day.ago) }
+  describe "AASM transitions" do
+    let(:job) { create(:job_posting, status: "none") }
 
-    it "orders by published_at" do
-      # NOTE: This is an example, adjust based on actual logic
-      expect(described_class.all).to include(job)
+    it "prevents direct status updates" do
+      job.status = "applied"
+      expect(job.save).to be false
+      expect(job.errors[:status]).to include("cannot be updated directly. Use state machine events.")
+    end
+
+    it "permits status updates via events" do
+      job.favorite!
+      expect(job.status).to eq("favorited")
     end
   end
 end

@@ -63,11 +63,11 @@ class JobBoards::Syncer
         job_posting.company_id = company.id
 
         # Mark as ignored if company has ingestion disabled
-        job_posting.status = "ignored" unless company.ingestion_enabled?
+        job_posting.ignore unless company.ingestion_enabled?
       end
 
       # Apply Quality Filter
-      job_posting.status = "ignored" unless JobBoards::QualityFilter.new(job_posting).useful?
+      job_posting.ignore unless JobBoards::QualityFilter.new(job_posting).useful?
 
       # Capture the result of save! in a way that handles race conditions
       if job_posting.save
@@ -79,7 +79,7 @@ class JobBoards::Syncer
         end
 
         # Only categorize if not already enriched/categorized AND not ignored
-        if job_posting.status != "ignored" && job_posting.data["ai_category"].blank?
+        if !job_posting.ignored? && job_posting.data["ai_category"].blank?
           JobBoards::Categorizer.new(job_posting).call
           JobBoards::Embedder.new(job_posting).call
         end

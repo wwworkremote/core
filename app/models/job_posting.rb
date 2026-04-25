@@ -43,7 +43,7 @@ class JobPosting < ApplicationRecord
   has_many :interview_sessions, dependent: :destroy
   has_many :interview_tasks, dependent: :destroy
 
-  aasm column: :status do
+  aasm column: :status, whiny_persistence: true do
     state :none, initial: true
     state :favorited, :applied, :interview, :offered, :archived, :ignored, :purged
 
@@ -57,7 +57,7 @@ class JobPosting < ApplicationRecord
 
     event :purge do
       after do
-        update!(embedding: nil) # Instant removal from neural search
+        update_column(:embedding, nil) # Instant removal from neural search
       end
       transitions from: %i[none favorited archived ignored], to: :purged
     end
@@ -81,6 +81,25 @@ class JobPosting < ApplicationRecord
     event :archive do
       transitions from: %i[favorited applied interview offered], to: :archived
     end
+  end
+
+  # Prevent direct status updates
+  before_update :ensure_aasm_transition, if: :status_changed?
+
+  def company_record
+    return @company_record if defined?(@company_record)
+
+    @company_record = Company.find_by(name: company)
+  end
+
+  private
+
+  def ensure_aasm_transition
+    return if aasm.current_event.present?
+    return if status_was.nil? || (status_was == "none" && status == "none")
+
+    errors.add(:status, "cannot be updated directly. Use state machine events.")
+    throw(:abort)
   end
 
   def add_pipeline_note(note, link: nil)
@@ -126,12 +145,6 @@ class JobPosting < ApplicationRecord
     where(latitude: nil, longitude: nil).where.not(location: nil).find_each do |posting|
       JobBoards::GeocodingJob.perform_later(posting.id)
     end
-  end
-
-  def company_record
-    return @company_record if defined?(@company_record)
-
-    @company_record = Company.find_by(name: company)
   end
 
   # Real-time dashboard telemetry
