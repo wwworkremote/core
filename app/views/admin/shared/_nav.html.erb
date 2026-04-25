@@ -32,6 +32,19 @@
         <%= link_to "Visits", admin_visits_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'visits' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
         <%= link_to "Events", admin_events_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'events' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
       </div>
+
+      <div class="w-px h-3 bg-white/10 hidden md:block"></div>
+
+      <div class="dropdown dropdown-hover">
+        <div tabindex="0" role="button" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors flex items-center gap-1">
+          Mounts <i class="bi bi-chevron-down text-[8px]"></i>
+        </div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-0 border border-white/5">
+          <li><%= link_to 'PgHero', '/mounts/pghero' %></li>
+          <li><%= link_to 'Mission Control', '/mounts/jobs' %></li>
+          <li><%= link_to 'Ahoy Analytics', '/mounts/analytics' %></li>
+        </ul>
+      </div>
     </div>
 
     <div>

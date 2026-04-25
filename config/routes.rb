@@ -188,8 +188,7 @@ Rails.application.routes.draw do
       post :sync_github
     end
   end
-  get 'companies/index'
-  get 'companies/show'
+  resources :companies, only: %i[index show]
   get 'company_pipeline_steps/create'
   get 'contacts/create'
   get 'contacts/destroy'

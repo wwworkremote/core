@@ -1,14 +1,62 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Operational Overview</h1>
-    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Real-time node telemetry and signal velocity</p>
+    <h1 class="text-4xl font-black tracking-tight text-white mb-2 uppercase italic italic">Neural_Market_Intelligence</h1>
+    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Autonomous Remote Job Synthesis & Strategic Alignment</p>
   </div>
-  <div>
+  <div class="flex gap-4">
+    <%= link_to career_profile_path, class: "btn btn-outline btn-sm rounded-lg font-black uppercase tracking-widest text-[10px]" do %>
+      <%= heroicon "user-circle", options: { class: "w-4 h-4" } %> IDENTITY_SYNC
+    <% end %>
     <%= link_to data_fetchers_path, class: "btn btn-primary btn-sm rounded-lg font-black uppercase tracking-widest text-[10px]" do %>
       <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> INGESTION_CONTROL
     <% end %>
   </div>
 </div>
+
+<!-- Platform Capabilities Overview -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
+    <div class="card-body p-8 relative z-10">
+      <div class="text-[9px] font-black text-primary uppercase tracking-[0.3em] mb-4">Core_Capability_01</div>
+      <h2 class="text-xl font-black text-white uppercase italic mb-4">Autonomous_Extraction</h2>
+      <p class="text-xs text-slate-500 leading-relaxed font-bold mb-6">Mass-scale ingestion from global job boards, Resolve canonical signals, and archive low-quality data nodes automatically.</p>
+      <%= link_to job_postings_path, class: "btn btn-ghost btn-xs p-0 text-primary hover:bg-transparent font-black tracking-widest" do %>
+        BROWSE_MARKET <i class="bi bi-arrow-right"></i>
+      <% end %>
+    </div>
+    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <%= heroicon "globe-alt", options: { class: "w-24 h-24" } %>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group border-primary/20">
+    <div class="card-body p-8 relative z-10">
+      <div class="text-[9px] font-black text-secondary uppercase tracking-[0.3em] mb-4">Core_Capability_02</div>
+      <h2 class="text-xl font-black text-white uppercase italic mb-4">Neural_Alignment</h2>
+      <p class="text-xs text-slate-500 leading-relaxed font-bold mb-6">Deep semantic matching between your professional identity and the global market. 80%+ confidence scoring for strategic priority.</p>
+      <%= link_to user_job_postings_path, class: "btn btn-ghost btn-xs p-0 text-secondary hover:bg-transparent font-black tracking-widest" do %>
+        VIEW_PIPELINE <i class="bi bi-arrow-right"></i>
+      <% end %>
+    </div>
+    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <%= heroicon "sparkles", options: { class: "w-24 h-24" } %>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
+    <div class="card-body p-8 relative z-10">
+      <div class="text-[9px] font-black text-accent uppercase tracking-[0.3em] mb-4">Core_Capability_03</div>
+      <h2 class="text-xl font-black text-white uppercase italic mb-4">Operational_Transparency</h2>
+      <p class="text-xs text-slate-500 leading-relaxed font-bold mb-6">Real-time telemetry on crawler velocity, database health, and background pipeline orchestration via Mission Control.</p>
+      <%= link_to admin_root_path, class: "btn btn-ghost btn-xs p-0 text-accent hover:bg-transparent font-black tracking-widest" do %>
+        ACCESS_CONTROL <i class="bi bi-arrow-right"></i>
+      <% end %>
+    </div>
+    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <%= heroicon "adjustments-horizontal", options: { class: "w-24 h-24" } %>
+    </div>
+  </div>
+</section>
 
 <%= turbo_stream_from "system_telemetry" %>
 
@@ -93,12 +141,12 @@
       <div class="card bg-base-200 border border-white/5 shadow-xl">
         <div class="card-body p-6">
           <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">Ingestion_Velocity</h3>
-          <%= line_chart(charts_data_sources_path(days: 21), 
-              discrete: true, 
+          <%= line_chart(charts_data_sources_path(days: 21),
+              discrete: true,
               height: "140px",
               colors: ["#9580FF"],
-              library: { 
-                scales: { 
+              library: {
+                scales: {
                   y: { display: false },
                   x: { display: false }
                 },
@@ -124,12 +172,12 @@
       <div class="card bg-base-200 border border-white/5 shadow-xl">
         <div class="card-body p-6">
           <h3 class="card-title text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">Market_Publication_Curve</h3>
-          <%= line_chart(charts_data_job_postings_path(days: 21), 
-              discrete: true, 
+          <%= line_chart(charts_data_job_postings_path(days: 21),
+              discrete: true,
               height: "140px",
               colors: ["#80FFEA"],
-              library: { 
-                scales: { 
+              library: {
+                scales: {
                   y: { display: false },
                   x: { display: false }
                 },
