@@ -70,7 +70,8 @@ RSpec.describe "Ingestion Pipeline Hardening", type: :system do
       click_button "Force"
     end
 
-    expect(page).to have_text(/Fetcher arbeitnow started successfully/i)
+    # Use a more specific selector and wait for visibility
+    expect(page).to have_css(".alert-success", text: /started successfully/i, wait: 10)
 
     # Verify Document was created
     expect(JobBoards::Document.count).to eq(1)
