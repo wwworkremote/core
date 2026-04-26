@@ -24,9 +24,13 @@ RSpec.describe Adzuna::Fetcher, type: :service do
     end
 
     it "fetches JSON jobs and stores them as documents" do
+      # Debug: check if source exists
+      expect(JobBoards::Source.find_by(slug: "adzuna")).to be_present
+      
       expect {
-        service.call(force: true)
-      }.to change(JobBoards::Document, :count)
+        result = service.call(force: true)
+        puts "DEBUG: result=#{result.inspect}"
+      }.to change(JobBoards::Document, :count).by(1)
 
       doc = JobBoards::Document.last
       data = JSON.parse(doc.document)
@@ -42,6 +46,27 @@ RSpec.describe Adzuna::Fetcher, type: :service do
 
       service.call(force: true)
       expect(JobBoards::Document.count).to eq(initial_count)
+    end
+
+    it "trips the circuit breaker on 429 rate limit" do
+      stub_request(:get, /api.adzuna.com/).to_return(status: 429, body: "Too Many Requests")
+
+      expect(Rails.logger).to receive(:warn).with(/Circuit Breaker Tripped for adzuna/).at_least(:once)
+      
+      # First call returns false because of the return false if response.nil?
+      service.call(force: true)
+      
+      # Second call should be locked
+      result = service.call(force: true)
+      expect(result).to eq(:locked)
+    end
+
+    it "handles missing credentials gracefully" do
+      allow(ENV).to receive(:fetch).with("ADZUNA_APPLICATION_ID", nil).and_return(nil)
+      
+      expect(Rails.logger).to receive(:error).with(/Adzuna API credentials missing/)
+      result = service.call(force: true)
+      expect(result).to be false
     end
   end
 end

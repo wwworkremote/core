@@ -30,15 +30,15 @@ class EmailIngestion::Importer
 
     begin
       # 1. Parse Email
-      parsed_email = MessageParser.new(@file_path).call
+      parsed_email = EmailIngestion::MessageParser.new(@file_path).call
       @record.update!(message_id: parsed_email[:message_id])
 
       # 2. Extract Links
-      job_links = LinkExtractor.new(parsed_email, @source_provider).call
+      job_links = EmailIngestion::LinkExtractor.new(parsed_email, @source_provider).call
 
       if job_links.empty?
         @record.update!(status: "processed", processed_at: Time.current)
-        FileLifecycle.new(@file_path, @source_provider).processed
+        EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
         return
       end
 
@@ -53,17 +53,17 @@ class EmailIngestion::Importer
       JobBoards::Syncer.new.call
 
       @record.update!(status: "processed", processed_at: Time.current)
-      FileLifecycle.new(@file_path, @source_provider).processed
+      EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
     rescue StandardError => e
       @record.update!(status: "error", error_message: e.message)
-      FileLifecycle.new(@file_path, @source_provider).error
+      EmailIngestion::FileLifecycle.new(@file_path, @source_provider).error
       Rails.logger.error "[EmailImporter] Error for record #{@record.id}: #{e.message}\n#{e.backtrace.join("\n")}"
     end
   end
 
   def process_job_link(job_link, parsed_email)
     # a. Resolve Canonical URL
-    canonical_url = CanonicalUrlResolver.new(job_link).call
+    canonical_url = EmailIngestion::CanonicalUrlResolver.new(job_link).call
 
     # b. Idempotency Check for this specific job link in this email
     signature = Digest::SHA256.hexdigest("#{@record.message_id}-#{canonical_url}")

@@ -74,6 +74,10 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
 
+  config.before(:each) do
+    Rails.cache.clear
+  end
+
   config.before do
     # Stub Geocoder
     Geocoder.configure(lookup: :test, ip_lookup: :test)

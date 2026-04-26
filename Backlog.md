@@ -11,11 +11,13 @@
 ## Phase 7: The Final Ingestion Sweep & Ops Coverage
 - [x] **Phase 7: The Final Ingestion Sweep & Ops Coverage**: Implemented request specs for Admin Tasks, Models, and Domains; completed scraper specs for Dice, LinkedIn, and Glassdoor.
 
-## Phase 8: Search & UX Hardening
-- [ ] **Semantic Search Hardening**: Implement request and system specs for `JobPostingsController` search and filter logic.
-- [ ] **Turbo UX Verification**: Build system specs for the "Neural Dialogue" (LLM Chat) and User Pipeline state transitions (Hotwire).
-- [ ] **Infrastructure Resilience**: Add coverage for `DatabaseBackupJob` and `SyncDashboardJob`.
-- [ ] **Board Integrity (Remaining)**: Complete specs for Adzuna, Remotive, WWR, and Arbeitnow fetchers.
+- [x] **Phase 8: Search & UX Hardening**: Verified end-to-end user flows (Favorite -> Match) and Neural Dialogue UI; hardened search filtering and infrastructure jobs.
+
+## Phase 9: The Final Ingestion Sweep & External Hardening
+- [ ] **Outbound Link Tracking**: Implement request specs for `OutboundLinksController` (0% coverage).
+- [ ] **Adzuna, Remotive, WWR Fetchers**: Enhance coverage for remaining ingestion providers, focusing on error paths.
+- [ ] **Email Ingestion Resilience**: Add specs for `EmailIngestion::Scanner` and `Importer` edge cases.
+- [ ] **Data Integrity**: Verify `JobBoards::Syncer` logic for handling incomplete 3rd party documents.
 
 
 - **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, Robust Indeed/LinkedIn Scraping, and MacOS Fork Safety hardening.

@@ -23,7 +23,7 @@ class EmailIngestion::Scanner
     checksum = Digest::SHA256.file(file_path).hexdigest
 
     # Try to claim the file
-    record = FileClaim.new(file_path, source, checksum).call
+    record = EmailIngestion::FileClaim.new(file_path, source, checksum).call
     return unless record
 
     # Enqueue processing
