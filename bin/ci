@@ -38,12 +38,18 @@ fi
 DOCKER_SOCKET_PATH="${DOCKER_HOST#unix://}"
 
 echo "--- Running Local CI via act ---"
-# We use --container-daemon-socket to force act to use the standard internal path
-# but we must ensure it doesn't try to mkdir the source path incorrectly.
-# On macOS/Colima, it's often better to just let act handle the host connection
-# and skip mounting the socket if it's causing issues, but many actions need it.
-# Let's try passing the architecture and the explicit socket path.
+echo "Sequence: Lint -> Security -> Test -> Boot"
+
+# If we are in a terminal, use pretty output
+ACT_OPTS=()
+if [ -t 1 ]; then
+  ACT_OPTS+=("--log-prefix=false")
+fi
+
+# We use --container-architecture to match standard CI environments
+# and ensure we don't spin up redundant containers if possible.
 act --container-architecture linux/amd64 \
     --container-daemon-socket "/var/run/docker.sock" \
+    "${ACT_OPTS[@]}" \
     "$@"
 

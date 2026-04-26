@@ -21,12 +21,30 @@ class JobFetchers::CanonicalJobExtractor
       extract_glassdoor
     when "dice"
       extract_dice
+    when "remotive"
+      extract_remotive
+    when "wwr"
+      extract_wwr
+    when "arbeitnow"
+      extract_arbeitnow
     else
       extract_generic
     end
   end
 
   private
+
+  def extract_remotive
+    extract_generic
+  end
+
+  def extract_wwr
+    extract_generic
+  end
+
+  def extract_arbeitnow
+    extract_generic
+  end
 
   def extract_glassdoor
     {

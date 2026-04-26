@@ -13,15 +13,31 @@
       </tr>
     </thead>
     <tbody class="font-mono text-[11px] divide-y divide-white/5">
-      <% JobBoards::Source.order(name: :asc).limit(5).each do |source| %>
+      <% Ingestion::JobBoards::Source.order(name: :asc).limit(5).each do |source| %>
         <%
           sync_gap = Time.current - (source.last_synced_at || 1.week.ago)
           status = sync_gap > 24.hours ? :critical : (sync_gap > 6.hours ? :warning : :healthy)
+          
+          # Sequence Telemetry
+          pending_docs = Ingestion::JobBoards::Document.where(source_id: source.id, aasm_state: "pending").count
+          unprocessed_postings = JobPosting.where(company_name: source.name, crawl_status: "none").count
         %>
         <tr class="hover:bg-white/[0.03]">
-          <td class="px-6 py-3 font-bold text-white"><%= source.name %></td>
-          <td class="px-6 py-3"><span class="text-slate-500 uppercase"><%= DataAcquisitionManager::FETCHERS.dig(source.slug, :type) %></span></td>
-          <td class="px-6 py-3 text-slate-400"><%= source.last_synced_at&.strftime("%b %d, %H:%M") || "NEVER" %></td>
+          <td class="px-6 py-3 font-bold text-white">
+            <%= source.name %>
+            <div class="flex gap-1 mt-1 opacity-50">
+              <div class="h-1 w-8 bg-primary <%= 'animate-pulse' if pending_docs.positive? %>" title="Discovery"></div>
+              <div class="h-1 w-8 <%= pending_docs.positive? ? 'bg-slate-700' : 'bg-success' %>" title="Ingestion"></div>
+              <div class="h-1 w-8 <%= unprocessed_postings.positive? ? 'bg-primary animate-pulse' : 'bg-slate-700' %>" title="Enrichment"></div>
+            </div>
+          </td>
+          <td class="px-6 py-3"><span class="text-slate-500 uppercase"><%= Ingestion::DataAcquisitionManager::FETCHERS.dig(source.slug, :type) %></span></td>
+          <td class="px-6 py-3 text-slate-400">
+            <%= source.last_synced_at&.strftime("%b %d, %H:%M") || "NEVER" %>
+            <% if pending_docs.positive? %>
+              <span class="text-primary block text-[9px] mt-1">⚡ <%= pending_docs %> docs pending</span>
+            <% end %>
+          </td>
           <td class="px-6 py-3 text-right">
             <% case status
                when :healthy %><span class="badge badge-success badge-xs"></span>
