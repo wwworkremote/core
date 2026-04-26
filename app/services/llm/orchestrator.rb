@@ -18,21 +18,16 @@ class LLM::Orchestrator
                          (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
     @schema = schema
     @model = model || @chat&.model || agent_model || LLM::Registry.default_model
-    @metadata = metadata
+    @metadata = metadata || {}
   end
 
   def call(&)
+    return format_failure("No model provided or found in registry") unless @model
+
     tracer = OpenTelemetry.tracer_provider.tracer("llm_orchestrator")
 
-    # Ensure all metadata keys are strings for OTel
-    stringified_metadata = @metadata.transform_keys(&:to_s)
-
-    tracer.in_span("orchestrate_llm_call",
-                   attributes: { "app.llm.model" => @model&.model_id }.merge(stringified_metadata)) do |span|
-      unless @model
-        span.status = OpenTelemetry::Trace::Status.error("No model provided or found in registry")
-        return format_failure("No model provided or found in registry")
-      end
+    tracer.in_span("orchestrate_llm_call") do |span|
+      span.set_attribute("app.llm.model", @model.model_id)
 
       # 1. Inbound Guardrails
       guardrail_result = Guardrails::Pipeline.call(@untrusted_text)
@@ -64,7 +59,7 @@ class LLM::Orchestrator
   end
 
   def execute_with_model(model, sanitized_text, span, &)
-    span.add_event("sending_llm_request", attributes: { "model" => model.model_id })
+    span.add_event("sending_llm_request", attributes: { "model" => model.model_id.to_s })
 
     chat = @chat || LLMChat.create!(model: model)
 
@@ -93,7 +88,7 @@ class LLM::Orchestrator
       perplexity: RubyLLM::Providers::Perplexity,
       vertexai: RubyLLM::Providers::VertexAI,
       xai: RubyLLM::Providers::XAI
-    }
+    }.freeze
 
     provider_class = provider_map[model.provider.to_sym]
     raise "Unknown provider: #{model.provider}" unless provider_class
@@ -130,7 +125,7 @@ class LLM::Orchestrator
     # Save the final response to the chat history
     chat.llm_messages.create!(role: "assistant", content: full_output) if full_output.present?
 
-    span.add_event("received_llm_response")
+    span.add_event("received_llm_response", attributes: {})
     { success: true, model: model.model_id, output: full_output }
   end
 

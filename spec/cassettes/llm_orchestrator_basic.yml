@@ -1,0 +1,27 @@
+http_interactions:
+- request:
+    method: post
+    uri: http://localhost:8080/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"llama3.2:latest","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"Normalize this job: Ruby dev at TestCorp.\n\nProcess the data."}],"stream":true,"temperature":0.7,"stream_options":{"include_usage":true}}'
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Faraday v2.14.1
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+    body:
+      encoding: UTF-8
+      string: |
+        data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1677649420,"model":"llama3.2:latest","choices":[{"index":0,"delta":{"role":"assistant","content":"{\n  \"title\": \"Senior Ruby Engineer\",\n  \"company\": \"TestCorp\"\n}"},"finish_reason":null}]}
+
+        data: [DONE]
+  recorded_at: Sat, 25 Apr 2026 15:55:00 GMT
+recorded_with: VCR 6.1.0

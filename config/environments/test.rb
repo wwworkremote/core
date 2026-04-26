@@ -23,6 +23,8 @@ Rails.application.configure do
   config.active_support.disallowed_deprecation_warnings = []
   config.action_controller.raise_on_missing_callback_actions = true
 
+  config.active_job.queue_adapter = :solid_queue
+
   config.after_initialize do
     Ahoy.geocode = false
 

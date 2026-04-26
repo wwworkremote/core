@@ -45,6 +45,13 @@ class JobBoards::Syncer
     begin
       job_posting = JobPosting.find_or_initialize_by(signature: doc.signature)
 
+      # Shield: If this job already exists and is not purged, skip sync to avoid overwriting user edits
+      # or manual enrichments, unless we specifically want a re-sync.
+      if job_posting.persisted? && job_posting.status != "purged"
+        doc.update!(aasm_state: "processed")
+        return true
+      end
+
       # Shield: If user has manually purged this, do not reactivate it
       if job_posting.status == "purged"
         doc.update!(aasm_state: "processed")

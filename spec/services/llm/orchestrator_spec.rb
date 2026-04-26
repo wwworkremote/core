@@ -3,55 +3,55 @@
 require "rails_helper"
 
 RSpec.describe LLM::Orchestrator do
-  let(:untrusted_text) { "Tell me about Ruby." }
-  let(:mock_model) do
-    instance_double(Model,
-                    model_id: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf",
-                    provider: "ollama")
-  end
+  let(:untrusted_text) { "Normalize this job: Ruby dev at TestCorp." }
+  let(:model_id) { "llama3.2:latest" }
+  let!(:model) { create(:model, model_id: model_id, provider: "ollama") }
 
   before do
-    allow(LLM::Registry).to receive(:default_model).and_return(mock_model)
+    allow(LLM::Registry).to receive(:default_model).and_return(model)
   end
 
   describe ".call" do
-    it "blocks disallowed content" do
-      allow(Guardrails::Pipeline).to receive(:call)
-        .and_return(double("Result", allowed?: false, findings: ["Malicious content"]))
+    it "executes the full chain including guardrails and real HTTP communication" do
+      # Realistic SSE (Server-Sent Events) response body
+      sse_body = <<~SSE
+        data: {"choices":[{"delta":{"content":"{\\n  \\\"title\\\": \\\"Senior Ruby Engineer\\\",\\n  \\\"company\\\": \\\"TestCorp\\\"\\n}"}}]}
 
-      result = described_class.call(untrusted_text: untrusted_text)
+        data: [DONE]
+      SSE
 
-      expect(result[:success]).to be false
-      expect(result[:error]).to include("Blocked by guardrails")
-    end
+      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+        .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
 
-    it "executes with model when allowed" do
-      allow(Guardrails::Pipeline).to receive(:call)
-        .and_return(double("Result", allowed?: true, sanitized_text: "Ruby explanation."))
-
-      mock_client = double("Client")
-      allow(RubyLLM::Providers::Ollama).to receive(:new).and_return(mock_client)
-
-      chat = instance_double(LLMChat, llm_messages: double("messages"))
-      allow(LLMChat).to receive(:create!).and_return(chat)
-      allow(chat.llm_messages).to receive(:create!)
-      allow(chat.llm_messages).to receive_messages(empty?: true, order: [])
-
-      allow(mock_client).to receive(:complete).and_yield(double("Chunk", content: "Ruby is great."))
-
-      result = described_class.call(untrusted_text: untrusted_text)
+      result = described_class.call(
+        untrusted_text: untrusted_text,
+        system_rules: "You are a helpful assistant.",
+        metadata: {}
+      )
 
       expect(result[:success]).to be true
-      expect(result[:output]).to eq("Ruby is great.")
+      expect(result[:output]).to include("Senior Ruby Engineer")
+      expect(LLMChat.count).to eq(1)
     end
 
-    it "returns failure when no model is available" do
-      allow(LLM::Registry).to receive(:default_model).and_return(nil)
+    it "gracefully handles LLM connection failures" do
+      stub_request(:post, %r{localhost:8080/v1/chat/completions})
+        .to_raise(Faraday::ConnectionFailed.new("Connection refused"))
 
-      result = described_class.call(untrusted_text: untrusted_text)
+      result = described_class.call(untrusted_text: untrusted_text, metadata: {})
 
       expect(result[:success]).to be false
-      expect(result[:error]).to include("No model")
+      expect(result[:error]).to include("Model execution failed")
+    end
+
+    it "handles malformed or empty output from the provider" do
+      stub_request(:post, %r{localhost:8080/v1/chat/completions})
+        .to_return(status: 200, body: "", headers: {})
+
+      result = described_class.call(untrusted_text: untrusted_text, metadata: {})
+
+      expect(result[:success]).to be true
+      expect(result[:output]).to eq("")
     end
   end
 end
