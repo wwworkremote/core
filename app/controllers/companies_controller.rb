@@ -10,6 +10,6 @@ class CompaniesController < ApplicationController
   end
 
   def show
-    @company = Company.includes(:job_postings, :company_pipeline_steps).find(params[:id])
+    @company = Company.includes(:job_postings).find(params[:id])
   end
 end
