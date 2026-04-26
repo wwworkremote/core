@@ -26,9 +26,9 @@
 #
 FactoryBot.define do
   factory :user_job_posting do
-    user { nil }
-    job_posting { nil }
-    status { "MyString" }
+    user
+    job_posting
+    status { "favorited" }
     notes { "MyText" }
   end
 end

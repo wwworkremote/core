@@ -62,5 +62,37 @@ RSpec.describe ApiGuard do
       result = instance.with_api_guard(slug, force: true) { :executed }
       expect(result).to be true
     end
+
+    it "returns :missing_source if the source does not exist" do
+      result = instance.with_api_guard("ghost-slug") { :executed }
+      expect(result).to eq(:missing_source)
+    end
+
+    it "yields the source object to the block" do
+      yielded_source = nil
+      instance.with_api_guard(slug) do |s|
+        yielded_source = s
+      end
+      expect(yielded_source).to eq(source)
+    end
+  end
+
+  describe "#can_fetch?" do
+    let!(:source) { JobBoards::Source.create!(slug: slug, name: "Test") }
+
+    it "returns true if never fetched" do
+      expect(instance.can_fetch?(slug)).to be true
+    end
+
+    it "returns false if within cooldown" do
+      instance.with_api_guard(slug) { :executed }
+      expect(instance.can_fetch?(slug)).to be false
+    end
+
+    it "returns true after cooldown expires" do
+      instance.with_api_guard(slug, cooldown: 1.second) { :executed }
+      sleep 1.1
+      expect(instance.can_fetch?(slug, cooldown: 1.second)).to be true
+    end
   end
 end
