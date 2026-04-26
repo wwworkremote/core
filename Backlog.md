@@ -1,8 +1,26 @@
 # Engineering Backlog: Job Search Automation Platform
 
-## Backlog Audit
-- **Status**: Synchronized with active mass-scraping and AI-alignment features.
-- **Current Focus**: Scaling ingestion pipelines and refining personal career matching.
+## Completed Phases (Stability & Modularization)
+- [x] **Phase 1: Ingestion Hardening**: Established full system flow spec and hardened Syncer/Crawler.
+- [x] **Phase 2: LLM Logic Isolation**: Implemented realistic WebMock tests for Orchestrator/Categorizer.
+- [x] **Phase 3: Coverage Gap Filling**: Added request specs for key controllers (LLM, Companies, Admin Ops).
+- [x] **Phase 4: Resilience & Infrastructure**: 100% coverage for Guardrails; hardened ApiGuard.
+- [x] **Phase 5: External Contracts**: Established extraction contracts and Golden Cassette audit.
+- [x] **Phase 6: Search & AI Alignment**: Hardened CompanyAuditor, ProfileMatcher, and Indeed scraper.
+
+## Phase 7: The Final Ingestion Sweep & Ops Coverage
+- [ ] **Administrative CRUD**: Implement request specs for 0% covered controllers:
+  - `Admin::TasksController`
+  - `Admin::ModelsController`
+  - `Admin::DomainsController`
+- [ ] **Scraper Completion**: Add specs for remaining ingestion providers:
+  - `Scraper::Dice::ApiClient`
+  - `Scraper::LinkedIn::ApiClient`
+  - `Scraper::Glassdoor::ApiClient`
+- [ ] **Core Logic Depth**: Achieve coverage for complex services:
+  - `Quality::ContextBuilder`
+  - `Guardrails::PromptBuilder`
+
 - **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, Robust Indeed/LinkedIn Scraping, and MacOS Fork Safety hardening.
 
 ---

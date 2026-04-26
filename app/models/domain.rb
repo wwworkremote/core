@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Domain < ApplicationRecord
-  has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :domains
-  has_many :job_postings, -> { readonly }, through: :target_domains
+  has_many :target_domains, dependent: :destroy
+  has_many :job_postings, through: :target_domains
 
   # rails_admin do
   #   label 'Domain'

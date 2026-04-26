@@ -60,7 +60,7 @@ class Scraper::LinkedIn::ApiClient
       next unless title_link
 
       href = title_link["href"]
-      job_id = href.match(%r{/view/(\w+-\w+|(\d+))})&.[](0)&.split("-")&.last || href.match(%r{view/(\d+)})&.[](1)
+      job_id = href.match(%r{view/(\d+)})&.[](1) || href.match(%r{/view/(\w+-\w+|(\d+))})&.[](0)&.split("-")&.last
 
       # If we can't get a clean numeric ID, use a hash of the href
       job_id ||= Digest::MD5.hexdigest(href)[0..10]
