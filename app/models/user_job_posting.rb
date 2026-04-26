@@ -30,7 +30,7 @@ class UserJobPosting < ApplicationRecord
   belongs_to :user
   belongs_to :job_posting
 
-  aasm column: :status do
+  aasm column: :status, whiny_persistence: true do
     state :none, initial: true
     state :favorited, :applied, :interview, :offered, :archived
 

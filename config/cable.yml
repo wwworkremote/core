@@ -6,7 +6,7 @@ development:
   adapter: solid_cable
 
 test:
-  adapter: test
+  adapter: solid_cable
 
 production:
   adapter: solid_cable

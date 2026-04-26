@@ -19,7 +19,8 @@ RSpec.describe Scraper::Crawler::Discovery do
       expect(mock_chromium).to receive(:launch).and_yield(mock_browser)
       expect(mock_browser).to receive(:new_page).and_return(mock_page)
 
-      expect(mock_page).to receive(:goto).with(base_url)
+      expect(mock_page).to receive(:default_timeout=).with(30_000)
+      expect(mock_page).to receive(:goto).with(base_url, waitUntil: "domcontentloaded")
       expect(mock_page).to receive(:wait_for_load_state).with(state: "networkidle")
 
       mock_links = ["https://cord.com/jobs/1", "https://cord.com/jobs/2"]
