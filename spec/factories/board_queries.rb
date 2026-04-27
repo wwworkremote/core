@@ -15,10 +15,10 @@
 #
 FactoryBot.define do
   factory :board_query do
-    board_name { "MyString" }
-    terms { "MyText" }
-    remote { false }
+    board_name { "indeed" }
+    terms { ["Ruby"] }
+    remote { true }
     priority { 1 }
-    query_params { "" }
+    query_params { { "remote" => true } }
   end
 end

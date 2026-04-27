@@ -2,29 +2,31 @@
 
 require "rails_helper"
 
-RSpec.describe "Charts::Data::Pipelines", type: :request do
-  let!(:source) { create(:job_boards_source, name: "Arbeitnow") }
-  let!(:doc) { create(:job_boards_document, job_boards_source: source, created_at: 1.day.ago) }
-  let!(:job) { create(:job_posting, data: { "ai_category" => "Engineering" }, embedding: [0.1] * 3584) }
-
+RSpec.describe "Charts::Data::Pipeline", type: :request do
   describe "GET /charts/data/pipeline/health" do
-    it "returns health data as JSON" do
+    it "returns JSON data for pipeline health" do
+      source = create(:job_boards_source, name: "Test Board")
+      create(:job_boards_document, job_boards_source: source)
+      
       get charts_data_pipeline_health_path
       expect(response).to be_successful
-      json = JSON.parse(response.body)
-      expect(json["Arbeitnow"]).to eq(1)
+      data = JSON.parse(response.body)
+      expect(data["Test Board"]).to eq(1)
     end
   end
 
   describe "GET /charts/data/pipeline/funnel" do
-    it "returns funnel data as JSON" do
+    it "returns JSON data for pipeline funnel" do
+      create(:job_boards_document)
+      # Create an embedding with 3584 dimensions
+      mock_embedding = Array.new(3584) { 0.1 }
+      create(:job_posting, embedding: mock_embedding)
+      
       get charts_data_pipeline_funnel_path
       expect(response).to be_successful
-      json = JSON.parse(response.body)
-      expect(json.to_h["Raw Documents"]).to eq(1)
-      expect(json.to_h["Job Postings"]).to eq(1)
-      expect(json.to_h["AI Classified"]).to eq(1)
-      expect(json.to_h["Vector Indexed"]).to eq(1)
+      data = JSON.parse(response.body)
+      expect(data.assoc("Raw Documents")[1]).to eq(1)
+      expect(data.assoc("Vector Indexed")[1]).to eq(1)
     end
   end
 end

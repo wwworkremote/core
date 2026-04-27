@@ -248,13 +248,13 @@ class DataAcquisitionManager
     else
       # For Service Objects
       fetcher = config[:class].new
-      method = fetcher.method(:call)
+      method_sig = config[:class].instance_method(:call)
 
       # Detect if fetcher accepts 'force' or 'source' as keyword arguments
 
       call_args = {}
-      call_args[:force] = force if method.parameters.any? { |p| p[1] == :force }
-      call_args[:source] = slug.split("_").last if slug.start_with?("email_") && method.parameters.any? { |p|
+      call_args[:force] = force if method_sig.parameters.any? { |p| p[1] == :force }
+      call_args[:source] = slug.split("_").last if slug.start_with?("email_") && method_sig.parameters.any? { |p|
         p[1] == :source
       }
 

@@ -13,11 +13,13 @@
 
 - [x] **Phase 8: Search & UX Hardening**: Verified end-to-end user flows (Favorite -> Match) and Neural Dialogue UI; hardened search filtering and infrastructure jobs.
 
-## Phase 9: The Final Ingestion Sweep & External Hardening
-- [ ] **Outbound Link Tracking**: Implement request specs for `OutboundLinksController` (0% coverage).
-- [ ] **Adzuna, Remotive, WWR Fetchers**: Enhance coverage for remaining ingestion providers, focusing on error paths.
-- [ ] **Email Ingestion Resilience**: Add specs for `EmailIngestion::Scanner` and `Importer` edge cases.
-- [ ] **Data Integrity**: Verify `JobBoards::Syncer` logic for handling incomplete 3rd party documents.
+- [x] **Phase 9: The Final Ingestion Sweep & External Hardening**: Secured outbound link tracking; completed error-path coverage for all major fetchers; verified email ingestion resilience.
+
+## Phase 10: Performance & Scale Hardening
+- [ ] **Data Acquisition Manager Optimization**: Implement specs for batch execution, concurrency management, and source-level audits.
+- [ ] **JobBoards::Client Resilience**: Build specs for connection timeouts, retry logic, and proxy rotation simulations.
+- [ ] **Observability Verification**: Implement request specs for `Charts::Data` controllers and `Admin::Observability` telemetry (0% coverage).
+- [ ] **Vector Sync Reliability**: Harden `InsightEmbeddingJob` against intermittent LLM/Connectivity issues with exponential backoff verification.
 
 
 - **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, Robust Indeed/LinkedIn Scraping, and MacOS Fork Safety hardening.
