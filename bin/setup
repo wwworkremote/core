@@ -36,20 +36,21 @@ FileUtils.chdir APP_ROOT do
   end
 
   puts "\n== Installing Playwright Browsers =="
-  if File.exist?('node_modules/.bin/playwright')
-    system! 'node_modules/.bin/playwright install chromium'
+  if system("npm bin > /dev/null 2>&1") || File.exist?('node_modules/.bin/playwright')
+    system! 'npx playwright install chromium'
   else
-    puts "⚠️ Playwright not found in node_modules. Run npm install first."
+    puts "⚠️ Playwright not found. Ingestion may fail."
   end
 
   puts "\n== Preparing Database =="
   system! 'bin/rails db:prepare'
-  system! 'RAILS_ENV=test bin/rails db:test:prepare'
+  system! 'bin/rails db:test:prepare'
 
-  puts "\n== Loading AI Models =="
-  system! 'bin/rails LLM:load_models'
+  puts "\n== Syncing AI Registry =="
+  system! 'bin/rails runner "LLM::Registry.sync"'
 
   puts "\n== Verifying Infrastructure =="
+  # Use a slight delay for LLM check or handle it as non-fatal warning
   check_service('Local LLM (llama.cpp)', 'http://localhost:8080/v1/models')
 
   puts "\n== Cleaning Environment =="
