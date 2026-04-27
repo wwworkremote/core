@@ -66,12 +66,12 @@ class Admin::JobsController < Admin::ApplicationController
         args = config["args"] || []
         klass.perform_later(*args)
         flash[:notice] = "🚀 Triggered #{task_id} (#{config['class']})"
-      elsif config["command"]
-        # Safe because command string comes from static recurring.yml, not user input
-        # Using Rails.root to ensure the correct binary is used
-        rails_path = Rails.root.join("bin/rails").to_s
-        spawn("RAILS_ENV=#{Rails.env} #{rails_path} runner '#{config['command']}'")
-        flash[:notice] = "🚀 Spawned command for #{task_id}"
+      elsif task_id == "clear_solid_queue_finished_jobs"
+        # Directly call the logic instead of spawning a subshell
+        SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)
+        flash[:notice] = "🚀 Executed queue cleanup directly."
+      else
+        flash[:alert] = "Manual trigger not implemented for this command type."
       end
     else
       flash[:alert] = "Task configuration not found for #{task_id} in #{Rails.env}."
