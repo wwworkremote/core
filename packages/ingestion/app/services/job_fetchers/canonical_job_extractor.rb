@@ -27,6 +27,12 @@ class JobFetchers::CanonicalJobExtractor
       extract_wwr
     when "arbeitnow"
       extract_arbeitnow
+    when "builtin"
+      extract_builtin
+    when "remoteio"
+      extract_remoteio
+    when "echojobs"
+      extract_echojobs
     else
       extract_generic
     end
@@ -35,15 +41,63 @@ class JobFetchers::CanonicalJobExtractor
   private
 
   def extract_remotive
-    extract_generic
+    {
+      title: @doc.css("h1").first&.text&.strip,
+      company: @doc.css(".company-name").first&.text&.strip,
+      location: @doc.css(".location").first&.text&.strip,
+      description: @doc.css(".job-description").inner_html,
+      url: @url
+    }
   end
 
   def extract_wwr
-    extract_generic
+    {
+      title: @doc.css("h1").first&.text&.strip,
+      company: @doc.css(".company-card a").first&.text&.strip,
+      location: @doc.css(".location").first&.text&.strip,
+      description: @doc.css(".job-body").inner_html,
+      url: @url
+    }
   end
 
   def extract_arbeitnow
-    extract_generic
+    {
+      title: @doc.css("h1").first&.text&.strip,
+      company: @doc.css(".company-name").first&.text&.strip,
+      location: @doc.css(".location").first&.text&.strip,
+      description: @doc.css(".job-description").inner_html,
+      url: @url
+    }
+  end
+
+  def extract_builtin
+    {
+      title: @doc.css("h1.node-title").text.strip.presence || @doc.css("h1").first&.text&.strip,
+      company: @doc.css(".company-title").first&.text&.strip,
+      location: @doc.css(".job-location").first&.text&.strip,
+      description: @doc.css(".job-description").inner_html,
+      url: @url
+    }
+  end
+
+  def extract_remoteio
+    {
+      title: @doc.css("h1").first&.text&.strip,
+      company: @doc.css(".company-name").first&.text&.strip,
+      location: "Remote",
+      description: @doc.css(".job-description").inner_html,
+      url: @url
+    }
+  end
+
+  def extract_echojobs
+    {
+      title: @doc.css("h1").first&.text&.strip,
+      company: @doc.css(".company-name").first&.text&.strip,
+      location: @doc.css(".location").first&.text&.strip,
+      description: @doc.css(".job-description").inner_html,
+      url: @url
+    }
   end
 
   def extract_glassdoor

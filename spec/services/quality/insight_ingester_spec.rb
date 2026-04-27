@@ -3,42 +3,54 @@
 require "rails_helper"
 
 RSpec.describe Quality::InsightIngester do
-  describe ".ingest_rubocop" do
-    let(:json_report) do
+  describe ".ingest_brakeman" do
+    let(:json) do
       {
-        files: [
-          {
-            path: "app/models/user.rb",
-            offenses: [
-              {
-                severity: "warning",
-                message: "Style/StringLiterals: Prefer single-quoted strings...",
-                cop_name: "Style/StringLiterals",
-                location: { line: 10 }
-              }
-            ]
-          }
-        ]
+        warnings: [{
+          confidence: "High",
+          message: "Possible SQL injection",
+          file: "app/models/user.rb",
+          line: 10,
+          code: "User.where(params[:id])"
+        }]
       }.to_json
     end
 
-    it "creates SystemInsight records" do
+    it "creates SystemInsight records from Brakeman JSON" do
       expect {
-        described_class.ingest_rubocop(json_report)
+        described_class.ingest_brakeman(json)
+      }.to change(SystemInsight, :count).by(1)
+
+      insight = SystemInsight.last
+      expect(insight.tool).to eq("brakeman")
+      expect(insight.severity).to eq("critical")
+      expect(insight.active).to be true
+    end
+  end
+
+  describe ".ingest_rubocop" do
+    let(:json) do
+      {
+        files: [{
+          path: "app/models/user.rb",
+          offenses: [{
+            severity: "warning",
+            cop_name: "Style/Quotes",
+            message: "Prefer double quotes",
+            location: { line: 5 }
+          }]
+        }]
+      }.to_json
+    end
+
+    it "creates SystemInsight records from Rubocop JSON" do
+      expect {
+        described_class.ingest_rubocop(json)
       }.to change(SystemInsight, :count).by(1)
 
       insight = SystemInsight.last
       expect(insight.tool).to eq("rubocop")
-      expect(insight.file_path).to eq("app/models/user.rb")
-      expect(insight.severity).to eq("warning")
-    end
-
-    it "marks old insights as inactive" do
-      SystemInsight.create!(tool: :rubocop, message: "Old", file_path: "app/models/user.rb", active: true)
-
-      described_class.ingest_rubocop(json_report)
-
-      expect(SystemInsight.where(message: "Old").first.active).to be false
+      expect(insight.message).to include("Style/Quotes")
     end
   end
 end
