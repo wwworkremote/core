@@ -15,11 +15,13 @@
 
 - [x] **Phase 9: The Final Ingestion Sweep & External Hardening**: Secured outbound link tracking; completed error-path coverage for all major fetchers; verified email ingestion resilience.
 
-## Phase 10: Performance & Scale Hardening
-- [ ] **Data Acquisition Manager Optimization**: Implement specs for batch execution, concurrency management, and source-level audits.
-- [ ] **JobBoards::Client Resilience**: Build specs for connection timeouts, retry logic, and proxy rotation simulations.
-- [ ] **Observability Verification**: Implement request specs for `Charts::Data` controllers and `Admin::Observability` telemetry (0% coverage).
-- [ ] **Vector Sync Reliability**: Harden `InsightEmbeddingJob` against intermittent LLM/Connectivity issues with exponential backoff verification.
+- [x] **Phase 10: Performance & Scale Hardening**: Hardened DataAcquisitionManager and JobBoards::Client; implemented full observability telemetry specs.
+
+## Phase 11: The Final Coverage Push (Target 65%)
+- [ ] **AI Deep Hardening**: Expand specs for `Guardrails::Heuristics` and `Normalization` to cover edge-case prompts and malformed LLM outputs.
+- [ ] **Vector Sync Resilience**: Implement specs for `InsightEmbeddingJob` handling network timeouts and partial indexing failures.
+- [ ] **Long-Tail Scraper Verification**: Build specs for generic crawlers (`BuiltIn`, `RemoteIO`, `EchoJobs`) using the discovery/fetch contract.
+- [ ] **System-Wide Integrity Check**: Perform a full regression run and audit any remaining 0% coverage files in the `app/services` directory.
 
 
 - **Recent Major Wins**: Unified Admin/User Research UI, Distributed Crawler Discovery, Robust Indeed/LinkedIn Scraping, and MacOS Fork Safety hardening.

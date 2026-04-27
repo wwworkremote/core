@@ -6,10 +6,10 @@ class Guardrails::Normalizer
   end
 
   def call
-    return "" if @text.blank?
-
-    # 1. Normalize encoding
+    # 1. Normalize encoding first to avoid ArgumentError in blank? check
     normalized = @text.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+
+    return "" if normalized.blank?
 
     # 2. Replace null bytes with space (to prevent joining words)
     normalized.tr!("\u0000", " ")
