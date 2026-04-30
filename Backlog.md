@@ -24,6 +24,31 @@
 
 ---
 
+## AI Architectural Principles & Core Implementation
+
+The system implements a production-grade AI stack designed for reliability, safety, and deep technical alignment.
+
+### 1. Robust LLM Orchestration & Provider Registry
+- **Unified Interface**: `LLM::Orchestrator` abstracts disparate providers (Anthropic, OpenAI, Gemini, Ollama) into a single call pattern.
+- **Provider Registry**: A dedicated `Model` registry manages capabilities, token windows, and provider-specific metadata.
+- **Observability**: Native OpenTelemetry integration for tracing LLM latency, token usage, and failure modes.
+
+### 2. Multi-Layered Guardrails & Safety Pipeline
+- **Adversarial Mitigation**: `Guardrails::Normalizer` handles pathological input (null bytes, whitespace attacks) before inference.
+- **Heuristic Scanning**: Fuzzy-matching detection of prompt injection and "jailbreak" attempts (e.g., "ignore previous instructions").
+- **Classification Engine**: Risk-based disposition (allow/block) based on instruction density and pattern weights.
+
+### 3. Vector-Native RAG Architecture
+- **Semantic Identity**: `Resume::ProfileEmbedder` synthesizes work history, GitHub activity, and career goals into 3584-dimensional embeddings.
+- **Efficient Retrieval**: Native `pgvector` integration for cosine-distance similarity matching between profiles and job postings.
+- **Technical Proof Synthesis**: LLM-driven analysis of GitHub READMEs to extract verifiable architectural patterns and complexity evidence.
+
+### 4. Closed-Loop Quality Injection
+- **Contextual Awareness**: `Quality::ContextBuilder` automatically injects active security/linting insights (Brakeman, Rubocop) into LLM prompts.
+- **Architectural Constraints**: Ensures AI-generated artifacts comply with the project's real-time security and quality posture.
+
+---
+
 ## Priority Backlog (Dependency-Ordered)
 
 ### 1. Implement Distributed Circuit Breaker for Rate Limiting
@@ -76,6 +101,12 @@
 - **Context**: Susceptibility to HTTP 429 rate limits in fetchers.
 - **Decision**: Implement a **Distributed Circuit Breaker** using `Rails.cache` (backed by PostgreSQL).
 - **Rationale**: Prevents hammering external APIs, improves resource efficiency by not blocking worker threads.
+- **Status**: Implemented.
+
+### ADR 004: Unified AI Orchestration & Guardrail Pipeline
+- **Context**: Need for a secure, provider-agnostic way to handle LLM interactions while preventing prompt injection and ensuring data quality.
+- **Decision**: Implement a centralized `LLM::Orchestrator` coupled with a multi-stage `Guardrails::Pipeline`.
+- **Rationale**: Isolation of AI provider logic allows for seamless model switching (e.g., Anthropic to local Ollama); integrated guardrails ensure that untrusted user data is sanitized and scanned for adversarial patterns before reaching the inference engine.
 - **Status**: Implemented.
 
 ---
