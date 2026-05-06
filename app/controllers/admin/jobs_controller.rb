@@ -49,20 +49,19 @@ class Admin::JobsController < Admin::ApplicationController
 
     # Whitelist Task IDs to prevent Command Injection and RCE
     all_configs = YAML.load_file(Rails.root.join("config/recurring.yml"))
-    allowed_tasks = (all_configs[Rails.env] || all_configs["development"]).keys
+    env_config = all_configs[Rails.env] || all_configs["development"]
 
-    unless allowed_tasks.include?(task_id)
+    unless env_config.key?(task_id)
       flash[:alert] = "Unauthorized or invalid task ID: #{task_id}"
       return redirect_to admin_jobs_path
     end
 
-    env_config = all_configs[Rails.env] || all_configs["development"]
     config = env_config[task_id]
 
     if config
-      if config["class"]
-        # Safe because task_id is now whitelisted from recurring.yml
-        klass = config["class"].constantize
+      if (klass_name = config["class"])
+        # Safe because klass_name is now retrieved from a fixed whitelist key lookup
+        klass = klass_name.constantize
         args = config["args"] || []
         klass.perform_later(*args)
         flash[:notice] = "🚀 Triggered #{task_id} (#{config['class']})"

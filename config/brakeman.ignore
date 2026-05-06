@@ -22,6 +22,52 @@
         601
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "1c74bad7ceb4025aa815859f6ca5c7bea73cb5df407a4841c601bb2867964aaa",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/outbound_links_controller.rb",
+      "line": 17,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(JobPosting.where(:target_url => params[:url]).limit(1).pick(:target_url), :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OutboundLinksController",
+        "method": "show"
+      },
+      "user_input": "JobPosting.where(:target_url => params[:url]).limit(1).pick(:target_url)",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "Secondary verification against database records makes this safe."
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "8eb7fb2e8aa0ebe6fd2200ca3f6b81b958a7eb0e383dd7cf455c312be8cfb80f",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `constantize` called on parameter value",
+      "file": "app/controllers/admin/jobs_controller.rb",
+      "line": 64,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "(YAML.load_file(Rails.root.join(\"config/recurring.yml\"))[Rails.env] or YAML.load_file(Rails.root.join(\"config/recurring.yml\"))[\"development\"])[params[:task_id]][\"class\"].constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::JobsController",
+        "method": "trigger"
+      },
+      "user_input": "params[:task_id]",
+      "confidence": "Medium",
+      "cwe_id": [
+        470
+      ],
+      "note": "Task ID is whitelisted against recurring.yml keys before constantize is called."
     }
   ],
   "brakeman_version": "8.0.4"
