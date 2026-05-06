@@ -123,10 +123,7 @@ class JobPosting < ApplicationRecord
                   }
 
   def self.semantic_search(query_text, limit: 10)
-    embedding = JobBoards::Embedder.embed_text(query_text)
-    return none if embedding.blank?
-
-    nearest_neighbors(:embedding, embedding, distance: "cosine").limit(limit)
+    VectorIntelligence.search(query_text, target_class: self, limit: limit)
   end
 
   def self.ransackable_attributes(_auth_object = nil)
