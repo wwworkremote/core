@@ -202,6 +202,7 @@ Rails.application.routes.draw do
     end
   end
   namespace :admin do
+    resources :skills
     root to: "dashboard#index"
     post "toggle_pause" => "dashboard#toggle_pause"
     get "observability" => "observability#index"
