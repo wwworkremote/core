@@ -177,6 +177,13 @@
 #                        root GET    /                                                              mission_control/jobs/queues#index
 
 Rails.application.routes.draw do
+  get "resumes/index"
+  get "resumes/show"
+  get "resumes/new"
+  get "resumes/create"
+  get "resumes/edit"
+  get "resumes/update"
+  get "resumes/destroy"
   resources :user_job_postings, only: %i[index create update destroy] do
     collection do
       post :analyze_match
@@ -201,6 +208,14 @@ Rails.application.routes.draw do
       post :refresh
     end
   end
+  resources :resumes do
+    member do
+      post :fork
+      get :diff
+      get :export
+    end
+  end
+  resources :job_searches
   namespace :admin do
     resources :skills
     root to: "dashboard#index"

@@ -1,0 +1,153 @@
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+    <div class="flex items-center gap-3">
+      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <%= link_to "Resume_Registry", resumes_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <span class="text-white"><%= @resume.name %>_v<%= @resume.version %></span>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none"><%= @resume.name %></h1>
+        <span class="text-xl font-black text-primary opacity-50 tracking-tighter mt-1">V<%= @resume.version %></span>
+      </div>
+      <div class="flex items-center gap-4">
+        <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Tracked version of professional context.</p>
+        <span class="badge badge-neutral bg-white/5 border-none text-[8px] font-black uppercase tracking-widest"><%= @resume.status %></span>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-4">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost border-white/10 rounded-xl px-6 font-black tracking-widest text-[10px]">
+          <i class="bi bi-download mr-2"></i> EXPORT_ARTIFACT
+        </div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
+          <li><%= link_to "Markdown (.md)", export_resume_path(@resume, format: :markdown) %></li>
+          <li><%= link_to "Plain Text (.txt)", export_resume_path(@resume, format: :text) %></li>
+          <li><%= link_to "JSON (.json)", export_resume_path(@resume, format: :json) %></li>
+          <li><%= link_to "MCP Object", export_resume_path(@resume, format: :mcp) %></li>
+          <li><%= link_to "PDF (HTML)", export_resume_path(@resume, format: :pdf) %></li>
+        </ul>
+      </div>
+
+      <% if @parent %>
+        <%= link_to diff_resume_path(@resume, other_id: @parent.id), class: "btn btn-ghost border-white/10 rounded-xl px-6 font-black tracking-widest text-[10px] hover:text-blue-400" do %>
+          <i class="bi bi-intersect mr-2"></i> DIFF_WITH_PARENT (v<%= @parent.version %>)
+        <% end %>
+      <% end %>
+
+      <%= button_to fork_resume_path(@resume), method: :post, class: "btn btn-ghost border-white/10 rounded-xl px-6 font-black tracking-widest text-[10px] hover:text-accent" do %>
+        <i class="bi bi-git mr-2"></i> FORK_VERSION
+      <% end %>
+
+      <%= link_to edit_resume_path(@resume), class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" do %>
+        RECONFIGURE_VERSION
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="md:col-span-2 space-y-8">
+      <div class="card-neural p-8">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Version_Content</h3>
+        
+        <div class="prose prose-invert max-w-none prose-sm leading-relaxed">
+          <% if @resume.content.present? %>
+            <% if @resume.content["summary"] %>
+              <div class="mb-10">
+                <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-3">Narrative_Summary</div>
+                <p class="text-base text-white/80"><%= @resume.content["summary"] %></p>
+              </div>
+            <% end %>
+
+            <% if @resume.content["experience"].present? %>
+              <div class="space-y-8">
+                <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-2">Professional_History</div>
+                <% Array(@resume.content["experience"]).each do |exp| %>
+                  <div class="border-l-2 border-white/5 pl-6 py-1">
+                    <div class="flex justify-between items-start mb-1">
+                      <h4 class="text-lg font-black text-white uppercase"><%= exp["role"] %></h4>
+                      <span class="text-[9px] font-bold text-slate-500"><%= exp["start_date"] %> &mdash; <%= exp["end_date"] %></span>
+                    </div>
+                    <div class="text-xs font-bold text-primary tracking-widest uppercase mb-4"><%= exp["company"] %></div>
+                    <div class="text-xs text-white/60"><%= markdown(exp["description"]) %></div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-20 opacity-20 italic">
+              NO_CONTENT_DEFINED_IN_JSONB
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-8">
+      <div class="card-neural p-8">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Metadata_Intelligence</h3>
+        <div class="space-y-6">
+          <div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Lineage</div>
+            <div class="flex flex-col gap-2">
+              <% if @parent %>
+                <div class="text-[10px] font-bold text-slate-400">Parent: <%= link_to "#{@parent.name} v#{@parent.version}", resume_path(@parent), class: "text-primary hover:underline" %></div>
+              <% else %>
+                <div class="text-[10px] font-bold text-slate-600 italic">ROOT_VERSION</div>
+              <% end %>
+              
+              <% if @children.any? %>
+                <div class="text-[10px] font-black uppercase tracking-tighter text-slate-600 mt-2 mb-1">Forks:</div>
+                <div class="flex flex-col gap-1">
+                  <% @children.each do |child| %>
+                    <%= link_to "#{child.name} v#{child.version}", resume_path(child), class: "text-[10px] font-bold text-slate-400 hover:text-accent" %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Neural_Status</div>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full <%= @resume.embedding.present? ? 'bg-success' : 'bg-warning' %> animate-pulse"></div>
+              <span class="text-[10px] font-black text-white uppercase"><%= @resume.embedding.present? ? "VECTORIZED" : "PENDING_EMBEDDING" %></span>
+            </div>
+          </div>
+
+          <% if @resume.imported_from_url.present? %>
+            <div>
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Origin_Source</div>
+              <div class="text-[10px] font-mono text-slate-500 break-all"><%= @resume.imported_from_url %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card-neural p-8 border-l-4 border-primary bg-primary/5">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex justify-between items-center">
+          <span>Active_Campaigns</span>
+          <i class="bi bi-broadcast text-primary"></i>
+        </h3>
+        <div class="space-y-4">
+          <% if @resume.job_searches.active.any? %>
+            <% @resume.job_searches.active.each do |campaign| %>
+              <%= link_to job_search_path(campaign), class: "block p-4 bg-white/5 rounded-xl border border-white/5 hover:border-primary transition-all" do %>
+                <div class="text-xs font-black text-white uppercase"><%= campaign.name %></div>
+                <div class="text-[8px] font-bold text-slate-500 uppercase mt-1"><%= campaign.user_job_postings.count %> Jobs_Linked</div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div class="text-[10px] text-slate-600 italic py-4">No active campaigns linked to this version.</div>
+            <%= link_to "INITIATE_CAMPAIGN", new_job_search_path(resume_id: @resume.id), class: "btn btn-ghost border-white/10 btn-block btn-xs font-black tracking-widest text-[9px]" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
