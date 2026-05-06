@@ -14,10 +14,10 @@ class JobSearch < ApplicationRecord
   }, default: :active
 
   def matches(limit: 10)
-    VectorIntelligence.rank(source: resume, target_class: JobPosting, limit: limit)
+    JobSearchManager::MatcherService.new(self).call(limit: limit)
   end
 
   def skill_matches(limit: 10)
-    VectorIntelligence.rank(source: resume, target_class: Skill, limit: limit)
+    JobSearchManager::MatcherService.new(self).skills_analysis(limit: limit)
   end
 end
