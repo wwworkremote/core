@@ -50,6 +50,22 @@
     </div>
   </div>
 
+  <% other_versions = current_user.resumes.where(name: @resume.name).where.not(id: @resume.id).order(version: :desc) %>
+  <% if other_versions.any? %>
+    <div class="mb-12 p-6 bg-white/5 rounded-2xl border border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Comparative_Intelligence</div>
+        <p class="text-[11px] text-slate-600">Select another generation in this track to perform a structural delta analysis.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <%= form_with url: diff_resume_path(@resume), method: :get, class: "flex gap-2" do |f| %>
+          <%= f.select :other_id, other_versions.map { |r| ["v#{r.version} (#{r.created_at.strftime('%Y-%m-%d')})", r.id] }, {}, class: "select select-sm bg-base-300 rounded-lg text-[9px] font-mono border-white/10" %>
+          <%= f.submit "PERFORM_DIFF", class: "btn btn-ghost btn-sm border-white/10 rounded-lg font-black tracking-widest text-[9px] hover:text-primary" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <div class="md:col-span-2 space-y-8">
       <div class="card-neural p-8">

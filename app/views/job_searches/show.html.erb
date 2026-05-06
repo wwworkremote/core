@@ -103,7 +103,7 @@
                     <% if job.user_job_postings.where(user: current_user).any? %>
                       <div class="badge badge-success badge-outline rounded text-[8px] font-black uppercase px-4 h-8">TRACKED</div>
                     <% else %>
-                      <%= button_to "TRACK", job_job_postings_path(job_posting_id: job.id, job_search_id: @job_search.id), method: :post, class: "btn btn-primary btn-sm font-black tracking-widest text-[9px] px-6" %>
+                      <%= button_to "TRACK", user_job_postings_path(job_posting_id: job.id, job_search_id: @job_search.id), method: :post, class: "btn btn-primary btn-sm font-black tracking-widest text-[9px] px-6" %>
                     <% end %>
                   </div>
                 </div>

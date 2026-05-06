@@ -1,0 +1,47 @@
+<div class="max-w-4xl mx-auto py-10 px-6">
+  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+    <div class="flex items-center gap-3">
+      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <%= link_to "Campaign_Registry", job_searches_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <span class="text-white">Configure_Campaign</span>
+    </div>
+  </div>
+
+  <div class="mb-12">
+    <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none mb-3">
+      <%= @job_search.new_record? ? "Initiate New Campaign" : "Reconfigure Campaign" %>
+    </h1>
+    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Strategic grouping of opportunities bound to a specific professional narrative.</p>
+  </div>
+
+  <div class="card-neural p-8">
+    <%= form_with(model: @job_search, class: "space-y-8") do |f| %>
+      <div class="form-control">
+        <%= f.label :name, "CAMPAIGN_NAME", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+        <%= f.text_field :name, placeholder: "e.g., Q3 2026 Senior Backend Pursuit", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="form-control">
+          <%= f.label :resume_id, "BOUND_RESUME_VERSION", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+          <%= f.select :resume_id, @resumes.map { |r| ["#{r.name} (v#{r.version})", r.id] }, { include_blank: "Select a version..." }, class: "select select-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
+          <label class="label">
+            <span class="label-text-alt text-[9px] text-slate-600">The neural embedding of this version will drive match rankings.</span>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :status, "CAMPAIGN_STATUS", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+          <%= f.select :status, JobSearch.statuses.keys.map { |s| [s.humanize.upcase, s] }, {}, class: "select select-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-white/5 flex justify-end gap-4">
+        <%= link_to "ABORT_CAMPAIGN", job_searches_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+        <%= f.submit (@job_search.new_record? ? "INITIATE_CAMPAIGN" : "UPDATE_CAMPAIGN"), class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+      </div>
+    <% end %>
+  </div>
+</div>

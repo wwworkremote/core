@@ -10,6 +10,7 @@ class UserJobPostingsController < ApplicationController
   def create
     @job_posting = JobPosting.find(params[:job_posting_id])
     @user_job_posting = current_user.user_job_postings.find_or_initialize_by(job_posting: @job_posting)
+    @user_job_posting.job_search_id = params[:job_search_id] if params[:job_search_id].present?
 
     if params[:status].present?
       # Whitelist AASM events for UserJobPosting

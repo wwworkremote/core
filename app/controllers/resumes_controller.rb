@@ -20,7 +20,7 @@ class ResumesController < ApplicationController
   end
 
   def create
-    @resume = current_user.resumes.new(resume_params)
+    @resume = current_user.resumes.new(processed_params)
     if @resume.save
       redirect_to resumes_path, notice: "Resume created."
     else
@@ -34,7 +34,7 @@ class ResumesController < ApplicationController
 
   def update
     @resume = current_user.resumes.find(params[:id])
-    if @resume.update(resume_params)
+    if @resume.update(processed_params)
       redirect_to resume_path(@resume), notice: "Resume updated."
     else
       render :edit, status: :unprocessable_entity
@@ -69,7 +69,19 @@ class ResumesController < ApplicationController
 
   private
 
+  def processed_params
+    p = resume_params.to_h
+    if p[:content].is_a?(String)
+      begin
+        p[:content] = JSON.parse(p[:content])
+      rescue JSON::ParserError
+        # Fallback if invalid JSON
+      end
+    end
+    p
+  end
+
   def resume_params
-    params.expect(resume: [:name, :version, :status, :content, :imported_from_url])
+    params.expect(resume: %i[name version status content imported_from_url])
   end
 end

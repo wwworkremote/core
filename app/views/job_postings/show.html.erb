@@ -30,6 +30,14 @@
             <%= heroicon "calendar-days", options: { class: "w-4 h-4 text-accent" } %>
             <span class="text-white">SYNCED_<%= @job_posting.published_at&.strftime("%Y_%m_%d") || "NULL" %></span>
           </div>
+          <div class="flex items-center gap-2">
+            <%= heroicon "clock", options: { class: "w-4 h-4 text-warning" } %>
+            <span class="text-white">FRESHNESS: <%= @job_posting.freshness.upcase %></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <%= heroicon "eye", options: { class: "w-4 h-4 text-success" } %>
+            <span class="text-white">SEEN_COUNT: <%= @job_posting.seen_count %></span>
+          </div>
         </div>
       </div>
     </header>

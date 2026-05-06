@@ -1,0 +1,106 @@
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+    <div class="flex items-center gap-3">
+      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <%= link_to "Resume_Registry", resumes_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-[8px]"></i>
+      <span class="text-white">Neural_Diff_Analysis</span>
+    </div>
+  </div>
+
+  <div class="mb-12">
+    <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none mb-3">Version Difference</h1>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-500 uppercase">A:</span>
+        <span class="text-xs font-black text-white uppercase"><%= @resume_a.name %> (v<%= @resume_a.version %>)</span>
+      </div>
+      <i class="bi bi-arrow-right text-primary opacity-40"></i>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-500 uppercase">B:</span>
+        <span class="text-xs font-black text-white uppercase"><%= @resume_b.name %> (v<%= @resume_b.version %>)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <div class="card-neural p-8 border-l-4 border-slate-700 bg-slate-900/20">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6">Structural_Changes</h3>
+      <div class="space-y-4">
+        <% if @diff[:name_changed] %>
+          <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-warning/20">
+            <span class="text-[9px] font-black text-warning uppercase">Track Name Change</span>
+            <span class="text-[9px] text-slate-400 font-mono"><%= @resume_a.name %> → <%= @resume_b.name %></span>
+          </div>
+        <% end %>
+
+        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-primary/20">
+          <span class="text-[9px] font-black text-primary uppercase">Version Advance</span>
+          <span class="text-[9px] text-white font-mono">+<%= @diff[:version_diff] %> Generations</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-neural p-8 border-l-4 border-accent bg-accent/5">
+      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6">Skillset_Delta</h3>
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <div class="text-[8px] font-black text-success uppercase mb-3 tracking-widest">Added</div>
+          <div class="flex flex-wrap gap-2">
+            <% if @diff[:skills_added].any? %>
+              <% @diff[:skills_added].each do |skill| %>
+                <span class="px-2 py-1 rounded bg-success/10 border border-success/20 text-[8px] font-black text-success uppercase"><%= skill %></span>
+              <% end %>
+            <% else %>
+              <span class="text-[9px] text-slate-600 italic">None</span>
+            <% end %>
+          </div>
+        </div>
+        <div>
+          <div class="text-[8px] font-black text-error uppercase mb-3 tracking-widest">Removed</div>
+          <div class="flex flex-wrap gap-2">
+            <% if @diff[:skills_removed].any? %>
+              <% @diff[:skills_removed].each do |skill| %>
+                <span class="px-2 py-1 rounded bg-error/10 border border-error/20 text-[8px] font-black text-error uppercase"><%= skill %></span>
+              <% end %>
+            <% else %>
+              <span class="text-[9px] text-slate-600 italic">None</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-neural p-8">
+    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6">Content_Delta (JSON_Structured)</h3>
+    <div class="space-y-8">
+      <% if @diff[:content_diff].any? %>
+        <% @diff[:content_diff].each do |key, values| %>
+          <div class="border-b border-white/5 pb-8 last:border-0">
+            <div class="text-xs font-black text-primary uppercase tracking-widest mb-4"><%= key.humanize %></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <div class="text-[8px] font-bold text-slate-600 uppercase">From:</div>
+                <div class="p-4 bg-error/5 border border-error/10 rounded-xl text-xs text-error/70 line-through leading-relaxed">
+                  <%= values[:from].is_a?(Array) ? "Modified list with #{values[:from].count} entries" : values[:from] %>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="text-[8px] font-bold text-slate-600 uppercase">To:</div>
+                <div class="p-4 bg-success/5 border border-success/10 rounded-xl text-xs text-success/70 leading-relaxed">
+                  <%= values[:to].is_a?(Array) ? "Modified list with #{values[:to].count} entries" : values[:to] %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-20 text-slate-700 italic text-xs uppercase tracking-widest">
+          No structural content changes detected between these generations.
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

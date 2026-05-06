@@ -1,4 +1,56 @@
-<div>
-  <h1 class="font-bold text-4xl">Admin::Skills#index</h1>
-  <p>Find me in app/views/admin/skills/index.html.erb</p>
+<%= render "admin/shared/nav" %>
+
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div>
+      <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">Skill Registry</h1>
+      <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Master label catalog for semantic matching.</p>
+    </div>
+    <div class="flex gap-4">
+      <%= link_to "NEW_SKILL_LABEL", new_admin_skill_path, class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+    </div>
+  </div>
+
+  <div class="card-neural overflow-hidden border border-white/5">
+    <table class="table w-full">
+      <thead>
+        <tr class="bg-white/5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/5">
+          <th class="p-6">Name</th>
+          <th class="p-6">Category</th>
+          <th class="p-6 text-center">Neural_Status</th>
+          <th class="p-6 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5">
+        <% @skills.each do |skill| %>
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="p-6">
+              <%= link_to skill.name, admin_skill_path(skill), class: "text-sm font-black text-white hover:text-primary transition-colors" %>
+            </td>
+            <td class="p-6">
+              <span class="badge badge-neutral bg-white/5 border-none text-[8px] font-black uppercase tracking-widest text-slate-400">
+                <%= skill.category || "UNCLASSIFIED" %>
+              </span>
+            </td>
+            <td class="p-6 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <div class="w-2 h-2 rounded-full <%= skill.embedding.present? ? 'bg-success' : 'bg-warning' %> animate-pulse"></div>
+                <span class="text-[9px] font-bold text-slate-500 uppercase"><%= skill.embedding.present? ? "EMBEDDED" : "PENDING" %></span>
+              </div>
+            </td>
+            <td class="p-6 text-right">
+              <div class="flex justify-end gap-3">
+                <%= link_to "EDIT", edit_admin_skill_path(skill), class: "text-[9px] font-black text-primary hover:underline" %>
+                <%= button_to "DELETE", admin_skill_path(skill), method: :delete, data: { confirm: "Are you sure?" }, class: "text-[9px] font-black text-error hover:underline" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-8">
+    <%= paginate @skills %>
+  </div>
 </div>
