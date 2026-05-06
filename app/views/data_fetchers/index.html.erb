@@ -16,13 +16,13 @@
         <%= button_to "START_ENRICHMENT", enrich_data_fetchers_path, class: "btn btn-xs rounded-lg bg-amber-500 text-black border-none font-black text-[9px]" %>
       </div>
     <% end %>
-    
+
     <%= button_to "RUN_AUDIT", audit_data_fetchers_path, class: "btn-admin bg-white/5 hover:bg-white/10" %>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-  <% DataAcquisitionManager::FETCHERS.group_by { |_, c| c[:type] }.each do |type, fetchers| %>
+  <% Ingestion::AdapterRegistry.all.group_by { |_, c| c[:type] }.each do |type, fetchers| %>
     <div class="card-neural p-6">
       <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
         <h3 class="text-xs font-black uppercase tracking-[0.2em] text-primary"><%= type %> Pipelines</h3>

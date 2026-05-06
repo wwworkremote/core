@@ -18,6 +18,13 @@ class LLM::Orchestrator
                          (agent.respond_to?(:render_instructions) ? agent.render_instructions : "Process the data.")
     @schema = schema
     @model = model || @chat&.model || agent_model || LLM::Registry.default_model
+
+    # Self-healing: if no model found, attempt one sync (useful for tests/first-run)
+    if @model.nil?
+      LLM::Registry.sync
+      @model = LLM::Registry.default_model
+    end
+
     @metadata = metadata || {}
   end
 

@@ -7,7 +7,6 @@ RSpec.describe "Neural Dialogue UX", :js do
 
   before do
     driven_by :cuprite
-    LLM::Registry.sync
   end
 
   let!(:model) { create(:model, name: "Llama Local", model_id: "llama3.2:latest") }

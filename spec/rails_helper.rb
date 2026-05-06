@@ -61,6 +61,11 @@ rescue ActiveRecord::PendingMigrationError
   exit 1
 end
 RSpec.configure do |config|
+  config.before(:suite) do
+    # Sync LLM models once for the entire suite to ensure availability in system tests
+    LLM::Registry.sync
+  end
+
   config.example_status_persistence_file_path = "tmp/rspec_failures.txt"
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
@@ -72,6 +77,12 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  config.before(:each, type: :system) do
+    # System test specific LLM stub to avoid transactional visibility issues
+    test_model = Model.new(model_id: "test-model", provider: "ollama", name: "Test Model")
+    allow(LLM::Registry).to receive(:default_model).and_return(test_model)
+  end
+
   config.include FactoryBot::Syntax::Methods
 
   config.before do
@@ -79,6 +90,13 @@ RSpec.configure do |config|
   end
 
   config.before do
+    # Global stub for Vector Intelligence to prevent connection errors in tests
+    allow(VectorIntelligence).to receive(:embed)
+                               .and_return(Array.new(3584, 0.0))
+    # Also stub the low-level embedder just in case
+    allow(JobBoards::Embedder).to receive(:embed_text)
+                                 .and_return(Array.new(3584, 0.0))
+
     # Stub Geocoder
     Geocoder.configure(lookup: :test, ip_lookup: :test)
     Geocoder::Lookup::Test.add_stub(
