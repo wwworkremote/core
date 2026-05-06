@@ -15,9 +15,9 @@ RSpec.describe Geo::GeoipClient do
       allow(File).to receive(:exist?).and_return(true)
       mock_reader = instance_double(MaxMind::GeoIP2::Reader)
       allow(MaxMind::GeoIP2::Reader).to receive(:new).and_return(mock_reader)
-      
+
       client = described_class.build
-      expect(client).to be_a(Geo::GeoipClient)
+      expect(client).to be_a(described_class)
     end
   end
 

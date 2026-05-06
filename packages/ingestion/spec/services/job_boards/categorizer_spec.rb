@@ -18,7 +18,7 @@ RSpec.describe JobBoards::Categorizer do
       # Realistic JSON response from the LLM
       llm_json = {
         category: "Software Engineering",
-        tags: ["ruby", "rails"],
+        tags: %w[ruby rails],
         is_remote: true,
         remote_nuance: "Strictly remote",
         salary_min: 100_000,
@@ -62,7 +62,7 @@ RSpec.describe JobBoards::Categorizer do
       # Use allow and check later or use a more specific match
       expect(Rails.logger).to receive(:error).with(include("execution failed"))
       expect(Rails.logger).to receive(:error).with(include("Agent failed for Job"))
-      
+
       categorizer.call
     end
   end

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Domains", type: :request do
+RSpec.describe "Admin::Domains" do
   let!(:domain) { create(:domain, name: "example.com") }
 
   describe "GET /admin/domains" do

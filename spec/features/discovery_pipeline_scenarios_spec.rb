@@ -22,21 +22,21 @@ RSpec.describe "The Discovery & Ingestion Flow", :live, type: :system do
     row = find(".group", text: /\ACord\b/i, wait: 15)
     row.find("button", text: "FORCE").click
 
-    expect(page).to have_content(/successfully/i, wait: 20)
+    expect(page).to have_text(/successfully/i, wait: 20)
 
     # 2. Live Telemetry
     visit admin_root_path
 
     DiscoveryLink.create!(board_name: "Cord", url: "https://cord.com/jobs/999", status: "pending")
 
-    expect(page).to have_content(/DISCOVERED/i, wait: 15)
-    expect(page).to have_content("Cord")
+    expect(page).to have_text(/DISCOVERED/i, wait: 15)
+    expect(page).to have_text("Cord")
 
     # 3. Full Ingestion promotion
     create(:job_posting, title: "Neural Link Architect", company: "Cyberdyne",
                          source: JobBoards::Source.find_by(slug: "cord"))
 
-    expect(page).to have_content(/INGESTED/i, wait: 15)
-    expect(page).to have_content("Neural Link Architect")
+    expect(page).to have_text(/INGESTED/i, wait: 15)
+    expect(page).to have_text("Neural Link Architect")
   end
 end

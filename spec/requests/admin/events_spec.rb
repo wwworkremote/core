@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Events", type: :request do
+RSpec.describe "Admin::Events" do
   let!(:visit) { Ahoy::Visit.create!(started_at: Time.current) }
   let!(:event) { Ahoy::Event.create!(visit: visit, name: "Test Event", time: Time.current) }
 

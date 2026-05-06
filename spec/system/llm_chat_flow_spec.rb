@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Neural Dialogue UX", type: :system, js: true do
+RSpec.describe "Neural Dialogue UX", :js do
   include ActiveJob::TestHelper
 
   before do
@@ -15,10 +15,10 @@ RSpec.describe "Neural Dialogue UX", type: :system, js: true do
 
   it "allows a user to start a dialogue and receive a simulated response" do
     visit new_llm_chat_path
-    
+
     select model.name, from: "llm_chat[model_id]"
     fill_in "llm_chat[prompt]", with: "Explain Ruby blocks."
-    
+
     # Mock LLM for the initial prompt
     mock_output = "Ruby blocks are chunks of code."
     sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_output.to_json}}}]}\n\ndata: [DONE]\n"
@@ -37,7 +37,7 @@ RSpec.describe "Neural Dialogue UX", type: :system, js: true do
 
     # Send a follow up
     fill_in "Describe your objective...", with: "Give an example."
-    
+
     # Mock LLM for follow up
     mock_example = "3.times { puts 'hello' }"
     sse_example = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_example.to_json}}}]}\n\ndata: [DONE]\n"
@@ -45,7 +45,7 @@ RSpec.describe "Neural Dialogue UX", type: :system, js: true do
       .to_return(status: 200, body: sse_example, headers: { "Content-Type" => "text/event-stream" })
 
     click_on "Send"
-    
+
     # Trigger follow up job
     LLMChatResponseJob.perform_now(chat.id, "Give an example.")
 

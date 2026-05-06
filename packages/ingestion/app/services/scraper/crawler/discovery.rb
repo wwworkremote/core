@@ -10,34 +10,32 @@ class Scraper::Crawler::Discovery
   end
 
   def call
-    begin
-      Playwright.create(playwright_cli_executable_path: Rails.root.join("node_modules/.bin/playwright").to_s) do |playwright|
-        playwright.chromium.launch(headless: true) do |browser|
-          page = browser.new_page
-          # Set a timeout for the whole operation
-          page.default_timeout = 30_000 # 30 seconds
+    Playwright.create(playwright_cli_executable_path: Rails.root.join("node_modules/.bin/playwright").to_s) do |playwright|
+      playwright.chromium.launch(headless: true) do |browser|
+        page = browser.new_page
+        # Set a timeout for the whole operation
+        page.default_timeout = 30_000 # 30 seconds
 
-          page.goto(@base_url, waitUntil: "domcontentloaded")
-          page.wait_for_load_state(state: "networkidle")
+        page.goto(@base_url, waitUntil: "domcontentloaded")
+        page.wait_for_load_state(state: "networkidle")
 
-          # Discover links
-          all_links = page.eval_on_selector_all(@selector, "elements => elements.map(el => el.href)")
+        # Discover links
+        all_links = page.eval_on_selector_all(@selector, "elements => elements.map(el => el.href)")
 
-          # Filter links based on board-specific patterns to ensure we only get job details
-          job_links = filter_links(all_links)
+        # Filter links based on board-specific patterns to ensure we only get job details
+        job_links = filter_links(all_links)
 
-          job_links.uniq.each do |url|
-            DiscoveryLink.find_or_create_by!(board_name: @board_name, url: url) do |link|
-              link.status = "pending"
-            end
+        job_links.uniq.each do |url|
+          DiscoveryLink.find_or_create_by!(board_name: @board_name, url: url) do |link|
+            link.status = "pending"
           end
         end
       end
-    rescue Playwright::Error => e
-      Rails.logger.error "[Crawler::Discovery] Playwright error for #{@board_name} at #{@base_url}: #{e.message}"
-    rescue StandardError => e
-      Rails.logger.error "[Crawler::Discovery] Unexpected error for #{@board_name}: #{e.message}"
     end
+  rescue Playwright::Error => e
+    Rails.logger.error "[Crawler::Discovery] Playwright error for #{@board_name} at #{@base_url}: #{e.message}"
+  rescue StandardError => e
+    Rails.logger.error "[Crawler::Discovery] Unexpected error for #{@board_name}: #{e.message}"
   end
 
   private

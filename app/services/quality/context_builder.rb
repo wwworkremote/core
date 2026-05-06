@@ -26,7 +26,7 @@ class Quality::ContextBuilder
   end
 
   # Returns similar insights using vector search
-  def self.semantic_constraints_for(query_text, limit: 5)
+  def self.semantic_constraints_for(_query_text, limit: 5)
     # This requires the embedding to be populated
     # SystemInsight.nearest_neighbors(:embedding, embedding, distance: "cosine").limit(limit)
     ""

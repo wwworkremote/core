@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Queries", type: :request do
+RSpec.describe "Admin::Queries" do
   let!(:source) { create(:job_boards_source) }
   let!(:query) { create(:job_boards_query, job_boards_source: source) }
 

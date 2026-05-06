@@ -35,7 +35,7 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
     click_button "SYNC_FROM_YAML", wait: 10
 
     # Verify sync by checking for content that should be in the DB after sync
-    expect(page).to have_content(/Career Profile/i)
+    expect(page).to have_text(/Career Profile/i)
 
     # Wait for the record to be created in the background/transaction
     start_time = Time.current
@@ -52,12 +52,12 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
 
     # Use a very specific button matcher
     click_button "RUN_ALIGNMENT_SCAN"
-    expect(page).to have_content(/scan complete/i)
-    expect(page).to have_content("MATCH_CONFIDENCE: 92%")
+    expect(page).to have_text(/scan complete/i)
+    expect(page).to have_text("MATCH_CONFIDENCE: 92%")
 
     # 3. Priority Recognition
     visit root_path
-    expect(page).to have_content(job_posting.title)
-    expect(page).to have_content(/HIGH_CONFIDENCE/i)
+    expect(page).to have_text(job_posting.title)
+    expect(page).to have_text(/HIGH_CONFIDENCE/i)
   end
 end

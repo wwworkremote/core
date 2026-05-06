@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe LLM::BatchMatchJob, type: :job do
+RSpec.describe LLM::BatchMatchJob do
   let!(:user) { create(:user, email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) }
   let!(:profile) { create(:career_profile, user: user, resume_text: "I am a Ruby expert.") }
   let!(:ruby_job) { create(:job_posting, title: "Senior Ruby Engineer") }

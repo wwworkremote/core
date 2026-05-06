@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Companies", type: :request do
+RSpec.describe "Companies" do
   let!(:company) { create(:company, name: "Test Corp") }
   let!(:job) { create(:job_posting, company: company) }
   let(:user) { create(:user) }

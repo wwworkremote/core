@@ -12,11 +12,13 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  job_posting_id :bigint           not null
+#  job_search_id  :bigint
 #  user_id        :bigint           not null
 #
 # Indexes
 #
 #  index_user_job_postings_on_job_posting_id  (job_posting_id)
+#  index_user_job_postings_on_job_search_id   (job_search_id)
 #  index_user_job_postings_on_user_id         (user_id)
 #
 # Foreign Keys

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ApplicationJob, type: :job do
+RSpec.describe ApplicationJob do
   # Create a dummy job to test the base class behavior
   class TestDummyJob < ApplicationJob
     def perform
@@ -14,7 +14,7 @@ RSpec.describe ApplicationJob, type: :job do
     it "aborts performance if global pipelines are paused" do
       allow(SystemSetting).to receive(:paused?).and_return(true)
       expect(Rails.logger).to receive(:info).with(/cancelled due to global pause/)
-      
+
       job = TestDummyJob.new
       expect(job.perform_now).to be false
     end
@@ -24,7 +24,7 @@ RSpec.describe ApplicationJob, type: :job do
       allow(SystemSetting).to receive(:paused?).and_return(false)
       allow(SystemSetting).to receive(:job_cancelled?).with(job.job_id).and_return(true)
       expect(SystemSetting).to receive(:clear_job_cancellation!).with(job.job_id)
-      
+
       expect(job.perform_now).to be false
     end
   end

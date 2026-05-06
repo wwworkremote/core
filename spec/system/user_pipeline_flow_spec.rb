@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "User Pipeline UX", type: :system do
+RSpec.describe "User Pipeline UX" do
   let(:user) { User.find_or_create_by!(email: "mike@just3ws.com") { |u| u.name = "Mike"; u.password = "password" } }
   let!(:job) { create(:job_posting, title: "Neural Engineer", company: "Cyberdyne", body: "We build Skynet.") }
   let!(:career_profile) { create(:career_profile, user: user, resume_text: "I am a high-level software architect.") }
@@ -17,7 +17,7 @@ RSpec.describe "User Pipeline UX", type: :system do
     # 1. Favorite the job
     click_on "MARK_AS_FAVORITE"
     expect(page).to have_text(/RECORD_FAVORITED/i)
-    
+
     # 2. Run AI Match (Mocked)
     mock_output = "### AI ANALYSIS\n- **MATCH_CONFIDENCE**: 95%\n- **STRENGTHS**: Expert level."
     sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_output.to_json}}}]}\n\ndata: [DONE]\n"

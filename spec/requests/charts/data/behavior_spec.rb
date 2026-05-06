@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Charts::Data::Behavior", type: :request do
+RSpec.describe "Charts::Data::Behavior" do
   describe "GET /charts/data/behavior/visits" do
     it "returns JSON data for visits" do
       get charts_data_behavior_visits_path

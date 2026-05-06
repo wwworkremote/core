@@ -21,7 +21,7 @@ RSpec.describe "LLM Chat Automation", :js, :live do
     click_button "Establish Neural Link"
 
     # Verify redirection to chat
-    expect(page).to have_content("Neural link established.")
+    expect(page).to have_text("Neural link established.")
 
     # 2. Wait for assistant response (streamed)
     expect(page).to have_css(".chat-start .chat-bubble", wait: 30)

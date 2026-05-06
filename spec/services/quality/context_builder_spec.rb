@@ -6,13 +6,12 @@ RSpec.describe Quality::ContextBuilder do
   describe ".architectural_constraints_for" do
     let(:file_path) { "app/models/user.rb" }
     let!(:insight) do
-      create(:system_insight, 
-        tool: :rubocop, 
-        severity: :warning, 
-        file_path: file_path, 
-        message: "Prefer double quotes", 
-        line_number: 10
-      )
+      create(:system_insight,
+             tool: :rubocop,
+             severity: :warning,
+             file_path: file_path,
+             message: "Prefer double quotes",
+             line_number: 10)
     end
 
     it "formats active insights into a prompt section" do

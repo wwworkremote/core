@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_25_134031) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_06_021016) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -381,6 +381,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_134031) do
     t.index ["title"], name: "index_job_postings_on_title", opclass: :gin_trgm_ops, using: :gin
   end
 
+  create_table "job_searches", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "resume_id"
+    t.string "name", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resume_id"], name: "index_job_searches_on_resume_id"
+    t.index ["user_id"], name: "index_job_searches_on_user_id"
+  end
+
   create_table "llm_chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "model_id"
@@ -479,6 +490,42 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_134031) do
     t.bigint "user_id"
     t.index ["job_posting_id"], name: "index_pipeline_steps_on_job_posting_id"
     t.index ["user_id"], name: "index_pipeline_steps_on_user_id"
+  end
+
+  create_table "resume_skills", force: :cascade do |t|
+    t.bigint "resume_id", null: false
+    t.bigint "skill_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resume_id", "skill_id"], name: "index_resume_skills_on_resume_id_and_skill_id", unique: true
+    t.index ["resume_id"], name: "index_resume_skills_on_resume_id"
+    t.index ["skill_id"], name: "index_resume_skills_on_skill_id"
+  end
+
+  create_table "resumes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "parent_id"
+    t.string "name", null: false
+    t.integer "version", default: 1, null: false
+    t.string "status", default: "inactive", null: false
+    t.jsonb "content", default: {}, null: false
+    t.vector "embedding", limit: 3584
+    t.string "imported_from_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_resumes_on_parent_id"
+    t.index ["user_id", "name", "version"], name: "index_resumes_on_user_id_and_name_and_version", unique: true
+    t.index ["user_id"], name: "index_resumes_on_user_id"
+  end
+
+  create_table "skills", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "category"
+    t.text "description"
+    t.vector "embedding", limit: 3584
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_skills_on_name", unique: true
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -688,7 +735,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_134031) do
     t.datetime "updated_at", null: false
     t.text "match_analysis"
     t.boolean "priority_flag"
+    t.bigint "job_search_id"
     t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
+    t.index ["job_search_id"], name: "index_user_job_postings_on_job_search_id"
     t.index ["user_id"], name: "index_user_job_postings_on_user_id"
   end
 
@@ -751,12 +800,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_134031) do
   add_foreign_key "job_experiences", "career_profiles"
   add_foreign_key "job_postings", "companies"
   add_foreign_key "job_postings", "sources"
+  add_foreign_key "job_searches", "resumes"
+  add_foreign_key "job_searches", "users"
   add_foreign_key "llm_chats", "models"
   add_foreign_key "llm_messages", "llm_chats"
   add_foreign_key "llm_messages", "models"
   add_foreign_key "llm_messages", "tool_calls"
   add_foreign_key "pipeline_steps", "job_postings"
   add_foreign_key "pipeline_steps", "users"
+  add_foreign_key "resume_skills", "resumes"
+  add_foreign_key "resume_skills", "skills"
+  add_foreign_key "resumes", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

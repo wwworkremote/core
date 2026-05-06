@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Sources", type: :request do
+RSpec.describe "Admin::Sources" do
   let!(:source) { create(:job_boards_source) }
 
   describe "GET /admin/sources" do

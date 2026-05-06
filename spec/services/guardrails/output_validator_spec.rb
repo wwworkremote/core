@@ -19,7 +19,7 @@ RSpec.describe Guardrails::OutputValidator do
 
     it "validates JSON schema if provided" do
       schema = { "title" => String, "salary" => Integer }
-      
+
       # Valid JSON
       validator = described_class.new('{"title": "Dev", "salary": 100000}', schema: schema)
       expect(validator.call[:valid]).to be true

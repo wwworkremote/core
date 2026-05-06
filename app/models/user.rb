@@ -22,6 +22,8 @@ class User < ApplicationRecord
   has_secure_password
 
   has_one :career_profile, dependent: :destroy
+  has_many :resumes, dependent: :destroy
+  has_many :job_searches, dependent: :destroy
   has_many :user_job_postings, dependent: :destroy
   has_many :job_postings, through: :user_job_postings
   has_many :pipeline_steps, dependent: :destroy

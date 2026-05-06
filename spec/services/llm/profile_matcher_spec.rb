@@ -43,7 +43,7 @@ RSpec.describe LLM::ProfileMatcher do
       # CareerProfile creation above has resume_text. Let's make a new user without one.
       incomplete_user = create(:user, email: "incomplete@example.com")
       create(:career_profile, user: incomplete_user, resume_text: nil)
-      
+
       result = described_class.call(incomplete_user, job_posting)
       expect(result[:success]).to be false
       expect(result[:error]).to include("Profile incomplete")

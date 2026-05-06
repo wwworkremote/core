@@ -22,7 +22,7 @@ RSpec.describe LLM::JobSchedulerInspector do
   describe ".call" do
     it "categorizes and returns task info" do
       result = described_class.call
-      
+
       expect(result[:utilities].first[:id]).to eq("nightly_database_backup")
       expect(result[:pipeline].first[:id]).to eq("fetch_all_jobs")
       expect(result[:pipeline].first[:class_name]).to eq("DataAcquisition::RunAllJob")

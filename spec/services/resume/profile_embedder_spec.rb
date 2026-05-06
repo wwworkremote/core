@@ -23,7 +23,7 @@ RSpec.describe Resume::ProfileEmbedder do
 
       result = embedder.call
       expect(result).to be true
-      
+
       career_profile.reload
       expect(career_profile.embedding.size).to eq(3584)
     end
@@ -33,7 +33,7 @@ RSpec.describe Resume::ProfileEmbedder do
         .to_return(status: 503, body: "Down")
 
       expect(Rails.logger).to receive(:error).with(/API Error: 503/)
-      
+
       result = embedder.call
       expect(result).to be false
     end
@@ -41,7 +41,7 @@ RSpec.describe Resume::ProfileEmbedder do
     it "skips if disabled via ENV" do
       allow(ENV).to receive(:fetch).and_call_original
       allow(ENV).to receive(:[]).with("ENABLE_EMBEDDINGS").and_return("false")
-      
+
       expect(Faraday).not_to receive(:post)
       embedder.call
     end

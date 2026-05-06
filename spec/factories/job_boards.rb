@@ -7,12 +7,12 @@ FactoryBot.define do
   end
 
   factory :job_boards_query, class: "JobBoards::Query" do
-    association :job_boards_source
+    job_boards_source
   end
 
   factory :job_boards_document, class: "JobBoards::Document" do
-    association :job_boards_source
-    association :job_boards_query
+    job_boards_source
+    job_boards_query
     signature { SecureRandom.hex(16) }
     document { { title: "Ruby Dev" }.to_json }
     aasm_state { "pending" }

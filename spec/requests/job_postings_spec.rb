@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Job Postings", type: :request do
+RSpec.describe "Job Postings" do
   let(:origin) { Origin.find_or_create_by!(name: "Test Origin") }
   let(:source) { Source.find_or_create_by!(signature: "test-source", origin: origin) }
   let!(:job) {
@@ -37,8 +37,8 @@ RSpec.describe "Job Postings", type: :request do
     end
 
     it "filters out ignored and purged jobs by default" do
-      ignored_job = create(:job_posting, signature: "ignored-1", title: "Ignored Job", status: "ignored")
-      purged_job = create(:job_posting, signature: "purged-1", title: "Purged Job", status: "purged")
+      create(:job_posting, signature: "ignored-1", title: "Ignored Job", status: "ignored")
+      create(:job_posting, signature: "purged-1", title: "Purged Job", status: "purged")
 
       get job_postings_path
       expect(response.body).not_to include("Ignored Job")

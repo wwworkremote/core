@@ -15,11 +15,11 @@ RSpec.describe Resume::SemanticMatchFinder do
     it "finds nearest neighbors by cosine distance" do
       # 1. Create a match (similar embedding)
       match = create(:job_posting, embedding: embedding)
-      
+
       # 2. Create a non-match (different embedding)
       different_embedding = embedding.map { |v| v * -1 }
       non_match = create(:job_posting, embedding: different_embedding)
-      
+
       # 3. Create one without embedding
       no_embedding = create(:job_posting, embedding: nil)
 

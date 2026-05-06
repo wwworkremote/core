@@ -18,7 +18,8 @@ RSpec.describe EmailIngestion::Importer do
       instance_double(EmailIngestion::CanonicalUrlResolver, call: "https://indeed.com/job/1/canonical")
     )
     allow(JobFetchers::PageFetch).to receive(:new).and_return(
-      instance_double(JobFetchers::PageFetch, call: { content: "<html></html>", final_url: "https://indeed.com/job/1/canonical" })
+      instance_double(JobFetchers::PageFetch,
+                      call: { content: "<html></html>", final_url: "https://indeed.com/job/1/canonical" })
     )
     allow(JobFetchers::CanonicalJobExtractor).to receive(:new).and_return(
       instance_double(JobFetchers::CanonicalJobExtractor, call: { title: "Dev" })
@@ -42,7 +43,7 @@ RSpec.describe EmailIngestion::Importer do
 
     it "handles errors and updates record status" do
       allow(EmailIngestion::MessageParser).to receive(:new).and_raise(StandardError.new("Parse failed"))
-      
+
       importer.call
       record.reload
       expect(record.status).to eq("error")

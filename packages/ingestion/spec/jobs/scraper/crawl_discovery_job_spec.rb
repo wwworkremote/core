@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Scraper::CrawlDiscoveryJob, type: :job do
+RSpec.describe Scraper::CrawlDiscoveryJob do
   let(:board) { "BuiltIn" }
   let(:url) { "https://builtin.com/jobs" }
   let(:selector) { ".job-card" }

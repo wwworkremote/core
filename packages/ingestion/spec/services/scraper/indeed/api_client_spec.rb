@@ -6,7 +6,7 @@ RSpec.describe Scraper::Indeed::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "indeed", name: "Indeed") }
   let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-  
+
   let(:indeed_html) do
     <<~HTML
       <html>
@@ -27,9 +27,9 @@ RSpec.describe Scraper::Indeed::ApiClient do
       page_fetch_double = instance_double(JobFetchers::PageFetch)
       allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch_double)
       allow(page_fetch_double).to receive(:call).and_return({
-        content: indeed_html,
-        final_url: "https://www.indeed.com/jobs?q=Staff+Engineer&l=Remote"
-      })
+                                                              content: indeed_html,
+                                                              final_url: "https://www.indeed.com/jobs?q=Staff+Engineer&l=Remote"
+                                                            })
 
       expect {
         client.search("Staff Engineer", "Remote")

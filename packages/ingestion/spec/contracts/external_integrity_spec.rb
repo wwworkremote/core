@@ -19,7 +19,8 @@ RSpec.describe "External Ingestion Integrity" do
     it "verifies that CanonicalJobExtractor has a specific extraction method for each provider" do
       extractor = JobFetchers::CanonicalJobExtractor.new("<html></html>", "http://ex.com", "test")
       providers.each do |provider|
-        expect(extractor.private_methods).to include(:"extract_#{provider}"), "CanonicalJobExtractor is missing extract_#{provider} method"
+        expect(extractor.private_methods).to include(:"extract_#{provider}"),
+                                             "CanonicalJobExtractor is missing extract_#{provider} method"
       end
     end
   end

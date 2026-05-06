@@ -12,11 +12,13 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  job_posting_id :bigint           not null
+#  job_search_id  :bigint
 #  user_id        :bigint           not null
 #
 # Indexes
 #
 #  index_user_job_postings_on_job_posting_id  (job_posting_id)
+#  index_user_job_postings_on_job_search_id   (job_search_id)
 #  index_user_job_postings_on_user_id         (user_id)
 #
 # Foreign Keys
@@ -29,6 +31,7 @@ class UserJobPosting < ApplicationRecord
 
   belongs_to :user
   belongs_to :job_posting
+  belongs_to :job_search, optional: true
 
   aasm column: :status, whiny_persistence: true do
     state :none, initial: true

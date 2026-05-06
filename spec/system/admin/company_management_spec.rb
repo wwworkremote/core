@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin Company Management", type: :system do
+RSpec.describe "Admin Company Management" do
   let!(:company) { create(:company, name: "Cyberdyne", ingestion_enabled: true) }
   let!(:job) { create(:job_posting, company: company, status: "none", title: "Liquid Metal Specialist") }
 
@@ -10,14 +10,14 @@ RSpec.describe "Admin Company Management", type: :system do
     visit admin_companies_path
 
     expect(page).to have_text(/Cyberdyne/i)
-    
+
     # 1. Pause Ingestion
     click_button "PAUSE_INGESTION"
-    
+
     # Use specific selector and wait
     expect(page).to have_css(".alert-success", text: /Ingestion disabled for Cyberdyne/i, wait: 10)
     expect(page).to have_text(/OFFLINE/i)
-    
+
     # Verify side-effect: cascade purge
     expect(job.reload.status).to eq("purged")
 
@@ -25,7 +25,7 @@ RSpec.describe "Admin Company Management", type: :system do
     click_button "RESUME_INGESTION"
     expect(page).to have_css(".alert-success", text: /Ingestion resumed for Cyberdyne/i, wait: 10)
     expect(page).to have_text(/ACTIVE_SYNC/i)
-    
+
     company.reload
     expect(company.ingestion_enabled?).to be true
   end

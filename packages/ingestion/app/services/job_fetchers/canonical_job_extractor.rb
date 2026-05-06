@@ -106,7 +106,7 @@ class JobFetchers::CanonicalJobExtractor
       company: @doc.css("div.JobDetails_companyName__ksNxn").first&.text&.strip,
       location: @doc.css("div.JobDetails_location__mSAsu").first&.text&.strip,
       description: @doc.css("div.JobDetails_jobDescriptionWrapper__j9vYp").inner_html.presence ||
-                   @doc.css(".desc").inner_html,
+        @doc.css(".desc").inner_html,
       url: @url
     }
   end
@@ -127,7 +127,7 @@ class JobFetchers::CanonicalJobExtractor
       company: @doc.css('[data-company-name="true"], .jobsearch-InlineCompanyRating div').first&.text&.strip,
       location: @doc.css(".jobsearch-JobInfoHeader-subtitle div").last&.text&.strip,
       description: @doc.css("#jobDescriptionText").inner_html.presence ||
-                   @doc.css(".jobsearch-JobComponent-description").inner_html,
+        @doc.css(".jobsearch-JobComponent-description").inner_html,
       url: @url
     }
   end
@@ -158,7 +158,7 @@ class JobFetchers::CanonicalJobExtractor
       company: nil,
       location: nil,
       description: @doc.css("article, .description, .job-description").inner_html.presence ||
-                   @doc.css("body").inner_html,
+        @doc.css("body").inner_html,
       url: @url
     }
   end

@@ -15,7 +15,7 @@ RSpec.describe LLM::Orchestrator do
     it "executes the full chain including guardrails and real HTTP communication" do
       # Realistic SSE (Server-Sent Events) response body
       sse_body = <<~SSE
-        data: {"choices":[{"delta":{"content":"{\\n  \\\"title\\\": \\\"Senior Ruby Engineer\\\",\\n  \\\"company\\\": \\\"TestCorp\\\"\\n}"}}]}
+        data: {"choices":[{"delta":{"content":"{\\n  \\"title\\": \\"Senior Ruby Engineer\\",\\n  \\"company\\": \\"TestCorp\\"\\n}"}}]}
 
         data: [DONE]
       SSE

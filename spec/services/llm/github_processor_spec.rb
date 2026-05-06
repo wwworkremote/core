@@ -10,13 +10,13 @@ RSpec.describe LLM::GithubProcessor do
     before do
       # 1. Stub Repos
       stub_request(:get, "https://api.github.com/users/testuser/repos?per_page=20&sort=updated")
-        .to_return(status: 200, body: [{ name: "rails-core", description: "Fixing rails", language: "Ruby" }].to_json, 
+        .to_return(status: 200, body: [{ name: "rails-core", description: "Fixing rails", language: "Ruby" }].to_json,
                    headers: { "Content-Type" => "application/json" })
 
       # 2. Stub README
       readme_content = Base64.encode64("# Rails Core Fork\nExpert level stuff.")
       stub_request(:get, "https://api.github.com/repos/testuser/rails-core/readme")
-        .to_return(status: 200, body: { content: readme_content }.to_json, 
+        .to_return(status: 200, body: { content: readme_content }.to_json,
                    headers: { "Content-Type" => "application/json" })
 
       # 3. Stub LLM Orchestrator
@@ -26,7 +26,7 @@ RSpec.describe LLM::GithubProcessor do
     it "fetches GitHub data and updates profile synthesis" do
       result = processor.call
       expect(result[:success]).to be true
-      
+
       career_profile.reload
       expect(career_profile.github_context["synthesis"]).to eq("Expert Ruby Developer")
       expect(career_profile.github_context["repos"].first["name"]).to eq("rails-core")
@@ -41,9 +41,9 @@ RSpec.describe LLM::GithubProcessor do
 
     it "handles API failures gracefully" do
       stub_request(:get, /api.github.com/).to_return(status: 500)
-      
-      # It should return Success: true if LLM works even with 0 repos, 
-      # or handle it based on implementation. 
+
+      # It should return Success: true if LLM works even with 0 repos,
+      # or handle it based on implementation.
       # Current implementation returns success if synthesis exists.
       result = processor.call
       expect(result[:success]).to be true

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Models", type: :request do
+RSpec.describe "Admin::Models" do
   let!(:model) { create(:model, name: "Test Model") }
 
   describe "GET /admin/models" do

@@ -27,7 +27,7 @@ RSpec.describe JobBoards::Syncer do
     end
 
     it "handles deeply nested HTML without stack level too deep" do
-      deep_html = "<div>" * 100 + "Deep Job" + "</div>" * 100
+      deep_html = "#{'<div>' * 100}Deep Job#{'</div>' * 100}"
       JobBoards::Document.create!(
         job_boards_source: source,
         job_boards_query: query,

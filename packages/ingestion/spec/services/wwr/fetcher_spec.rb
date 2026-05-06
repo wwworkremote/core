@@ -39,9 +39,9 @@ RSpec.describe Wwr::Fetcher, type: :service do
       VCR.eject_cassette
       VCR.turned_off do
         stub_request(:get, /weworkremotely.com/).to_return(status: 429, body: "Too Many Requests")
-        
+
         expect(Rails.logger).to receive(:warn).with(/Circuit Breaker Tripped for wwr/).at_least(:once)
-        
+
         service.call(force: true)
         result = service.call(force: true)
         expect(result).to eq(:locked)

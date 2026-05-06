@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Quality::InsightEmbeddingJob, type: :job do
+RSpec.describe Quality::InsightEmbeddingJob do
   include ActiveJob::TestHelper
 
   let(:insight) { create(:system_insight, message: "Use double quotes", tool: :rubocop) }
@@ -39,9 +39,9 @@ RSpec.describe Quality::InsightEmbeddingJob, type: :job do
 
   it "logs an error if embedding generation fails" do
     allow(JobBoards::Embedder).to receive(:embed_text).and_return(nil)
-    
+
     expect(Rails.logger).to receive(:error).with(/Failed to generate embedding for Insight #{insight.id}/)
-    
+
     described_class.perform_now(insight.id)
     expect(insight.reload.embedding).to be_nil
   end
@@ -56,7 +56,7 @@ RSpec.describe Quality::InsightEmbeddingJob, type: :job do
   it "skips if embedding already present" do
     insight.update!(embedding: mock_embedding)
     expect(JobBoards::Embedder).not_to receive(:embed_text)
-    
+
     described_class.perform_now(insight.id)
   end
 end

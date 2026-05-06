@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "LLM Messages", type: :request do
+RSpec.describe "LLM Messages" do
   let!(:model) { create(:model) }
   let!(:chat) { LLMChat.create!(model: model) }
   let(:message_params) { { llm_message: { content: "Hello AI" } } }

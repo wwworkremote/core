@@ -2,14 +2,14 @@
 
 require "rails_helper"
 
-RSpec.describe "Api::V0::JobPostings", type: :request do
+RSpec.describe "Api::V0::JobPostings" do
   let!(:job) { create(:job_posting, title: "API Job") }
 
   describe "GET /api/v0/job_postings" do
     it "returns a list of job postings" do
       get api_v0_job_postings_path, as: :json
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json.first["title"]).to eq("API Job")
     end
   end
@@ -18,7 +18,7 @@ RSpec.describe "Api::V0::JobPostings", type: :request do
     it "returns a single job posting" do
       get api_v0_job_posting_path(job), as: :json
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["id"]).to eq(job.id)
     end
   end

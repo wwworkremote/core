@@ -59,7 +59,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     # For production use a specific allowlist.
     origins(%r{\Achrome-extension://})
 
-    resource '/api/*',
+    resource "/api/*",
              headers: :any,
              methods: %i[get post options],
              credentials: false
@@ -85,27 +85,31 @@ def enrich
   provider    = params[:provider] || detect_provider(params[:url].to_s)
 
   # Prefer user-reviewed structured data over re-extraction
-  if extracted['description_text'].present?
+  if extracted["description_text"].present?
     markdown_body = ReverseMarkdown.convert(
-      extracted['description_html'].presence || extracted['description_text'],
+      extracted["description_html"].presence || extracted["description_text"],
       unknown_tags: :bypass, github_flavored: true
     ).strip
   else
     job_data = JobFetchers::CanonicalJobExtractor.new(params[:html], params[:url], provider).call
-    markdown_body = (ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass,
-github_flavored: true).strip if job_data[:description].present?)
+    markdown_body = (if job_data[:description].present?
+                       ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass,
+                                                                       github_flavored: true).strip
+                     end)
   end
 
-  return render json: { success: false, error: 'No description found.' },
-status: :unprocessable_entity unless markdown_body
+  unless markdown_body
+    return render json: { success: false, error: "No description found." },
+                                  status: :unprocessable_entity
+  end
 
   attrs = {
     body: markdown_body,
-    crawl_status: 'enriched',
+    crawl_status: "enriched",
     enriched_at: Time.current
   }
-  attrs[:title]   = extracted['title']   if extracted['title'].present?
-  attrs[:company] = extracted['company'] if extracted['company'].present?
+  attrs[:title]   = extracted["title"]   if extracted["title"].present?
+  attrs[:company] = extracted["company"] if extracted["company"].present?
   # Map additional fields into job_posting.data JSONB as appropriate
 
   job_posting.update!(attrs)

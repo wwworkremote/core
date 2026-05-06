@@ -74,7 +74,7 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
 
-  config.before(:each) do
+  config.before do
     Rails.cache.clear
   end
 

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Contacts", type: :request do
+RSpec.describe "Contacts" do
   let!(:job) { create(:job_posting) }
   let(:contact_params) do
     {

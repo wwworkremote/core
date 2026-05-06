@@ -11,9 +11,9 @@ RSpec.describe Scraper::Crawler::Discovery do
     it "handles Playwright errors gracefully" do
       # Stub Playwright to raise an error
       allow(Playwright).to receive(:create).and_raise(Playwright::Error.new(message: "Timeout!"))
-      
+
       expect(Rails.logger).to receive(:error).with(/Playwright error/)
-      
+
       expect {
         discovery.call
       }.not_to raise_error
@@ -21,9 +21,9 @@ RSpec.describe Scraper::Crawler::Discovery do
 
     it "handles unexpected errors gracefully" do
       allow(Playwright).to receive(:create).and_raise(StandardError.new("Boom!"))
-      
+
       expect(Rails.logger).to receive(:error).with(/Unexpected error/)
-      
+
       expect {
         discovery.call
       }.not_to raise_error

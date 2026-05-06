@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe JobPostingsHelper, type: :helper do
+RSpec.describe JobPostingsHelper do
   describe "#safe_job_url" do
     it "returns the url if valid" do
       url = "https://example.com"

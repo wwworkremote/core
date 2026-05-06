@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Tasks", type: :request do
+RSpec.describe "Admin::Tasks" do
   let(:user) { create(:user) }
   let!(:job) { create(:job_posting) }
 

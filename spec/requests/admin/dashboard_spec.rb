@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Dashboard", type: :request do
+RSpec.describe "Admin::Dashboard" do
   describe "GET /admin" do
     it "returns a success response" do
       get admin_root_path
@@ -14,7 +14,7 @@ RSpec.describe "Admin::Dashboard", type: :request do
   describe "POST /admin/toggle_pause" do
     it "toggles the pipeline pause state" do
       expect(SystemSetting.paused?).to be false
-      
+
       post admin_toggle_pause_path
       expect(response).to redirect_to(admin_root_path)
       expect(flash[:alert]).to include("Emergency Brake Engaged")

@@ -6,7 +6,7 @@ RSpec.describe Scraper::Dice::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "dice", name: "Dice") }
   let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-  
+
   let(:dice_html) do
     <<~HTML
       <html>
@@ -26,9 +26,9 @@ RSpec.describe Scraper::Dice::ApiClient do
       page_fetch_double = instance_double(JobFetchers::PageFetch)
       allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch_double)
       allow(page_fetch_double).to receive(:call).and_return({
-        content: dice_html,
-        final_url: "https://www.dice.com/jobs?q=Ruby+on+Rails&l=Remote"
-      })
+                                                              content: dice_html,
+                                                              final_url: "https://www.dice.com/jobs?q=Ruby+on+Rails&l=Remote"
+                                                            })
 
       expect {
         client.search("Ruby on Rails", "Remote")

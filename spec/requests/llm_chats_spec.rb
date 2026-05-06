@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "LLM Chats", type: :request do
+RSpec.describe "LLM Chats" do
   let!(:model) { create(:model) }
   let!(:chat) { LLMChat.create!(model: model) }
   let(:chat_params) do

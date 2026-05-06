@@ -6,7 +6,7 @@ RSpec.describe Scraper::Glassdoor::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "glassdoor", name: "Glassdoor") }
   let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-  
+
   let(:glassdoor_html) do
     <<~HTML
       <html>
@@ -28,9 +28,9 @@ RSpec.describe Scraper::Glassdoor::ApiClient do
       page_fetch_double = instance_double(JobFetchers::PageFetch)
       allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch_double)
       allow(page_fetch_double).to receive(:call).and_return({
-        content: glassdoor_html,
-        final_url: "https://www.glassdoor.com/Job/jobs.htm"
-      })
+                                                              content: glassdoor_html,
+                                                              final_url: "https://www.glassdoor.com/Job/jobs.htm"
+                                                            })
 
       expect {
         client.search("Staff Ruby on Rails", "Remote")

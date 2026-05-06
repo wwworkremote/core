@@ -20,7 +20,7 @@ RSpec.describe LLM::CompanyAuditor do
         toxic_culture_flag: true,
         summary: "High burnout risk detected.",
         top_pros: ["Good pay"],
-        top_cons: ["Micromanagement", "Overtime"]
+        top_cons: %w[Micromanagement Overtime]
       }.to_json
 
       # Realistic SSE format for RubyLLM

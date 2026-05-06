@@ -19,7 +19,7 @@ RSpec.describe DataAcquisitionManager do
     it "returns the status of a specific fetcher" do
       create(:job_boards_source, slug: slug, name: "Adzuna")
       status = described_class.status(slug)
-      
+
       expect(status[:slug]).to eq(slug)
       expect(status).to have_key(:can_fetch)
       expect(status).to have_key(:time_until_reset)
@@ -47,10 +47,10 @@ RSpec.describe DataAcquisitionManager do
 
       it "successfully executes the fetcher and syncs" do
         expect(fetcher_double).to receive(:call).with(force: true).and_return(true)
-        
+
         result = described_class.run(slug, force: true)
         expect(result[:success]).to be true
-        
+
         source.reload
         expect(source.last_ingested_at).to be_present
       end
@@ -82,11 +82,11 @@ RSpec.describe DataAcquisitionManager do
 
       it "triggers a default search if no queries exist" do
         expect(Scraper::CrawlDiscoveryJob).to receive(:perform_later).with(
-          scraper_slug, 
-          /cord\.com/, 
+          scraper_slug,
+          /cord\.com/,
           any_args
         )
-        
+
         described_class.run(scraper_slug)
       end
     end
@@ -96,7 +96,7 @@ RSpec.describe DataAcquisitionManager do
     it "executes all registered fetchers" do
       # We just want to make sure it iterates and doesn't crash
       allow(described_class).to receive(:run).and_return({ success: true })
-      
+
       results = described_class.run_all
       expect(results.keys.size).to eq(described_class::FETCHERS.keys.size)
     end

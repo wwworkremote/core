@@ -20,7 +20,7 @@ RSpec.describe JobBoards::Syncer do
     it "handles existing job postings with the same signature gracefully" do
       # 1. Create an existing job posting
       create(:job_posting, signature: signature, title: "Original Job")
-      
+
       # 2. Create a document with the same signature
       JobBoards::Document.create!(
         source_id: source.id,
@@ -44,7 +44,7 @@ RSpec.describe JobBoards::Syncer do
     it "handles purged jobs by marking document as processed without recreating" do
       # 1. Create a purged job
       job = create(:job_posting, signature: signature, status: "purged")
-      
+
       # 2. Create document
       JobBoards::Document.create!(
         source_id: source.id,

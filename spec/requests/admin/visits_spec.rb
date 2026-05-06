@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Admin::Visits", type: :request do
+RSpec.describe "Admin::Visits" do
   let!(:visit) { Ahoy::Visit.create!(started_at: Time.current) }
 
   describe "GET /admin/visits" do

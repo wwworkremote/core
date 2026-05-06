@@ -2,12 +2,12 @@
 
 require "rails_helper"
 
-RSpec.describe "Ingestion Pipeline Hardening", type: :system do
+RSpec.describe "Ingestion Pipeline Hardening" do
   include ActiveJob::TestHelper
 
   let!(:source) { JobBoards::Source.find_or_create_by!(slug: "arbeitnow") { |s| s.name = "Arbeitnow" } }
   let!(:query) { JobBoards::Query.find_or_create_by!(source_id: source.id) }
-  
+
   let(:job_data) do
     {
       slug: "senior-ruby-engineer-123",
@@ -17,7 +17,7 @@ RSpec.describe "Ingestion Pipeline Hardening", type: :system do
       company_name: "Test Corp",
       location: "Remote",
       created_at: Time.current.to_i,
-      tags: ["ruby", "rails"]
+      tags: %w[ruby rails]
     }
   end
 
@@ -47,10 +47,10 @@ RSpec.describe "Ingestion Pipeline Hardening", type: :system do
     page_fetch_double = instance_double(JobFetchers::PageFetch)
     allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch_double)
     allow(page_fetch_double).to receive(:call).and_return({
-      final_url: job_data[:url],
-      content: "<html><body><div class='description'>#{enrichment_content}</div></body></html>"
-    })
-    
+                                                            final_url: job_data[:url],
+                                                            content: "<html><body><div class='description'>#{enrichment_content}</div></body></html>"
+                                                          })
+
     # Ensure pipelines are not paused
     SystemSetting.create!(key: "pipelines_paused", value: "false") unless SystemSetting.find_by(key: "pipelines_paused")
   end
@@ -62,9 +62,9 @@ RSpec.describe "Ingestion Pipeline Hardening", type: :system do
   it "executes the full ingestion sequence from UI trigger to Enriched JobPosting" do
     # Phase A: Trigger Ingestion via UI
     visit data_fetchers_path
-    
-    expect(page).to have_content("Arbeitnow")
-    
+
+    expect(page).to have_text("Arbeitnow")
+
     # Target the Arbeitnow row specifically
     within(".bg-base-300", text: "Arbeitnow") do
       click_button "Force"
@@ -87,7 +87,7 @@ RSpec.describe "Ingestion Pipeline Hardening", type: :system do
     # Phase C: Trigger Enrichment via UI
     visit data_fetchers_path
     expect(page).to have_text(/Pending Enrichment/i)
-    
+
     expect {
       click_on "START_ENRICHMENT"
     }.to have_enqueued_job(JobBoards::ContentEnrichmentJob)
@@ -99,7 +99,7 @@ RSpec.describe "Ingestion Pipeline Hardening", type: :system do
     expect(job.crawl_status).to eq("enriched")
     expect(job.body).to include("full job description after enrichment")
     expect(job.enriched_at).to be_present
-    
+
     visit admin_job_posting_path(job)
     expect(page).to have_text(/Senior Ruby Engineer/i)
     expect(page).to have_text(/Test Corp/i)
