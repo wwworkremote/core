@@ -17,9 +17,12 @@ class JobBoards::Categorizer
     @job_posting = job_posting
   end
 
-  def call
+  def call(force: false)
     # Skip if already categorized unless forced (to save local LLM tokens/resources)
-    return if @job_posting.data["ai_category"].present?
+    return if @job_posting.data["ai_category"].present? && !force
+
+    # Shield: Do not process categorization for expired/stale jobs unless forced
+    return if @job_posting.expired? && !force
 
     agent = JobBoards::CategorizerAgent.new
     result = agent.call(@job_posting)

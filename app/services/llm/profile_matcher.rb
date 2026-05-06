@@ -6,9 +6,15 @@ class LLM::ProfileMatcher
   # Executes the deep alignment scan and preparation.
   # @param user [User] The candidate being evaluated.
   # @param job_posting [JobPosting] The opportunity to analyze.
+  # @param force [Boolean] Skip staleness check if true.
   # @return [Hash] Success status and structured analysis output.
-  def self.call(user, job_posting)
+  def self.call(user, job_posting, force: false)
     profile = user.career_profile
+
+    # Shield: Do not process alignment for expired/stale jobs unless forced
+    if job_posting.expired? && !force
+      return { success: false, error: "Job posting is expired/stale. Analysis aborted." }
+    end
 
     # Debug logging for incomplete profiles
     unless profile&.resume_text.present? || profile&.work_experiences&.any? || profile&.resumes&.attached?

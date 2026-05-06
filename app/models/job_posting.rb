@@ -45,10 +45,14 @@ class JobPosting < ApplicationRecord
 
   aasm column: :status, whiny_persistence: true do
     state :none, initial: true
-    state :favorited, :applied, :interview, :offered, :archived, :ignored, :purged
+    state :favorited, :applied, :interview, :offered, :archived, :ignored, :purged, :expired
 
     event :favorite do
-      transitions from: %i[none archived ignored purged], to: :favorited
+      transitions from: %i[none archived ignored purged expired], to: :favorited
+    end
+
+    event :expire do
+      transitions from: %i[none favorited archived ignored], to: :expired
     end
 
     event :ignore do
@@ -113,6 +117,17 @@ class JobPosting < ApplicationRecord
   }
 
   scope :recent, -> { order(published_at: :desc) }
+
+  def freshness
+    return :stale if stale?
+    return :fresh if published_at > 24.hours.ago
+
+    :normal
+  end
+
+  def stale?
+    published_at < 72.hours.ago
+  end
 
   # Advanced full-text search
   pg_search_scope :search,
@@ -188,6 +203,7 @@ end
 #  location           :string
 #  longitude          :float
 #  published_at       :datetime
+#  seen_count         :integer          default(1), not null
 #  signature          :string           not null
 #  status             :string
 #  tags               :string           is an Array

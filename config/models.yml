@@ -1,9 +1,9 @@
 defaults:
-  primary: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf"
+  primary: "local"
   fallback: "claude-3-5-sonnet-20241022"
 
 models:
-  Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf:
+  local:
     name: "Qwen 2.5 Coder 7B (Local)"
     provider: "ollama"
     family: "qwen"

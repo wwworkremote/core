@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_06_021016) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_06_052537) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -366,6 +366,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_021016) do
     t.bigint "company_id"
     t.string "company_name"
     t.string "country_code"
+    t.integer "seen_count", default: 1, null: false
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["company", "published_at"], name: "index_job_postings_on_company_and_published_at", order: { published_at: :desc }
     t.index ["company_id"], name: "index_job_postings_on_company_id"

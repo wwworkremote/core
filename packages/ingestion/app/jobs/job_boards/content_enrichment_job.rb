@@ -10,7 +10,7 @@ class JobBoards::ContentEnrichmentJob < ApplicationJob
 
     # Find postings with missing bodies or pending enrichment
     targets = JobPosting.where(body: [nil, ""])
-                        .where.not(status: "archived")
+                        .where.not(status: %w[archived expired])
                         .where.not(target_url: [nil, ""])
                         .order(created_at: :desc)
                         .limit(limit)

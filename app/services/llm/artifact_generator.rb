@@ -1,18 +1,24 @@
 # frozen_string_literal: true
 
 class LLM::ArtifactGenerator
-  def self.call(user, job_posting)
-    new(user, job_posting).call
+  def self.call(user, job_posting, force: false)
+    new(user, job_posting, force: force).call
   end
 
-  def initialize(user, job_posting)
+  def initialize(user, job_posting, force: false)
     @user = user
     @job_posting = job_posting
     @profile = user.career_profile
+    @force = force
   end
 
   def call
     return { success: false, error: "Profile incomplete" } unless @profile&.work_experiences&.any?
+
+    # Shield: Do not generate artifacts for expired/stale jobs unless forced
+    if @job_posting.expired? && !@force
+      return { success: false, error: "Job posting is expired/stale. Generation aborted." }
+    end
 
     prompt = build_cover_letter_prompt
 

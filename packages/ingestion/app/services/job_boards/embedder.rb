@@ -8,9 +8,12 @@ class JobBoards::Embedder
     @job_posting = job_posting
   end
 
-  def call
+  def call(force: false)
     return unless enabled?
     return if @job_posting.body.blank? && @job_posting.title.blank?
+
+    # Shield: Do not process embeddings for expired/stale jobs unless forced
+    return if @job_posting.expired? && !force
 
     # Construct text for embedding
     input_text = "Title: #{@job_posting.title}\nCompany: #{@job_posting.company}\nDescription: #{@job_posting.body&.truncate(3000)}"

@@ -7,11 +7,14 @@ class JobBoards::GeocodingJob < ApplicationJob
   lightweight!
   idempotent! ->(id) { "geocoding/#{id}" }
 
-  def perform(job_posting_id)
+  def perform(job_posting_id, force: false)
     return if source_locked?("geocoding")
 
     job_posting = JobPosting.find_by(id: job_posting_id)
     return unless job_posting && job_posting.location.present?
+
+    # Shield: Do not process geocoding for expired/stale jobs unless forced
+    return if job_posting.expired? && !force
 
     begin
       # Geocoder.search returns an array of Geocoder::Result objects

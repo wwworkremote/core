@@ -16,6 +16,7 @@
 #  location           :string
 #  longitude          :float
 #  published_at       :datetime
+#  seen_count         :integer          default(1), not null
 #  signature          :string           not null
 #  status             :string
 #  tags               :string           is an Array
