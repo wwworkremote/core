@@ -29,7 +29,7 @@ RSpec.describe JobBoards::Categorizer do
       # Realistic SSE format for RubyLLM's streaming expectation
       sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{llm_json.inspect}}}]}\n\ndata: [DONE]\n"
 
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
 
       categorizer.call
@@ -44,7 +44,7 @@ RSpec.describe JobBoards::Categorizer do
       # LLM returns some chatter before/after valid JSON or just broken stuff
       bad_body = "data: {\"choices\":[{\"delta\":{\"content\":\"I am thinking... here is your data: { broken json\"}}]}\n\ndata: [DONE]\n"
 
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 200, body: bad_body, headers: { "Content-Type" => "text/event-stream" })
 
       expect {
@@ -56,7 +56,7 @@ RSpec.describe JobBoards::Categorizer do
     end
 
     it "handles LLM failures gracefully" do
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 500, body: "Internal Server Error")
 
       # Use allow and check later or use a more specific match

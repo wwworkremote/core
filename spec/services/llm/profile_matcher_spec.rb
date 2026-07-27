@@ -26,7 +26,7 @@ RSpec.describe LLM::ProfileMatcher do
       # Realistic SSE format for RubyLLM
       sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_output.to_json}}}]}\n\ndata: [DONE]\n"
 
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
 
       result = described_class.call(user, job_posting)
@@ -50,7 +50,7 @@ RSpec.describe LLM::ProfileMatcher do
     end
 
     it "handles LLM failures accurately" do
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 500, body: "Error")
 
       result = described_class.call(user, job_posting)

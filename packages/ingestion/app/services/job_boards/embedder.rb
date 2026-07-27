@@ -2,7 +2,7 @@
 
 class JobBoards::Embedder
   # Using local llama.cpp / v1 API endpoint
-  API_URL = "#{ENV.fetch('OLLAMA_API_BASE', 'http://localhost:8080/v1')}/embeddings".freeze
+  API_URL = "#{ENV.fetch('OLLAMA_API_BASE', 'http://localhost:11500/v1')}/embeddings".freeze
 
   def initialize(job_posting)
     @job_posting = job_posting

@@ -10,4 +10,9 @@ fi
 export RUBY_DEBUG_OPEN="true"
 export RUBY_DEBUG_LAZY="true"
 
+# Pin PORT explicitly: foreman defaults unset PORT to 5000 (base-port-per-process
+# convention), silently overriding config/puma.rb's 31000 default and colliding
+# with macOS ControlCenter/AirPlay Receiver, which squats 5000 by default.
+export PORT="${PORT:-31000}"
+
 exec foreman start -f Procfile.dev "$@"

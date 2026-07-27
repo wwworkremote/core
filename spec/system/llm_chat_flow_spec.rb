@@ -21,7 +21,7 @@ RSpec.describe "Neural Dialogue UX", :js do
     # Mock LLM for the initial prompt
     mock_output = "Ruby blocks are chunks of code."
     sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_output.to_json}}}]}\n\ndata: [DONE]\n"
-    stub_request(:post, "http://localhost:8080/v1/chat/completions")
+    stub_request(:post, "http://localhost:11500/v1/chat/completions")
       .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
 
     click_button "Establish Neural Link"
@@ -40,7 +40,7 @@ RSpec.describe "Neural Dialogue UX", :js do
     # Mock LLM for follow up
     mock_example = "3.times { puts 'hello' }"
     sse_example = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_example.to_json}}}]}\n\ndata: [DONE]\n"
-    stub_request(:post, "http://localhost:8080/v1/chat/completions")
+    stub_request(:post, "http://localhost:11500/v1/chat/completions")
       .to_return(status: 200, body: sse_example, headers: { "Content-Type" => "text/event-stream" })
 
     click_on "Send"

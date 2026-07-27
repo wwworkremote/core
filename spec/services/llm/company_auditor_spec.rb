@@ -26,7 +26,7 @@ RSpec.describe LLM::CompanyAuditor do
       # Realistic SSE format for RubyLLM
       sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{llm_json.inspect}}}]}\n\ndata: [DONE]\n"
 
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
 
       result = auditor.call
@@ -40,7 +40,7 @@ RSpec.describe LLM::CompanyAuditor do
     end
 
     it "handles LLM failures gracefully" do
-      stub_request(:post, "http://localhost:8080/v1/chat/completions")
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 500, body: "Internal Server Error")
 
       result = auditor.call

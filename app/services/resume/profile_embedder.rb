@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Resume::ProfileEmbedder
-  API_URL = "#{ENV.fetch('OLLAMA_API_BASE', 'http://localhost:8080/v1')}/embeddings".freeze
+  API_URL = "#{ENV.fetch('OLLAMA_API_BASE', 'http://localhost:11500/v1')}/embeddings".freeze
 
   def initialize(career_profile)
     @career_profile = career_profile

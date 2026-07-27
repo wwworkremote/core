@@ -39,7 +39,7 @@ There is no Docker/Ollama dependency; the server exposes an OpenAI-compatible AP
 
 | Setting | Value |
 | :--- | :--- |
-| Endpoint | `http://127.0.0.1:8080/v1` |
+| Endpoint | `http://127.0.0.1:11500/v1` |
 | Model alias (use in all API calls) | `local` |
 | Active model | Qwen 2.5 Coder 7B Instruct (Q4_K_M) |
 | Profiles | `standard`, `reasoning`, `constrained`, `embed` |
@@ -60,8 +60,8 @@ llama-ctl install && llama-ctl restart
 ## RubyLLM Configuration (`config/initializers/00_ruby_llm.rb`)
 
 ```ruby
-config.openai_api_base  = "http://localhost:8080/v1"   # inference
-config.ollama_api_base  = "http://localhost:8080/v1"   # embeddings
+config.openai_api_base  = "http://localhost:11500/v1"   # inference
+config.ollama_api_base  = "http://localhost:11500/v1"   # embeddings
 config.openai_use_system_role = true                   # llama.cpp needs 'system' not 'developer'
 config.use_new_acts_as = true
 ```

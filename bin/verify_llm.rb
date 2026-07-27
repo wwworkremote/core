@@ -14,14 +14,14 @@
 #
 # Usage:
 #   ruby bin/verify_llm.rb            # default endpoint
-#   OLLAMA_API_BASE=http://host:8080/v1 ruby bin/verify_llm.rb
+#   OLLAMA_API_BASE=http://host:11500/v1 ruby bin/verify_llm.rb
 
 require 'net/http'
 require 'json'
 require 'benchmark'
 require 'uri'
 
-BASE = (ENV.fetch('OLLAMA_API_BASE', 'http://127.0.0.1:8080/v1')).sub(%r{/v1/?$}, '')
+BASE = (ENV.fetch('OLLAMA_API_BASE', 'http://127.0.0.1:11500/v1')).sub(%r{/v1/?$}, '')
 MODEL = 'local'.freeze
 SENTINEL = 'NEURAL_LINK_ESTABLISHED'.freeze
 INFERENCE_TIMEOUT_S = 90  # cold start loads GGUF weights into Metal; allow extra headroom

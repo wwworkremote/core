@@ -57,7 +57,7 @@ Chrome extension that captures structured job data from third-party job boards a
 The extension sends HTTP Basic Auth credentials to the Rails API. Set your credentials once in the popup:
 
 1. Click the extension icon in the toolbar
-2. Enter the **API endpoint** (default: `http://localhost:3010`)
+2. Enter the **API endpoint** (default: `http://localhost:31000`)
 3. Enter your **Admin email** and **Admin password** (matching `ADMIN_EMAIL` / `ADMIN_PASSWORD` in Rails `.env`)
 4. Click **SAVE** (or press Enter)
 

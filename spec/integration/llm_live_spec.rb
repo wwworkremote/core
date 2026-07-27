@@ -14,7 +14,7 @@ require "net/http"
 #
 # For CI pre-flight use bin/verify_llm.rb instead (no Rails boot required).
 
-LLAMA_BASE = ENV.fetch("OLLAMA_API_BASE", "http://127.0.0.1:8080/v1").sub(%r{/v1/?$}, "").freeze
+LLAMA_BASE = ENV.fetch("OLLAMA_API_BASE", "http://127.0.0.1:11500/v1").sub(%r{/v1/?$}, "").freeze
 
 RSpec.describe "llama.cpp live integration", :live do
   # ── Server sanity ──────────────────────────────────────────────────────────
