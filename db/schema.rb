@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_28_155214) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -95,51 +95,51 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
 
   create_table "board_queries", force: :cascade do |t|
     t.string "board_name"
-    t.text "terms"
-    t.boolean "remote"
+    t.datetime "created_at", null: false
     t.integer "priority"
     t.json "query_params"
-    t.datetime "created_at", null: false
+    t.boolean "remote"
+    t.text "terms"
     t.datetime "updated_at", null: false
   end
 
   create_table "career_profiles", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.text "resume_text"
-    t.text "goals"
-    t.text "skills"
-    t.string "experience_level"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.jsonb "contact_info"
-    t.jsonb "location_info"
+    t.datetime "created_at", null: false
     t.vector "embedding", limit: 3584
-    t.string "github_url"
+    t.string "experience_level"
     t.jsonb "github_context"
+    t.string "github_url"
+    t.text "goals"
+    t.jsonb "location_info"
+    t.text "resume_text"
+    t.text "skills"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_career_profiles_on_user_id"
   end
 
   create_table "companies", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "disposition"
+    t.jsonb "glassdoor_data"
+    t.boolean "ingestion_enabled", default: true, null: false
     t.string "name"
+    t.float "sentiment_score"
     t.string "slug"
     t.string "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.jsonb "glassdoor_data"
-    t.float "sentiment_score"
-    t.string "disposition"
     t.boolean "toxic_culture_flag"
-    t.boolean "ingestion_enabled", default: true, null: false
+    t.datetime "updated_at", null: false
     t.index ["name"], name: "index_companies_on_name", unique: true
     t.index ["slug"], name: "index_companies_on_slug"
   end
 
   create_table "company_pipeline_steps", force: :cascade do |t|
     t.bigint "company_id", null: false
-    t.string "status"
-    t.text "note"
-    t.string "link"
     t.datetime "created_at", null: false
+    t.string "link"
+    t.text "note"
+    t.string "status"
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["company_id"], name: "index_company_pipeline_steps_on_company_id"
@@ -147,13 +147,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string "name"
-    t.string "email"
-    t.string "phone"
-    t.string "role"
-    t.string "relationship_type"
-    t.bigint "job_posting_id", null: false
     t.datetime "created_at", null: false
+    t.string "email"
+    t.bigint "job_posting_id", null: false
+    t.string "name"
+    t.string "phone"
+    t.string "relationship_type"
+    t.string "role"
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["job_posting_id"], name: "index_contacts_on_job_posting_id"
@@ -162,11 +162,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
 
   create_table "discovery_links", force: :cascade do |t|
     t.string "board_name"
-    t.string "url"
-    t.string "status"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "error_message"
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.string "url"
     t.index ["url"], name: "index_discovery_links_on_url"
   end
 
@@ -179,14 +179,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "email_import_records", force: :cascade do |t|
-    t.string "message_id"
-    t.string "file_path"
+    t.datetime "created_at", null: false
+    t.text "error_message"
     t.string "file_checksum"
+    t.string "file_path"
+    t.string "message_id"
+    t.datetime "processed_at"
     t.string "source"
     t.string "status"
-    t.text "error_message"
-    t.datetime "processed_at"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["file_checksum"], name: "index_email_import_records_on_file_checksum"
     t.index ["message_id"], name: "index_email_import_records_on_message_id"
@@ -223,11 +223,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "experience_highlights", force: :cascade do |t|
-    t.bigint "work_experience_id", null: false
+    t.datetime "created_at", null: false
     t.string "label"
     t.text "text"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "work_experience_id", null: false
     t.index ["work_experience_id"], name: "index_experience_highlights_on_work_experience_id"
   end
 
@@ -258,38 +258,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "interview_questions", force: :cascade do |t|
-    t.bigint "interview_session_id", null: false
-    t.text "question_text"
     t.text "answer_text"
     t.string "category"
     t.datetime "created_at", null: false
+    t.bigint "interview_session_id", null: false
+    t.text "question_text"
     t.datetime "updated_at", null: false
     t.index ["interview_session_id"], name: "index_interview_questions_on_interview_session_id"
   end
 
   create_table "interview_sessions", force: :cascade do |t|
-    t.bigint "job_posting_id", null: false
-    t.bigint "user_id", null: false
-    t.string "session_type"
-    t.datetime "scheduled_at"
-    t.string "vibe"
-    t.text "notes"
-    t.text "feedback"
     t.datetime "created_at", null: false
+    t.text "feedback"
+    t.bigint "job_posting_id", null: false
+    t.text "notes"
+    t.datetime "scheduled_at"
+    t.string "session_type"
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "vibe"
     t.index ["job_posting_id"], name: "index_interview_sessions_on_job_posting_id"
     t.index ["user_id"], name: "index_interview_sessions_on_user_id"
   end
 
   create_table "interview_tasks", force: :cascade do |t|
-    t.bigint "job_posting_id", null: false
-    t.bigint "user_id", null: false
-    t.string "title"
+    t.datetime "created_at", null: false
     t.text "description"
     t.datetime "due_at"
+    t.bigint "job_posting_id", null: false
     t.string "status"
-    t.datetime "created_at", null: false
+    t.string "title"
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["job_posting_id"], name: "index_interview_tasks_on_job_posting_id"
     t.index ["user_id"], name: "index_interview_tasks_on_user_id"
   end
@@ -321,24 +321,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
     t.string "aasm_state"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.jsonb "data", default: {}, null: false
+    t.integer "job_boards_documents_count", default: 0, null: false
+    t.datetime "last_ingested_at"
+    t.datetime "last_synced_at"
     t.string "name", null: false
     t.string "slug"
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.datetime "last_synced_at"
-    t.datetime "last_ingested_at"
-    t.integer "job_boards_documents_count", default: 0, null: false
     t.index ["slug"], name: "index_job_boards_sources_on_slug", unique: true
   end
 
   create_table "job_experiences", force: :cascade do |t|
     t.bigint "career_profile_id", null: false
-    t.string "title"
     t.string "company"
-    t.date "start_date"
-    t.date "end_date"
+    t.datetime "created_at", null: false
     t.boolean "current"
     t.text "description"
-    t.datetime "created_at", null: false
+    t.date "end_date"
+    t.date "start_date"
+    t.string "title"
     t.datetime "updated_at", null: false
     t.index ["career_profile_id"], name: "index_job_experiences_on_career_profile_id"
   end
@@ -346,28 +346,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   create_table "job_postings", force: :cascade do |t|
     t.string "body"
     t.string "company"
+    t.bigint "company_id"
+    t.string "company_name"
+    t.string "country_code"
+    t.string "crawl_status"
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
     t.vector "embedding", limit: 3584
+    t.datetime "enriched_at"
     t.string "external_author_id"
     t.string "external_id"
     t.float "latitude"
     t.string "location"
     t.float "longitude"
     t.datetime "published_at"
+    t.integer "seen_count", default: 1, null: false
     t.string "signature", null: false
     t.bigint "source_id"
+    t.string "status"
     t.string "tags", array: true
     t.string "target_url"
     t.string "title"
     t.datetime "updated_at", null: false
-    t.string "status"
-    t.datetime "enriched_at"
-    t.string "crawl_status"
-    t.bigint "company_id"
-    t.string "company_name"
-    t.string "country_code"
-    t.integer "seen_count", default: 1, null: false
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["company", "published_at"], name: "index_job_postings_on_company_and_published_at", order: { published_at: :desc }
     t.index ["company_id"], name: "index_job_postings_on_company_id"
@@ -384,12 +384,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "job_searches", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "resume_id"
-    t.string "name", null: false
-    t.string "status", default: "active", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "resume_id"
+    t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["resume_id"], name: "index_job_searches_on_resume_id"
     t.index ["user_id"], name: "index_job_searches_on_user_id"
   end
@@ -482,22 +482,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "pipeline_steps", force: :cascade do |t|
-    t.bigint "job_posting_id", null: false
-    t.string "status"
-    t.text "notes"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.bigint "job_posting_id", null: false
     t.string "link"
     t.text "note"
+    t.text "notes"
+    t.string "status"
+    t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["job_posting_id"], name: "index_pipeline_steps_on_job_posting_id"
     t.index ["user_id"], name: "index_pipeline_steps_on_user_id"
   end
 
   create_table "resume_skills", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.bigint "resume_id", null: false
     t.bigint "skill_id", null: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["resume_id", "skill_id"], name: "index_resume_skills_on_resume_id_and_skill_id", unique: true
     t.index ["resume_id"], name: "index_resume_skills_on_resume_id"
@@ -505,27 +505,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "resumes", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "parent_id"
-    t.string "name", null: false
-    t.integer "version", default: 1, null: false
-    t.string "status", default: "inactive", null: false
     t.jsonb "content", default: {}, null: false
+    t.datetime "created_at", null: false
     t.vector "embedding", limit: 3584
     t.string "imported_from_url"
-    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "parent_id"
+    t.string "status", default: "inactive", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "version", default: 1, null: false
     t.index ["parent_id"], name: "index_resumes_on_parent_id"
     t.index ["user_id", "name", "version"], name: "index_resumes_on_user_id_and_name_and_version", unique: true
     t.index ["user_id"], name: "index_resumes_on_user_id"
   end
 
   create_table "skills", force: :cascade do |t|
-    t.string "name", null: false
     t.string "category"
+    t.datetime "created_at", null: false
     t.text "description"
     t.vector "embedding", limit: 3584
-    t.datetime "created_at", null: false
+    t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_skills_on_name", unique: true
   end
@@ -596,8 +596,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "solid_queue_pauses", force: :cascade do |t|
-    t.string "queue_name", null: false
     t.datetime "created_at", null: false
+    t.string "queue_name", null: false
     t.index ["queue_name"], name: "index_solid_queue_pauses_on_queue_name", unique: true
   end
 
@@ -607,9 +607,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
     t.string "kind", null: false
     t.datetime "last_heartbeat_at", null: false
     t.text "metadata"
+    t.string "name"
     t.integer "pid", null: false
     t.bigint "supervisor_id"
-    t.string "name"
     t.index ["last_heartbeat_at"], name: "index_solid_queue_processes_on_last_heartbeat_at"
     t.index ["supervisor_id"], name: "index_solid_queue_processes_on_supervisor_id"
   end
@@ -684,25 +684,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "system_insights", force: :cascade do |t|
-    t.integer "tool"
-    t.integer "severity"
-    t.text "message"
+    t.boolean "active", default: true
+    t.text "context"
+    t.datetime "created_at", null: false
+    t.vector "embedding", limit: 3584
     t.string "file_path"
     t.integer "line_number"
-    t.text "context"
-    t.boolean "active", default: true
-    t.vector "embedding", limit: 3584
-    t.datetime "created_at", null: false
+    t.text "message"
+    t.integer "severity"
+    t.integer "tool"
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_system_insights_on_active"
     t.index ["file_path"], name: "index_system_insights_on_file_path"
   end
 
   create_table "system_settings", force: :cascade do |t|
-    t.string "key"
-    t.string "value"
     t.datetime "created_at", null: false
+    t.string "key"
     t.datetime "updated_at", null: false
+    t.string "value"
     t.index ["key"], name: "index_system_settings_on_key"
   end
 
@@ -729,15 +729,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "user_job_postings", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "job_posting_id", null: false
-    t.string "status"
-    t.text "notes"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "match_analysis"
-    t.boolean "priority_flag"
+    t.bigint "job_posting_id", null: false
     t.bigint "job_search_id"
+    t.text "match_analysis"
+    t.text "notes"
+    t.boolean "priority_flag"
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
     t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
     t.index ["job_search_id"], name: "index_user_job_postings_on_job_search_id"
     t.index ["user_id"], name: "index_user_job_postings_on_user_id"
@@ -748,9 +748,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
     t.string "email", default: "", null: false
     t.string "name", null: false
     t.string "password_digest"
+    t.text "preferred_countries", default: [], array: true
     t.string "slug", null: false
     t.datetime "updated_at", null: false
-    t.text "preferred_countries", default: [], array: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["slug"], name: "index_users_on_slug", unique: true
   end
@@ -766,22 +766,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   end
 
   create_table "work_experiences", force: :cascade do |t|
+    t.text "action"
     t.bigint "career_profile_id", null: false
     t.string "company_name"
-    t.string "location"
-    t.string "title"
-    t.string "employment_type"
-    t.date "start_date"
-    t.date "end_date"
     t.text "context"
-    t.text "description"
-    t.text "summary"
-    t.text "action"
-    t.text "impact"
-    t.jsonb "scope"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.text "description"
+    t.string "employment_type"
+    t.date "end_date"
     t.string "external_id"
+    t.text "impact"
+    t.string "location"
+    t.jsonb "scope"
+    t.date "start_date"
+    t.text "summary"
+    t.string "title"
+    t.datetime "updated_at", null: false
     t.index ["career_profile_id"], name: "index_work_experiences_on_career_profile_id"
     t.index ["external_id"], name: "index_work_experiences_on_external_id"
   end

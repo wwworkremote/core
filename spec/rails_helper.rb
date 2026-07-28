@@ -3,9 +3,9 @@
 
 require "simplecov"
 SimpleCov.start "rails" do
-  add_filter "app/controllers/concerns/authenticatable.rb"
-  add_group "LLM Services", "app/services/LLM"
-  add_group "Scrapers", "app/services/scraper"
+  skip "app/controllers/concerns/authenticatable.rb"
+  group "LLM Services", "app/services/LLM"
+  group "Scrapers", "app/services/scraper"
 end
 
 require "spec_helper"
