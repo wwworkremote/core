@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class UserJobPostingsController < ApplicationController
+  ALLOWED_STATUS_EVENTS = %w[favorite apply interview offer archive].freeze
+
+  before_action :set_job_posting, only: %i[create analyze_match generate_artifacts]
+
   def index
     @user_job_postings = current_user.user_job_postings.includes(:job_posting).order(created_at: :desc)
     @favorites = @user_job_postings.where(status: "favorited")
@@ -8,24 +12,8 @@ class UserJobPostingsController < ApplicationController
   end
 
   def create
-    @job_posting = JobPosting.find(params.expect(:job_posting_id))
-    @user_job_posting = current_user.user_job_postings.find_or_initialize_by(job_posting: @job_posting)
-    @user_job_posting.job_search_id = params[:job_search_id] if params[:job_search_id].present?
-
-    if params[:status].present?
-      # Whitelist AASM events for UserJobPosting
-      allowed_events = %w[favorite apply interview offer archive]
-      if allowed_events.include?(params[:status])
-        @user_job_posting.send("#{params[:status]}!")
-
-        # Log to pipeline as well
-        current_user.pipeline_steps.create!(
-          job_posting: @job_posting,
-          status: params[:status],
-          note: "User marked as #{params[:status]}"
-        )
-      end
-    end
+    build_user_job_posting
+    apply_status_event(params[:status]) if params[:status].present?
 
     redirect_back_or_to(job_posting_path(@job_posting), notice: "Job status updated.")
   end
@@ -33,6 +21,7 @@ class UserJobPostingsController < ApplicationController
   def update
     @user_job_posting = current_user.user_job_postings.find(params.expect(:id))
     return unless @user_job_posting.update(user_job_posting_params)
+
     redirect_back_or_to(user_job_postings_path, notice: "Job record updated.")
   end
 
@@ -43,35 +32,54 @@ class UserJobPostingsController < ApplicationController
   end
 
   def analyze_match
-    @job_posting = JobPosting.find(params.expect(:job_posting_id))
-
-    # We call this synchronously for now to provide immediate feedback,
-    # but could be moved to an ActiveJob if it takes too long.
-    result = LLM::ProfileMatcher.call(current_user, @job_posting, force: params[:force] == "true")
-
-    if result[:success]
-      flash[:notice] = "AI alignment scan complete."
-    else
-      flash[:alert] = "Scan failed: #{result[:error]}"
-    end
-
+    result = LLM::ProfileMatcher.call(current_user, @job_posting, force: forced?)
+    flash_llm_result(result, success: "AI alignment scan complete.", failure: "Scan failed")
     redirect_back_or_to(job_posting_path(@job_posting))
   end
 
   def generate_artifacts
-    @job_posting = JobPosting.find(params.expect(:job_posting_id))
-    result = LLM::ArtifactGenerator.call(current_user, @job_posting, force: params[:force] == "true")
-
-    if result[:success]
-      flash[:notice] = "Bespoke application artifacts generated and appended to notes."
-    else
-      flash[:alert] = "Generation failed: #{result[:error]}"
-    end
-
+    result = LLM::ArtifactGenerator.call(current_user, @job_posting, force: forced?)
+    flash_llm_result(result, success: "Bespoke application artifacts generated and appended to notes.",
+                             failure: "Generation failed")
     redirect_back_or_to(job_posting_path(@job_posting))
   end
 
   private
+
+  def set_job_posting
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
+  end
+
+  def build_user_job_posting
+    @user_job_posting = current_user.user_job_postings.find_or_initialize_by(job_posting: @job_posting)
+    assign_job_search_id
+    @user_job_posting.save!
+  end
+
+  def assign_job_search_id
+    @user_job_posting.job_search_id = params[:job_search_id] if params[:job_search_id].present?
+  end
+
+  # Log to pipeline as well as applying the AASM event, so the pipeline
+  # timeline reflects user-initiated status changes.
+  def apply_status_event(status)
+    return unless ALLOWED_STATUS_EVENTS.include?(status)
+
+    @user_job_posting.send("#{status}!")
+    current_user.pipeline_steps.create!(job_posting: @job_posting, status: status, note: "User marked as #{status}")
+  end
+
+  def forced?
+    params[:force] == "true"
+  end
+
+  def flash_llm_result(result, success:, failure:)
+    if result[:success]
+      flash[:notice] = success
+    else
+      flash[:alert] = "#{failure}: #{result[:error]}"
+    end
+  end
 
   def user_job_posting_params
     params.expect(user_job_posting: %i[status notes])
