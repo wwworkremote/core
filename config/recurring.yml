@@ -37,6 +37,10 @@ development:
     class: DatabaseBackupJob
     schedule: every day at 3am
 
+  expire_stale_postings:
+    class: JobLifecycle::ExpirySweepJob
+    schedule: every day at 4:30am
+
 
 production:
   fetch_all_jobs:
@@ -75,3 +79,7 @@ production:
   nightly_database_backup:
     class: DatabaseBackupJob
     schedule: every day at 3am
+
+  expire_stale_postings:
+    class: JobLifecycle::ExpirySweepJob
+    schedule: every day at 4:30am
