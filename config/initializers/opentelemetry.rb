@@ -12,14 +12,7 @@ Rails.application.config.after_initialize do
   # Also disable if explicitly requested
   next if ENV["SKIP_OTEL"] || (defined?(Puma) && Puma.respond_to?(:jruby?) && Puma.jruby?)
 
-  # MacOS Fork Safety: OpenTelemetry can crash if initialized before fork.
-  # Solid Queue and Puma both fork.
-  if RUBY_PLATFORM.include?("darwin") && !defined?(Puma) && !defined?(SolidQueue)
-    # If we are in the master process on Mac, we often want to defer SDK start
-    # but for local dev we just want it to not scream if it fails.
-  end
-
-  begin
+  configure_otel = lambda do
     OpenTelemetry::SDK.configure do |c|
       c.service_name = "wwworkremote"
       c.use "OpenTelemetry::Instrumentation::Rails"
@@ -29,5 +22,24 @@ Rails.application.config.after_initialize do
     end
   rescue StandardError => e
     Rails.logger.warn "[OTel] Failed to initialize: #{e.message}"
+  end
+
+  configure_otel.call
+
+  # MacOS Fork Safety: BatchSpanProcessor's Mutex objects are created once and
+  # never reset on fork (only its span buffer/thread are, via reset_on_fork) --
+  # if Solid Queue forks a worker while the parent's background export thread
+  # holds @export_mutex mid-flush, the child inherits that Mutex's state with
+  # no owning thread, which can corrupt the next gzip-compressed export
+  # ("gzip: invalid header" from a torn Zlib stream). Confirmed via jobs.log:
+  # happened exactly at process shutdown/restart boundaries, never during
+  # live operation. Solid Queue's on_start hook runs after boot, inside each
+  # forked child (Processes::Runnable#start -> fork(&block) -> boot -> Life-
+  # cycleHooks#run_start_hooks), so reconfiguring OTel there discards the
+  # fork-inherited Mutex objects and builds fresh ones per child.
+  if defined?(SolidQueue)
+    [SolidQueue::Worker, SolidQueue::Dispatcher, SolidQueue::Scheduler].each do |klass|
+      klass.on_start { configure_otel.call }
+    end
   end
 end

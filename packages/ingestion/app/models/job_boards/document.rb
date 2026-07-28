@@ -21,7 +21,8 @@
 #  index_job_boards_documents_on_source_id            (source_id)
 #
 class JobBoards::Document < ApplicationRecord
-  belongs_to :job_boards_source, class_name: "JobBoards::Source", foreign_key: "source_id"
+  belongs_to :job_boards_source, class_name: "JobBoards::Source", foreign_key: "source_id",
+                                 counter_cache: :job_boards_documents_count, inverse_of: :job_boards_documents
   belongs_to :job_boards_query, class_name: "JobBoards::Query"
 
   validates :signature, presence: true, uniqueness: true

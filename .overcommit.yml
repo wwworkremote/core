@@ -103,6 +103,7 @@ PreCommit:
 
   RSpec:
     enabled: true
+    command: ['bundle', 'exec', 'rspec']
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test
@@ -133,6 +134,10 @@ CommitMsg:
 
   CapitalizedSubject:
     enabled: true
+    # This repo's entire history uses lowercase Conventional Commits prefixes
+    # (fix:/chore:/feat:), which this hook otherwise rejects -- don't let
+    # ALL's on_warn: fail escalate that mismatch into a hard failure.
+    on_warn: warn
 
   SingleLineSubject:
     enabled: true

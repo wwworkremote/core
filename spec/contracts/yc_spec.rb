@@ -14,14 +14,15 @@ RSpec.describe "YC Scraper Contract", type: :contract do
   end
 
   let(:url) { Yc::Scraper::BASE_URL }
+  let(:headers) { Yc::Scraper::REQUEST_HEADERS }
 
   it "returns a successful response from Work at a Startup" do
-    response = Faraday.get(url)
+    response = Faraday.get(url, nil, headers)
     expect(response.status).to eq(200)
   end
 
   it "contains the embedded JSON data-page attribute" do
-    response = Faraday.get(url)
+    response = Faraday.get(url, nil, headers)
     doc = Nokogiri::HTML(response.body)
     data_attr = doc.at_css("div[data-page]")&.[]("data-page")
 

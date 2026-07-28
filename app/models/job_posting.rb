@@ -118,7 +118,10 @@ class JobPosting < ApplicationRecord
 
   scope :recent, -> { order(published_at: :desc) }
 
+  public
+
   def freshness
+    return :unknown if published_at.nil?
     return :stale if stale?
     return :fresh if published_at > 24.hours.ago
 
@@ -126,10 +129,10 @@ class JobPosting < ApplicationRecord
   end
 
   def stale?
+    return false if published_at.nil?
+
     published_at < 72.hours.ago
   end
-
-  # Advanced full-text search
   pg_search_scope :search,
                   against: { title: "A", body: "B" },
                   using: {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_06_052537) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_28_103047) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -326,6 +326,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_052537) do
     t.datetime "updated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "last_synced_at"
     t.datetime "last_ingested_at"
+    t.integer "job_boards_documents_count", default: 0, null: false
     t.index ["slug"], name: "index_job_boards_sources_on_slug", unique: true
   end
 

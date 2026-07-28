@@ -6,13 +6,20 @@ class Yc::Scraper
   include ApiGuard
 
   BASE_URL = "https://www.workatastartup.com/jobs"
+  # workatastartup.com returns 406 Not Acceptable without an explicit Accept
+  # header (bare Faraday/Ruby requests send none) -- TASK-11.
+  REQUEST_HEADERS = {
+    "Accept" => "text/html",
+    "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " \
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  }.freeze
 
   def call(force: false)
     with_api_guard("yc", cooldown: 4.hours, force:) do |source|
       query = JobBoards::Query.find_or_create_by!(source_id: source.id)
 
       client = JobBoards::Client.new("yc")
-      response = client.get(BASE_URL)
+      response = client.get(BASE_URL, {}, REQUEST_HEADERS)
       return false if response.nil? || response.status != 200
 
       doc = Nokogiri::HTML(response.body)
