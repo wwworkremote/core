@@ -4,6 +4,14 @@ class ApplicationJob < ActiveJob::Base
   # Enforce transaction-safe job enqueuing per SolidQueue skill best practices
   self.enqueue_after_transaction_commit = true
 
+  # These fire when a worker process dies mid-job (dev restarts, deploys) --
+  # operational churn, not a code defect. Without this, every restart
+  # permanently strands whatever was in flight (confirmed: 76% of all
+  # failed_executions were this pair, 2026-07-27).
+  retry_on SolidQueue::Processes::ProcessPrunedError,
+           SolidQueue::Processes::ProcessMissingError,
+           wait: 30.seconds, attempts: 3
+
   before_perform do |job|
     if SystemSetting.paused?
       Rails.logger.info "[PauseSignal] Job #{job.class.name} (#{job.job_id}) cancelled due to global pause."

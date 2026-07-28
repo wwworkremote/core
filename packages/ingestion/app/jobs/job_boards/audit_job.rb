@@ -2,6 +2,7 @@
 
 class JobBoards::AuditJob < ApplicationJob
   queue_as :light
+  mediumweight!
 
   def perform(limit: 100)
     stats = Auditor.new(fix: true, limit: limit).call

@@ -4,6 +4,7 @@ class HackerNews::FetchJobstoryJob < ApplicationJob
   include ApiGuard
 
   queue_as :light
+  lightweight!
 
   def perform(jobstory_id, source_id = nil, query_id = nil)
     return if source_locked?("hackernews")

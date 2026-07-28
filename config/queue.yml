@@ -17,6 +17,10 @@ default: &default
       threads: 2
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
       polling_interval: 0.1
+    - queues: "broadcasts"
+      threads: 1
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
 
 development:
   dispatchers:
@@ -34,6 +38,9 @@ development:
       polling_interval: 0.1
     - queues: "default"
       threads: 3
+      polling_interval: 0.1
+    - queues: "broadcasts"
+      threads: 2
       polling_interval: 0.1
   # Concurrency controls to prevent LLM starvation
   # limit: total number of concurrent jobs for this group across all workers

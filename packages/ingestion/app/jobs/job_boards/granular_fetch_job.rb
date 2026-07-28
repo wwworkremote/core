@@ -4,6 +4,7 @@ class JobBoards::GranularFetchJob < ApplicationJob
   include ApiGuard
 
   queue_as :light
+  mediumweight!
 
   def perform(fetcher_class_name, site_slug, term, source_id, query_id)
     fetcher_slug = fetcher_class_name.split("::").first.downcase
