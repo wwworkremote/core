@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "digest"
 require "fileutils"
 
 class EmailIngestion::Importer
@@ -10,101 +9,64 @@ class EmailIngestion::Importer
     @file_path = record&.file_path
   end
 
-  def call(source: nil, force: false)
-    if @record
-      process_record
-    else
-      # When called without a record, perform a scan for the given source
-      rake = Rake::Application.new
-      Rake.application = rake
-      Rake::Task.define_task(:environment)
-      load Rails.root.join("lib/tasks/eml.rake")
-      rake["eml:scan_source"].invoke(source)
-    end
+  def call(source: nil)
+    return process_record if @record
+
+    # When called without a record, perform a scan for the given source
+    scan_source(source)
   end
 
   private
 
-  def process_record
-    @record.update!(status: "processing")
-
-    begin
-      # 1. Parse Email
-      parsed_email = EmailIngestion::MessageParser.new(@file_path).call
-      @record.update!(message_id: parsed_email[:message_id])
-
-      # 2. Extract Links
-      job_links = EmailIngestion::LinkExtractor.new(parsed_email, @source_provider).call
-
-      if job_links.empty?
-        moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
-        @record.update!(status: "processed", processed_at: Time.current, file_path: moved_to || @file_path)
-        return
-      end
-
-      # 3. Resolve & Fetch each job link
-      processed_jobs_count = 0
-      job_links.each do |job_link|
-        process_job_link(job_link, parsed_email)
-        processed_jobs_count += 1
-      end
-
-      # 4. Sync Job Postings (from Documents created in process_job_link)
-      JobBoards::Syncer.new.call
-
-      moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
-      @record.update!(status: "processed", processed_at: Time.current, file_path: moved_to || @file_path)
-    rescue StandardError => e
-      moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).error
-      # Persist the file's new location even on failure -- otherwise a retry looks for the file at
-      # the pre-move path, gets Errno::ENOENT, and permanently masks the real error above.
-      @record.update!(status: "error", error_message: e.message, file_path: moved_to || @file_path)
-      Rails.logger.error "[EmailImporter] Error for record #{@record.id}: #{e.message}\n#{e.backtrace.join("\n")}"
-    end
+  def scan_source(source)
+    rake = Rake::Application.new
+    Rake.application = rake
+    Rake::Task.define_task(:environment)
+    load Rails.root.join("lib/tasks/eml.rake")
+    rake["eml:scan_source"].invoke(source)
   end
 
-  def process_job_link(job_link, parsed_email)
-    # a. Resolve Canonical URL
-    canonical_url = EmailIngestion::CanonicalUrlResolver.new(job_link).call
+  def process_record
+    @record.update!(status: "processing")
+    import_from_email
+  rescue StandardError => e
+    handle_import_error(e)
+  end
 
-    # b. Idempotency Check for this specific job link in this email
-    signature = Digest::SHA256.hexdigest("#{@record.message_id}-#{canonical_url}")
-    return if JobBoards::Document.exists?(signature: signature)
+  def import_from_email
+    parsed_email = parse_email
+    job_links = EmailIngestion::LinkExtractor.new(parsed_email, @source_provider).call
+    return mark_processed if job_links.empty?
 
-    # c. Fetch content
-    fetch_result = JobFetchers::PageFetch.new(canonical_url).call
-    return unless fetch_result
+    process_job_links(job_links, parsed_email)
+  end
 
-    # d. Extract metadata
-    job_data = JobFetchers::CanonicalJobExtractor.new(fetch_result[:content], fetch_result[:final_url],
-                                                      @source_provider).call
-    return unless job_data
+  def process_job_links(job_links, parsed_email)
+    job_links.each { |job_link| EmailIngestion::JobLinkProcessor.new(job_link, parsed_email, @record).call }
+    JobBoards::Syncer.new.call
+    mark_processed
+  end
 
-    # e. Create JobBoards::Document
-    source_slug = "email_ingestion"
-    source = JobBoards::Source.find_or_create_by!(slug: source_slug) do |s|
-      s.name = "Email Ingestion"
-    end
-    query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+  def parse_email
+    parsed_email = EmailIngestion::MessageParser.new(@file_path).call
+    @record.update!(message_id: parsed_email[:message_id])
+    parsed_email
+  end
 
-    # Enrich job_data with email provenance
-    enriched_data = job_data.merge(
-      source_provider: @source_provider,
-      email_message_id: @record.message_id,
-      email_file_path: @file_path,
-      email_received_at: parsed_email[:date],
-      discovered_url: job_link,
-      canonical_url: canonical_url,
-      final_fetch_url: fetch_result[:final_url],
-      fetch_mode: fetch_result[:fetch_mode]
-    )
+  def mark_processed
+    moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
+    @record.update!(status: "processed", processed_at: Time.current, file_path: moved_to || @file_path)
+  end
 
-    doc = JobBoards::Document.find_or_initialize_by(signature: signature)
-    return unless doc.new_record?
-    doc.source_id = source.id
-    doc.job_boards_query_id = query.id
-    doc.document = enriched_data.to_json
-    return if doc.save
-    Rails.logger.error "[EmailImporter] Failed to save document #{signature}: #{doc.errors.full_messages.join(', ')}"
+  # Persist the file's new location even on failure -- otherwise a retry looks for the file at
+  # the pre-move path, gets Errno::ENOENT, and permanently masks the real error above.
+  def handle_import_error(error)
+    moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).error
+    @record.update!(status: "error", error_message: error.message, file_path: moved_to || @file_path)
+    log_import_error(error)
+  end
+
+  def log_import_error(error)
+    Rails.logger.error "[EmailImporter] Error for record #{@record.id}: #{error.message}\n#{error.backtrace.join("\n")}"
   end
 end
