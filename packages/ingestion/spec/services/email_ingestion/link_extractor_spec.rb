@@ -33,5 +33,18 @@ RSpec.describe EmailIngestion::LinkExtractor do
       links = extractor.call
       expect(links).to include("https://www.linkedin.com/jobs/view/67890")
     end
+
+    it "extracts and strips fragments from links in the text body" do
+      text_email = { text_body: "Check this out: https://www.indeed.com/rc/clk?jk=999#section" }
+      extractor = described_class.new(text_email, "indeed")
+
+      expect(extractor.call).to include("https://www.indeed.com/rc/clk?jk=999")
+    end
+
+    it "silently drops malformed urls instead of raising" do
+      bad_email = { text_body: "See https://www.indeed.com/rc/clk?jk=1 and not-a-url://[bad" }
+
+      expect { described_class.new(bad_email, "indeed").call }.not_to raise_error
+    end
   end
 end

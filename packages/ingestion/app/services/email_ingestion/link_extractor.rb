@@ -35,36 +35,39 @@ class EmailIngestion::LinkExtractor
   end
 
   def call
-    urls = []
-
-    # Extract from text body
-    urls += URI.extract(@parsed_email[:text_body], %w[http https]) if @parsed_email[:text_body]
-
-    # Extract from HTML body
-    if @parsed_email[:html_body]
-      doc = Nokogiri::HTML(@parsed_email[:html_body])
-      urls += doc.css("a").filter_map { |a| a["href"] }
-    end
-
-    clean_urls(urls)
+    clean_urls(text_body_urls + html_body_urls)
   end
 
   private
 
+  def text_body_urls
+    return [] unless @parsed_email[:text_body]
+
+    URI.extract(@parsed_email[:text_body], %w[http https])
+  end
+
+  def html_body_urls
+    return [] unless @parsed_email[:html_body]
+
+    Nokogiri::HTML(@parsed_email[:html_body]).css("a").filter_map { |a| a["href"] }
+  end
+
   def clean_urls(urls)
-    urls.filter_map do |url|
-      uri = URI.parse(url.to_s.strip)
-      next unless %w[http https].include?(uri.scheme)
+    normalized = urls.filter_map { |url| normalize_url(url) }
+    normalized.uniq.select { |url| candidate_job_link?(url) }
+  end
 
-      # Remove fragments
-      uri.fragment = nil
+  # Strips fragments and normalizes the string. Special handling for
+  # tracked/redirect links could go here if we can identify them.
+  def normalize_url(url)
+    parse_http_uri(url)&.tap { |uri| uri.fragment = nil }&.to_s
+  end
 
-      # Special handling for tracked/redirect links if we can identify them
-      # For now, just normalize the URL string
-      uri.to_s
-    rescue URI::InvalidURIError
-      nil
-    end.uniq.select { |url| candidate_job_link?(url) }
+  def parse_http_uri(url)
+    uri = URI.parse(url.to_s.strip)
+    uri if %w[http https].include?(uri.scheme)
+  rescue URI::InvalidURIError
+    nil
   end
 
   def candidate_job_link?(url)
