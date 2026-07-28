@@ -2,7 +2,7 @@
 
 class Admin::PipelineStepsController < Admin::ApplicationController
   def create
-    @job_posting = JobPosting.find(params[:job_posting_id])
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
 
     # Handle status transitions or manual notes
     if params[:status].present?

@@ -2,7 +2,7 @@
 
 class Admin::InterviewQuestionsController < ApplicationController
   def create
-    @session = InterviewSession.find(params[:interview_session_id])
+    @session = InterviewSession.find(params.expect(:interview_session_id))
     @question = @session.interview_questions.build(question_params)
 
     if @question.save

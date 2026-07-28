@@ -6,6 +6,6 @@ class Admin::EmailImportRecordsController < Admin::ApplicationController
   end
 
   def show
-    @record = EmailImportRecord.find(params[:id])
+    @record = EmailImportRecord.find(params.expect(:id))
   end
 end

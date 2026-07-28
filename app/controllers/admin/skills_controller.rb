@@ -6,7 +6,7 @@ class Admin::SkillsController < Admin::ApplicationController
   end
 
   def show
-    @skill = Skill.find(params[:id])
+    @skill = Skill.find(params.expect(:id))
     @nearest_skills = VectorIntelligence.rank(source: @skill, target_class: Skill, limit: 6).where.not(id: @skill.id)
   end
 
@@ -14,30 +14,30 @@ class Admin::SkillsController < Admin::ApplicationController
     @skill = Skill.new
   end
 
+  def edit
+    @skill = Skill.find(params.expect(:id))
+  end
+
   def create
     @skill = Skill.new(skill_params)
     if @skill.save
       redirect_to admin_skills_path, notice: "Skill created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
-  def edit
-    @skill = Skill.find(params[:id])
-  end
-
   def update
-    @skill = Skill.find(params[:id])
+    @skill = Skill.find(params.expect(:id))
     if @skill.update(skill_params)
       redirect_to admin_skill_path(@skill), notice: "Skill updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   def destroy
-    @skill = Skill.find(params[:id])
+    @skill = Skill.find(params.expect(:id))
     @skill.destroy
     redirect_to admin_skills_path, notice: "Skill deleted."
   end

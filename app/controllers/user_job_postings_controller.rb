@@ -8,7 +8,7 @@ class UserJobPostingsController < ApplicationController
   end
 
   def create
-    @job_posting = JobPosting.find(params[:job_posting_id])
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
     @user_job_posting = current_user.user_job_postings.find_or_initialize_by(job_posting: @job_posting)
     @user_job_posting.job_search_id = params[:job_search_id] if params[:job_search_id].present?
 
@@ -31,19 +31,19 @@ class UserJobPostingsController < ApplicationController
   end
 
   def update
-    @user_job_posting = current_user.user_job_postings.find(params[:id])
+    @user_job_posting = current_user.user_job_postings.find(params.expect(:id))
     return unless @user_job_posting.update(user_job_posting_params)
     redirect_back_or_to(user_job_postings_path, notice: "Job record updated.")
   end
 
   def destroy
-    @user_job_posting = current_user.user_job_postings.find(params[:id])
+    @user_job_posting = current_user.user_job_postings.find(params.expect(:id))
     @user_job_posting.destroy
     redirect_back_or_to(user_job_postings_path, notice: "Job removed from your list.")
   end
 
   def analyze_match
-    @job_posting = JobPosting.find(params[:job_posting_id])
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
 
     # We call this synchronously for now to provide immediate feedback,
     # but could be moved to an ActiveJob if it takes too long.
@@ -59,7 +59,7 @@ class UserJobPostingsController < ApplicationController
   end
 
   def generate_artifacts
-    @job_posting = JobPosting.find(params[:job_posting_id])
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
     result = LLM::ArtifactGenerator.call(current_user, @job_posting, force: params[:force] == "true")
 
     if result[:success]

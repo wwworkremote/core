@@ -100,7 +100,7 @@ def enrich
 
   unless markdown_body
     return render json: { success: false, error: "No description found." },
-                                  status: :unprocessable_entity
+                  status: :unprocessable_entity
   end
 
   attrs = {

@@ -70,8 +70,6 @@ class DataAcquisitionManager
     end
   end
 
-  private
-
   def self.run_crawler(slug, config, _force)
     queries = BoardQuery.where(board_name: slug.downcase)
 
@@ -116,7 +114,9 @@ class DataAcquisitionManager
 
     call_args = {}
     call_args[:force] = force if method_sig.parameters.any? { |p| p[1] == :force }
-    call_args[:source] = slug.split("_").last if slug.start_with?("email_") && method_sig.parameters.any? { |p| p[1] == :source }
+    call_args[:source] = slug.split("_").last if slug.start_with?("email_") && method_sig.parameters.any? { |p|
+      p[1] == :source
+    }
 
     result_raw = call_args.any? ? fetcher.call(**call_args) : fetcher.call
 

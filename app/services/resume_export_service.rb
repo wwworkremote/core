@@ -6,7 +6,7 @@ class ResumeExportService
     @content = resume.content
   end
 
-  def to_json
+  def to_json(*_args)
     @content.merge(
       meta: {
         name: @resume.name,
@@ -18,7 +18,7 @@ class ResumeExportService
 
   def to_markdown
     [
-      "# #{@content["name"] || @resume.user.name}",
+      "# #{@content['name'] || @resume.user.name}",
       @content["summary"],
       "## Skills",
       @resume.skills.pluck(:name).join(", "),
@@ -31,7 +31,7 @@ class ResumeExportService
 
   def to_text
     # Simple plain text conversion of markdown or direct from content
-    to_markdown.gsub(/^#+ /, "").gsub(/\*\*/, "")
+    to_markdown.gsub(/^#+ /, "").gsub("**", "")
   end
 
   def to_mcp
@@ -58,13 +58,13 @@ class ResumeExportService
 
   def render_experience
     Array(@content["experience"]).map do |exp|
-      "### #{exp["role"]} at #{exp["company"]}\n(#{exp["start_date"]} - #{exp["end_date"]})\n\n#{exp["description"]}"
+      "### #{exp['role']} at #{exp['company']}\n(#{exp['start_date']} - #{exp['end_date']})\n\n#{exp['description']}"
     end.join("\n\n")
   end
 
   def render_education
     Array(@content["education"]).map do |edu|
-      "* **#{edu["degree"]}**, #{edu["school"]} (#{edu["year"]})"
+      "* **#{edu['degree']}**, #{edu['school']} (#{edu['year']})"
     end.join("\n")
   end
 end

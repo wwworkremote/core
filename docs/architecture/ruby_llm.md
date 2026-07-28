@@ -62,7 +62,7 @@ llama-ctl install && llama-ctl restart
 ```ruby
 config.openai_api_base  = "http://localhost:11500/v1"   # inference
 config.ollama_api_base  = "http://localhost:11500/v1"   # embeddings
-config.openai_use_system_role = true                   # llama.cpp needs 'system' not 'developer'
+config.openai_use_system_role = true # llama.cpp needs 'system' not 'developer'
 config.use_new_acts_as = true
 ```
 

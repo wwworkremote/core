@@ -6,7 +6,11 @@ RSpec.describe "User Pipeline UX" do
   let(:user) { User.find_or_create_by!(email: "mike@just3ws.com") { |u| u.name = "Mike"; u.password = "password" } }
   let!(:job) { create(:job_posting, title: "Neural Engineer", company: "Cyberdyne", body: "We build Skynet.") }
   let!(:career_profile) { create(:career_profile, user: user, resume_text: "I am a high-level software architect.") }
-  let!(:model) { Model.find_or_create_by!(model_id: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf") { |m| m.name = "Qwen 2.5 Coder 7B (Local)"; m.provider = "ollama" } }
+  let!(:model) {
+    Model.find_or_create_by!(model_id: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf") { |m|
+      m.name = "Qwen 2.5 Coder 7B (Local)"; m.provider = "ollama"
+    }
+  }
 
   it "allows a user to favorite a job and run an alignment scan" do
     visit job_posting_path(job)

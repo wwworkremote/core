@@ -2,7 +2,7 @@
 
 class Admin::InterviewSessionsController < ApplicationController
   def create
-    @job_posting = JobPosting.find(params[:job_posting_id])
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
     @session = @job_posting.interview_sessions.build(session_params)
     @session.user = current_user
 

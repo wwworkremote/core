@@ -87,12 +87,12 @@ class Admin::JobsController < Admin::ApplicationController
   end
 
   def details
-    @job = SolidQueue::Job.find(params[:id])
+    @job = SolidQueue::Job.find(params.expect(:id))
     render layout: false
   end
 
   def discard
-    @job = SolidQueue::Job.find(params[:id])
+    @job = SolidQueue::Job.find(params.expect(:id))
 
     # If the job is claimed (in progress), we need to remove the claim record first
     # to satisfy Solid Queue's integrity checks for discarding.
@@ -109,7 +109,7 @@ class Admin::JobsController < Admin::ApplicationController
   end
 
   def cancel
-    @job = SolidQueue::Job.find(params[:id])
+    @job = SolidQueue::Job.find(params.expect(:id))
     # Signal mid-performance cancellation for heavy jobs
     SystemSetting.cancel_job!(@job.active_job_id)
 

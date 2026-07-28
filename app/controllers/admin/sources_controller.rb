@@ -6,6 +6,6 @@ class Admin::SourcesController < Admin::ApplicationController
   end
 
   def show
-    @source = JobBoards::Source.find(params[:id])
+    @source = JobBoards::Source.find(params.expect(:id))
   end
 end

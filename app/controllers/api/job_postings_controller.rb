@@ -4,7 +4,7 @@ class Api::JobPostingsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def enrich
-    job_posting = JobPosting.find(params[:id])
+    job_posting = JobPosting.find(params.expect(:id))
     extracted   = params[:extracted]&.to_unsafe_h || {}
     provider    = params[:provider].presence || detect_provider(params[:url].to_s)
 

@@ -12,7 +12,7 @@ class Admin::TasksController < ApplicationController
   end
 
   def create
-    @job_posting = JobPosting.find(params[:job_posting_id])
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
     @task = @job_posting.interview_tasks.build(task_params)
     @task.user = current_user
     @task.status ||= "pending"
@@ -25,7 +25,7 @@ class Admin::TasksController < ApplicationController
   end
 
   def update
-    @task = InterviewTask.find(params[:id])
+    @task = InterviewTask.find(params.expect(:id))
     if @task.update(task_params)
       redirect_back_or_to(admin_tasks_path, notice: "Task updated.")
     else

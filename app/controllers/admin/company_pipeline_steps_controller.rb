@@ -2,7 +2,7 @@
 
 class Admin::CompanyPipelineStepsController < Admin::ApplicationController
   def create
-    @company = Company.find(params[:company_id])
+    @company = Company.find(params.expect(:company_id))
 
     if params[:status].present?
       # Whitelist AASM events to prevent dangerous send

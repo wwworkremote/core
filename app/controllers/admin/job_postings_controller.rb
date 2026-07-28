@@ -15,7 +15,7 @@ class Admin::JobPostingsController < Admin::ApplicationController
   end
 
   def show
-    @job_posting = JobPosting.find(params[:id])
+    @job_posting = JobPosting.find(params.expect(:id))
     return unless params[:frame] == "semantic_matches"
     @similar_jobs = if @job_posting.embedding.present?
                       @job_posting.nearest_neighbors(:embedding,
@@ -27,7 +27,7 @@ class Admin::JobPostingsController < Admin::ApplicationController
   end
 
   def update
-    @job_posting = JobPosting.find(params[:id])
+    @job_posting = JobPosting.find(params.expect(:id))
 
     if params[:action_type] == "enrich"
       Scraper::Enricher.call(@job_posting)
@@ -41,13 +41,13 @@ class Admin::JobPostingsController < Admin::ApplicationController
   end
 
   def purge
-    @job_posting = JobPosting.find(params[:id])
+    @job_posting = JobPosting.find(params.expect(:id))
     @job_posting.purge!
     redirect_back_or_to(admin_job_postings_path, notice: "Job record moved to trash and vectors cleared.")
   end
 
   def restore
-    @job_posting = JobPosting.find(params[:id])
+    @job_posting = JobPosting.find(params.expect(:id))
     @job_posting.restore!
     redirect_back_or_to(admin_job_postings_path, notice: "Job record restored to registry.")
   end
@@ -74,7 +74,7 @@ class Admin::JobPostingsController < Admin::ApplicationController
   end
 
   def destroy
-    @job_posting = JobPosting.find(params[:id])
+    @job_posting = JobPosting.find(params.expect(:id))
     @job_posting.destroy
     redirect_to admin_job_postings_path, notice: "Job posting was permanently deleted."
   end

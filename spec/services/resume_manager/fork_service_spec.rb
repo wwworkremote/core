@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe ResumeManager::ForkService do
+  subject { described_class.new(original_resume) }
+
   let(:user) { create(:user) }
   let(:original_resume) do
     Resume.create!(
@@ -14,7 +16,6 @@ RSpec.describe ResumeManager::ForkService do
     )
   end
 
-  subject { described_class.new(original_resume) }
 
   describe "#call" do
     it "creates a new resume with incremented version" do

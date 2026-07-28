@@ -6,6 +6,6 @@ class Admin::QueriesController < Admin::ApplicationController
   end
 
   def show
-    @query = JobBoards::Query.find(params[:id])
+    @query = JobBoards::Query.find(params.expect(:id))
   end
 end

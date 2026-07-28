@@ -10,12 +10,12 @@ class Admin::CompaniesController < Admin::ApplicationController
   end
 
   def show
-    @company = Company.find(params[:id])
+    @company = Company.find(params.expect(:id))
     @job_postings = @company.job_postings.recent.page(params[:page]).per(30)
   end
 
   def toggle_ingestion
-    @company = Company.find(params[:id])
+    @company = Company.find(params.expect(:id))
     @company.update!(ingestion_enabled: !@company.ingestion_enabled)
 
     if @company.ingestion_enabled?

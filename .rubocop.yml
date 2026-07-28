@@ -48,9 +48,9 @@ Rails/ActiveRecordCallbacksOrder:
 Rails/UniqueValidationWithoutIndex:
   Enabled: true
 
-# --- Metrics (Balanced for High Quality) ---
+# --- Metrics (Sandi Metz rules: 5-line methods, 4 params, 100-line classes) ---
 Metrics/AbcSize:
-  Max: 20
+  Max: 10
 
 Metrics/BlockLength:
   Exclude:
@@ -60,14 +60,17 @@ Metrics/BlockLength:
     - 'spec/**/*'
     - 'lib/tasks/*.rake'
 
+Metrics/ClassLength:
+  Max: 100
+
 Metrics/MethodLength:
-  Max: 15
+  Max: 5
 
 Metrics/ModuleLength:
   Max: 100
 
 Metrics/ParameterLists:
-  Max: 5
+  Max: 4
 
 # --- RSpec Standards ---
 RSpec/ContextWording:

@@ -3,6 +3,11 @@
 class LLM::Registry
   CONFIG_PATH = Rails.root.join("config/models.yml")
 
+  # @default_model_id memoizes a YAML config read; under a race, worst case
+  # is two threads computing and assigning the same value -- not a
+  # correctness hazard, so ThreadSafety/ClassInstanceVariable is disabled
+  # rather than adding synchronization this doesn't need.
+  # rubocop:disable ThreadSafety/ClassInstanceVariable
   def self.sync
     @default_model_id = nil
     return unless File.exist?(CONFIG_PATH)
@@ -22,6 +27,7 @@ class LLM::Registry
   def self.default_model_id
     @default_model_id ||= YAML.load_file(CONFIG_PATH).dig("defaults", "primary")
   end
+  # rubocop:enable ThreadSafety/ClassInstanceVariable
 
   def self.default_model
     Model.find_by(model_id: default_model_id)

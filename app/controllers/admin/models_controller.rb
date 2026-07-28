@@ -6,6 +6,6 @@ class Admin::ModelsController < Admin::ApplicationController
   end
 
   def show
-    @model = Model.find(params[:id])
+    @model = Model.find(params.expect(:id))
   end
 end

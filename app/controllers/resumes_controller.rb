@@ -10,7 +10,7 @@ class ResumesController < ApplicationController
   end
 
   def show
-    @resume = current_user.resumes.find(params[:id])
+    @resume = current_user.resumes.find(params.expect(:id))
     @parent = @resume.parent
     @children = @resume.children
   end
@@ -19,48 +19,48 @@ class ResumesController < ApplicationController
     @resume = current_user.resumes.new
   end
 
+  def edit
+    @resume = current_user.resumes.find(params.expect(:id))
+  end
+
   def create
     @resume = current_user.resumes.new(processed_params)
     if @resume.save
       redirect_to resumes_path, notice: "Resume created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
-  def edit
-    @resume = current_user.resumes.find(params[:id])
-  end
-
   def update
-    @resume = current_user.resumes.find(params[:id])
+    @resume = current_user.resumes.find(params.expect(:id))
     if @resume.update(processed_params)
       redirect_to resume_path(@resume), notice: "Resume updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   def destroy
-    @resume = current_user.resumes.find(params[:id])
+    @resume = current_user.resumes.find(params.expect(:id))
     @resume.destroy
     redirect_to resumes_path, notice: "Resume deleted."
   end
 
   def fork
-    @resume = current_user.resumes.find(params[:id])
+    @resume = current_user.resumes.find(params.expect(:id))
     @forked = ResumeManager.fork(@resume, new_name: params[:new_name])
     redirect_to resume_path(@forked), notice: "Resume forked successfully."
   end
 
   def diff
-    @resume_a = current_user.resumes.find(params[:id])
-    @resume_b = current_user.resumes.find(params[:other_id])
+    @resume_a = current_user.resumes.find(params.expect(:id))
+    @resume_b = current_user.resumes.find(params.expect(:other_id))
     @diff = ResumeManager.diff(@resume_a, @resume_b)
   end
 
   def export
-    @resume = current_user.resumes.find(params[:id])
+    @resume = current_user.resumes.find(params.expect(:id))
     format = params[:format] || :markdown
     content = ResumeManager.export(@resume, format: format)
 

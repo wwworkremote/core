@@ -22,7 +22,7 @@ Rails.application.configure do
     Logger.new(Rails.root.join("log", "#{Rails.env}.log"), 5, 20.megabytes)
   )
 
-  config.action_mailer.default_url_options = { host: "localhost", port: 31000 }
+  config.action_mailer.default_url_options = { host: "localhost", port: 31_000 }
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.

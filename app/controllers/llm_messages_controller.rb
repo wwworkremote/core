@@ -18,6 +18,6 @@ class LLMMessagesController < ApplicationController
   private
 
   def set_llm_chat
-    @llm_chat = LLMChat.find(params[:llm_chat_id])
+    @llm_chat = LLMChat.find(params.expect(:llm_chat_id))
   end
 end

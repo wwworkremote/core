@@ -32,7 +32,7 @@ class Api::V0::JobPostingsController < ApiController
   # POST /api/v0/job_postings/:id/enrich
   # For updating an existing job with rich context.
   def enrich
-    job = JobPosting.find(params[:id])
+    job = JobPosting.find(params.expect(:id))
 
     if job.update(enrich_params.merge(crawl_status: "enriched", enriched_at: Time.current))
       # Optionally trigger re-alignment if body changed significantly

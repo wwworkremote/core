@@ -6,7 +6,7 @@ class Admin::VisitsController < Admin::ApplicationController
   end
 
   def show
-    @visit = Ahoy::Visit.find(params[:id])
+    @visit = Ahoy::Visit.find(params.expect(:id))
     @events = @visit.events.order(time: :desc)
   end
 end

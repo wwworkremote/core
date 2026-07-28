@@ -7,11 +7,11 @@ class Admin::DocumentsController < Admin::ApplicationController
   end
 
   def show
-    @document = JobBoards::Document.find(params[:id])
+    @document = JobBoards::Document.find(params.expect(:id))
   end
 
   def destroy
-    @document = JobBoards::Document.find(params[:id])
+    @document = JobBoards::Document.find(params.expect(:id))
     @document.destroy
     redirect_to admin_documents_path, notice: "Document was successfully deleted."
   end

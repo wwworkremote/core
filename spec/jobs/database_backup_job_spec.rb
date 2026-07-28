@@ -9,7 +9,7 @@ RSpec.describe DatabaseBackupJob do
   before do
     FileUtils.mkdir_p(tmp_backup_dir)
     allow(Rails.root).to receive(:join).with("data/backups").and_return(tmp_backup_dir)
-    
+
     # Use a proper mock for system to satisfy RuboCop RSpec/AnyInstance
     allow(described_class).to receive(:new).and_return(job_instance)
     allow(job_instance).to receive(:system) do |*args|
@@ -45,7 +45,7 @@ RSpec.describe DatabaseBackupJob do
 
     it "handles errors gracefully" do
       allow(job_instance).to receive(:system).and_raise(StandardError.new("Dump failed"))
-      
+
       described_class.perform_now
       expect(Rails.logger).to have_received(:error).with(/Critical error: Dump failed/)
     end

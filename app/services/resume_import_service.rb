@@ -39,7 +39,7 @@ class ResumeImportService
           summary: data["summary"] || data["basics"]&.[]("summary"),
           experience: data["experience"] || data["work"],
           education: data["education"],
-          skills_names: data["skills"]&.map { |s| s["name"] }
+          skills_names: data["skills"]&.pluck("name")
         }.compact
       rescue JSON::ParserError
         { summary: "Imported from #{url}", raw_body: body.truncate(5000) }

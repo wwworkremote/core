@@ -6,6 +6,6 @@ class Admin::EventsController < Admin::ApplicationController
   end
 
   def show
-    @event = Ahoy::Event.find(params[:id])
+    @event = Ahoy::Event.find(params.expect(:id))
   end
 end
