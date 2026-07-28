@@ -2,23 +2,15 @@
 
 class Quality::InsightIngester
   def self.ingest_brakeman(json_report)
-    data = JSON.parse(json_report)
+    warnings = JSON.parse(json_report)["warnings"]
+    deactivate(:brakeman, warnings.pluck("file").uniq)
+    warnings.each { |w| create_brakeman_insight(w) }
+  end
 
-    # Mark old brakeman insights as inactive for files mentioned in this report
-    files = data["warnings"].pluck("file").uniq
-    SystemInsight.brakeman.where(file_path: files).update_all(active: false)
-
-    data["warnings"].each do |w|
-      SystemInsight.create!(
-        tool: :brakeman,
-        severity: map_brakeman_confidence(w["confidence"]),
-        message: w["message"],
-        file_path: w["file"],
-        line_number: w["line"],
-        context: w["code"],
-        active: true
-      )
-    end
+  def self.create_brakeman_insight(warning)
+    create_insight(tool: :brakeman, severity: map_brakeman_confidence(warning["confidence"]),
+                   message: warning["message"], file_path: warning["file"], line_number: warning["line"],
+                   context: warning["code"])
   end
 
   def self.map_brakeman_confidence(confidence)
@@ -30,23 +22,18 @@ class Quality::InsightIngester
   end
 
   def self.ingest_rubocop(json_report)
-    data = JSON.parse(json_report)
+    JSON.parse(json_report)["files"].each { |f| ingest_rubocop_file(f) }
+  end
 
-    data["files"].each do |f|
-      path = f["path"]
-      SystemInsight.rubocop.where(file_path: path).update_all(active: false)
+  def self.ingest_rubocop_file(file)
+    deactivate(:rubocop, file["path"])
+    file["offenses"].each { |o| create_rubocop_insight(file["path"], o) }
+  end
 
-      f["offenses"].each do |o|
-        SystemInsight.create!(
-          tool: :rubocop,
-          severity: map_rubocop_severity(o["severity"]),
-          message: "[#{o['cop_name']}] #{o['message']}",
-          file_path: path,
-          line_number: o["location"]["line"],
-          active: true
-        )
-      end
-    end
+  def self.create_rubocop_insight(path, offense)
+    create_insight(tool: :rubocop, severity: map_rubocop_severity(offense["severity"]),
+                   message: "[#{offense['cop_name']}] #{offense['message']}", file_path: path,
+                   line_number: offense["location"]["line"])
   end
 
   def self.map_rubocop_severity(severity)
@@ -58,23 +45,32 @@ class Quality::InsightIngester
   end
 
   def self.ingest_reek(json_report)
-    data = JSON.parse(json_report)
+    JSON.parse(json_report).each { |smell| ingest_reek_smell(smell) }
+  end
 
-    data.each do |smell|
-      smell["lines"].each do |line|
-        SystemInsight.create!(
-          tool: :reek,
-          severity: :warning,
-          message: "[#{smell['smell_type']}] #{smell['context']} #{smell['message']}",
-          file_path: smell["source"],
-          line_number: line,
-          active: true
-        )
-      end
-    end
+  def self.ingest_reek_smell(smell)
+    smell["lines"].each { |line| create_reek_insight(smell, line) }
+  end
+
+  def self.create_reek_insight(smell, line)
+    create_insight(tool: :reek, severity: :warning,
+                   message: "[#{smell['smell_type']}] #{smell['context']} #{smell['message']}",
+                   file_path: smell["source"], line_number: line)
   end
 
   def self.ingest_rails_best_practices(_yaml_report)
     # Rails Best Practices doesn't easily output JSON via CLI without extra gems
+  end
+
+  # update_all deliberately skips validations/callbacks -- this is a bulk
+  # flag flip on prior insights, not a domain mutation that needs them.
+  # rubocop:disable Rails/SkipsModelValidations
+  def self.deactivate(tool, file_paths)
+    SystemInsight.public_send(tool).where(file_path: file_paths).update_all(active: false)
+  end
+  # rubocop:enable Rails/SkipsModelValidations
+
+  def self.create_insight(**attrs)
+    SystemInsight.create!(**attrs, active: true)
   end
 end
