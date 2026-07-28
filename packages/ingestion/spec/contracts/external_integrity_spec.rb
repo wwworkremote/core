@@ -2,6 +2,9 @@
 
 require "rails_helper"
 
+# Cross-cutting integration audit spanning multiple providers/classes, not a
+# unit spec of one class -- a string description is the honest one here.
+# rubocop:disable RSpec/DescribeClass
 RSpec.describe "External Ingestion Integrity" do
   let(:providers) { %w[indeed linkedin adzuna glassdoor dice remotive wwr arbeitnow] }
 
@@ -18,9 +21,10 @@ RSpec.describe "External Ingestion Integrity" do
   describe "Extractor Contract Audit" do
     it "verifies that CanonicalJobExtractor has field selectors configured for each provider" do
       providers.each do |provider|
-        expect(JobFetchers::CanonicalJobExtractor::Selectors::FIELD_SELECTORS).to have_key(provider),
-                                                                                   "CanonicalJobExtractor is missing selectors for #{provider}"
+        selectors = JobFetchers::CanonicalJobExtractor::Selectors::FIELD_SELECTORS
+        expect(selectors).to have_key(provider), "CanonicalJobExtractor is missing selectors for #{provider}"
       end
     end
   end
 end
+# rubocop:enable RSpec/DescribeClass
