@@ -6,7 +6,13 @@ RSpec.describe JobBoards::Categorizer do
   let(:job_posting) { create(:job_posting, body: "We need a Ruby on Rails expert.", data: {}) }
   let(:categorizer) { described_class.new(job_posting) }
   let(:model_id) { LLM::Registry.default_model_id }
-  let!(:model) { create(:model, model_id: model_id, provider: "ollama") }
+  # find_or_create, not create: rails_helper's before(:suite) already syncs
+  # LLM::Registry's models (including this default one) once for the whole
+  # run, outside any per-example transaction -- a bare create collides with
+  # that row's (provider, model_id) unique index.
+  let!(:model) do
+    Model.find_or_create_by!(model_id: model_id, provider: "ollama") { |m| m.name = model_id }
+  end
 
   before do
     RubyLLM.config.default_model = model_id

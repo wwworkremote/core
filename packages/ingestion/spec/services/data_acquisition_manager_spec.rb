@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe DataAcquisitionManager do
   let(:slug) { "adzuna" }
-  let(:config) { described_class::FETCHERS[slug] }
+  let(:config) { Ingestion::AdapterRegistry.get(slug) }
 
   describe ".fetchers" do
     it "returns an array of fetcher configurations" do
@@ -98,7 +98,7 @@ RSpec.describe DataAcquisitionManager do
       allow(described_class).to receive(:run).and_return({ success: true })
 
       results = described_class.run_all
-      expect(results.keys.size).to eq(described_class::FETCHERS.keys.size)
+      expect(results.keys.size).to eq(Ingestion::AdapterRegistry.all.keys.size)
     end
   end
 end

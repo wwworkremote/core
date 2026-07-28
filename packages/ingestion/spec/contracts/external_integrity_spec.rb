@@ -16,11 +16,10 @@ RSpec.describe "External Ingestion Integrity" do
   end
 
   describe "Extractor Contract Audit" do
-    it "verifies that CanonicalJobExtractor has a specific extraction method for each provider" do
-      extractor = JobFetchers::CanonicalJobExtractor.new("<html></html>", "http://ex.com", "test")
+    it "verifies that CanonicalJobExtractor has field selectors configured for each provider" do
       providers.each do |provider|
-        expect(extractor.private_methods).to include(:"extract_#{provider}"),
-                                             "CanonicalJobExtractor is missing extract_#{provider} method"
+        expect(JobFetchers::CanonicalJobExtractor::Selectors::FIELD_SELECTORS).to have_key(provider),
+                                                                                   "CanonicalJobExtractor is missing selectors for #{provider}"
       end
     end
   end
