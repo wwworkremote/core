@@ -8,6 +8,10 @@ class ApplicationController < ActionController::Base
   def authenticate_admin
     # Skip authentication in test environment for simplicity in request specs
     return if Rails.env.test?
+    # This only ever runs on loopback (dev server + nginx .localhost vhost) --
+    # no point challenging for a password to log in as the one admin account
+    # current_user already resolves to unconditionally.
+    return if Rails.env.development?
 
     authenticate_or_request_with_http_basic("WWWorkRemote") do |username, password|
       username == ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com") &&
