@@ -3,109 +3,99 @@
 # Service to match a User's career profile against a specific JobPosting.
 # It leverages multi-document resume analysis and structured work experience.
 class LLM::ProfileMatcher
+  SYSTEM_RULES = "You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach."
+  TASK_INSTRUCTIONS = "Return a structured markdown analysis. Be honest, critical, and preparation-oriented."
+
   # Executes the deep alignment scan and preparation.
   # @param user [User] The candidate being evaluated.
   # @param job_posting [JobPosting] The opportunity to analyze.
   # @param force [Boolean] Skip staleness check if true.
   # @return [Hash] Success status and structured analysis output.
   def self.call(user, job_posting, force: false)
-    profile = user.career_profile
+    new(user, job_posting, force: force).call
+  end
 
+  def initialize(user, job_posting, force: false)
+    @user = user
+    @job_posting = job_posting
+    @force = force
+    @profile = user.career_profile
+  end
+
+  def call
+    guard = validate
+    return guard if guard
+
+    user_job = @user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
+    result = call_orchestrator
+    handle_result(result, user_job)
+  end
+
+  private
+
+  def call_orchestrator
+    prompt = PromptBuilder.call(@profile, @job_posting)
+    LLM::Orchestrator.call(untrusted_text: prompt, system_rules: SYSTEM_RULES, task_instructions: TASK_INSTRUCTIONS)
+  end
+
+  def validate
     # Shield: Do not process alignment for expired/stale jobs unless forced
-    if job_posting.expired? && !force
-      return { success: false, error: "Job posting is expired/stale. Analysis aborted." }
-    end
+    return expired_error if @job_posting.expired? && !@force
+    return incomplete_profile_error if profile_incomplete?
 
-    # Debug logging for incomplete profiles
-    unless profile&.resume_text.present? || profile&.work_experiences&.any? || profile&.resumes&.attached?
-      Rails.logger.warn "[ProfileMatcher] Profile incomplete for User ##{user.id}: " \
-                        "resume_text: #{profile&.resume_text.present?}, " \
-                        "work_experiences: #{profile&.work_experiences&.any?}, " \
-                        "resumes_attached: #{profile&.resumes&.attached?}"
-      return { success: false, error: "Profile incomplete. Please set up your resume." }
-    end
+    nil
+  end
 
-    user_job = user.user_job_postings.find_or_create_by!(job_posting: job_posting)
+  def expired_error
+    { success: false, error: "Job posting is expired/stale. Analysis aborted." }
+  end
 
-    # Build structured experience context
-    experiences_context = profile.work_experiences.includes(:experience_highlights).order(start_date: :desc).limit(10).map do |exp|
-      highlights = exp.experience_highlights.map { |h| "- [#{h.label}] #{h.text}" }.join("\n")
-      <<~EXP
-        ### #{exp.title} at #{exp.company_name}
-        Dates: #{exp.start_date} to #{exp.end_date || 'Present'}
-        Summary: #{exp.summary}
-        Action: #{exp.action}
-        Impact: #{exp.impact}
-        Highlights:
-        #{highlights}
-      EXP
-    end.join("\n\n")
+  def profile_incomplete?
+    !profile_signal_present?
+  end
 
-    # Include multi-document resume content
-    extra_documents = LLM::DocumentProcessor.extract_pdf_text_for_all(profile).map do |doc|
-      "--- DOCUMENT: #{doc[:filename]} ---\n#{doc[:content]}"
-    end.join("\n\n")
+  def profile_signal_present?
+    return false unless @profile
 
-    prompt = <<~PROMPT
-      [SYSTEM_OBJECTIVE]
-      Perform a deep semantic alignment scan between the following CANDIDATE_PROFILE and JOB_POSTING.
-      You are a RUTHLESS CAREER ADVOCATE and INTERVIEW COACH. Your job is to identify PERFECT matches and prepare the user to win.
+    @profile.resume_text.present? || @profile.work_experiences.any? || @profile.resumes.attached?
+  end
 
-      [CANDIDATE_PROFILE]
-      Tier: #{profile.experience_level}
-      Skills: #{profile.skills}
-      Goals: #{profile.goals}
+  def incomplete_profile_error
+    log_incomplete_profile
+    { success: false, error: "Profile incomplete. Please set up your resume." }
+  end
 
-      [STRUCTURED_EXPERIENCE]
-      #{experiences_context}
+  def log_incomplete_profile
+    Rails.logger.warn "[ProfileMatcher] Profile incomplete for User ##{@user.id}: #{profile_completeness_summary}"
+  end
 
-      [TECHNICAL_EVIDENCE_GITHUB]
-      #{profile.github_context&.dig('synthesis') || 'No GitHub context available.'}
+  def profile_completeness_summary
+    "resume_text: #{@profile&.resume_text.present?}, work_experiences: #{@profile&.work_experiences&.any?}, " \
+      "resumes_attached: #{@profile&.resumes&.attached?}"
+  end
 
-      [ATTACHED_DOCUMENTS]
-      #{extra_documents}
+  def handle_result(result, user_job)
+    return failure_result(result) unless result[:success] && result[:output].present?
 
-      [JOB_POSTING]
-      Title: #{job_posting.title}
-      Company: #{job_posting.company}
-      Description: #{job_posting.body}
+    apply_result(result, user_job)
+  end
 
-      [CRITICAL_EVALUATION_CRITERIA]
-      1. **REMOTE_PURITY**: Is this truly remote? Penalize 'hybrid' or 'occasional travel'.
-      2. **TECH_STACK_DENSITY**: How much Ruby/Rails focus is there? Reject 'full-stack' if it's 90% React/Node.
-      3. **SENIORITY_ALIGNMENT**: Does this role offer the autonomy expected for a #{profile.experience_level} level?
-      4. **RED_FLAGS**: Identify signs of toxic culture, legacy tech debt, or unrealistic expectations.
+  def apply_result(result, user_job)
+    user_job.update!(match_analysis: result[:output])
+    score = extract_score(result[:output])
+    user_job.update!(priority_flag: true) if score >= 80
+    { success: true, output: result[:output], score: score }
+  end
 
-      [OUTPUT_FORMAT]
-      1. **MATCH_CONFIDENCE**: (0-100%)
-      2. **STRENGTHS**: Why this aligns with the user's stated goals.
-      3. **WEAKNESSES**: Why the user might want to SKIP this opportunity.
-      4. **RESUME_DELTA**: The exact technical bullet points to add/tweak if the user decides to apply.
-      5. **INTERVIEW_PREP**: 3 custom technical questions they will likely ask, and the 'STAR' method responses the user should give based on their experience.
-    PROMPT
+  # Try to extract numerical score (e.g. 85%)
+  def extract_score(output)
+    match = output.match(/MATCH_CONFIDENCE.*?(\d+)%/i)
+    match ? match[1].to_i : 0
+  end
 
-    result = LLM::Orchestrator.call(
-      untrusted_text: prompt,
-      system_rules: "You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach.",
-      task_instructions: "Return a structured markdown analysis. Be honest, critical, and preparation-oriented."
-    )
-
-    if result[:success] && result[:output].present?
-      user_job.update!(match_analysis: result[:output])
-
-      # Try to extract numerical score (e.g. 85%)
-      score_match = result[:output].match(/MATCH_CONFIDENCE.*?(\d+)%/i)
-      score = 0
-      if score_match
-        score = score_match[1].to_i
-        user_job.update!(priority_flag: true) if score >= 80
-      end
-
-      { success: true, output: result[:output], score: score }
-    else
-      error_msg = result[:error] || "LLM returned empty response"
-      Rails.logger.error "[ProfileMatcher] Failed for Job #{job_posting.id}: #{error_msg}"
-      { success: false, error: error_msg }
-    end
+  def failure_result(result)
+    error_msg = result[:error] || "LLM returned empty response"
+    Rails.logger.error "[ProfileMatcher] Failed for Job #{@job_posting.id}: #{error_msg}"
+    { success: false, error: error_msg }
   end
 end

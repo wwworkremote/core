@@ -57,5 +57,27 @@ RSpec.describe LLM::ProfileMatcher do
       expect(result[:success]).to be false
       expect(result[:error]).to include("Model execution failed")
     end
+
+    it "aborts for an expired job posting unless forced" do
+      job_posting.expire!
+
+      result = described_class.call(user, job_posting)
+
+      expect(result[:success]).to be false
+      expect(result[:error]).to include("expired/stale")
+    end
+
+    it "does not set priority_flag when the score is below 80" do
+      mock_output = "1. **MATCH_CONFIDENCE**: 40%"
+      sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_output.to_json}}}]}\n\ndata: [DONE]\n"
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
+        .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+
+      result = described_class.call(user, job_posting)
+
+      expect(result[:score]).to eq(40)
+      user_job = user.user_job_postings.find_by(job_posting: job_posting)
+      expect(user_job.priority_flag).not_to be true
+    end
   end
 end
