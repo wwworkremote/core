@@ -145,8 +145,17 @@ run_prechecks() {
   lsof -ti:31000 | xargs kill -9 2>/dev/null || true
 
   # Enforcement: Ensure environment is set to use read-write connections for all services
-  # zdots Rule: Use RW account for services, ensuring no drift
-  export DATABASE_URL=${DATABASE_RW_URL:-$DATABASE_URL}
+  # zdots Rule: Use RW account for services, ensuring no drift.
+  # Only override when DATABASE_RW_URL is actually set -- unconditionally
+  # exporting DATABASE_URL=${DATABASE_RW_URL:-$DATABASE_URL} force-set it to
+  # an empty string whenever neither var was already in this shell (normal
+  # case: DATABASE_URL only lives in .env, loaded by dotenv inside the Ruby
+  # process, not this script's shell), and ENV.fetch("DATABASE_URL") { ... }
+  # only falls back on an absent key, not an empty one -- so database.yml's
+  # ERB then failed with "Database URL cannot be empty".
+  if [ -n "${DATABASE_RW_URL:-}" ]; then
+    export DATABASE_URL="$DATABASE_RW_URL"
+  fi
 
   # Solid Stack Safety: Explicitly map write connection
   # This ensures SolidQueue, Cache, and Cable have write capability regardless of default replica settings
