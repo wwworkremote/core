@@ -36,6 +36,12 @@ class User < ApplicationRecord
 
   before_validation :set_defaults
 
+  # Single-admin app (see ApplicationController#authenticate_admin) -- there
+  # is no role column because there is only ever one user.
+  def admin?
+    true
+  end
+
   def set_defaults
     self.name ||= "User #{SecureRandom.hex(4)}"
     self.slug ||= SecureRandom.hex(8)
