@@ -39,7 +39,9 @@ class JobBoards::ContentEnrichmentJob < ApplicationJob
     # 4. Extract content
     job_data = JobFetchers::CanonicalJobExtractor.new(fetch_result[:content], fetch_result[:final_url], provider).call
 
-    if job_data[:description].present?
+    if job_data.nil?
+      job.update!(crawl_status: "enrichment_blocked")
+    elsif job_data[:description].present?
       # 5. Normalize and update
       markdown_body = ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass,
                                                                       github_flavored: true).strip

@@ -19,7 +19,7 @@ class Api::JobPostingsController < ApplicationController
         job_data = JobFetchers::CanonicalJobExtractor.new(
           params[:html], params[:url], provider
         ).call
-        if job_data[:description].present?
+        if job_data && job_data[:description].present?
           ReverseMarkdown.convert(job_data[:description], unknown_tags: :bypass,
                                                           github_flavored: true).strip
         end

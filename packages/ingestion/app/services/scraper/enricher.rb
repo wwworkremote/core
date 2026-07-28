@@ -55,6 +55,7 @@ class Scraper::Enricher
     extractor = JobFetchers::CanonicalJobExtractor.new(fetch_result[:content], fetch_result[:final_url],
                                                        discovery_link.board_name)
     data = extractor.call
+    return unless data
 
     JobPosting.create!(
       title: data[:title],
@@ -77,6 +78,7 @@ class Scraper::Enricher
     extractor = JobFetchers::CanonicalJobExtractor.new(fetch_result[:content], fetch_result[:final_url],
                                                        job_posting.source&.name || "manual")
     data = extractor.call
+    return unless data
 
     job_posting.update!(
       body: data[:body] || job_posting.body,

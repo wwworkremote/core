@@ -78,6 +78,7 @@ class EmailIngestion::Importer
     # d. Extract metadata
     job_data = JobFetchers::CanonicalJobExtractor.new(fetch_result[:content], fetch_result[:final_url],
                                                       @source_provider).call
+    return unless job_data
 
     # e. Create JobBoards::Document
     source_slug = "email_ingestion"
