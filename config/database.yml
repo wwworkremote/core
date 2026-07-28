@@ -4,8 +4,14 @@ default: &default
   reconnect: true
   # Disable GSSAPI encryption to prevent macOS fork segmentation faults
   gssencmode: "disable"
-  # High-density pool for high concurrency (Falcon/Puma threads + Solid Queue)
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 100 } %>
+  # NOT just puma.rb's web-thread count -- Solid Queue's own worker groups (config/queue.yml)
+  # need pool >= their largest single thread_pool_size plus scheduler/dispatcher overhead
+  # (dev: light queue alone needs 5 + ~2 overhead = 7) or the supervisor refuses to boot.
+  # 10 covers that with headroom while still tracking RAILS_MAX_THREADS if set explicitly,
+  # instead of the flat 100 that was here before -- that default multiplied by
+  # WEB_CONCURRENCY/JOB_CONCURRENCY process counts could exceed Postgres's max_connections
+  # in production without anyone changing a single number on purpose.
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 10 } %>
   # Long checkout timeout to prevent contention during heavy LLM orchestration
   checkout_timeout: <%= ENV.fetch("DATABASE_CHECKOUT_TIMEOUT") { 20 } %>
 
@@ -15,6 +21,12 @@ development:
     url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } %>
   replica:
     <<: *default
+    # Dedicated read-only role (wwworkremote_ro, SELECT-only, CONNECTION LIMIT 5) on the
+    # same Postgres cluster -- kept off the app's pool so ad hoc/reporting queries can't
+    # starve request-serving connections. Not a physical streaming replica: MVCC already
+    # gives ad hoc SELECTs snapshot isolation from concurrent app writes, so a second
+    # Postgres process wasn't worth the memory cost on this box.
+    pool: <%= ENV.fetch("DATABASE_REPLICA_POOL") { 5 } %>
     url: <%= ENV.fetch("DATABASE_REPLICA_URL") { ENV.fetch("DATABASE_URL") { "postgres://postgres:password@localhost:5432/wwworkremote_development" } } %>
     replica: true
 
@@ -33,5 +45,6 @@ production:
     url: <%= ENV.fetch("DATABASE_URL") { "postgres://deploy@localhost/wwworkremote_production" } %>
   replica:
     <<: *default
+    pool: <%= ENV.fetch("DATABASE_REPLICA_POOL") { 5 } %>
     url: <%= ENV.fetch("DATABASE_REPLICA_URL") { ENV.fetch("DATABASE_URL") { "postgres://deploy@localhost/wwworkremote_production" } } %>
     replica: true

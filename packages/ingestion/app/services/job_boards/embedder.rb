@@ -16,7 +16,8 @@ class JobBoards::Embedder
     return if @job_posting.expired? && !force
 
     # Construct text for embedding
-    input_text = "Title: #{@job_posting.title}\nCompany: #{@job_posting.company}\nDescription: #{@job_posting.body&.truncate(3000)}"
+    raw_text = "Title: #{@job_posting.title}\nCompany: #{@job_posting.company}\nDescription: #{@job_posting.body&.truncate(3000)}"
+    input_text = Guardrails::Normalizer.new(raw_text).call
 
     response = Faraday.post(API_URL) do |req|
       req.headers["Content-Type"] = "application/json"
@@ -53,10 +54,12 @@ class JobBoards::Embedder
   def self.embed_text(text)
     return nil unless new(nil).send(:enabled?)
 
+    input_text = Guardrails::Normalizer.new(text).call
+
     response = Faraday.post(API_URL) do |req|
       req.headers["Content-Type"] = "application/json"
       req.body = {
-        input: text,
+        input: input_text,
         model: "local"
       }.to_json
     end

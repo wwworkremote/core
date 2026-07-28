@@ -37,8 +37,8 @@ class EmailIngestion::Importer
       job_links = EmailIngestion::LinkExtractor.new(parsed_email, @source_provider).call
 
       if job_links.empty?
-        @record.update!(status: "processed", processed_at: Time.current)
-        EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
+        moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
+        @record.update!(status: "processed", processed_at: Time.current, file_path: moved_to || @file_path)
         return
       end
 
@@ -52,11 +52,13 @@ class EmailIngestion::Importer
       # 4. Sync Job Postings (from Documents created in process_job_link)
       JobBoards::Syncer.new.call
 
-      @record.update!(status: "processed", processed_at: Time.current)
-      EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
+      moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).processed
+      @record.update!(status: "processed", processed_at: Time.current, file_path: moved_to || @file_path)
     rescue StandardError => e
-      @record.update!(status: "error", error_message: e.message)
-      EmailIngestion::FileLifecycle.new(@file_path, @source_provider).error
+      moved_to = EmailIngestion::FileLifecycle.new(@file_path, @source_provider).error
+      # Persist the file's new location even on failure -- otherwise a retry looks for the file at
+      # the pre-move path, gets Errno::ENOENT, and permanently masks the real error above.
+      @record.update!(status: "error", error_message: e.message, file_path: moved_to || @file_path)
       Rails.logger.error "[EmailImporter] Error for record #{@record.id}: #{e.message}\n#{e.backtrace.join("\n")}"
     end
   end

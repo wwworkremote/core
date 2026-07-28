@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # 1. Base stage for common dependencies
-ARG RUBY_VERSION=4.0.2
+ARG RUBY_VERSION=4.0.6
 FROM ruby:${RUBY_VERSION}-slim AS base
 
 WORKDIR /rails

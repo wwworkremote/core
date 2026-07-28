@@ -17,6 +17,11 @@ Rails.application.configure do
   # Enable server timing
   config.server_timing = true
 
+  # Rotate the dev log instead of letting it grow unbounded -- this box is disk-constrained.
+  config.logger = ActiveSupport::TaggedLogging.new(
+    Logger.new(Rails.root.join("log", "#{Rails.env}.log"), 5, 20.megabytes)
+  )
+
   config.action_mailer.default_url_options = { host: "localhost", port: 31000 }
 
   # Enable/disable caching. By default caching is disabled.

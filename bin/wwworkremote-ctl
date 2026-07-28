@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# bin/wwworkremote-ctl — launchd-backed service control for local dev.
+#
+# Mirrors the zdots platform's own service pattern (see zsvc / docs at
+# ~/.config/zsh/docs/platform-service-plane.md) instead of foreman: each
+# process is a real LaunchAgent with KeepAlive + a 30s ThrottleInterval, so a
+# crash gets throttled and retried instead of foreman's group-kill-on-any-exit
+# behavior turning one bad process into a full outage (see TASK-22 for the bug
+# that motivated this).
+#
+# Services:  web (Puma)  jobs (Solid Queue)
+# Commands:  start  stop  restart  status  logs
+
+set -euo pipefail
+
+ZDOTS_LIB="$HOME/.config/zsh/lib/svc-launchd.bash"
+if [[ ! -f "$ZDOTS_LIB" ]]; then
+  echo "wwworkremote-ctl: missing $ZDOTS_LIB (zdots platform not present on this machine)" >&2
+  exit 1
+fi
+# shellcheck source=/dev/null
+source "$ZDOTS_LIB"
+
+APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STATE_DIR="$HOME/.local/state/wwworkremote"
+PLIST_DIR="$HOME/Library/LaunchAgents"
+
+_meta() {
+  case "$1" in
+    web)
+      SVC_LABEL="com.wwworkremote.web"
+      SVC_BIN="$APP_ROOT/bin/wwworkremote-web"
+      ;;
+    jobs)
+      SVC_LABEL="com.wwworkremote.jobs"
+      SVC_BIN="$APP_ROOT/bin/wwworkremote-jobs"
+      ;;
+    *)
+      echo "wwworkremote-ctl: unknown service: $1 (expected: web, jobs, all)" >&2
+      exit 1
+      ;;
+  esac
+  SVC_NAME="$1"
+  SVC_PLIST="$PLIST_DIR/${SVC_LABEL}.plist"
+  SVC_LOG="$STATE_DIR/${1}.log"
+}
+
+ALL_SVCS=(web jobs)
+
+cmd_start() {
+  _meta "$1"
+  zdots_svc_launchd_register "$SVC_LABEL" "$SVC_PLIST" "$SVC_BIN" "$SVC_LOG"
+  zdots_svc_launchd_start "$SVC_LABEL" "$SVC_PLIST"
+}
+
+cmd_stop() {
+  _meta "$1"
+  zdots_svc_launchd_stop "$SVC_LABEL"
+}
+
+cmd_restart() {
+  _meta "$1"
+  zdots_svc_launchd_stop "$SVC_LABEL"
+  zdots_svc_launchd_register "$SVC_LABEL" "$SVC_PLIST" "$SVC_BIN" "$SVC_LOG"
+  zdots_svc_launchd_start "$SVC_LABEL" "$SVC_PLIST"
+}
+
+cmd_status() {
+  _meta "$1"
+  local sp running pid
+  sp=$(zdots_svc_launchd_status "$SVC_LABEL")
+  running="${sp%% *}"
+  pid="${sp#* }"
+  if [[ "$running" == "true" ]]; then
+    echo "$SVC_NAME: running (pid ${pid:-?})"
+  else
+    echo "$SVC_NAME: stopped"
+  fi
+}
+
+cmd_logs() {
+  _meta "$1"
+  mkdir -p "$STATE_DIR"
+  echo "wwworkremote-ctl: tailing $SVC_LOG — Ctrl+C to stop" >&2
+  tail -f "$SVC_LOG"
+}
+
+_for_each() {
+  local fn="$1" svc
+  for svc in "${ALL_SVCS[@]}"; do "$fn" "$svc"; done
+}
+
+usage() {
+  cat <<'EOF'
+Usage: bin/wwworkremote-ctl <command> [web|jobs|all]
+
+COMMANDS
+  start   <svc|all>   Register + start (RunAtLoad, KeepAlive, 30s throttle)
+  stop    <svc|all>   Stop and unregister
+  restart <svc|all>   Stop, re-register, start
+  status  <svc|all>   running/stopped + pid
+  logs    <svc>       Tail the service log (Ctrl+C to stop)
+
+SERVICES
+  web    Puma            (config/puma.rb, port 31000)
+  jobs   Solid Queue      (bin/jobs)
+
+Logs:  ~/.local/state/wwworkremote/{web,jobs}.log
+Plists: ~/Library/LaunchAgents/com.wwworkremote.{web,jobs}.plist
+EOF
+}
+
+[[ $# -ge 1 ]] || { usage >&2; exit 1; }
+cmd="$1"; shift || true
+target="${1:-all}"
+
+case "$cmd" in
+  start|stop|restart|status)
+    if [[ "$target" == "all" ]]; then
+      _for_each "cmd_${cmd}"
+    else
+      "cmd_${cmd}" "$target"
+    fi
+    ;;
+  logs)
+    [[ "$target" != "all" ]] || { echo "wwworkremote-ctl: logs needs a single service (web or jobs)" >&2; exit 1; }
+    cmd_logs "$target"
+    ;;
+  -h|--help) usage ;;
+  *) echo "wwworkremote-ctl: unknown command: $cmd" >&2; usage >&2; exit 1 ;;
+esac

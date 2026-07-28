@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# bin/wwworkremote-web — launchd entry point for the Puma web process.
+#
+# Not meant to be run by hand; registered as a LaunchAgent by bin/wwworkremote-ctl.
+# Sets up the environment the same way bin/dev does, then execs Puma directly
+# (no foreman) so a crash is a clean process exit launchd can KeepAlive/throttle,
+# instead of foreman's group-kill-on-any-sibling-exit behavior.
+
+set -euo pipefail
+
+APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$APP_ROOT"
+
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+export RUBY_DEBUG_OPEN="true"
+export RUBY_DEBUG_LAZY="true"
+export PORT="${PORT:-31000}"
+
+exec bundle exec puma -C config/puma.rb

@@ -374,9 +374,9 @@
 
   // ─── Configurable API config ───────────────────────────────────────────────
   // Reads apiUrl, apiEmail, apiPassword from chrome.storage.local (set via popup).
-  // Falls back to localhost:3010 with no auth if nothing is saved.
+  // Falls back to localhost:31000 with no auth if nothing is saved.
 
-  const DEFAULT_API = 'http://localhost:3010';
+  const DEFAULT_API = 'http://localhost:31000';
 
   async function getApiConfig() {
     return new Promise(resolve => {

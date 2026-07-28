@@ -35,5 +35,6 @@ class EmailIngestion::FileLifecycle
     end
 
     FileUtils.move(@file_path, target_path)
+    target_path
   end
 end

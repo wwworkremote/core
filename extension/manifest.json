@@ -5,7 +5,7 @@
   "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
   "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
   "host_permissions": [
-    "http://localhost:3010/*",
+    "http://localhost:31000/*",
     "http://localhost:*/*",
     "https://www.linkedin.com/*",
     "https://www.indeed.com/*",
