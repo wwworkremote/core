@@ -141,11 +141,20 @@ is_running() {
 
 run_prechecks() {
   echo "🔍 Running pre-boot checks..."
-  # Kill anything on port 3010
-  lsof -ti:3010 | xargs kill -9 2>/dev/null || true
+  # Kill anything on port 31000
+  lsof -ti:31000 | xargs kill -9 2>/dev/null || true
+
+  # Enforcement: Ensure environment is set to use read-write connections for all services
+  # zdots Rule: Use RW account for services, ensuring no drift
+  export DATABASE_URL=${DATABASE_RW_URL:-$DATABASE_URL}
+
+  # Solid Stack Safety: Explicitly map write connection
+  # This ensures SolidQueue, Cache, and Cable have write capability regardless of default replica settings
+  export SOLID_QUEUE_WRITE_CONNECTION=true
+
   # Run migrations for all databases (Solid Queue, Cache, Cable, etc.)
-  # This uses db:prepare which is idempotent and non-destructive
   bin/rails db:prepare
+
   # Ensure environment is set
   bin/rails db:environment:set RAILS_ENV=development 2>/dev/null || true
   # Touch log files to ensure tail -F doesn't fail

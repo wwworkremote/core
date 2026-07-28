@@ -1,6 +1,6 @@
 boards = [
-  'cord', 'linkedin', 'indeed', 'dice', 'remoteok', 
-  'remotive', 'wwr', 'yc', 'glassdoor', 'builtin', 
+  'cord', 'linkedin', 'indeed', 'dice', 'remoteok',
+  'remotive', 'wwr', 'yc', 'glassdoor', 'builtin',
   'remoteio', 'flexjobs', 'bestjobs', 'echojobs', 'roberthalf'
 ]
 
@@ -21,8 +21,8 @@ boards.each do |board|
       remote: true,
       priority: 1
     ) do |q|
-      q.query_params = { 
-        remote: true, 
+      q.query_params = {
+        remote: true,
         location: 'Remote',
         seniority: ['staff', 'principal', 'lead'],
         selector: 'a[href*="/job/"], a[href*="/jobs/"], .job-link, a[data-testid="job-title"]'

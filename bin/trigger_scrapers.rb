@@ -1,6 +1,6 @@
 scrapers = [
-  'cord', 'linkedin', 'indeed', 'dice', 'remoteok', 
-  'remotive', 'wwr', 'yc', 'glassdoor', 'builtin', 
+  'cord', 'linkedin', 'indeed', 'dice', 'remoteok',
+  'remotive', 'wwr', 'yc', 'glassdoor', 'builtin',
   'remoteio', 'flexjobs', 'bestjobs', 'echojobs', 'roberthalf'
 ]
 

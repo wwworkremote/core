@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk grep *)",
+      "mcp__backlog__task_view",
+      "Bash(ruby -c *)",
+      "Bash(rtk cat *)",
+      "Bash(rtk find *)",
+      "Bash(rtk ls *)",
+      "Bash(rtk tail *)",
+      "Bash(xcrun simctl list *)",
+      "Bash(curl -s -o /dev/null -w *)"
+    ]
+  }
+}

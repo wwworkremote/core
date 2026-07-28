@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# bin/smoke — Project-wide operational smoke test suite.
+# Orchestrates infrastructure (LLM) and operational (Ingestion) checks.
+
+set -e
+
+echo "=== Running Smoke Tests ==="
+
+echo "[1/2] Checking LLM Infrastructure..."
+ruby bin/verify_llm.rb
+
+echo "[2/2] Checking Operational Ingestion..."
+RAILS_ENV=test bundle exec ruby bin/verify_ingestion
+
+echo -e "\e[32m=== All Smoke Tests Passed ===\e[0m"

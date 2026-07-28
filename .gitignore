@@ -24,6 +24,8 @@
 .DS_Store
 
 data/*.xml
+data/backups/*.dump
+database_consistency_*.txt
 
 .wwworkremote/
 

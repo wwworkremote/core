@@ -1,4 +1,7 @@
-# Proposal: YC (Work at a Startup) Scraper
+# Implementation Archive: YC (Work at a Startup) Scraper
+
+**Status**: [x] IMPLEMENTED (Phase 7)
+**Date**: April 2026
 
 ## Context
 Himalayas API is currently returning 524 (Timeout). We need a high-signal source for startups and high-quality remote roles. YC's "Work at a Startup" is the ideal target.

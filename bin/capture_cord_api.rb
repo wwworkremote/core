@@ -9,7 +9,7 @@ puts "Initiating Capture Session for: #{url}"
 Playwright.create(playwright_cli_executable_path: Rails.root.join('node_modules', '.bin', 'playwright').to_s) do |playwright|
   playwright.chromium.launch(headless: true) do |browser|
     page = browser.new_page
-    
+
     # Intercept responses using proc
     callback = ->(response) {
       if response.request.resource_type == 'fetch' || response.request.resource_type == 'xhr'
