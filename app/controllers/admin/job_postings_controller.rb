@@ -1,42 +1,44 @@
 # frozen_string_literal: true
 
 class Admin::JobPostingsController < Admin::ApplicationController
+  ACTION_HANDLERS = {
+    "enrich" => ->(job_posting) { Scraper::Enricher.call(job_posting) },
+    "synthesize" => ->(job_posting) { JobBoards::Categorizer.new(job_posting).call(force: true) }
+  }.freeze
+
+  ACTION_NOTICES = {
+    "enrich" => "Enrichment complete.",
+    "synthesize" => "Synthesis triggered."
+  }.freeze
+
+  BULK_OPERATIONS = {
+    "purge" => ->(scope) { scope.find_each(&:purge!) },
+    "restore" => ->(scope) { scope.find_each(&:restore!) },
+    "delete" => ->(scope) { scope.destroy_all }
+  }.freeze
+
+  BULK_NOTICE_TEXT = {
+    "purge" => "moved to trash",
+    "restore" => "restored",
+    "delete" => "permanently deleted"
+  }.freeze
+
   def index
     @status = params[:status]
-    @job_postings = JobPosting.recent.includes(source: :origin)
-
-    @job_postings = if @status == "purged"
-                      @job_postings.where(status: "purged")
-                    else
-                      @job_postings.where.not(status: "purged")
-                    end
-
-    @job_postings = @job_postings.page(params[:page]).per(50)
+    @job_postings = filtered_job_postings.page(params[:page]).per(50)
   end
 
   def show
     @job_posting = JobPosting.find(params.expect(:id))
     return unless params[:frame] == "semantic_matches"
-    @similar_jobs = if @job_posting.embedding.present?
-                      @job_posting.nearest_neighbors(:embedding,
-                                                     distance: "cosine").limit(5)
-                    else
-                      []
-                    end
+
+    @similar_jobs = semantic_matches(@job_posting)
     render partial: "semantic_matches", locals: { similar_jobs: @similar_jobs }
   end
 
   def update
     @job_posting = JobPosting.find(params.expect(:id))
-
-    if params[:action_type] == "enrich"
-      Scraper::Enricher.call(@job_posting)
-      flash[:notice] = "Enrichment complete."
-    elsif params[:action_type] == "synthesize"
-      JobBoards::Categorizer.new.call(@job_posting.id)
-      flash[:notice] = "Synthesis triggered."
-    end
-
+    perform_action(params[:action_type])
     redirect_back_or_to(admin_job_posting_path(@job_posting))
   end
 
@@ -53,29 +55,50 @@ class Admin::JobPostingsController < Admin::ApplicationController
   end
 
   def bulk_action
-    ids = params[:job_ids]
-    action = params[:bulk_operation]
-
-    if ids.present?
-      case action
-      when "purge"
-        JobPosting.where(id: ids).find_each(&:purge!)
-        notice = "#{ids.size} records moved to trash."
-      when "restore"
-        JobPosting.where(id: ids).find_each(&:restore!)
-        notice = "#{ids.size} records restored."
-      when "delete"
-        JobPosting.where(id: ids).destroy_all
-        notice = "#{ids.size} records permanently deleted."
-      end
-    end
-
-    redirect_back_or_to(admin_job_postings_path, notice: notice || "No records selected.")
+    redirect_back_or_to(admin_job_postings_path, notice: bulk_action_notice)
   end
 
   def destroy
     @job_posting = JobPosting.find(params.expect(:id))
     @job_posting.destroy
     redirect_to admin_job_postings_path, notice: "Job posting was permanently deleted."
+  end
+
+  private
+
+  def filtered_job_postings
+    scope = JobPosting.recent
+    @status == "purged" ? scope.where(status: "purged") : scope.where.not(status: "purged")
+  end
+
+  def semantic_matches(job_posting)
+    return [] if job_posting.embedding.blank?
+
+    job_posting.nearest_neighbors(:embedding, distance: "cosine").limit(5)
+  end
+
+  def perform_action(action_type)
+    handler = ACTION_HANDLERS[action_type]
+    return unless handler
+
+    handler.call(@job_posting)
+    flash[:notice] = ACTION_NOTICES[action_type]
+  end
+
+  def bulk_action_notice
+    ids = params[:job_ids]
+    operation = BULK_OPERATIONS[params[:bulk_operation]]
+    return "No records selected." if ids.blank? || operation.nil?
+
+    apply_bulk_operation(operation, ids)
+  end
+
+  def apply_bulk_operation(operation, ids)
+    operation.call(JobPosting.where(id: ids))
+    "#{ids.size} records #{bulk_notice_text}."
+  end
+
+  def bulk_notice_text
+    BULK_NOTICE_TEXT[params[:bulk_operation]]
   end
 end
