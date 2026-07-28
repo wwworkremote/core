@@ -103,7 +103,11 @@ PreCommit:
 
   RSpec:
     enabled: true
-    command: ['bundle', 'exec', 'rspec']
+    # Explicit dirs, not a bare `rspec` -- packages/*/spec (the ingestion
+    # engine's specs) sits outside RSpec's default_path ("spec"), so a bare
+    # invocation silently never discovers it. Listed explicitly (not a glob)
+    # since command: execs directly, without shell glob expansion.
+    command: ['bundle', 'exec', 'rspec', 'spec', 'packages/ingestion/spec']
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test

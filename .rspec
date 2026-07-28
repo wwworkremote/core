@@ -2,4 +2,3 @@
 --color
 --order random
 --require rails_helper
---pattern "{spec,packages/*/spec}/**/*_spec.rb"
