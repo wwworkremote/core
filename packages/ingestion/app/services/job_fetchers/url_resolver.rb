@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class JobFetchers::UrlResolver
+  RESOLVERS = {
+    /linkedin\.com/ => :resolve_linkedin,
+    /indeed\.com/ => :resolve_indeed,
+    /adzuna\.com/ => :resolve_adzuna
+  }.freeze
+
   def self.resolve(url)
     new(url).resolve
   end
@@ -10,26 +16,18 @@ class JobFetchers::UrlResolver
   end
 
   def resolve
-    case @url
-    when /linkedin\.com/ then resolve_linkedin
-    when /indeed\.com/ then resolve_indeed
-    when /adzuna\.com/ then resolve_adzuna
-    else resolve_generic
-    end
+    _pattern, handler = RESOLVERS.find { |pattern, _| pattern.match?(@url) }
+    handler ? send(handler) : resolve_generic
   end
 
   private
 
+  # Convert tracking/short URLs to canonical job view.
+  # Pattern: https://www.linkedin.com/jobs/view/123456789 (optionally
+  # prefixed with comm/ for the tracking-link variant).
   def resolve_linkedin
-    # Convert tracking/short URLs to canonical job view
-    # Pattern: https://www.linkedin.com/jobs/view/123456789
-    if @url =~ %r{jobs/view/(\d+)}
-      "https://www.linkedin.com/jobs/view/#{::Regexp.last_match(1)}"
-    elsif @url =~ %r{comm/jobs/view/(\d+)}
-      "https://www.linkedin.com/jobs/view/#{::Regexp.last_match(1)}"
-    else
-      @url
-    end
+    match = @url.match(%r{(?:comm/)?jobs/view/(\d+)})
+    match ? "https://www.linkedin.com/jobs/view/#{match[1]}" : @url
   end
 
   def resolve_indeed
@@ -46,14 +44,15 @@ class JobFetchers::UrlResolver
     @url
   end
 
+  # Follow redirects to get the final destination.
   def resolve_generic
-    # Follow redirects to get the final destination
-
-    response = Faraday.head(@url) do |req|
-      req.options.timeout = 5
-    end
-    response.headers["location"] || @url
+    fetch_location || @url
   rescue StandardError
     @url
+  end
+
+  def fetch_location
+    response = Faraday.head(@url) { |req| req.options.timeout = 5 }
+    response.headers["location"]
   end
 end
