@@ -20,20 +20,30 @@ class JobBoards::Client
   private
 
   def execute_request(method, url, payload, headers)
-    if source_locked?(slug)
-      Rails.logger.info "[JobBoards::Client] Skipping #{method.upcase} #{url} - #{slug} is currently locked."
-      return nil
-    end
+    return log_locked_skip(method, url) if source_locked?(slug)
 
-    response = connection(headers).send(method, url, payload)
-    if response.status == 429
-      handle_rate_limit(response)
-      return nil
-    end
+    respond(fetch(method, url, payload, headers))
+  rescue Faraday::Error => e
+    log_connection_error(e)
+  end
+
+  def respond(response)
+    return handle_rate_limit(response) if response.status == 429
 
     response
-  rescue Faraday::Error => e
-    Rails.logger.error "[JobBoards::Client] Connection error for #{slug}: #{e.message}"
+  end
+
+  def fetch(method, url, payload, headers)
+    connection(headers).send(method, url, payload)
+  end
+
+  def log_locked_skip(method, url)
+    Rails.logger.info "[JobBoards::Client] Skipping #{method.upcase} #{url} - #{slug} is currently locked."
+    nil
+  end
+
+  def log_connection_error(error)
+    Rails.logger.error "[JobBoards::Client] Connection error for #{slug}: #{error.message}"
     nil
   end
 
@@ -45,14 +55,15 @@ class JobBoards::Client
   end
 
   def handle_rate_limit(response)
-    # Extract retry-after if available, default to 1 hour
-    retry_after = response.headers["Retry-After"]
-    duration = if retry_after.present? && retry_after.to_i.positive?
-                 retry_after.to_i.seconds
-               else
-                 1.hour
-               end
+    lock_source!(slug, duration: retry_after_duration(response))
+    nil
+  end
 
-    lock_source!(slug, duration: duration)
+  # Extract retry-after if available, default to 1 hour
+  def retry_after_duration(response)
+    retry_after = response.headers["Retry-After"]
+    return 1.hour unless retry_after.present? && retry_after.to_i.positive?
+
+    retry_after.to_i.seconds
   end
 end
