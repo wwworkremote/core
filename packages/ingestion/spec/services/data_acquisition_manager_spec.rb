@@ -35,20 +35,20 @@ RSpec.describe DataAcquisitionManager do
 
     before do
       allow(SystemSetting).to receive(:paused?).and_return(false)
-      allow_any_instance_of(JobBoards::Syncer).to receive(:call).and_return(true)
+      allow(JobBoards::Syncer).to receive(:new).and_return(instance_double(JobBoards::Syncer, call: true))
     end
 
     context "with a service object fetcher (Adzuna)" do
-      let(:fetcher_double) { instance_double(Adzuna::Fetcher) }
+      let(:fetcher_double) { instance_double(Adzuna::Fetcher, call: true) }
 
       before do
         allow(Adzuna::Fetcher).to receive(:new).and_return(fetcher_double)
       end
 
       it "successfully executes the fetcher and syncs" do
-        expect(fetcher_double).to receive(:call).with(force: true).and_return(true)
-
         result = described_class.run(slug, force: true)
+
+        expect(fetcher_double).to have_received(:call).with(force: true)
         expect(result[:success]).to be true
 
         source.reload
@@ -65,15 +65,16 @@ RSpec.describe DataAcquisitionManager do
 
     context "with a Scraper (Indeed)" do
       let(:scraper_slug) { "indeed" }
-      let(:client_double) { instance_double(Scraper::Indeed::ApiClient) }
+      let(:client_double) { instance_double(Scraper::Indeed::ApiClient, call: { success: true }) }
 
       before do
         allow(Scraper::Indeed::ApiClient).to receive(:new).and_return(client_double)
       end
 
       it "triggers a default search if no queries exist" do
-        expect(client_double).to receive(:call).and_return({ success: true })
         described_class.run(scraper_slug)
+
+        expect(client_double).to have_received(:call)
       end
     end
 
@@ -81,13 +82,11 @@ RSpec.describe DataAcquisitionManager do
       let(:scraper_slug) { "cord" }
 
       it "triggers a default search if no queries exist" do
-        expect(Scraper::CrawlDiscoveryJob).to receive(:perform_later).with(
-          scraper_slug,
-          /cord\.com/,
-          any_args
-        )
+        allow(Scraper::CrawlDiscoveryJob).to receive(:perform_later)
 
         described_class.run(scraper_slug)
+
+        expect(Scraper::CrawlDiscoveryJob).to have_received(:perform_later).with(scraper_slug, /cord\.com/, any_args)
       end
     end
   end
