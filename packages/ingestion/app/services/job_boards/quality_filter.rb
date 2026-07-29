@@ -25,29 +25,34 @@ class JobBoards::QualityFilter
   end
 
   def useful?
-    return false if @job_posting.title.blank?
-    return false if BANNED_TITLES.any? { |banned| @job_posting.title.upcase == banned.upcase }
-    return false if @job_posting.title.length < 3
-
-    # Geographic Shield: Only keep jobs in preferred countries
-    if @job_posting.country_code.present? && @user.preferred_countries.present? && @user.preferred_countries.exclude?(@job_posting.country_code)
-      return false
-    end
-
-    # Seniority Check: Filter out Junior/Intern if user is Senior/Staff
-    # (This assumes we have profile data, but for now we can do basic string matches)
-    if @job_posting.title.match?(/junior|intern|associate/i)
-      # return false if user_is_senior?
-    end
-
-    # Eligibility Check: Search for "US only" or "UK only" in body if mismatch
-    if @job_posting.body.present?
-      # Logic here to detect high-certainty exclusion text
-    end
-
-    # If body is extremely short and it's from a known "noisy" source, it might be junk
-    return false if @job_posting.body.blank? || @job_posting.body.length < 50
+    return false unless valid_title?
+    return false if country_mismatch?
+    return false if body_too_short?
 
     true
+  end
+
+  private
+
+  def valid_title?
+    return false if @job_posting.title.blank?
+    return false if banned_title?
+
+    @job_posting.title.length >= 3
+  end
+
+  def banned_title?
+    BANNED_TITLES.any? { |banned| @job_posting.title.upcase == banned.upcase }
+  end
+
+  # Geographic Shield: only keep jobs in the user's preferred countries.
+  def country_mismatch?
+    return false if @job_posting.country_code.blank? || @user.preferred_countries.blank?
+
+    @user.preferred_countries.exclude?(@job_posting.country_code)
+  end
+
+  def body_too_short?
+    @job_posting.body.blank? || @job_posting.body.length < 50
   end
 end
