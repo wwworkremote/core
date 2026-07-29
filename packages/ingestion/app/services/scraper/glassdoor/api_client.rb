@@ -15,60 +15,75 @@ class Scraper::Glassdoor::ApiClient
   end
 
   def search(keywords, location)
-    source = JobBoards::Source.find_or_create_by!(slug: "glassdoor") { |s| s.name = "Glassdoor" }
-    query = JobBoards::Query.find_or_create_by!(source_id: source.id)
-
-    { "sc.keyword" => keywords, "locT" => "C", "locId" => location }
-    url = "https://www.glassdoor.com/Job/jobs.htm?suggestCount=0&suggestChosen=false&clickSource=searchBtn&typedKeyword=#{keywords}&locT=R&locId=110&jobType="
-
-    Rails.logger.info "[Glassdoor::ApiClient] Fetching: #{url}"
-
-    # Using Playwright for full page render
-    fetch_result = JobFetchers::PageFetch.new(url).call
+    source, query = source_and_query
+    fetch_result = fetch_page(search_url(keywords, location))
     return { success: false, error: "Fetch failed" } unless fetch_result
 
-    data = parse_results(fetch_result[:content])
-
-    processed_count = 0
-    data["results"].each do |job_data|
-      # Create/Update Document
-      signature = Digest::SHA256.hexdigest("glassdoor-#{job_data['external_id']}")
-      doc = JobBoards::Document.find_or_initialize_by(signature: signature)
-      doc.assign_attributes(
-        source_id: source.id,
-        job_boards_query_id: query.id,
-        document: job_data.to_json,
-        aasm_state: "pending"
-      )
-      doc.save!
-      processed_count += 1
-    end
-
-    { success: true, count: processed_count }
+    import(source, query, fetch_result)
   end
 
   private
 
+  def source_and_query
+    source = JobBoards::Source.find_or_create_by!(slug: "glassdoor") { |s| s.name = "Glassdoor" }
+    query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+    [source, query]
+  end
+
+  # NOTE: locId is hardcoded to a fixed Glassdoor region id; `location` is
+  # accepted for API-shape parity with the other ApiClients but not yet
+  # wired into a real geo lookup -- pre-existing behavior, unchanged here.
+  def search_url(keywords, _location)
+    "#{BASE_URL}?suggestCount=0&suggestChosen=false&clickSource=searchBtn&typedKeyword=#{keywords}" \
+      "&locT=R&locId=110&jobType="
+  end
+
+  def fetch_page(url)
+    Rails.logger.info "[Glassdoor::ApiClient] Fetching: #{url}"
+    JobFetchers::PageFetch.new(url).call
+  end
+
+  def import(source, query, fetch_result)
+    data = parse_results(fetch_result[:content])
+    count = Scraper::DocumentUpserter.call("glassdoor", source, query, data["results"])
+    { success: true, count: count }
+  end
+
   def parse_results(html)
     doc = Nokogiri::HTML(html)
-    results = []
+    { "results" => doc.css('li[data-test="jobListing"]').filter_map { |card| card_fields(card) } }
+  end
 
-    # Target the modern Glassdoor job card structure
-    doc.css('li[data-test="jobListing"]').each do |card|
-      external_id = card["data-id"]
-      next unless external_id
+  def card_fields(card)
+    external_id = card["data-id"]
+    return unless external_id
 
-      results << {
-        "jobTitle" => card.css('[data-test="job-title"]').text.strip,
-        "companyName" => card.css('[data-test="employer-short-name"]').text.strip,
-        "jobGeo" => card.css('[data-test="location"]').text.strip,
-        "rating" => card.css('[data-test="rating"]').text.strip,
-        "url" => "https://www.glassdoor.com#{card.css('a[data-test="job-link"]').first['href']}",
-        "external_id" => external_id,
-        "found_by_terms" => nil
-      }
-    end
+    build_result(card, external_id)
+  end
 
-    { "results" => results }
+  def build_result(card, external_id)
+    base_result(card).merge("external_id" => external_id, "found_by_terms" => nil)
+  end
+
+  def base_result(card)
+    title_and_company(card).merge(geo_and_rating(card), "url" => job_url(card))
+  end
+
+  def title_and_company(card)
+    {
+      "jobTitle" => card.css('[data-test="job-title"]').text.strip,
+      "companyName" => card.css('[data-test="employer-short-name"]').text.strip
+    }
+  end
+
+  def geo_and_rating(card)
+    {
+      "jobGeo" => card.css('[data-test="location"]').text.strip,
+      "rating" => card.css('[data-test="rating"]').text.strip
+    }
+  end
+
+  def job_url(card)
+    "https://www.glassdoor.com#{card.css('a[data-test="job-link"]').first['href']}"
   end
 end

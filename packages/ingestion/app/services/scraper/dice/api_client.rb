@@ -17,61 +17,78 @@ class Scraper::Dice::ApiClient
   end
 
   def search(keywords, location)
-    source = JobBoards::Source.find_or_create_by!(slug: "dice") { |s| s.name = "Dice" }
-    query = JobBoards::Query.find_or_create_by!(source_id: source.id)
-
-    # Build the Dice search URL
-    params = { q: keywords, l: location, countryCode: "US", radius: 30, radiusUnit: "mi", page: 1, pageSize: 20 }
-    url = "#{BASE_URL}?#{params.to_query}"
-
-    Rails.logger.info "[Dice::ApiClient] Fetching: #{url}"
-
-    fetch_result = JobFetchers::PageFetch.new(url).call
+    source, query = source_and_query
+    fetch_result = fetch_page(search_url(keywords, location))
     return { success: false, error: "Fetch failed" } unless fetch_result
 
-    data = parse_results(fetch_result[:content])
-
-    processed_count = 0
-    data["results"].each do |job_data|
-      signature = Digest::SHA256.hexdigest("dice-#{job_data['external_id']}")
-      doc = JobBoards::Document.find_or_initialize_by(signature: signature)
-      doc.assign_attributes(
-        source_id: source.id,
-        job_boards_query_id: query.id,
-        document: job_data.to_json,
-        aasm_state: "pending"
-      )
-      doc.save!
-      processed_count += 1
-    end
-
-    { success: true, count: processed_count }
+    import(source, query, fetch_result)
   end
 
   private
 
+  def source_and_query
+    source = JobBoards::Source.find_or_create_by!(slug: "dice") { |s| s.name = "Dice" }
+    query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+    [source, query]
+  end
+
+  def search_url(keywords, location)
+    params = { q: keywords, l: location, countryCode: "US", radius: 30, radiusUnit: "mi", page: 1, pageSize: 20 }
+    "#{BASE_URL}?#{params.to_query}"
+  end
+
+  def fetch_page(url)
+    Rails.logger.info "[Dice::ApiClient] Fetching: #{url}"
+    JobFetchers::PageFetch.new(url).call
+  end
+
+  def import(source, query, fetch_result)
+    data = parse_results(fetch_result[:content])
+    count = Scraper::DocumentUpserter.call("dice", source, query, data["results"])
+    { success: true, count: count }
+  end
+
   def parse_results(html)
     doc = Nokogiri::HTML(html)
-    results = []
+    { "results" => doc.css("d-job-card, .card").filter_map { |card| card_fields(card) } }
+  end
 
-    # Target Dice's search result cards (d-job-card)
-    doc.css("d-job-card, .card").each do |card|
-      title_link = card.css("a.card-title-link").first
-      next unless title_link
+  def card_fields(card)
+    title_link = card.css("a.card-title-link").first
+    return unless title_link
 
-      job_id = title_link["id"] || title_link["href"]&.match(%r{job-detail/([^/?]+)})&.[](1)
-      next unless job_id
+    job_id = job_id_from(title_link)
+    return unless job_id
 
-      results << {
-        "jobTitle" => title_link.text.strip,
-        "companyName" => card.css('[data-cy="search-result-company-name"], .card-company a').text.strip,
-        "jobGeo" => card.css(".card-location").text.strip,
-        "url" => title_link["href"].start_with?("http") ? title_link["href"] : "https://www.dice.com#{title_link['href']}",
-        "external_id" => job_id,
-        "found_by_terms" => nil
-      }
-    end
+    build_result(card, title_link, job_id)
+  end
 
-    { "results" => results }
+  def job_id_from(title_link)
+    title_link["id"] || title_link["href"]&.match(%r{job-detail/([^/?]+)})&.[](1)
+  end
+
+  def build_result(card, title_link, job_id)
+    base_result(card, title_link).merge("external_id" => job_id, "found_by_terms" => nil)
+  end
+
+  def base_result(card, title_link)
+    title_fields(title_link).merge(location_fields(card))
+  end
+
+  def title_fields(title_link)
+    { "jobTitle" => title_link.text.strip, "url" => job_url(title_link) }
+  end
+
+  def location_fields(card)
+    { "companyName" => company_name(card), "jobGeo" => card.css(".card-location").text.strip }
+  end
+
+  def company_name(card)
+    card.css('[data-cy="search-result-company-name"], .card-company a').text.strip
+  end
+
+  def job_url(title_link)
+    href = title_link["href"]
+    href.start_with?("http") ? href : "https://www.dice.com#{href}"
   end
 end

@@ -16,43 +16,66 @@ class Scraper::ApplicationAgent
   def call
     return { success: false, error: "No target URL" } if @job_posting.target_url.blank?
 
-    Playwright.create(playwright_cli_executable_path: Rails.root.join("node_modules/.bin/playwright").to_s) do |playwright|
-      playwright.chromium.launch(headless: false) do |browser| # Headful so you can see it work!
-        page = browser.new_page
-        page.goto(@job_posting.target_url)
-
-        # 1. Identify 'Apply' Button
-        apply_button = page.query_selector('text="Apply", text="Apply Now", .apply-button')
-        if apply_button
-          apply_button.click
-          page.wait_for_load_state(state: "networkidle")
-
-          # 2. Attempt Auto-Fill (Foundation)
-          # This is where we would map @profile data to form selectors
-          auto_fill_form(page)
-
-          { success: true, message: "Navigated to application and attempted auto-fill." }
-        else
-          { success: false, error: "Could not find apply button." }
-        end
-      end
-    end
+    with_browser_page { |page| attempt_application(page) }
   end
 
   private
 
+  def with_browser_page
+    Playwright.create(playwright_cli_executable_path: playwright_cli_path) do |playwright|
+      playwright.chromium.launch(headless: false) do |browser| # Headful so you can see it work!
+        yield browser.new_page
+      end
+    end
+  end
+
+  def playwright_cli_path
+    Rails.root.join("node_modules/.bin/playwright").to_s
+  end
+
+  def attempt_application(page)
+    page.goto(@job_posting.target_url)
+    apply_button = page.query_selector('text="Apply", text="Apply Now", .apply-button')
+    return { success: false, error: "Could not find apply button." } unless apply_button
+
+    click_and_fill(page, apply_button)
+  end
+
+  def click_and_fill(page, apply_button)
+    apply_button.click
+    page.wait_for_load_state(state: "networkidle")
+    auto_fill_form(page)
+    { success: true, message: "Navigated to application and attempted auto-fill." }
+  end
+
   def auto_fill_form(page)
-    # Common selector mappings
-    field_map = {
+    field_map.each { |selector, value| fill_field(page, selector, value) }
+  end
+
+  def field_map
+    name_fields.merge(contact_fields)
+  end
+
+  def name_fields
+    {
       'input[name*="first_name"]' => @user.name.split.first,
       'input[name*="last_name"]' => @user.name.split.last,
-      'input[name*="email"]' => @user.email,
-      'input[name*="phone"]' => @profile.contact_info&.[]("phone"),
-      'textarea[name*="summary"]' => @profile.resume_text&.truncate(500)
+      'input[name*="email"]' => @user.email
     }
+  end
 
-    field_map.each do |selector, value|
-      page.fill(selector, value) if page.query_selector(selector) && value.present?
-    end
+  def contact_fields
+    {
+      'input[name*="phone"]' => @profile.contact_info&.[]("phone"),
+      'textarea[name*="summary"]' => resume_summary
+    }
+  end
+
+  def resume_summary
+    @profile.resume_text&.truncate(500)
+  end
+
+  def fill_field(page, selector, value)
+    page.fill(selector, value) if page.query_selector(selector) && value.present?
   end
 end
