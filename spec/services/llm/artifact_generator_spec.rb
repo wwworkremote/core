@@ -21,24 +21,37 @@ RSpec.describe LLM::ArtifactGenerator do
       create(:work_experience, career_profile: profile, title: "Lead", summary: "Managing", impact: "Team",
                                start_date: Time.current, company_name: "Tech Corp")
 
-      expect(LLM::Orchestrator).to receive(:call) do |args|
-        expect(args[:untrusted_text]).to include("Lead at Tech Corp") # Most recent first
-        expect(args[:untrusted_text]).to include("Dev at Tech Corp")
+      captured_args = nil
+      allow(LLM::Orchestrator).to receive(:call) do |args|
+        captured_args = args
         { success: true, output: "Dear Hiring Manager..." }
       end
 
       result = described_class.call(user, job)
+
       expect(result[:success]).to be true
+      expect(captured_args[:untrusted_text]).to include("Lead at Tech Corp") # Most recent first
+      expect(captured_args[:untrusted_text]).to include("Dev at Tech Corp")
     end
 
     it "handles missing skills and goals in profile gracefully" do
       profile.update!(skills: nil, goals: nil)
       create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
 
-      expect(LLM::Orchestrator).to receive(:call).and_return({ success: true, output: "Draft" })
+      allow(LLM::Orchestrator).to receive(:call).and_return(success: true, output: "Draft")
 
       result = described_class.call(user, job)
       expect(result[:success]).to be true
+    end
+
+    it "aborts for an expired job posting unless forced" do
+      create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
+      job.expire!
+
+      result = described_class.call(user, job)
+
+      expect(result[:success]).to be false
+      expect(result[:error]).to include("expired/stale")
     end
 
     it "handles LLM failures" do

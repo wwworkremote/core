@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class LLM::ArtifactGenerator
+  SYSTEM_RULES = "You are an elite technical career strategist and ghostwriter."
+  TASK_INSTRUCTIONS = "Generate a bespoke, high-impact cover letter in markdown format."
+
   def self.call(user, job_posting, force: false)
     new(user, job_posting, force: force).call
   end
@@ -13,61 +16,43 @@ class LLM::ArtifactGenerator
   end
 
   def call
-    return { success: false, error: "Profile incomplete" } unless @profile&.work_experiences&.any?
+    guard = validate
+    return guard if guard
 
-    # Shield: Do not generate artifacts for expired/stale jobs unless forced
-    if @job_posting.expired? && !@force
-      return { success: false, error: "Job posting is expired/stale. Generation aborted." }
-    end
-
-    prompt = build_cover_letter_prompt
-
-    result = LLM::Orchestrator.call(
-      untrusted_text: prompt,
-      system_rules: "You are an elite technical career strategist and ghostwriter.",
-      task_instructions: "Generate a bespoke, high-impact cover letter in markdown format."
-    )
-
-    if result[:success]
-      # Attach the generated artifact to the user's job record
-      user_job = @user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
-      # We can store this in a new field or just return it for now.
-      # I will store it in notes or a dedicated field if we add one.
-      user_job.update!(notes: "#{user_job.notes}\n\n### [GENERATED_COVER_LETTER]\n#{result[:output]}")
-      { success: true, output: result[:output] }
-    else
-      { success: false, error: result[:error] }
-    end
+    handle_result(call_orchestrator)
   end
 
   private
 
-  def build_cover_letter_prompt
-    experiences = @profile.work_experiences.order(start_date: :desc).map do |exp|
-      "#{exp.title} at #{exp.company_name}: #{exp.summary}. Impact: #{exp.impact}"
-    end.join("\n")
+  def validate
+    return incomplete_profile_error unless @profile&.work_experiences&.any?
+    return expired_error if @job_posting.expired? && !@force
 
-    <<~PROMPT
-      [OBJECTIVE]
-      Generate a bespoke, high-impact cover letter for the following job posting.
-      Focus on how my specific technical actions and business impacts (from my history) directly address their needs.
+    nil
+  end
 
-      [CANDIDATE_PROFILE]
-      Skills: #{@profile.skills}
-      Goals: #{@profile.goals}
-      History:
-      #{experiences}
+  def incomplete_profile_error
+    { success: false, error: "Profile incomplete" }
+  end
 
-      [JOB_POSTING]
-      Title: #{@job_posting.title}
-      Company: #{@job_posting.company}
-      Body: #{@job_posting.body}
+  def expired_error
+    { success: false, error: "Job posting is expired/stale. Generation aborted." }
+  end
 
-      [CONSTRAINTS]
-      - Keep it under 400 words.
-      - Tone: Professional, authoritative, yet approachable.
-      - Avoid generic fluff; use specific metrics from the History.
-      - Format: Markdown.
-    PROMPT
+  def call_orchestrator
+    prompt = PromptBuilder.call(@profile, @job_posting)
+    LLM::Orchestrator.call(untrusted_text: prompt, system_rules: SYSTEM_RULES, task_instructions: TASK_INSTRUCTIONS)
+  end
+
+  def handle_result(result)
+    return { success: false, error: result[:error] } unless result[:success]
+
+    attach_artifact(result)
+  end
+
+  def attach_artifact(result)
+    user_job = @user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
+    user_job.update!(notes: "#{user_job.notes}\n\n### [GENERATED_COVER_LETTER]\n#{result[:output]}")
+    { success: true, output: result[:output] }
   end
 end
