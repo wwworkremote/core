@@ -7,26 +7,11 @@ class ResumeExportService
   end
 
   def to_json(*_args)
-    @content.merge(
-      meta: {
-        name: @resume.name,
-        version: @resume.version,
-        skills: @resume.skills.pluck(:name)
-      }
-    ).to_json
+    @content.merge(meta: json_meta).to_json
   end
 
   def to_markdown
-    [
-      "# #{@content['name'] || @resume.user.name}",
-      @content["summary"],
-      "## Skills",
-      @resume.skills.pluck(:name).join(", "),
-      "## Experience",
-      render_experience,
-      "## Education",
-      render_education
-    ].compact.join("\n\n")
+    markdown_sections.compact.join("\n\n")
   end
 
   def to_text
@@ -36,12 +21,7 @@ class ResumeExportService
 
   def to_mcp
     # Return a structured format ideal for LLM context
-    {
-      role: "resume",
-      identifier: "#{@resume.name}_v#{@resume.version}",
-      data: to_markdown,
-      skills: @resume.skills.pluck(:name)
-    }.to_json
+    mcp_payload.to_json
   end
 
   def to_pdf
@@ -55,6 +35,35 @@ class ResumeExportService
   end
 
   private
+
+  def json_meta
+    { name: @resume.name, version: @resume.version, skills: @resume.skills.pluck(:name) }
+  end
+
+  def markdown_sections
+    headline_and_summary + skills_section + experience_section + education_section
+  end
+
+  def headline_and_summary
+    ["# #{@content['name'] || @resume.user.name}", @content["summary"]]
+  end
+
+  def skills_section
+    ["## Skills", @resume.skills.pluck(:name).join(", ")]
+  end
+
+  def experience_section
+    ["## Experience", render_experience]
+  end
+
+  def education_section
+    ["## Education", render_education]
+  end
+
+  def mcp_payload
+    { role: "resume", identifier: "#{@resume.name}_v#{@resume.version}", data: to_markdown,
+      skills: @resume.skills.pluck(:name) }
+  end
 
   def render_experience
     Array(@content["experience"]).map do |exp|
