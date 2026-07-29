@@ -27,6 +27,15 @@ RSpec.describe Resume::YamlImporter do
       "summary" => "Improved testability.",
       "highlights" => [{ "label" => "Quality", "text" => "Hardened test suite." }]
     }.to_yaml)
+
+    # Mock a position exercising the year-only and "present" date fallbacks
+    File.write(base_path.join("positions", "currentco.yml"), {
+      "company" => { "name" => "CurrentCo", "location" => "Remote" },
+      "title" => "Staff Engineer",
+      "type" => "Full-time",
+      "start_date" => "2020",
+      "end_date" => "Present"
+    }.to_yaml)
   end
 
   after do
@@ -37,16 +46,23 @@ RSpec.describe Resume::YamlImporter do
     it "imports profile and positions correctly" do
       expect {
         described_class.call(user, base_path: base_path.to_s)
-      }.to change(WorkExperience, :count).by(1)
+      }.to change(WorkExperience, :count).by(2)
        .and change(ExperienceHighlight, :count).by(1)
 
       user.reload
       expect(user.name).to eq("Mike Hall")
       expect(user.career_profile.location_info["display"]).to eq("Chicago, IL")
 
-      exp = user.career_profile.work_experiences.first
-      expect(exp.company_name).to eq("ActiveCampaign")
+      exp = user.career_profile.work_experiences.find_by(company_name: "ActiveCampaign")
       expect(exp.start_date).to eq(Date.new(2018, 9, 1))
+    end
+
+    it "parses a year-only start_date and treats end_date 'Present' as nil" do
+      described_class.call(user, base_path: base_path.to_s)
+
+      exp = user.career_profile.work_experiences.find_by(company_name: "CurrentCo")
+      expect(exp.start_date).to eq(Date.new(2020, 1, 1))
+      expect(exp.end_date).to be_nil
     end
   end
 end
