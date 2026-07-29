@@ -4,22 +4,6 @@
 # prefers the user-reviewed text/HTML sent by the browser extension panel,
 # falling back to re-running CanonicalJobExtractor on the raw HTML snapshot.
 class JobPostingEnrichment::DescriptionResolver
-  PROVIDER_DOMAINS = {
-    "linkedin.com" => "linkedin",
-    "indeed.com" => "indeed",
-    "adzuna.com" => "adzuna",
-    "greenhouse.io" => "greenhouse",
-    "lever.co" => "lever",
-    "workday.com" => "workday",
-    "myworkdayjobs.com" => "workday",
-    "ashby.com" => "ashby",
-    "ashbyhq.com" => "ashby",
-    "smartrecruiters.com" => "smartrecruiters",
-    "wellfound.com" => "wellfound",
-    "weworkremotely.com" => "weworkremotely",
-    "remoteok.com" => "remoteok"
-  }.freeze
-
   attr_reader :provider
 
   def self.call(...)
@@ -30,7 +14,7 @@ class JobPostingEnrichment::DescriptionResolver
     @extracted = extracted
     @html = html
     @url = url
-    @provider = provider.presence || detect_provider(url.to_s)
+    @provider = provider.presence || JobFetchers::ProviderDetector.call(url.to_s)
   end
 
   def call
@@ -58,12 +42,5 @@ class JobPostingEnrichment::DescriptionResolver
 
   def to_markdown(source)
     ReverseMarkdown.convert(source, unknown_tags: :bypass, github_flavored: true).strip
-  end
-
-  # Use the provider string sent by the extension directly; only fall back to
-  # URL detection for legacy callers that do not send the field.
-  def detect_provider(url)
-    url_lower = url.downcase
-    PROVIDER_DOMAINS.find { |domain, _| url_lower.include?(domain) }&.last || "generic"
   end
 end
