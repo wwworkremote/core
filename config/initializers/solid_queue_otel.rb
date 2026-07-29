@@ -23,33 +23,39 @@ module SolidQueueOtel
   # nearly every job class, none of which had anything to do with their own
   # logic. Telemetry code must never be able to fail the thing it's observing.
   def record_perform(tracer, *)
-    event = ActiveSupport::Notifications::Event.new(*)
-    job = event.payload[:job]
-    exception = event.payload[:exception_object]
-
-    tracer.in_span("solid_queue.perform", attributes: span_attributes(event, job, exception)) do |span|
-      record_outcome(span, job, event, exception)
-    end
+    emit_span(tracer, ActiveSupport::Notifications::Event.new(*))
   rescue StandardError => e
     Rails.logger.warn "[SolidQueueOTel] Span emission failed (job unaffected): #{e.class}: #{e.message}"
   end
 
-  def span_attributes(event, job, exception)
-    {
-      "app.job.class" => job.class.name,
-      "app.job.queue" => job.queue_name,
-      "app.job.duration_ms" => event.duration.round(2),
-      "app.job.outcome" => exception ? "error" : "success"
-    }
+  def emit_span(tracer, event)
+    tracer.in_span("solid_queue.perform", attributes: span_attributes(event)) do |span|
+      record_exception(span, event.payload[:exception_object])
+      record_queue_wait(span, event, event.payload[:job])
+    end
   end
 
-  def record_outcome(span, job, event, exception)
-    if exception
-      span.status = OpenTelemetry::Trace::Status.error(exception.message)
-      span.record_exception(exception)
-    end
+  def span_attributes(event)
+    job_fields(event.payload[:job]).merge(outcome_fields(event, event.payload[:exception_object]))
+  end
 
-    # Queue wait time (enqueue -> perform start), when Solid Queue populated it.
+  def job_fields(job)
+    { "app.job.class" => job.class.name, "app.job.queue" => job.queue_name }
+  end
+
+  def outcome_fields(event, exception)
+    { "app.job.duration_ms" => event.duration.round(2), "app.job.outcome" => exception ? "error" : "success" }
+  end
+
+  def record_exception(span, exception)
+    return unless exception
+
+    span.status = OpenTelemetry::Trace::Status.error(exception.message)
+    span.record_exception(exception)
+  end
+
+  # Queue wait time (enqueue -> perform start), when Solid Queue populated it.
+  def record_queue_wait(span, event, job)
     return unless job.enqueued_at
 
     wait_ms = ((event.time - job.enqueued_at.to_f) * 1000).round(2)
