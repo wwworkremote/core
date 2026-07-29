@@ -6,7 +6,6 @@ RSpec.describe "Ingestion Pipeline Hardening" do
   include ActiveJob::TestHelper
 
   let!(:source) { JobBoards::Source.find_or_create_by!(slug: "arbeitnow") { |s| s.name = "Arbeitnow" } }
-  let!(:query) { JobBoards::Query.find_or_create_by!(source_id: source.id) }
 
   let(:job_data) do
     {
@@ -30,8 +29,9 @@ RSpec.describe "Ingestion Pipeline Hardening" do
   end
 
   before do
+    JobBoards::Query.find_or_create_by!(source_id: source.id)
     ActiveJob::Base.queue_adapter = :test
-    allow_any_instance_of(JobBoards::ContentEnrichmentJob).to receive(:sleep)
+    stub_job_sleep
     VCR.configure { |c| c.allow_http_connections_when_no_cassette = true }
     # 1. Stub the HTTP request for the Fetcher
     stub_request(:get, Arbeitnow::Fetcher::API_URL)
@@ -42,23 +42,46 @@ RSpec.describe "Ingestion Pipeline Hardening" do
     allow(JobBoards::Embedder).to receive(:new).and_return(double(call: true))
 
     # 3. Stub Enrichment network calls
-    enrichment_content = "This is the full job description after enrichment."
-    allow(JobFetchers::UrlResolver).to receive(:resolve).and_return(job_data[:url])
-    page_fetch_double = instance_double(JobFetchers::PageFetch)
-    allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch_double)
-    allow(page_fetch_double).to receive(:call).and_return({
-                                                            final_url: job_data[:url],
-                                                            content: "<html><body><div class='description'>#{enrichment_content}</div></body></html>"
-                                                          })
+    stub_enrichment_fetch
 
     # Ensure pipelines are not paused
     SystemSetting.create!(key: "pipelines_paused", value: "false") unless SystemSetting.find_by(key: "pipelines_paused")
+  end
+
+  # Rate-limit sleep between enrichment targets -- irrelevant to (and far too
+  # slow for) a single-job system spec. Stubbed via #new rather than
+  # allow_any_instance_of so the real instance still runs; only Kernel#sleep
+  # on it is short-circuited.
+  def stub_job_sleep
+    allow(JobBoards::ContentEnrichmentJob).to receive(:new).and_wrap_original do |original, *args|
+      original.call(*args).tap { |job| allow(job).to receive(:sleep) }
+    end
+  end
+
+  def stub_enrichment_fetch
+    allow(JobFetchers::UrlResolver).to receive(:resolve).and_return(job_data[:url])
+    stub_page_fetch
+  end
+
+  def stub_page_fetch
+    html = "<html><body><div class='description'>#{enrichment_content}</div></body></html>"
+    page_fetch_double = instance_double(JobFetchers::PageFetch, call: { final_url: job_data[:url], content: html })
+    allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch_double)
+  end
+
+  def enrichment_content
+    "This is the full job description after enrichment."
   end
 
   after do
     VCR.configure { |c| c.allow_http_connections_when_no_cassette = false }
   end
 
+  # One continuous UI-triggered pipeline (fetch -> sync -> enrich), each
+  # phase's assertions gating the next -- splitting into separate examples
+  # would either re-run the full expensive setup per phase or hide the
+  # temporal ordering that's the entire point of this system spec.
+  # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
   it "executes the full ingestion sequence from UI trigger to Enriched JobPosting" do
     # Phase A: Trigger Ingestion via UI
     visit data_fetchers_path
@@ -104,4 +127,5 @@ RSpec.describe "Ingestion Pipeline Hardening" do
     expect(page).to have_text(/Senior Ruby Engineer/i)
     expect(page).to have_text(/Test Corp/i)
   end
+  # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
 end
