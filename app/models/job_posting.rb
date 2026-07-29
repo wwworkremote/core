@@ -2,6 +2,8 @@
 
 class JobPosting < ApplicationRecord
   include PgSearch::Model
+  include JobPosting::LegacyCompanyAccess
+  include JobPosting::StatusWorkflow
 
   validates :signature, presence: true, uniqueness: true
 
@@ -11,100 +13,18 @@ class JobPosting < ApplicationRecord
   belongs_to :source, optional: true
   belongs_to :company, optional: true
 
-  # Legacy string access, backed by company_name column
-  alias_attribute :company_legacy, :company_name
-
-  # Allow existing code to use .company as a string without shadowing association
-  def company=(val)
-    if val.is_a?(String)
-      self.company_name = val
-    else
-      super
-    end
-  end
-
-  def company
-    return super if super.is_a?(Company)
-    company_name
-  end
-
-  self.ignored_columns += ["company"]
-
   has_many :target_domains, -> { readonly }, dependent: :restrict_with_error, inverse_of: :job_posting
   has_many :domains, -> { readonly }, through: :target_domains
 
   has_many :user_job_postings, dependent: :destroy
   has_many :users, through: :user_job_postings
 
-  include AASM
-
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
   has_many :interview_sessions, dependent: :destroy
   has_many :interview_tasks, dependent: :destroy
 
-  aasm column: :status, whiny_persistence: true do
-    state :none, initial: true
-    state :favorited, :applied, :interview, :offered, :archived, :ignored, :purged, :expired
-
-    event :favorite do
-      transitions from: %i[none archived ignored purged expired], to: :favorited
-    end
-
-    event :expire do
-      transitions from: %i[none favorited archived ignored], to: :expired
-    end
-
-    event :ignore do
-      transitions from: %i[none], to: :ignored
-    end
-
-    event :purge do
-      after do
-        update_column(:embedding, nil) # Instant removal from neural search
-      end
-      transitions from: %i[none favorited archived ignored], to: :purged
-    end
-
-    event :restore do
-      transitions from: :purged, to: :none
-    end
-
-    event :apply do
-      transitions from: %i[favorited interview], to: :applied
-    end
-
-    event :interview do
-      transitions from: %i[favorited applied], to: :interview
-    end
-
-    event :offer do
-      transitions from: %i[favorited applied interview], to: :offered
-    end
-
-    event :archive do
-      transitions from: %i[favorited applied interview offered], to: :archived
-    end
-  end
-
-  # Prevent direct status updates
-  before_update :ensure_aasm_transition, if: :status_changed?
-
-  def company_record
-    return @company_record if defined?(@company_record)
-
-    @company_record = Company.find_by(name: company)
-  end
-
   private
-
-  def ensure_aasm_transition
-    return if aasm.current_event.present?
-    return if status_was.nil? || (status_was == "none" && status == "none")
-
-    errors.add(:status, "cannot be updated directly. Use state machine events.")
-    throw(:abort)
-  end
 
   def add_pipeline_note(note, link: nil)
     pipeline_steps.create!(status: "noted", note: note, link: link)

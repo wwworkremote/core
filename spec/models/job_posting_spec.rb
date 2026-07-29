@@ -79,5 +79,48 @@ RSpec.describe JobPosting do
       job.favorite!
       expect(job.status).to eq("favorited")
     end
+
+    it "nils out the embedding when purged" do
+      job.update!(embedding: Array.new(3584, 0.1))
+      job.purge!
+      expect(job.reload.embedding).to be_nil
+    end
+  end
+
+  describe "#company=" do
+    it "sets company_name when given a string" do
+      job = build(:job_posting, company: "Acme Corp")
+      expect(job.company_name).to eq("Acme Corp")
+    end
+
+    it "sets the real association when given a Company record" do
+      company = create(:company)
+      job = build(:job_posting)
+      job.company = company
+      expect(job.company).to eq(company)
+    end
+  end
+
+  describe "#company" do
+    it "returns the company_name string when no Company association is set" do
+      job = build(:job_posting, company: "Acme Corp")
+      expect(job.company).to eq("Acme Corp")
+    end
+  end
+
+  describe "#company_record" do
+    it "finds the Company matching the current company name" do
+      company = create(:company, name: "Acme Corp")
+      job = create(:job_posting, company: "Acme Corp")
+
+      expect(job.company_record).to eq(company)
+    end
+
+    it "returns nil and memoizes when no matching Company exists" do
+      job = create(:job_posting, company: "Nonexistent Inc")
+
+      expect(job.company_record).to be_nil
+      expect(job.instance_variable_get(:@company_record)).to be_nil
+    end
   end
 end
