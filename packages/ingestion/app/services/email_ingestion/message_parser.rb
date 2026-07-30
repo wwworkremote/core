@@ -8,8 +8,13 @@ class EmailIngestion::MessageParser
   end
 
   def call
-    mail = Mail.read(@file_path)
+    mail_attributes(Mail.read(@file_path))
+  end
 
+  private
+
+  # rubocop:disable Metrics/MethodLength
+  def mail_attributes(mail)
     {
       message_id: mail.message_id,
       from: mail.from&.first,
@@ -20,8 +25,7 @@ class EmailIngestion::MessageParser
       headers: mail.headers.to_h
     }
   end
-
-  private
+  # rubocop:enable Metrics/MethodLength
 
   def extract_text_body(mail)
     return mail.body.decoded if mail.mime_type == "text/plain"

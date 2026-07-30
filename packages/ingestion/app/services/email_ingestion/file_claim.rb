@@ -7,25 +7,35 @@ class EmailIngestion::FileClaim
     @checksum = checksum
   end
 
+  # rubocop:disable Metrics/MethodLength
   def call
     EmailImportRecord.transaction do
-      record = EmailImportRecord.find_by(file_checksum: @checksum)
-
-      if record
-        return nil if record.status != "error" # Only retry on error
-        # If it was an error, we can try again
-        record.update!(status: "pending", error_message: nil)
-        return record
-      end
-
-      EmailImportRecord.create!(
-        file_path: @file_path,
-        source: @source,
-        file_checksum: @checksum,
-        status: "pending"
-      )
+      existing = EmailImportRecord.find_by(file_checksum: @checksum)
+      existing ? retry_if_errored(existing) : create_record
     rescue ActiveRecord::RecordNotUnique
       nil
     end
   end
+  # rubocop:enable Metrics/MethodLength
+
+  private
+
+  # Only retry on error -- if it was an error, we can try again
+  def retry_if_errored(record)
+    return nil if record.status != "error"
+
+    record.update!(status: "pending", error_message: nil)
+    record
+  end
+
+  # rubocop:disable Metrics/MethodLength
+  def create_record
+    EmailImportRecord.create!(
+      file_path: @file_path,
+      source: @source,
+      file_checksum: @checksum,
+      status: "pending"
+    )
+  end
+  # rubocop:enable Metrics/MethodLength
 end

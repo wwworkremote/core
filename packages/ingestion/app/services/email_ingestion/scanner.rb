@@ -7,17 +7,17 @@ class EmailIngestion::Scanner
   SOURCES = %w[indeed linkedin adzuna].freeze
 
   def call
-    SOURCES.each do |source|
-      source_dir = File.join(BASE_DIR, source)
-      next unless Dir.exist?(source_dir)
-
-      Dir.glob(File.join(source_dir, "*.eml")).each do |file_path|
-        process_file(file_path, source)
-      end
-    end
+    SOURCES.each { |source| scan_source(source) }
   end
 
   private
+
+  def scan_source(source)
+    source_dir = File.join(BASE_DIR, source)
+    return unless Dir.exist?(source_dir)
+
+    Dir.glob(File.join(source_dir, "*.eml")).each { |file_path| process_file(file_path, source) }
+  end
 
   def process_file(file_path, source)
     checksum = Digest::SHA256.file(file_path).hexdigest

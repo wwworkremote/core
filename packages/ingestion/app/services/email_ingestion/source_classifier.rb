@@ -1,24 +1,27 @@
 # frozen_string_literal: true
 
 class EmailIngestion::SourceClassifier
+  DOMAIN_SOURCES = { "indeed.com" => "indeed", "linkedin.com" => "linkedin", "adzuna.com" => "adzuna" }.freeze
+  SUBJECT_SOURCES = { "Indeed" => "indeed", "LinkedIn" => "linkedin", "Adzuna" => "adzuna" }.freeze
+
   def initialize(parsed_email)
     @parsed_email = parsed_email
   end
 
   def call
-    return "indeed" if from_domain?("indeed.com")
-    return "linkedin" if from_domain?("linkedin.com")
-    return "adzuna" if from_domain?("adzuna.com")
-
-    # Fallback to subject line analysis
-    return "indeed" if subject_contains?("Indeed")
-    return "linkedin" if subject_contains?("LinkedIn")
-    return "adzuna" if subject_contains?("Adzuna")
-
-    "unknown"
+    source_from_domain || source_from_subject || "unknown"
   end
 
   private
+
+  def source_from_domain
+    DOMAIN_SOURCES.find { |domain, _| from_domain?(domain) }&.last
+  end
+
+  # Fallback to subject line analysis
+  def source_from_subject
+    SUBJECT_SOURCES.find { |text, _| subject_contains?(text) }&.last
+  end
 
   def from_domain?(domain)
     @parsed_email[:from]&.downcase&.include?(domain)
