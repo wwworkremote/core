@@ -39,6 +39,24 @@ RSpec.describe "Api::V0::JobPostings" do
 
       expect(response).to have_http_status(:created)
     end
+
+    it "upserts the existing record when the signature already exists" do
+      expect {
+        post api_v0_job_postings_path, params: job_params.merge(signature: job.signature), as: :json
+      }.not_to change(JobPosting, :count)
+
+      expect(response).to have_http_status(:created)
+      expect(job.reload.title).to eq("New API Job")
+    end
+
+    it "returns errors when the signature is blank" do
+      post api_v0_job_postings_path, params: job_params.merge(signature: ""), as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      json = response.parsed_body
+      expect(json["success"]).to be false
+      expect(json["errors"]).to include("Signature can't be blank")
+    end
   end
 
   describe "POST /api/v0/job_postings/:id/enrich" do
@@ -48,6 +66,39 @@ RSpec.describe "Api::V0::JobPostings" do
       job.reload
       expect(job.body).to eq("Enriched body")
       expect(job.crawl_status).to eq("enriched")
+    end
+
+    it "returns errors when enrichment fails" do
+      allow(JobPosting).to receive(:find).and_return(job)
+      allow(job).to receive(:update) do
+        job.errors.add(:body, "is invalid")
+        false
+      end
+
+      post enrich_api_v0_job_posting_path(job), params: { body: "x" }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      json = response.parsed_body
+      expect(json["success"]).to be false
+      expect(json["errors"]).to include("Body is invalid")
+    end
+
+    it "triggers realignment when realign is requested" do
+      user = create(:user)
+      allow(User).to receive(:first).and_return(user)
+      allow(LLM::ProfileMatcher).to receive(:call)
+
+      post enrich_api_v0_job_posting_path(job), params: { body: "Re-aligned", realign: true }, as: :json
+
+      expect(LLM::ProfileMatcher).to have_received(:call).with(user, job)
+    end
+
+    it "does not trigger realignment when realign is not requested" do
+      allow(LLM::ProfileMatcher).to receive(:call)
+
+      post enrich_api_v0_job_posting_path(job), params: { body: "Not aligned" }, as: :json
+
+      expect(LLM::ProfileMatcher).not_to have_received(:call)
     end
   end
 end
