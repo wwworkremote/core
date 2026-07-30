@@ -13,24 +13,21 @@ module ApiGuard
   def with_api_guard(source_slug, cooldown: 15.minutes, force: false)
     return :locked if source_locked?(source_slug)
 
-    source = JobBoards::Source.find_by(slug: source_slug)
-    unless source
-      Rails.logger.warn "[ApiGuard] Source #{source_slug} not found in database. Skipping."
-      return :missing_source
-    end
-
-    last_fetched_at = last_fetched_at(source_slug)
-    if !force && last_fetched_at && last_fetched_at > cooldown.ago
-      Rails.logger.info "[ApiGuard] Skipping #{source_slug}, last fetched #{time_ago_in_words(last_fetched_at)} ago."
-      return :cooldown
-    end
+    source = JobBoards::Source.find_by(slug: source_slug) || (return missing_source(source_slug))
+    return :cooldown if within_cooldown?(source_slug, cooldown, force)
 
     yield(source)
+    record_fetch(source_slug)
+  end
 
-    # If successful, update the timestamp in the database-backed cache
+  # Mutator, not a query -- returns true to match with_api_guard's documented
+  # success value, not to signal a yes/no question.
+  # rubocop:disable Naming/PredicateMethod
+  def record_fetch(source_slug)
     Rails.cache.write("api_guard:#{source_slug}:last_fetched_at", Time.zone.now)
     true
   end
+  # rubocop:enable Naming/PredicateMethod
 
   def lock_source!(source_slug, duration: 1.hour)
     Rails.logger.warn "[ApiGuard] ⚡ Circuit Breaker Tripped for #{source_slug}. Locking for #{duration.inspect}."
@@ -45,14 +42,11 @@ module ApiGuard
   def source_locked?(source_slug)
     locked_until = Rails.cache.read("api_guard:#{source_slug}:locked_until")
     return false unless locked_until
+    return true if locked_until > Time.zone.now
 
-    if locked_until > Time.zone.now
-      true
-    else
-      # Lock expired, clean up
-      Rails.cache.delete("api_guard:#{source_slug}:locked_until")
-      false
-    end
+    # Lock expired, clean up
+    Rails.cache.delete("api_guard:#{source_slug}:locked_until")
+    false
   end
 
   def last_fetched_at(source_slug)
@@ -72,6 +66,19 @@ module ApiGuard
   end
 
   private
+
+  def missing_source(source_slug)
+    Rails.logger.warn "[ApiGuard] Source #{source_slug} not found in database. Skipping."
+    :missing_source
+  end
+
+  def within_cooldown?(source_slug, cooldown, force)
+    last_fetched = last_fetched_at(source_slug)
+    return false if force || !last_fetched || last_fetched <= cooldown.ago
+
+    Rails.logger.info "[ApiGuard] Skipping #{source_slug}, last fetched #{time_ago_in_words(last_fetched)} ago."
+    true
+  end
 
   def time_ago_in_words(time)
     ActionController::Base.helpers.time_ago_in_words(time)

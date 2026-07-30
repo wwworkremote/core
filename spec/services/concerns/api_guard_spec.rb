@@ -78,7 +78,7 @@ RSpec.describe ApiGuard do
   end
 
   describe "#can_fetch?" do
-    let!(:source) { JobBoards::Source.create!(slug: slug, name: "Test") }
+    before { JobBoards::Source.create!(slug: slug, name: "Test") }
 
     it "returns true if never fetched" do
       expect(instance.can_fetch?(slug)).to be true
