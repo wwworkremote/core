@@ -2,6 +2,16 @@
 
 class CreateHackerNewsV0Jobstories < ActiveRecord::Migration[7.0]
   def change
+    create_hacker_news_v0_jobstories_table
+    add_index :hacker_news_v0_jobstories, :id, unique: true
+  end
+
+  private
+
+  # Column list is one cohesive table definition -- splitting it further
+  # would obscure the schema, not simplify it.
+  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  def create_hacker_news_v0_jobstories_table
     create_table(:hacker_news_v0_jobstories, id: false) do |t|
       t.integer :id, null: false
       t.string :by
@@ -14,7 +24,6 @@ class CreateHackerNewsV0Jobstories < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
-
-    add_index :hacker_news_v0_jobstories, :id, unique: true
   end
+  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end
