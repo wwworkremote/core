@@ -7,15 +7,20 @@ class Quality::ContextBuilder
     insights = SystemInsight.active.where(file_path: Array(file_paths))
     return "" if insights.empty?
 
-    sections = insights.group_by(&:tool).map do |tool, tool_insights|
-      header = "### [#{tool.upcase}] Architectural Constraints"
-      items = tool_insights.map do |i|
-        severity = i.severity.upcase
-        "[#{severity}] L#{i.line_number}: #{i.message}"
-      end.join("\n")
-      "#{header}\n#{items}"
-    end.join("\n\n")
+    build_prompt(insight_sections(insights))
+  end
 
+  def self.insight_sections(insights)
+    insights.group_by(&:tool).map { |tool, tool_insights| insight_section(tool, tool_insights) }.join("\n\n")
+  end
+
+  def self.insight_section(tool, tool_insights)
+    header = "### [#{tool.upcase}] Architectural Constraints"
+    items = tool_insights.map { |i| "[#{i.severity.upcase}] L#{i.line_number}: #{i.message}" }.join("\n")
+    "#{header}\n#{items}"
+  end
+
+  def self.build_prompt(sections)
     <<~PROMPT
       ## SYSTEM_QUALITY_CONSTRAINTS
       The following issues were detected by static analysis tools.#{' '}
@@ -26,7 +31,7 @@ class Quality::ContextBuilder
   end
 
   # Returns similar insights using vector search
-  def self.semantic_constraints_for(_query_text, limit: 5)
+  def self.semantic_constraints_for(_query_text, _limit: 5)
     # This requires the embedding to be populated
     # SystemInsight.nearest_neighbors(:embedding, embedding, distance: "cosine").limit(limit)
     ""
