@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_discovery_links_on_url  (url)
+#  index_discovery_links_on_url  (url) UNIQUE
 #
 FactoryBot.define do
   factory :discovery_link do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_28_155214) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -131,7 +131,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_155214) do
     t.boolean "toxic_culture_flag"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_companies_on_name", unique: true
-    t.index ["slug"], name: "index_companies_on_slug"
+    t.index ["slug"], name: "index_companies_on_slug", unique: true
   end
 
   create_table "company_pipeline_steps", force: :cascade do |t|
@@ -167,7 +167,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_155214) do
     t.string "status"
     t.datetime "updated_at", null: false
     t.string "url"
-    t.index ["url"], name: "index_discovery_links_on_url"
+    t.index ["url"], name: "index_discovery_links_on_url", unique: true
   end
 
   create_table "domains", force: :cascade do |t|
@@ -188,7 +188,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_155214) do
     t.string "source"
     t.string "status"
     t.datetime "updated_at", null: false
-    t.index ["file_checksum"], name: "index_email_import_records_on_file_checksum"
+    t.index ["file_checksum"], name: "index_email_import_records_on_file_checksum", unique: true
     t.index ["message_id"], name: "index_email_import_records_on_message_id"
   end
 
@@ -703,7 +703,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_155214) do
     t.string "key"
     t.datetime "updated_at", null: false
     t.string "value"
-    t.index ["key"], name: "index_system_settings_on_key"
+    t.index ["key"], name: "index_system_settings_on_key", unique: true
   end
 
   create_table "target_domains", force: :cascade do |t|

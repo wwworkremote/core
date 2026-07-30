@@ -17,7 +17,7 @@
 #
 # Indexes
 #
-#  index_email_import_records_on_file_checksum  (file_checksum)
+#  index_email_import_records_on_file_checksum  (file_checksum) UNIQUE
 #  index_email_import_records_on_message_id     (message_id)
 #
 FactoryBot.define do

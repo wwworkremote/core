@@ -28,8 +28,8 @@
 #
 class Resume < ApplicationRecord
   belongs_to :user
-  belongs_to :parent, class_name: "Resume", optional: true
-  has_many :children, class_name: "Resume", foreign_key: "parent_id", dependent: :nullify
+  belongs_to :parent, class_name: "Resume", optional: true, inverse_of: :children
+  has_many :children, class_name: "Resume", foreign_key: "parent_id", inverse_of: :parent, dependent: :nullify
 
   has_many :resume_skills, dependent: :destroy
   has_many :skills, through: :resume_skills

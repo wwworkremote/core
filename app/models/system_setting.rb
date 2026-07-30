@@ -12,7 +12,7 @@
 #
 # Indexes
 #
-#  index_system_settings_on_key  (key)
+#  index_system_settings_on_key  (key) UNIQUE
 #
 class SystemSetting < ApplicationRecord
   validates :key, presence: true, uniqueness: true

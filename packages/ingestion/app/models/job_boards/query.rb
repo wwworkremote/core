@@ -16,7 +16,8 @@
 #  index_job_boards_queries_on_source_id  (source_id)
 #
 class JobBoards::Query < ApplicationRecord
-  belongs_to :job_boards_source, class_name: "JobBoards::Source", foreign_key: "source_id"
+  belongs_to :job_boards_source, class_name: "JobBoards::Source", foreign_key: "source_id",
+                                 inverse_of: :job_boards_queries
   has_many :job_boards_documents, class_name: "JobBoards::Document", foreign_key: "job_boards_query_id",
-                                  dependent: :destroy
+                                  inverse_of: :job_boards_query, dependent: :destroy
 end

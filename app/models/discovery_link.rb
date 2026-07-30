@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_discovery_links_on_url  (url)
+#  index_discovery_links_on_url  (url) UNIQUE
 #
 class DiscoveryLink < ApplicationRecord
   validates :url, presence: true, uniqueness: true
