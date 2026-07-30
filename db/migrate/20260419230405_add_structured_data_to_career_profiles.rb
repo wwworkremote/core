@@ -2,7 +2,9 @@
 
 class AddStructuredDataToCareerProfiles < ActiveRecord::Migration[8.0]
   def change
-    add_column :career_profiles, :contact_info, :jsonb
-    add_column :career_profiles, :location_info, :jsonb
+    change_table :career_profiles, bulk: true do |t|
+      t.jsonb :contact_info
+      t.jsonb :location_info
+    end
   end
 end

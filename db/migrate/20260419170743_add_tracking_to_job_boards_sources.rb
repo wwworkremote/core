@@ -2,7 +2,9 @@
 
 class AddTrackingToJobBoardsSources < ActiveRecord::Migration[8.0]
   def change
-    add_column :job_boards_sources, :last_synced_at, :datetime
-    add_column :job_boards_sources, :last_ingested_at, :datetime
+    change_table :job_boards_sources, bulk: true do |t|
+      t.datetime :last_synced_at
+      t.datetime :last_ingested_at
+    end
   end
 end

@@ -2,7 +2,9 @@
 
 class AddEnrichmentToJobPostings < ActiveRecord::Migration[8.0]
   def change
-    add_column :job_postings, :enriched_at, :datetime
-    add_column :job_postings, :crawl_status, :string
+    change_table :job_postings, bulk: true do |t|
+      t.datetime :enriched_at
+      t.string :crawl_status
+    end
   end
 end

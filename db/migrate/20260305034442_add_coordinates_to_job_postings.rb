@@ -2,7 +2,9 @@
 
 class AddCoordinatesToJobPostings < ActiveRecord::Migration[8.0]
   def change
-    add_column :job_postings, :latitude, :float
-    add_column :job_postings, :longitude, :float
+    change_table :job_postings, bulk: true do |t|
+      t.float :latitude
+      t.float :longitude
+    end
   end
 end

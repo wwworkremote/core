@@ -2,7 +2,9 @@
 
 class AddFieldsToPipelineSteps < ActiveRecord::Migration[8.0]
   def change
-    add_column :pipeline_steps, :link, :string
-    add_column :pipeline_steps, :note, :text
+    change_table :pipeline_steps, bulk: true do |t|
+      t.string :link
+      t.text :note
+    end
   end
 end

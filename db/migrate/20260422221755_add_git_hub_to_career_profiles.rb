@@ -2,7 +2,9 @@
 
 class AddGitHubToCareerProfiles < ActiveRecord::Migration[8.0]
   def change
-    add_column :career_profiles, :github_url, :string
-    add_column :career_profiles, :github_context, :jsonb
+    change_table :career_profiles, bulk: true do |t|
+      t.string :github_url
+      t.jsonb :github_context
+    end
   end
 end
