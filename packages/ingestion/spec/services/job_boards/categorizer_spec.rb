@@ -19,24 +19,23 @@ RSpec.describe JobBoards::Categorizer do
     allow(LLM::Registry).to receive(:default_model).and_return(model)
   end
 
+  def stub_llm_response(body)
+    stub_request(:post, "http://localhost:11500/v1/chat/completions")
+      .to_return(status: 200, body: body, headers: { "Content-Type" => "text/event-stream" })
+  end
+
+  # Realistic SSE format for RubyLLM's streaming expectation
+  def sse_body(content)
+    "data: {\"choices\":[{\"delta\":{\"content\":#{content.inspect}}}]}\n\ndata: [DONE]\n"
+  end
+
   describe "#call" do
     it "updates the job posting with data from the LLM via real HTTP simulation" do
-      # Realistic JSON response from the LLM
       llm_json = {
-        category: "Software Engineering",
-        tags: %w[ruby rails],
-        is_remote: true,
-        remote_nuance: "Strictly remote",
-        salary_min: 100_000,
-        salary_max: 150_000,
-        currency: "USD"
+        category: "Software Engineering", tags: %w[ruby rails], is_remote: true,
+        remote_nuance: "Strictly remote", salary_min: 100_000, salary_max: 150_000, currency: "USD"
       }.to_json
-
-      # Realistic SSE format for RubyLLM's streaming expectation
-      sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{llm_json.inspect}}}]}\n\ndata: [DONE]\n"
-
-      stub_request(:post, "http://localhost:11500/v1/chat/completions")
-        .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+      stub_llm_response(sse_body(llm_json))
 
       categorizer.call
 
@@ -48,14 +47,10 @@ RSpec.describe JobBoards::Categorizer do
 
     it "handles malformed JSON from the LLM gracefully" do
       # LLM returns some chatter before/after valid JSON or just broken stuff
-      bad_body = "data: {\"choices\":[{\"delta\":{\"content\":\"I am thinking... here is your data: { broken json\"}}]}\n\ndata: [DONE]\n"
+      chatter = "I am thinking... here is your data: { broken json"
+      stub_llm_response(sse_body(chatter))
 
-      stub_request(:post, "http://localhost:11500/v1/chat/completions")
-        .to_return(status: 200, body: bad_body, headers: { "Content-Type" => "text/event-stream" })
-
-      expect {
-        categorizer.call
-      }.not_to raise_error
+      expect { categorizer.call }.not_to raise_error
 
       job_posting.reload
       expect(job_posting.data["ai_category"]).to be_nil
@@ -64,12 +59,43 @@ RSpec.describe JobBoards::Categorizer do
     it "handles LLM failures gracefully" do
       stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 500, body: "Internal Server Error")
-
-      # Use allow and check later or use a more specific match
-      expect(Rails.logger).to receive(:error).with(include("execution failed"))
-      expect(Rails.logger).to receive(:error).with(include("Agent failed for Job"))
+      allow(Rails.logger).to receive(:error)
 
       categorizer.call
+
+      expect(Rails.logger).to have_received(:error).with(include("execution failed")).at_least(:once)
+      expect(Rails.logger).to have_received(:error).with(include("Agent failed for Job"))
+    end
+
+    it "skips already-categorized postings unless forced" do
+      job_posting.update!(data: { "ai_category" => "Design" })
+      allow(JobBoards::CategorizerAgent).to receive(:new)
+
+      categorizer.call
+
+      expect(JobBoards::CategorizerAgent).not_to have_received(:new)
+    end
+
+    it "skips expired postings unless forced" do
+      job_posting.expire!
+      allow(JobBoards::CategorizerAgent).to receive(:new)
+
+      categorizer.call
+
+      expect(JobBoards::CategorizerAgent).not_to have_received(:new)
+    end
+
+    it "processes an already-categorized posting when forced" do
+      job_posting.update!(data: { "ai_category" => "Design" })
+      llm_json = {
+        category: "Software Engineering", tags: %w[ruby rails], is_remote: true,
+        remote_nuance: "Strictly remote", salary_min: 100_000, salary_max: 150_000, currency: "USD"
+      }.to_json
+      stub_llm_response(sse_body(llm_json))
+
+      categorizer.call(force: true)
+
+      expect(job_posting.reload.data["ai_category"]).to eq("Software Engineering")
     end
   end
 end
