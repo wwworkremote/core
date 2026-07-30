@@ -27,7 +27,7 @@ RSpec.describe EmailIngestion::Importer do
     allow(EmailIngestion::FileLifecycle).to receive(:new).and_return(
       instance_double(EmailIngestion::FileLifecycle, processed: true, error: true)
     )
-    allow_any_instance_of(JobBoards::Syncer).to receive(:call)
+    allow(JobBoards::Syncer).to receive(:new).and_return(instance_double(JobBoards::Syncer, call: nil))
   end
 
   describe "#call" do
