@@ -71,9 +71,12 @@ class Company < ApplicationRecord
   # Disables future ingestion and purges any existing non-purged postings --
   # the same cascade the admin toggle_ingestion action performs, extracted
   # here so the big-tech blocklist backfill (rake task) can share it.
+  # Skips expired postings: AASM's purge event doesn't allow transitioning
+  # from :expired, and expired postings are already excluded from every
+  # default listing, so there's nothing extra to hide by purging them.
   def disable_ingestion!
     update!(ingestion_enabled: false)
-    job_postings.where.not(status: "purged").find_each(&:purge!)
+    job_postings.where.not(status: %w[purged expired]).find_each(&:purge!)
   end
 
   def to_s

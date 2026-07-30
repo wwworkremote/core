@@ -93,5 +93,17 @@ RSpec.describe Company do
       expect(posting.reload.status).to eq("purged")
       expect(already_purged.reload.updated_at).to eq(already_purged.created_at)
     end
+
+    it "does not raise for a company with an expired posting" do
+      # AASM's purge event has no transition from :expired -- confirmed by
+      # reproducing the real failure this backfill hit against production
+      # data (Meta had an expired posting), which raised
+      # AASM::InvalidTransition and aborted the whole rake task.
+      company = create(:company, ingestion_enabled: true)
+      expired = create(:job_posting, company_id: company.id, status: "expired")
+
+      expect { company.disable_ingestion! }.not_to raise_error
+      expect(expired.reload.status).to eq("expired")
+    end
   end
 end

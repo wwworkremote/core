@@ -42,6 +42,9 @@ class JobPosting < ApplicationRecord
   after_commit :enqueue_geocoding, on: %i[create update], if: lambda {
     location.present? && (saved_change_to_location? || latitude.nil?)
   }
+  # Geocoding is async (GeocodingJob), so this is the earliest point a
+  # non-remote posting's commute feasibility is actually knowable.
+  after_commit :enforce_commute_zone, on: :update, if: -> { saved_change_to_latitude? || saved_change_to_longitude? }
 
   scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
   scope :management_tier, -> { where("title ~* ?", MANAGEMENT_TIER_TITLE_PATTERN) }
@@ -82,6 +85,12 @@ class JobPosting < ApplicationRecord
 
   def enqueue_geocoding
     JobBoards::GeocodingJob.perform_later(id)
+  end
+
+  def enforce_commute_zone
+    return unless may_ignore?
+
+    ignore! if Geo::CommuteZone.call(self) == :blocked
   end
 
   def self.geocode_all

@@ -139,4 +139,33 @@ RSpec.describe JobPosting do
       expect(job.instance_variable_get(:@company_record)).to be_nil
     end
   end
+
+  describe "#enforce_commute_zone" do
+    it "ignores the posting when Geo::CommuteZone reports it as blocked" do
+      job = create(:job_posting, status: "none")
+      allow(Geo::CommuteZone).to receive(:call).with(job).and_return(:blocked)
+
+      job.send(:enforce_commute_zone)
+
+      expect(job.status).to eq("ignored")
+    end
+
+    it "leaves the posting alone when allowed or undetermined" do
+      job = create(:job_posting, status: "none")
+      allow(Geo::CommuteZone).to receive(:call).with(job).and_return(:undetermined)
+
+      job.send(:enforce_commute_zone)
+
+      expect(job.status).to eq("none")
+    end
+
+    it "does not attempt an invalid AASM transition on an already-favorited posting" do
+      job = create(:job_posting, status: "none")
+      job.favorite!
+      allow(Geo::CommuteZone).to receive(:call).with(job).and_return(:blocked)
+
+      expect { job.send(:enforce_commute_zone) }.not_to raise_error
+      expect(job.status).to eq("favorited")
+    end
+  end
 end
