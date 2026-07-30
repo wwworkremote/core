@@ -11,10 +11,24 @@ class LLM::CareerComparator
     @profile = user.career_profile
   end
 
+  # One cohesive orchestrator call -- splitting it further would obscure
+  # it, not simplify it.
+  # rubocop:disable Metrics/MethodLength
   def call
     return { success: false, error: "Need at least 2 jobs to compare." } if @job_postings.count < 2
 
-    prompt = <<~PROMPT
+    LLM::Orchestrator.call(
+      untrusted_text: comparison_prompt,
+      system_rules: "You are a strategic career consultant and game-theory expert in technical hiring.",
+      task_instructions: "Return a sharp, comparative analysis in markdown."
+    )
+  end
+  # rubocop:enable Metrics/MethodLength
+
+  private
+
+  def comparison_prompt
+    <<~PROMPT
       [SYSTEM_OBJECTIVE]
       Perform a comparative semantic analysis between the candidate's profile and several potential job opportunities.
       Identify the 'Path of Least Resistance' to a high-impact remote Ruby role.
@@ -36,15 +50,7 @@ class LLM::CareerComparator
       2. **STRATEGIC_WINNER**: Which role should the user prioritize today?
       3. **APPLICATION_SEQUENCE**: In what order should the user apply to maximize leverage?
     PROMPT
-
-    LLM::Orchestrator.call(
-      untrusted_text: prompt,
-      system_rules: "You are a strategic career consultant and game-theory expert in technical hiring.",
-      task_instructions: "Return a sharp, comparative analysis in markdown."
-    )
   end
-
-  private
 
   def profile_context
     <<~CTX
@@ -55,14 +61,16 @@ class LLM::CareerComparator
   end
 
   def jobs_context
-    @job_postings.map.with_index do |job, i|
-      <<~JOB
-        --- JOB #{i + 1} ---
-        Title: #{job.title}
-        Company: #{job.company}
-        URL: #{job.target_url}
-        Summary: #{job.body&.truncate(500)}
-      JOB
-    end.join("\n\n")
+    @job_postings.map.with_index { |job, i| job_context(job, i) }.join("\n\n")
+  end
+
+  def job_context(job, index)
+    <<~JOB
+      --- JOB #{index + 1} ---
+      Title: #{job.title}
+      Company: #{job.company}
+      URL: #{job.target_url}
+      Summary: #{job.body&.truncate(500)}
+    JOB
   end
 end

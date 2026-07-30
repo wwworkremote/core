@@ -15,7 +15,57 @@ class LLM::CompanyAuditor
   def call
     return { success: false, error: "No feedback provided." } if @raw_feedback.blank?
 
-    prompt = <<~PROMPT
+    handle_result(request_audit)
+  end
+
+  private
+
+  # One cohesive orchestrator call -- splitting it further would obscure
+  # it, not simplify it.
+  # rubocop:disable Metrics/MethodLength
+  def request_audit
+    LLM::Orchestrator.call(
+      untrusted_text: audit_prompt,
+      system_rules: "You are a ruthless corporate culture auditor. " \
+                    "You prioritize candidate well-being over corporate PR.",
+      task_instructions: "Return JSON only. Be clinical and accurate."
+    )
+  end
+  # rubocop:enable Metrics/MethodLength
+
+  def handle_result(result)
+    return { success: false, error: result[:error] } unless result[:success]
+
+    apply_audit(parse_audit(result[:output]))
+    { success: true }
+  end
+
+  def parse_audit(output)
+    JSON.parse(output.match(/\{.*\}/m)[0])
+  rescue StandardError
+    nil
+  end
+
+  # One cohesive update! call -- splitting it further would obscure it,
+  # not simplify it.
+  # rubocop:disable Metrics/MethodLength
+  def apply_audit(parsed)
+    return unless parsed
+
+    @company.update!(
+      disposition: parsed["disposition"],
+      sentiment_score: parsed["sentiment_score"],
+      toxic_culture_flag: parsed["toxic_culture_flag"],
+      glassdoor_data: @company.glassdoor_data.to_h.merge(
+        "reputation_audit" => parsed,
+        "audited_at" => Time.current
+      )
+    )
+  end
+  # rubocop:enable Metrics/MethodLength
+
+  def audit_prompt
+    <<~PROMPT
       [SYSTEM_OBJECTIVE]
       Analyze the following Glassdoor feedback for company: #{@company.name}.
       You are a RUTHLESS CULTURE AUDITOR. Your job is to warn the candidate about toxic work environments
@@ -41,30 +91,5 @@ class LLM::CompanyAuditor
         "top_cons": ["...", "..."]
       }
     PROMPT
-
-    result = LLM::Orchestrator.call(
-      untrusted_text: prompt,
-      system_rules: "You are a ruthless corporate culture auditor. " \
-                    "You prioritize candidate well-being over corporate PR.",
-      task_instructions: "Return JSON only. Be clinical and accurate."
-    )
-
-    if result[:success]
-      parsed = JSON.parse(result[:output].match(/\{.*\}/m)[0]) rescue nil
-      if parsed
-        @company.update!(
-          disposition: parsed["disposition"],
-          sentiment_score: parsed["sentiment_score"],
-          toxic_culture_flag: parsed["toxic_culture_flag"],
-          glassdoor_data: @company.glassdoor_data.to_h.merge(
-            "reputation_audit" => parsed,
-            "audited_at" => Time.current
-          )
-        )
-      end
-      { success: true }
-    else
-      { success: false, error: result[:error] }
-    end
   end
 end
