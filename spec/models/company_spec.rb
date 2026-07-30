@@ -56,4 +56,42 @@ RSpec.describe Company do
       expect(company.toxic_culture_flag).to be true
     end
   end
+
+  describe "#big_tech?" do
+    it "matches known big-tech names case-insensitively" do
+      ["Meta", "Apple", "Amazon.com Inc", "Netflix", "Google", "Alphabet", "Microsoft", "Nvidia", "Tesla", "Oracle",
+       "Salesforce"].each do |name|
+        expect(described_class.new(name: name).big_tech?).to be(true), "expected #{name} to match"
+      end
+    end
+
+    it "does not match unrelated companies, including ones sharing a substring" do
+      expect(described_class.new(name: "Metadata Corp").big_tech?).to be false
+      expect(described_class.new(name: "Startup Inc").big_tech?).to be false
+    end
+  end
+
+  describe ".big_tech" do
+    it "returns only companies matching the blocklist pattern" do
+      meta = create(:company, name: "Meta Platforms")
+      startup = create(:company, name: "Startup Inc")
+
+      expect(described_class.big_tech).to contain_exactly(meta)
+      expect(described_class.big_tech).not_to include(startup)
+    end
+  end
+
+  describe "#disable_ingestion!" do
+    it "disables ingestion and purges non-purged postings" do
+      company = create(:company, ingestion_enabled: true)
+      posting = create(:job_posting, company_id: company.id, status: "none")
+      already_purged = create(:job_posting, company_id: company.id, status: "purged", signature: "already-purged")
+
+      company.disable_ingestion!
+
+      expect(company.reload.ingestion_enabled).to be false
+      expect(posting.reload.status).to eq("purged")
+      expect(already_purged.reload.updated_at).to eq(already_purged.created_at)
+    end
+  end
 end

@@ -18,8 +18,16 @@
 !/tmp/pids/
 !/tmp/pids/.keep
 
-# # Ignore master key for decrypting credentials and more.
-# /config/master.key
+# Ignore master key for decrypting credentials and more.
+/config/master.key
+
+# Local secrets -- never commit. .env is currently tracked in git history
+# (pre-existing; needs a deliberate untrack + secret-rotation pass, not
+# folded into an unrelated feature commit). New/local-only config belongs
+# in .env.local, which dotenv-rails loads automatically and this ignores.
+.env
+.env.local
+.env.*.local
 
 .DS_Store
 

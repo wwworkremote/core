@@ -30,6 +30,23 @@ class Company < ApplicationRecord
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true
 
+  # Classic FAANG + mega-cap tech -- companies whose scale/stage no longer
+  # fits where the user is in their career. Edit this list directly; no
+  # migration or redeploy needed beyond a code change.
+  BIG_TECH_NAMES = %w[
+    meta facebook apple amazon aws netflix google alphabet
+    microsoft nvidia tesla oracle salesforce
+  ].freeze
+
+  # Word-boundary matched to avoid overmatching (e.g. "Metadata Corp").
+  # Ruby (Onigmo) and Postgres (POSIX ARE) spell "word boundary"
+  # differently -- \b vs \y -- so each engine gets its own pattern
+  # generated from the same word list rather than sharing one string.
+  BIG_TECH_NAME_REGEXP = Regexp.new(BIG_TECH_NAMES.map { |n| "\\b#{n}\\b" }.join("|"), Regexp::IGNORECASE)
+  BIG_TECH_NAME_PATTERN = BIG_TECH_NAMES.map { |n| "\\y#{n}\\y" }.join("|")
+
+  scope :big_tech, -> { where("name ~* ?", BIG_TECH_NAME_PATTERN) }
+
   aasm column: :status do
     state :none, initial: true
     state :favorited, :archived
@@ -45,6 +62,18 @@ class Company < ApplicationRecord
 
   def add_pipeline_note(note, link: nil)
     company_pipeline_steps.create!(status: "noted", note: note, link: link)
+  end
+
+  def big_tech?
+    name.to_s.match?(BIG_TECH_NAME_REGEXP)
+  end
+
+  # Disables future ingestion and purges any existing non-purged postings --
+  # the same cascade the admin toggle_ingestion action performs, extracted
+  # here so the big-tech blocklist backfill (rake task) can share it.
+  def disable_ingestion!
+    update!(ingestion_enabled: false)
+    job_postings.where.not(status: "purged").find_each(&:purge!)
   end
 
   def to_s

@@ -16,7 +16,7 @@ class Admin::CompaniesController < Admin::ApplicationController
 
   def toggle_ingestion
     @company = Company.find(params.expect(:id))
-    @company.update!(ingestion_enabled: !@company.ingestion_enabled)
+    @company.ingestion_enabled? ? @company.disable_ingestion! : @company.update!(ingestion_enabled: true)
 
     redirect_back_or_to(admin_companies_path, notice: toggle_ingestion_message)
   end
@@ -26,12 +26,6 @@ class Admin::CompaniesController < Admin::ApplicationController
   def toggle_ingestion_message
     return "Ingestion resumed for #{@company.name}." if @company.ingestion_enabled?
 
-    purge_existing_job_postings
     "Ingestion disabled for #{@company.name} and all existing postings have been purged."
-  end
-
-  # Cascade: purge all existing jobs for this company
-  def purge_existing_job_postings
-    @company.job_postings.where.not(status: "purged").find_each(&:purge!)
   end
 end
