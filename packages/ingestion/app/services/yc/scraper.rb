@@ -15,41 +15,58 @@ class Yc::Scraper
   }.freeze
 
   def call(force: false)
-    with_api_guard("yc", cooldown: 4.hours, force:) do |source|
-      query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+    # `return` here escapes this method entirely (not just the block), since
+    # with_api_guard discards the block's own return value -- scrape must
+    # stay a pure predicate so this line is the only place `call` can
+    # short-circuit to `false` on a failed fetch.
+    with_api_guard("yc", cooldown: 4.hours, force:) { |source| return false unless scrape?(source) }
+  end
 
-      client = JobBoards::Client.new("yc")
-      response = client.get(BASE_URL, {}, REQUEST_HEADERS)
-      return false if response.nil? || response.status != 200
+  private
 
-      doc = Nokogiri::HTML(response.body)
-      data_attr = doc.at_css("div[data-page]")&.[]("data-page")
-      return false unless data_attr
+  def scrape?(source)
+    query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+    response = fetch_response
+    return false unless response
 
-      json_data = JSON.parse(CGI.unescape_html(data_attr))
-      jobs = json_data.dig("props", "jobs") || []
+    jobs = extract_jobs(response.body)
+    jobs ? persist_and_log?(source, query, jobs) : false
+  end
 
-      jobs.each do |job_data|
-        signature = "yc-#{job_data['id']}"
+  def fetch_response
+    response = JobBoards::Client.new("yc").get(BASE_URL, {}, REQUEST_HEADERS)
+    response if response && response.status == 200
+  end
 
-        JobBoards::Document.find_or_create_by!(signature: signature) do |doc_record|
-          doc_attr = {
-            id: job_data["id"],
-            title: job_data["title"],
-            company: job_data["companyName"],
-            description: job_data["companyOneLiner"], # Full desc requires sub-page fetch
-            url: "https://www.workatastartup.com/jobs/#{job_data['id']}",
-            location: job_data["location"],
-            role_type: job_data["roleType"]
-          }
-          doc_record.source_id = source.id
-          doc_record.job_boards_query_id = query.id
-          doc_record.document = doc_attr.to_json
-        end
-      end
+  def persist_and_log?(source, query, jobs)
+    persist_jobs(source, query, jobs)
+    Rails.logger.info "YC Scraper: Extracted #{jobs.count} jobs from embedded JSON."
+    true
+  end
 
-      Rails.logger.info "YC Scraper: Extracted #{jobs.count} jobs from embedded JSON."
-      true
+  def extract_jobs(html)
+    data_attr = Nokogiri::HTML(html).at_css("div[data-page]")&.[]("data-page")
+    return nil unless data_attr
+
+    JSON.parse(CGI.unescape_html(data_attr)).dig("props", "jobs") || []
+  end
+
+  def persist_jobs(source, query, jobs)
+    jobs.each { |job_data| persist_job(source, query, job_data) }
+  end
+
+  def persist_job(source, query, job_data)
+    JobBoards::Document.find_or_create_by!(signature: "yc-#{job_data['id']}") do |doc_record|
+      doc_record.source_id = source.id
+      doc_record.job_boards_query_id = query.id
+      doc_record.document = job_document_attrs(job_data).to_json
     end
+  end
+
+  def job_document_attrs(job_data)
+    { id: job_data["id"], title: job_data["title"], company: job_data["companyName"] }
+      .merge(description: job_data["companyOneLiner"]) # Full desc requires sub-page fetch
+      .merge(url: "https://www.workatastartup.com/jobs/#{job_data['id']}",
+             location: job_data["location"], role_type: job_data["roleType"])
   end
 end
