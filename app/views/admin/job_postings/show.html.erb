@@ -10,8 +10,8 @@
   <div class="lg:col-span-2 space-y-6">
     <div class="card-neural p-8 border-t-4 border-t-violet-500">
       <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-tight"><%= @job_posting.title %></h1>
-      <p class="text-blue-400 font-black text-xs uppercase tracking-[0.2em] mb-6"><%= @job_posting.company %></p>
-      
+      <p class="text-blue-400 font-black text-xs uppercase tracking-[0.2em] mb-6"><%= @job_posting.company_name %></p>
+
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-white/5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
         <div>
           <div class="mb-1 text-slate-600">Sync_Signature</div>
@@ -40,7 +40,7 @@
   <div class="space-y-6">
     <div class="card-neural p-6">
       <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Pipeline Activity</h3>
-      
+
       <!-- Status Actions -->
       <div class="flex flex-wrap gap-2 mb-6">
         <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
@@ -84,7 +84,7 @@
           </div>
         <% end %>
       </div>
-      
+
       <%= form_with model: [@job_posting, Contact.new], url: admin_job_posting_contacts_path(@job_posting), class: "space-y-2" do |f| %>
         <%= f.text_field :name, placeholder: "Name", class: "input input-bordered w-full text-xs" %>
         <%= f.text_field :role, placeholder: "Role (e.g. Recruiter)", class: "input input-bordered w-full text-xs" %>

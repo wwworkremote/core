@@ -18,7 +18,7 @@
         <span>Actionable_Queue</span>
         <span class="badge badge-primary badge-sm font-black"><%= @pending_tasks.count %></span>
       </h3>
-      
+
       <div class="space-y-4">
         <% @pending_tasks.each do |task| %>
           <div class="card-neural p-6 border-l-2 border-l-primary/30">
@@ -27,7 +27,7 @@
             </div>
             <h4 class="text-sm font-black text-white uppercase leading-tight mb-2"><%= task.title %></h4>
             <p class="text-[10px] text-slate-400 font-medium mb-4 italic">
-              @ <%= link_to task.job_posting.company, task.job_posting, class: "text-primary hover:underline" %>
+              @ <%= link_to task.job_posting.company_name, task.job_posting, class: "text-primary hover:underline" %>
             </p>
             <%= button_to "ACTIVATE_NODE", admin_task_path(task, status: 'in_progress'), method: :patch, class: "w-full py-1.5 rounded-lg bg-primary/10 text-primary text-[8px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all" %>
           </div>
@@ -47,7 +47,7 @@
           <div class="card-neural p-6 border-l-2 border-l-accent shadow-[0_0_15px_rgba(0,255,200,0.05)]">
             <h4 class="text-sm font-black text-white uppercase leading-tight mb-2"><%= task.title %></h4>
             <p class="text-[10px] text-slate-400 font-medium mb-4">
-              @ <%= link_to task.job_posting.company, task.job_posting, class: "text-accent hover:underline" %>
+              @ <%= link_to task.job_posting.company_name, task.job_posting, class: "text-accent hover:underline" %>
             </p>
             <div class="flex gap-2">
               <%= button_to "SYNCHRONIZE", admin_task_path(task, status: 'completed'), method: :patch, class: "flex-1 py-1.5 rounded-lg bg-accent/20 text-accent text-[8px] font-black uppercase tracking-widest hover:bg-accent hover:text-base-100 transition-all" %>
@@ -69,7 +69,7 @@
         <% @completed_tasks.each do |task| %>
           <div class="bg-white/5 p-4 rounded-xl border border-white/5">
             <h4 class="text-[10px] font-bold text-slate-400 uppercase line-through"><%= task.title %></h4>
-            <div class="text-[8px] text-slate-600 mt-1 uppercase"><%= task.job_posting.company %></div>
+            <div class="text-[8px] text-slate-600 mt-1 uppercase"><%= task.job_posting.company_name %></div>
           </div>
         <% end %>
       </div>

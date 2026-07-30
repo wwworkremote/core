@@ -218,6 +218,13 @@ GEM
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
     erb (6.0.6)
+    erb_lint (0.9.0)
+      activesupport
+      better_html (>= 2.0.1)
+      parser (>= 2.7.1.4)
+      rainbow
+      rubocop (>= 1)
+      smart_properties
     erubi (1.13.1)
     erubis (2.7.0)
     et-orbi (1.4.0)
@@ -1041,6 +1048,7 @@ DEPENDENCIES
   docx
   dotenv-rails
   druuid
+  erb_lint (~> 0.9.0)
   factory_bot_rails
   faker
   faraday
@@ -1208,6 +1216,7 @@ CHECKSUMS
   ed25519 (1.4.0) sha256=16e97f5198689a154247169f3453ef4cfd3f7a47481fde0ae33206cdfdcac506
   em-websocket (0.5.3) sha256=f56a92bde4e6cb879256d58ee31f124181f68f8887bd14d53d5d9a292758c6a8
   erb (6.0.6) sha256=a9b24986700f5bf127c4f297c5403c3ca41b83b0a316c0cd09a096b56e644ae5
+  erb_lint (0.9.0) sha256=dfb5e40ad839e8d1f0d56ca85ec9a7ac4c9cd966ec281138282f35b323ca7c31
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
   erubis (2.7.0) sha256=63653f5174a7997f6f1d6f465fbe1494dcc4bdab1fb8e635f6216989fb1148ba
   et-orbi (1.4.0) sha256=6c7e3c90779821f9e3b324c5e96fda9767f72995d6ae435b96678a4f3e2de8bc

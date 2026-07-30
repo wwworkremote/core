@@ -8,12 +8,12 @@
             <%= job.title %>
           <% end %>
           <div class="flex items-center justify-between">
-            <span class="text-[9px] font-black text-slate-600 uppercase tracking-tighter"><%= job.company %></span>
+            <span class="text-[9px] font-black text-slate-600 uppercase tracking-tighter"><%= job.company_name %></span>
             <span class="text-[9px] font-black text-violet-500 font-mono tracking-tighter"><%= match_score %>% MATCH</span>
           </div>
         </div>
       <% end %>
-      
+
       <div class="mt-4 pt-4 border-t border-white/5">
         <%= link_to admin_job_posting_path(@job_posting), class: "btn btn-ghost btn-xs w-full text-[9px] font-black tracking-widest text-slate-500", data: { turbo: false } do %>
           FULL_ADMIN_VIEW <%= heroicon "arrow-right", options: { class: "w-3 h-3 ml-1" } %>

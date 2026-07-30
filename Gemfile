@@ -135,3 +135,5 @@ end
 
 gem "cuprite", "~> 0.17"
 gem "tailwindcss-rails", "~> 4.4"
+
+gem "erb_lint", "~> 0.9.0", groups: %i[development test]
