@@ -2,6 +2,18 @@
 
 class CreateAhoyVisitsAndEvents < ActiveRecord::Migration[7.0]
   def change
+    create_ahoy_visits
+    create_ahoy_events
+  end
+
+  private
+
+  # Deliberately no t.timestamps -- matches ahoy_matey's own generator output;
+  # visits already carry started_at as their temporal column. Column list is
+  # one cohesive table definition -- splitting it further would obscure the
+  # schema, not simplify it.
+  # rubocop:disable Rails/CreateTableWithTimestamps, Metrics/MethodLength, Metrics/AbcSize
+  def create_ahoy_visits
     create_table :ahoy_visits do |t|
       t.string :visit_token
       t.string :visitor_token
@@ -47,7 +59,11 @@ class CreateAhoyVisitsAndEvents < ActiveRecord::Migration[7.0]
     end
 
     add_index :ahoy_visits, :visit_token, unique: true
+  end
+  # rubocop:enable Rails/CreateTableWithTimestamps, Metrics/MethodLength, Metrics/AbcSize
 
+  # rubocop:disable Rails/CreateTableWithTimestamps, Metrics/MethodLength
+  def create_ahoy_events
     create_table :ahoy_events do |t|
       t.references :visit
       t.references :user
@@ -60,4 +76,5 @@ class CreateAhoyVisitsAndEvents < ActiveRecord::Migration[7.0]
     add_index :ahoy_events, %i[name time]
     add_index :ahoy_events, :properties, using: :gin, opclass: :jsonb_path_ops
   end
+  # rubocop:enable Rails/CreateTableWithTimestamps, Metrics/MethodLength
 end
