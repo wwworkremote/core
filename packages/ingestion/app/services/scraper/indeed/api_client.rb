@@ -5,6 +5,8 @@ require "nokogiri"
 # Service object to scrape job listings from Indeed using Playwright.
 # It handles search execution and parsing of job cards into Document records.
 class Scraper::Indeed::ApiClient
+  prepend Scraper::Traceable
+
   # Indeed uses a more complex URL structure for search
   BASE_URL = "https://www.indeed.com/jobs"
 

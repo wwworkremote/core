@@ -4,6 +4,8 @@ require "nokogiri"
 
 # Service to deep-scrape Glassdoor job listings and associated company intelligence.
 class Scraper::Glassdoor::ApiClient
+  prepend Scraper::Traceable
+
   BASE_URL = "https://www.glassdoor.com/Job/jobs.htm"
 
   def self.search(keywords, location: "Remote")

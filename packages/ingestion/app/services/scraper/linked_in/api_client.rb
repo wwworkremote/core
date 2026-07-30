@@ -3,6 +3,8 @@
 require "nokogiri"
 
 class Scraper::LinkedIn::ApiClient
+  prepend Scraper::Traceable
+
   # LinkedIn guest search URL
   BASE_URL = "https://www.linkedin.com/jobs/search"
 

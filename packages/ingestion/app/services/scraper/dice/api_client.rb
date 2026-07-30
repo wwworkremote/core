@@ -5,6 +5,8 @@ require "nokogiri"
 # Service to scrape job listings from Dice.com.
 # Uses Playwright to handle client-side rendering and search parameters.
 class Scraper::Dice::ApiClient
+  prepend Scraper::Traceable
+
   BASE_URL = "https://www.dice.com/jobs"
 
   def self.search(keywords, location: "Remote")
