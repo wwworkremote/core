@@ -2,27 +2,51 @@
 
 class Charts::Data::JobPostingsController < DataController
   def index
-    @days = Integer(params["days"] || 1)
-    @days = 1 unless @days.positive?
-
-    # Use created_at for velocity monitoring since published_at can be missing or stale
-    if @days == 1
-      render json: JobPosting.where(created_at: 24.hours.ago..).group_by_hour(:created_at).count
-    else
-      render json: JobPosting.where(created_at: @days.days.ago..).group_by_day(:created_at).count
-    end
+    render json: velocity_data
   end
 
   def corpus
-    job_postings = JobPosting.where(published_at: Time.zone.now.all_month).order(id: :desc).limit(1_000).pluck(
-      :title, :body
-    )
+    render json: corpus_data.as_json
+  end
 
-    @corpus = job_postings.each_with_object({ names: [], descriptions: [] }) do |jp, c|
-      c[:names] << jp.first.to_s.gsub(/\s\+/, " ").downcase.strip
-      c[:descriptions] << jp.last.to_s.gsub(/\s\+/, " ").downcase.strip
+  private
+
+  def days
+    @days ||= Integer(params["days"] || 1)
+    @days = 1 unless @days.positive?
+    @days
+  end
+
+  # Use created_at for velocity monitoring since published_at can be missing or stale
+  def velocity_data
+    days == 1 ? hourly_velocity : daily_velocity
+  end
+
+  def hourly_velocity
+    JobPosting.where(created_at: 24.hours.ago..).group_by_hour(:created_at).count
+  end
+
+  def daily_velocity
+    JobPosting.where(created_at: days.days.ago..).group_by_day(:created_at).count
+  end
+
+  def corpus_data
+    corpus_job_postings.each_with_object({ names: [], descriptions: [] }) do |row, corpus|
+      append_corpus_row(corpus, row)
     end
+  end
 
-    render json: @corpus.as_json
+  def append_corpus_row(corpus, row)
+    title, body = row
+    corpus[:names] << normalize_corpus_text(title)
+    corpus[:descriptions] << normalize_corpus_text(body)
+  end
+
+  def corpus_job_postings
+    JobPosting.where(published_at: Time.zone.now.all_month).order(id: :desc).limit(1_000).pluck(:title, :body)
+  end
+
+  def normalize_corpus_text(text)
+    text.to_s.gsub(/\s\+/, " ").downcase.strip
   end
 end

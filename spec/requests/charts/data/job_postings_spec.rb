@@ -20,6 +20,14 @@ RSpec.describe "Charts::Data::JobPostings" do
       data = response.parsed_body
       expect(data.values.sum).to be >= 1
     end
+
+    it "falls back to 1 day when days is not positive" do
+      create(:job_posting)
+      get charts_data_job_postings_path, params: { days: -3 }
+      expect(response).to be_successful
+      data = response.parsed_body
+      expect(data.values.sum).to eq(1)
+    end
   end
 
   describe "GET /charts/data/job_postings/corpus" do
