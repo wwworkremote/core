@@ -50,7 +50,7 @@ RSpec.describe Adzuna::Fetcher, type: :service do
     it "trips the circuit breaker on 429 rate limit" do
       stub_request(:get, /api.adzuna.com/).to_return(status: 429, body: "Too Many Requests")
 
-      expect(Rails.logger).to receive(:warn).with(/Circuit Breaker Tripped for adzuna/).at_least(:once)
+      allow(Rails.logger).to receive(:warn).and_call_original
 
       # First call returns false because of the return false if response.nil?
       service.call(force: true)
@@ -58,14 +58,17 @@ RSpec.describe Adzuna::Fetcher, type: :service do
       # Second call should be locked
       result = service.call(force: true)
       expect(result).to eq(:locked)
+      expect(Rails.logger).to have_received(:warn).with(/Circuit Breaker Tripped for adzuna/).at_least(:once)
     end
 
     it "handles missing credentials gracefully" do
       allow(ENV).to receive(:fetch).with("ADZUNA_APPLICATION_ID", nil).and_return(nil)
+      allow(Rails.logger).to receive(:error).and_call_original
 
-      expect(Rails.logger).to receive(:error).with(/Adzuna API credentials missing/)
       result = service.call(force: true)
+
       expect(result).to be false
+      expect(Rails.logger).to have_received(:error).with(/Adzuna API credentials missing/)
     end
   end
 end

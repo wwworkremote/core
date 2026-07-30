@@ -40,11 +40,12 @@ RSpec.describe Wwr::Fetcher, type: :service do
       VCR.turned_off do
         stub_request(:get, /weworkremotely.com/).to_return(status: 429, body: "Too Many Requests")
 
-        expect(Rails.logger).to receive(:warn).with(/Circuit Breaker Tripped for wwr/).at_least(:once)
+        allow(Rails.logger).to receive(:warn).and_call_original
 
         service.call(force: true)
         result = service.call(force: true)
         expect(result).to eq(:locked)
+        expect(Rails.logger).to have_received(:warn).with(/Circuit Breaker Tripped for wwr/).at_least(:once)
       end
     end
   end
