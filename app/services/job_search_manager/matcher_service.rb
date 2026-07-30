@@ -7,25 +7,23 @@ class JobSearchManager::MatcherService
     @resume = job_search.resume
   end
 
+  # Leverage VectorIntelligence for the core ranking operation. This keeps
+  # the strategy centralized while providing campaign-specific context.
   def call(limit: 10)
     return JobPosting.none unless @resume&.embedding
 
-    # Leverage VectorIntelligence for the core ranking operation.
-    # This keeps the strategy centralized while providing campaign-specific context.
-    VectorIntelligence.rank(
-      source: @resume,
-      target_class: JobPosting,
-      limit: limit
-    )
+    rank(JobPosting, limit)
   end
 
   def skills_analysis(limit: 10)
     return Skill.none unless @resume&.embedding
 
-    VectorIntelligence.rank(
-      source: @resume,
-      target_class: Skill,
-      limit: limit
-    )
+    rank(Skill, limit)
+  end
+
+  private
+
+  def rank(target_class, limit)
+    VectorIntelligence.rank(source: @resume, target_class: target_class, limit: limit)
   end
 end
