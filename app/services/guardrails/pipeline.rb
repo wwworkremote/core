@@ -10,17 +10,27 @@ class Guardrails::Pipeline
   end
 
   def call
-    # 1. Normalize
     sanitized_text = Guardrails::Normalizer.new(@raw_text).call
+    scan_result = scan(sanitized_text)
+    classification = classify(scan_result)
 
-    # 2. Heuristic Scan
-    scan_result = Guardrails::HeuristicScanner.new(sanitized_text).call
-    score = scan_result[:score]
-    findings = scan_result[:findings]
+    build_result(sanitized_text, scan_result[:findings], classification)
+  end
 
-    # 3. Risk Classification
-    classification = Guardrails::RiskClassifier.new(score, findings).call
+  private
 
+  def scan(sanitized_text)
+    Guardrails::HeuristicScanner.new(sanitized_text).call
+  end
+
+  def classify(scan_result)
+    Guardrails::RiskClassifier.new(scan_result[:score], scan_result[:findings]).call
+  end
+
+  # One cohesive value-object construction -- splitting it further would
+  # obscure it, not simplify it.
+  # rubocop:disable Metrics/MethodLength
+  def build_result(sanitized_text, findings, classification)
     Guardrails::Result.new(
       allowed: classification[:disposition] != "block",
       risk_level: classification[:risk_level],
@@ -29,4 +39,5 @@ class Guardrails::Pipeline
       disposition: classification[:disposition]
     )
   end
+  # rubocop:enable Metrics/MethodLength
 end

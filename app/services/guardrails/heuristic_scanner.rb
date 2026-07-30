@@ -23,24 +23,39 @@ class Guardrails::HeuristicScanner
   end
 
   def call
+    findings, score = scan_patterns
+    findings << "High instruction density detected" if high_density?(score)
+
+    { score: score, findings: findings }
+  end
+
+  private
+
+  # rubocop:disable Metrics/MethodLength
+  def scan_patterns
     findings = []
     score = 0
 
     SUSPICIOUS_PATTERNS.each do |pattern, weight|
-      # Allow for up to 3 optional words between the keywords in the pattern
-      regex_pattern = pattern.split(/\s+/).map { |word| Regexp.escape(word) }.join('(?:\s+\w+){0,3}\s+')
-      if @text.match?(/#{regex_pattern}/i)
-        findings << "Matched pattern: '#{pattern}'"
-        score += weight
-      end
+      next unless @text.match?(pattern_regex(pattern))
+
+      findings << "Matched pattern: '#{pattern}'"
+      score += weight
     end
 
-    # Density check
-    if @text.length > 100 && score.positive?
-      density = score.to_f / @text.length
-      findings << "High instruction density detected" if density > 0.5
-    end
+    [findings, score]
+  end
+  # rubocop:enable Metrics/MethodLength
 
-    { score: score, findings: findings }
+  # Allow for up to 3 optional words between the keywords in the pattern
+  def pattern_regex(pattern)
+    words = pattern.split(/\s+/).map { |word| Regexp.escape(word) }.join('(?:\s+\w+){0,3}\s+')
+    /#{words}/i
+  end
+
+  def high_density?(score)
+    return false unless @text.length > 100 && score.positive?
+
+    (score.to_f / @text.length) > 0.5
   end
 end

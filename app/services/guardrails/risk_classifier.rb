@@ -7,14 +7,22 @@ class Guardrails::RiskClassifier
   end
 
   def call
-    if @score >= 100
-      { risk_level: "high", disposition: "block" }
-    elsif @score >= 50
-      { risk_level: "high", disposition: "quarantine" }
-    elsif @score >= 20
-      { risk_level: "medium", disposition: "allow" }
-    else
-      { risk_level: "low", disposition: "allow" }
-    end
+    { risk_level: risk_level, disposition: disposition }
+  end
+
+  private
+
+  def risk_level
+    return "high" if @score >= 50
+    return "medium" if @score >= 20
+
+    "low"
+  end
+
+  def disposition
+    return "block" if @score >= 100
+    return "quarantine" if @score >= 50
+
+    "allow"
   end
 end
