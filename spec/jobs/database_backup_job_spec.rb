@@ -49,5 +49,16 @@ RSpec.describe DatabaseBackupJob do
       described_class.perform_now
       expect(Rails.logger).to have_received(:error).with(/Critical error: Dump failed/)
     end
+
+    it "logs an error when the critical backup file was not created" do
+      allow(job_instance).to receive(:system) do |*args|
+        dest = args.last
+        FileUtils.touch(dest) if dest.to_s.include?("full_backup")
+        true
+      end
+
+      described_class.perform_now
+      expect(Rails.logger).to have_received(:error).with(/Failed to create critical dump file/)
+    end
   end
 end
