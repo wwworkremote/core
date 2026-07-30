@@ -4,11 +4,14 @@ module JobPostingsHelper
   def safe_job_url(url)
     return "#" if url.blank?
 
-    uri = URI.parse(url)
-    return "#" unless %w[http https].include?(uri.scheme)
+    valid_job_url?(url) ? url : "#"
+  end
 
-    url
+  private
+
+  def valid_job_url?(url)
+    %w[http https].include?(URI.parse(url).scheme)
   rescue URI::InvalidURIError
-    "#"
+    false
   end
 end

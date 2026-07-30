@@ -18,10 +18,8 @@ module LLMMessagesHelper
 
   def partial_for(prefix:, name:)
     normalized = name.to_s.underscore.tr("-", "_")
-    if normalized.present? && lookup_context.exists?(normalized, [prefix], true)
-      "#{prefix}/#{normalized}"
-    else
-      "#{prefix}/default"
-    end
+    return "#{prefix}/default" unless normalized.present? && lookup_context.exists?(normalized, [prefix], true)
+
+    "#{prefix}/#{normalized}"
   end
 end
