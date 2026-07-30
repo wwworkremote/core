@@ -4,9 +4,7 @@ require "rails_helper"
 
 RSpec.describe Scraper::Indeed::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "indeed", name: "Indeed") }
-  let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-
   let(:indeed_html) do
     <<~HTML
       <html>
@@ -20,6 +18,8 @@ RSpec.describe Scraper::Indeed::ApiClient do
       </html>
     HTML
   end
+
+  before { create(:job_boards_query, job_boards_source: source) }
 
   describe "#search" do
     it "fetches, parses, and stores job documents" do

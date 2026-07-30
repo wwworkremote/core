@@ -4,9 +4,7 @@ require "rails_helper"
 
 RSpec.describe Scraper::LinkedIn::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "linkedin", name: "LinkedIn") }
-  let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-
   let(:linkedin_html) do
     <<~HTML
       <html>
@@ -21,6 +19,8 @@ RSpec.describe Scraper::LinkedIn::ApiClient do
       </html>
     HTML
   end
+
+  before { create(:job_boards_query, job_boards_source: source) }
 
   describe "#search" do
     it "fetches, parses, and stores LinkedIn job documents" do

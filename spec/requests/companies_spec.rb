@@ -4,8 +4,9 @@ require "rails_helper"
 
 RSpec.describe "Companies" do
   let!(:company) { create(:company, name: "Test Corp") }
-  let!(:job) { create(:job_posting, company: company) }
   let(:user) { create(:user) }
+
+  before { create(:job_posting, company: company) }
 
   describe "GET /companies" do
     it "returns a success response" do

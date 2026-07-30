@@ -4,9 +4,7 @@ require "rails_helper"
 
 RSpec.describe Scraper::Dice::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "dice", name: "Dice") }
-  let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-
   let(:dice_html) do
     <<~HTML
       <html>
@@ -20,6 +18,8 @@ RSpec.describe Scraper::Dice::ApiClient do
       </html>
     HTML
   end
+
+  before { create(:job_boards_query, job_boards_source: source) }
 
   describe "#search" do
     it "fetches, parses, and stores Dice job documents" do

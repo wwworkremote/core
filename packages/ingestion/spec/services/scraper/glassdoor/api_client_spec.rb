@@ -4,9 +4,7 @@ require "rails_helper"
 
 RSpec.describe Scraper::Glassdoor::ApiClient do
   let!(:source) { create(:job_boards_source, slug: "glassdoor", name: "Glassdoor") }
-  let!(:query) { create(:job_boards_query, job_boards_source: source) }
   let(:client) { described_class.new }
-
   let(:glassdoor_html) do
     <<~HTML
       <html>
@@ -22,6 +20,8 @@ RSpec.describe Scraper::Glassdoor::ApiClient do
       </html>
     HTML
   end
+
+  before { create(:job_boards_query, job_boards_source: source) }
 
   describe "#search" do
     it "fetches, parses, and stores Glassdoor job documents" do
