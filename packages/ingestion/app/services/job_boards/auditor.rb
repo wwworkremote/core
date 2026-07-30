@@ -4,66 +4,64 @@ class JobBoards::Auditor
   def initialize(options = {})
     @fix = options.fetch(:fix, true)
     @limit = options.fetch(:limit, 100)
+    @stats = { missing_postings: 0, missing_category: 0, missing_embedding: 0, missing_geocoding: 0, fixed: 0 }
   end
 
+  AUDITS = %i[audit_missing_postings audit_missing_category audit_missing_embedding audit_missing_geocoding
+              audit_low_quality].freeze
+
   def call
-    stats = {
-      missing_postings: 0,
-      missing_category: 0,
-      missing_embedding: 0,
-      missing_geocoding: 0,
-      fixed: 0
-    }
+    AUDITS.each { |audit| send(audit) }
+    @stats
+  end
 
-    # 1. Check for documents without postings
+  private
+
+  def audit_missing_postings
     JobBoards::Document.find_each do |doc|
-      unless JobPosting.exists?(signature: doc.signature)
-        stats[:missing_postings] += 1
-        if @fix && stats[:fixed] < @limit
-          JobBoards::Syncer.new.send(:sync_document, doc)
-          stats[:fixed] += 1
-        end
-      end
-    end
+      next if JobPosting.exists?(signature: doc.signature)
 
-    # 2. Check for postings without AI category
+      @stats[:missing_postings] += 1
+      apply_fix { JobBoards::Syncer.new.send(:sync_document, doc) }
+    end
+  end
+
+  def audit_missing_category
     JobPosting.where("data->'ai_category' IS NULL").find_each do |jp|
-      stats[:missing_category] += 1
-      if @fix && stats[:fixed] < @limit
-        JobBoards::Categorizer.new(jp).call
-        stats[:fixed] += 1
-      end
+      @stats[:missing_category] += 1
+      apply_fix { JobBoards::Categorizer.new(jp).call }
     end
+  end
 
-    # 3. Check for postings without embeddings
+  def audit_missing_embedding
     JobPosting.where(embedding: nil).find_each do |jp|
-      stats[:missing_embedding] += 1
-      if @fix && stats[:fixed] < @limit
-        JobBoards::Embedder.new(jp).call
-        stats[:fixed] += 1
-      end
+      @stats[:missing_embedding] += 1
+      apply_fix { JobBoards::Embedder.new(jp).call }
     end
+  end
 
-    # 4. Check for postings without geocoding
+  def audit_missing_geocoding
     JobPosting.where(latitude: nil).where.not(location: nil).find_each do |jp|
-      stats[:missing_geocoding] += 1
-      if @fix && stats[:fixed] < @limit
-        jp.enqueue_geocoding
-        stats[:fixed] += 1
-      end
+      @stats[:missing_geocoding] += 1
+      apply_fix { jp.enqueue_geocoding }
     end
+  end
 
-    # 5. Check for low-quality postings that should be ignored
+  # Borrows the :missing_category counter rather than adding a new stat key,
+  # matching the original auditor's reporting shape.
+  def audit_low_quality
     JobPosting.where.not(status: "ignored").find_each do |jp|
-      unless JobBoards::QualityFilter.new(jp).useful?
-        stats[:missing_category] += 1 # Borrowing this counter or we could add a new one
-        if @fix && stats[:fixed] < @limit
-          jp.update!(status: "ignored")
-          stats[:fixed] += 1
-        end
-      end
-    end
+      next if JobBoards::QualityFilter.new(jp).useful?
 
-    stats
+      @stats[:missing_category] += 1
+      apply_fix { jp.ignore! } if jp.may_ignore?
+    end
+  end
+
+  def apply_fix
+    return unless @fix && @stats[:fixed] < @limit
+
+    yield
+    @stats[:fixed] += 1
   end
 end
