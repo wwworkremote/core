@@ -2,6 +2,11 @@
 
 require "rails_helper"
 
+# A live external HTTP contract check, not a class under test --
+# RSpec/DescribeClass doesn't apply. before(:all)/after(:all) toggle
+# global VCR/WebMock state deliberately and symmetrically for the
+# whole file, not per-example state that could leak.
+# rubocop:disable RSpec/DescribeClass, RSpec/BeforeAfterAll
 RSpec.describe "YC Scraper Contract", type: :contract do
   before(:all) do
     WebMock.allow_net_connect!
@@ -12,6 +17,7 @@ RSpec.describe "YC Scraper Contract", type: :contract do
     VCR.turn_on!
     WebMock.disable_net_connect!
   end
+  # rubocop:enable RSpec/BeforeAfterAll
 
   let(:url) { Yc::Scraper::BASE_URL }
   let(:headers) { Yc::Scraper::REQUEST_HEADERS }
@@ -43,3 +49,4 @@ RSpec.describe "YC Scraper Contract", type: :contract do
     end
   end
 end
+# rubocop:enable RSpec/DescribeClass

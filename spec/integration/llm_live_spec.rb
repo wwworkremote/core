@@ -16,6 +16,9 @@ require "net/http"
 
 LLAMA_BASE = ENV.fetch("OLLAMA_API_BASE", "http://127.0.0.1:11500/v1").sub(%r{/v1/?$}, "").freeze
 
+# Covers multiple classes against a live inference server, not one
+# class under test -- RSpec/DescribeClass doesn't apply.
+# rubocop:disable RSpec/DescribeClass
 RSpec.describe "llama.cpp live integration", :live do
   # ── Server sanity ──────────────────────────────────────────────────────────
 
@@ -94,10 +97,11 @@ RSpec.describe "llama.cpp live integration", :live do
 
     it "blocks content that fails guardrails" do
       allow(Guardrails::Pipeline).to receive(:call)
-        .and_return(double("r", allowed?: false, findings: ["test block"]))
+        .and_return(instance_double(Guardrails::Result, allowed?: false, findings: ["test block"]))
       result = described_class.call(untrusted_text: "anything", model: local_model)
       expect(result[:success]).to be(false)
       expect(result[:error]).to match(/guardrails/i)
     end
   end
 end
+# rubocop:enable RSpec/DescribeClass
