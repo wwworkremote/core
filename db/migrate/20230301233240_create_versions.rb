@@ -10,6 +10,16 @@ class CreateVersions < ActiveRecord::Migration[7.0]
   TEXT_BYTES = 1_073_741_823
 
   def change
+    create_versions_table
+    add_index :versions, %i[item_type item_id]
+  end
+
+  private
+
+  # Vendored verbatim from the paper_trail gem's own generator output --
+  # splitting the column list further would diverge from PT's schema.
+  # rubocop:disable Metrics/MethodLength
+  def create_versions_table
     create_table :versions do |t|
       t.string   :item_type, null: false
       t.bigint   :item_id,   null: false
@@ -34,6 +44,6 @@ class CreateVersions < ActiveRecord::Migration[7.0]
       # t.datetime :created_at, limit: 6
       t.datetime :created_at
     end
-    add_index :versions, %i[item_type item_id]
   end
+  # rubocop:enable Metrics/MethodLength
 end
