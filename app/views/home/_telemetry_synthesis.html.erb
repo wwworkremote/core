@@ -4,13 +4,13 @@
     <div class="stat-value text-dracula-cyan text-3xl"><%= JobPosting.where(published_at: 1.hour.ago..).count %></div>
     <div class="stat-desc font-bold text-[9px] text-dracula-cyan/50 uppercase tracking-tighter">New_Signals</div>
   </div>
-  
+
   <div class="stat">
     <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Inflow_24H</div>
     <div class="stat-value text-dracula-green text-3xl"><%= JobPosting.where(published_at: 1.day.ago..).count %></div>
     <div class="stat-desc font-bold text-[9px] text-dracula-green/50 uppercase tracking-tighter">Neural_Classification</div>
   </div>
-  
+
   <div class="stat !border-none">
     <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">STALE_NODES</div>
     <div class="stat-value text-dracula-comment text-3xl"><%= JobPosting.where('published_at < ?', 30.days.ago).count %></div>

@@ -14,7 +14,7 @@
       <div class="absolute top-0 right-0 p-8 opacity-5">
         <%= heroicon "building-office", options: { class: "w-32 h-32" } %>
       </div>
-      
+
       <div class="relative z-10">
         <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none"><%= @company.name %></h1>
         <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Company Intelligence Hub</p>
@@ -23,7 +23,7 @@
 
     <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
       <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-base-content/30 mb-10 pb-4 border-b border-white/5">Associated_Postings</h2>
-      
+
       <div class="grid grid-cols-1 gap-4">
         <% @company.job_postings.order(published_at: :desc).each do |job| %>
           <div class="card-neural p-6 hover:border-primary/50 transition-all group flex items-center justify-between">
@@ -47,7 +47,7 @@
     <!-- Pipeline Control -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Research_Timeline</h3>
-      
+
       <!-- Activity Logger -->
       <%= form_with url: admin_company_company_pipeline_steps_path(@company), class: "space-y-3 mb-10" do |f| %>
         <%= f.text_area :note, placeholder: "LOG_RESEARCH_CONTEXT...", class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-[10px] font-mono", rows: 2 %>

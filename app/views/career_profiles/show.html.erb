@@ -32,7 +32,7 @@
           <% @career_profile.work_experiences.order(start_date: :desc).each do |exp| %>
             <div class="relative pl-8 border-l-2 border-white/5">
               <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-base-100 border-2 border-primary shadow-[0_0_10px_rgba(149,128,255,0.5)]"></div>
-              
+
               <div class="flex justify-between items-start mb-2">
                 <div>
                   <h4 class="text-xl font-black text-white uppercase tracking-tight"><%= exp.title %></h4>
@@ -107,12 +107,12 @@
             <span>GitHub_Intelligence</span>
             <span class="text-[8px] opacity-40 font-mono">TECHNICAL_PROOF</span>
           </h3>
-          
+
           <div class="space-y-6">
             <div class="prose-invert text-[11px] leading-relaxed">
               <%= markdown(@career_profile.github_context['synthesis']) %>
             </div>
-            
+
             <div class="pt-4 border-t border-white/5">
               <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Analyzed_Repositories</div>
               <div class="flex flex-wrap gap-2">

@@ -17,7 +17,7 @@
         <%
           sync_gap = Time.current - (source.last_synced_at || 1.week.ago)
           status = sync_gap > 24.hours ? :critical : (sync_gap > 6.hours ? :warning : :healthy)
-          
+
           # Sequence Telemetry
           pending_docs = Ingestion::JobBoards::Document.where(source_id: source.id, aasm_state: "pending").count
           unprocessed_postings = JobPosting.where(company_name: source.name, crawl_status: "none").count

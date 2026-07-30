@@ -41,8 +41,8 @@
               <% end %>
             </td>
             <td class="px-6 py-5 text-right">
-              <%= button_to toggle_ingestion_admin_company_path(company), 
-                  method: :post, 
+              <%= button_to toggle_ingestion_admin_company_path(company),
+                  method: :post,
                   class: "btn btn-ghost btn-xs border border-white/10 rounded font-black tracking-widest text-base-content/40 hover:text-white" do %>
                 <%= company.ingestion_enabled? ? "PAUSE_INGESTION" : "RESUME_INGESTION" %>
               <% end %>

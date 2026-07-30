@@ -18,13 +18,13 @@
       <div class="stat-value text-primary text-4xl font-black tracking-tighter"><%= @latency_avg %>s</div>
       <div class="stat-desc font-bold text-[10px] uppercase tracking-tighter text-slate-400 mt-2">Sync_To_Enrich</div>
     </div>
-    
+
     <div class="stat p-8">
       <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">TRAFFIC_DAILY</div>
       <div class="stat-value text-dracula-pink text-4xl font-black tracking-tighter"><%= @traffic_daily %></div>
       <div class="stat-desc font-bold text-[10px] uppercase tracking-tighter text-slate-400 mt-2">Signals_Ingested</div>
     </div>
-    
+
     <div class="stat p-8">
       <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">ERROR_RATE</div>
       <div class="stat-value text-dracula-red text-4xl font-black tracking-tighter"><%= @error_rate %>%</div>
@@ -48,8 +48,8 @@
         <%= line_chart charts_data_pipeline_health_path,
             height: "250px",
             colors: ["#9580FF"],
-            library: { 
-              scales: { 
+            library: {
+              scales: {
                 y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } },
                 x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } }
               },
@@ -64,8 +64,8 @@
         <%= bar_chart charts_data_pipeline_funnel_path,
             height: "250px",
             colors: ["#80FFEA"],
-            library: { 
-              scales: { 
+            library: {
+              scales: {
                 x: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } },
                 y: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } }
               },
@@ -93,8 +93,8 @@
         <%= area_chart charts_data_behavior_visits_path,
             height: "280px",
             colors: ["#8AFF80"],
-            library: { 
-              scales: { 
+            library: {
+              scales: {
                 y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } },
                 x: { grid: { display: false }, ticks: { color: "#6272a4", font: { size: 10, weight: 'bold' } } }
               },

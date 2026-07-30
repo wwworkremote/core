@@ -9,7 +9,7 @@
       </div>
     </div>
   </td>
-  
+
   <td class="px-6 py-4">
     <div class="flex flex-col">
       <span class="text-sm font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors italic">
@@ -18,14 +18,14 @@
       <span class="text-[8px] font-bold uppercase tracking-widest opacity-30 mt-0.5"><%= model_id %></span>
     </div>
   </td>
-  
+
   <td class="px-6 py-4">
     <div class="flex items-center gap-2">
       <span class="text-xs font-mono opacity-70"><%= number_with_delimiter(model.context_window) if model.context_window %></span>
       <span class="text-[8px] font-black uppercase tracking-widest opacity-20 italic">ctx</span>
     </div>
   </td>
-  
+
   <td class="px-6 py-4">
     <div class="flex items-center gap-2">
       <% input = model.input_price_per_million %>
@@ -39,7 +39,7 @@
       <% end %>
     </div>
   </td>
-  
+
   <td class="px-6 py-4 text-right">
     <%= link_to new_llm_chat_path(model: model_id), class: "btn btn-ghost btn-xs rounded-lg group-hover:bg-primary group-hover:text-primary-content transition-all font-black uppercase tracking-widest text-[8px] gap-2 px-4" do %>
       Establish Link

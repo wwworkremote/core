@@ -9,7 +9,7 @@
         <span class="text-[10px] font-bold uppercase tracking-widest opacity-70"><%= @model.model_id %></span>
       </div>
     </div>
-    
+
     <div class="flex gap-2">
       <%= link_to models_path, class: "btn btn-ghost btn-sm rounded-xl gap-2 font-bold uppercase tracking-widest text-[10px]" do %>
         <%= heroicon "chevron-left", variant: :solid, options: { class: "w-3 h-3" } %>
@@ -23,18 +23,18 @@
       <div class="card bg-base-200 border border-white/5 shadow-xl">
         <div class="card-body p-8">
           <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-8 italic">Technical Specifications</h3>
-          
+
           <div class="space-y-6">
             <div class="flex justify-between items-center border-b border-white/5 pb-4">
               <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Provider Class</span>
               <span class="text-sm font-black uppercase tracking-tighter"><%= @model.provider_class&.name || @model.provider %></span>
             </div>
-            
+
             <div class="flex justify-between items-center border-b border-white/5 pb-4">
               <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Canonical Name</span>
               <span class="text-sm font-black uppercase tracking-tighter text-primary"><%= @model.name %></span>
             </div>
-            
+
             <div class="flex justify-between items-center border-b border-white/5 pb-4">
               <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Context Window</span>
               <div class="flex items-center gap-2">
@@ -42,7 +42,7 @@
                 <span class="text-[8px] font-black uppercase tracking-widest opacity-20">tokens</span>
               </div>
             </div>
-            
+
             <div class="flex justify-between items-center border-b border-white/5 pb-4">
               <span class="text-[10px] font-bold uppercase tracking-widest opacity-30">Max Output</span>
               <div class="flex items-center gap-2">
@@ -81,7 +81,7 @@
           <% end %>
         </div>
       </div>
-      
+
       <div class="card bg-base-300 border border-white/5 shadow-xl">
         <div class="card-body p-6">
           <div class="flex items-center gap-3 mb-4">

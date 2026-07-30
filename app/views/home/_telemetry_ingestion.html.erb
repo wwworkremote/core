@@ -4,13 +4,13 @@
     <div class="stat-value text-dracula-purple text-3xl"><%= Source.where(created_at: 1.hour.ago..).count %></div>
     <div class="stat-desc font-bold text-[9px] text-dracula-purple/50 uppercase tracking-tighter">Live_Signals</div>
   </div>
-  
+
   <div class="stat">
     <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Payload_24H</div>
     <div class="stat-value text-dracula-pink text-3xl"><%= Source.where(created_at: 1.day.ago..).count %></div>
     <div class="stat-desc font-bold text-[9px] text-dracula-pink/50 uppercase tracking-tighter">Sync_Nodes</div>
   </div>
-  
+
   <div class="stat !border-none">
     <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Growth_7D</div>
     <div class="stat-value text-dracula-cyan text-3xl"><%= Source.where(created_at: 1.week.ago..).count %></div>

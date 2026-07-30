@@ -4,12 +4,12 @@
     <div class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Jobs / Hour</div>
   </div>
   <div class="h-48">
-    <%= area_chart charts_data_job_postings_path, 
+    <%= area_chart charts_data_job_postings_path,
         height: "100%",
         colors: ["#80FFEA"],
-        library: { 
+        library: {
           plugins: { legend: { display: false } },
-          scales: { 
+          scales: {
             y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#7970a9", font: { size: 9 } } },
             x: { grid: { display: false }, border: { display: false }, ticks: { color: "#7970a9", font: { size: 9 } } }
           }
