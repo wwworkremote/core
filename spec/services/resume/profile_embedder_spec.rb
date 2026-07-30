@@ -31,19 +31,43 @@ RSpec.describe Resume::ProfileEmbedder do
     it "handles API errors gracefully" do
       stub_request(:post, described_class::API_URL)
         .to_return(status: 503, body: "Down")
-
-      expect(Rails.logger).to receive(:error).with(/API Error: 503/)
+      allow(Rails.logger).to receive(:error)
 
       result = embedder.call
+
       expect(result).to be false
+      expect(Rails.logger).to have_received(:error).with(/API Error: 503/)
+    end
+
+    it "returns false when the response has no embedding" do
+      stub_request(:post, described_class::API_URL)
+        .to_return(status: 200, body: { data: [] }.to_json, headers: { "Content-Type" => "application/json" })
+      allow(Rails.logger).to receive(:error)
+
+      result = embedder.call
+
+      expect(result).to be false
+      expect(Rails.logger).to have_received(:error).with(/No embedding found/)
+    end
+
+    it "returns false and logs when the request raises" do
+      stub_request(:post, described_class::API_URL).to_raise(Faraday::ConnectionFailed.new("boom"))
+      allow(Rails.logger).to receive(:error)
+
+      result = embedder.call
+
+      expect(result).to be false
+      expect(Rails.logger).to have_received(:error).with(/Exception: boom/)
     end
 
     it "skips if disabled via ENV" do
       allow(ENV).to receive(:fetch).and_call_original
       allow(ENV).to receive(:[]).with("ENABLE_EMBEDDINGS").and_return("false")
+      allow(Faraday).to receive(:post)
 
-      expect(Faraday).not_to receive(:post)
       embedder.call
+
+      expect(Faraday).not_to have_received(:post)
     end
   end
 end
