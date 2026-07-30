@@ -19,7 +19,7 @@ RSpec.describe Lever::Fetcher, type: :service do
     it "enqueues one granular fetch job per site/term combination" do
       expect { service.call(force: true) }
         .to have_enqueued_job(JobBoards::GranularFetchJob)
-        .with("Lever::Fetcher", "gitlab", "ruby", source.id, query.id)
+        .with("Lever::Fetcher", "gitlab", "ruby", { source_id: source.id, query_id: query.id })
     end
   end
 

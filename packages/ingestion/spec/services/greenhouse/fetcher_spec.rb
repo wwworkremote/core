@@ -19,7 +19,7 @@ RSpec.describe Greenhouse::Fetcher, type: :service do
     it "enqueues one granular fetch job per board/term combination" do
       expect { service.call(force: true) }
         .to have_enqueued_job(JobBoards::GranularFetchJob)
-        .with("Greenhouse::Fetcher", "stripe", "ruby", source.id, query.id)
+        .with("Greenhouse::Fetcher", "stripe", "ruby", { source_id: source.id, query_id: query.id })
     end
   end
 

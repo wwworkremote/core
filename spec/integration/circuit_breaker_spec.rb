@@ -2,6 +2,10 @@
 
 require "rails_helper"
 
+# This is a cross-cutting integration spec, not a spec for one class --
+# RSpec/DescribeClass's "describe the class under test" convention
+# doesn't apply.
+# rubocop:disable RSpec/DescribeClass
 RSpec.describe "Distributed Circuit Breaker Integration" do
   include ApiGuard
 
@@ -40,11 +44,13 @@ RSpec.describe "Distributed Circuit Breaker Integration" do
     # Execute the granular fetch job
     job = JobBoards::GranularFetchJob.new
 
-    # It should return early because the source is locked
-    # We can verify this by checking that no logs were produced for fetching
-    expect(Rails.logger).not_to receive(:info).with(/Lever: Fetched jobs/)
+    # It should return early because the source is locked -- verify by
+    # checking that no logs were produced for fetching
+    allow(Rails.logger).to receive(:info).and_call_original
 
-    job.perform("Lever::Fetcher", "test-site", "", source.id, query.id)
+    job.perform("Lever::Fetcher", "test-site", "", { source_id: source.id, query_id: query.id })
+
+    expect(Rails.logger).not_to have_received(:info).with(/Lever: Fetched jobs/)
   end
 
   it "does not affect other sources when one is locked" do
@@ -66,3 +72,4 @@ RSpec.describe "Distributed Circuit Breaker Integration" do
     }.to change { source_locked?("geocoding") }.from(false).to(true)
   end
 end
+# rubocop:enable RSpec/DescribeClass

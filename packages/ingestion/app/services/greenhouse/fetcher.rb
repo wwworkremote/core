@@ -57,7 +57,8 @@ class Greenhouse::Fetcher
   end
 
   def enqueue_job(board, term, source, query)
-    JobBoards::GranularFetchJob.perform_later(self.class.name, board, term, source.id, query.id)
+    ids = { source_id: source.id, query_id: query.id }
+    JobBoards::GranularFetchJob.perform_later(self.class.name, board, term, ids)
   end
 
   def process_jobs(jobs, context)

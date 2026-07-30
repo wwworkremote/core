@@ -48,7 +48,7 @@ class Lever::Fetcher
   end
 
   def enqueue_job(site, term, source, query)
-    JobBoards::GranularFetchJob.perform_later(self.class.name, site, term, source.id, query.id)
+    JobBoards::GranularFetchJob.perform_later(self.class.name, site, term, { source_id: source.id, query_id: query.id })
   end
 
   def each_page(site, term, &)

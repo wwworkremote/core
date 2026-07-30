@@ -6,15 +6,11 @@ class JobBoards::GranularFetchJob < ApplicationJob
   queue_as :light
   mediumweight!
 
-  def perform(fetcher_class_name, site_slug, term, source_id, query_id)
+  def perform(fetcher_class_name, site_slug, term, ids)
     fetcher_slug = fetcher_class_name.split("::").first.downcase
     return if source_locked?(fetcher_slug)
 
-    fetcher_class = fetcher_class_name.constantize
-    fetcher = fetcher_class.new
-
     # Execute the specific fetch logic
-    # We'll pass the necessary IDs and parameters to a specialized method
-    fetcher.fetch_granular(site_slug, term, source_id, query_id)
+    fetcher_class_name.constantize.new.fetch_granular(site_slug, term, ids[:source_id], ids[:query_id])
   end
 end
