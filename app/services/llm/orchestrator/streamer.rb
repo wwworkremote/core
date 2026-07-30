@@ -14,10 +14,11 @@ class LLM::Orchestrator::Streamer
     @block = block
   end
 
+  # Returns the full RubyLLM::Message (content + token/cost usage), not
+  # just the accumulated text -- client.complete's return value carries
+  # usage data the caller needs for telemetry, which a plain string can't.
   def call
-    full_output = +""
-    client.complete(llm_messages, **stream_args) { |chunk| append_chunk(full_output, chunk) }
-    full_output
+    client.complete(llm_messages, **stream_args) { |chunk| stream_chunk(chunk) }
   end
 
   private
@@ -41,9 +42,7 @@ class LLM::Orchestrator::Streamer
     { tools: [], temperature: 0.7, model: LLM::Orchestrator::ModelRef.new(@model.model_id) }
   end
 
-  def append_chunk(full_output, chunk)
-    text = chunk.content.to_s
-    full_output << text
-    @block&.call(text)
+  def stream_chunk(chunk)
+    @block&.call(chunk.content.to_s)
   end
 end

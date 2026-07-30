@@ -34,6 +34,29 @@ RSpec.describe LLM::Orchestrator do
       expect(LLMChat.count).to eq(1)
     end
 
+    it "persists token usage from the provider's SSE usage payload" do
+      # OpenAI-compatible SSE: a final data event carries top-level "usage"
+      # once the request sets stream_options.include_usage (ruby_llm does this for us).
+      sse_body = <<~SSE
+        data: {"choices":[{"delta":{"content":"Ruby blocks are great."}}]}
+
+        data: {"choices":[{"delta":{}}],"usage":{"prompt_tokens":42,"completion_tokens":8,"total_tokens":50}}
+
+        data: [DONE]
+      SSE
+
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
+        .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+
+      result = described_class.call(untrusted_text: untrusted_text, metadata: {})
+
+      expect(result[:success]).to be true
+      assistant_message = LLMMessage.where(role: "assistant").last
+      expect(assistant_message.input_tokens).to eq(42)
+      expect(assistant_message.output_tokens).to eq(8)
+      expect(assistant_message.model_id).to eq(model.id)
+    end
+
     it "gracefully handles LLM connection failures" do
       stub_request(:post, %r{localhost:11500/v1/chat/completions})
         .to_raise(Faraday::ConnectionFailed.new("Connection refused"))

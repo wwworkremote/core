@@ -97,14 +97,8 @@ class LLM::Orchestrator
     span.add_event("sending_llm_request", attributes: { "model" => model.model_id.to_s })
     chat = @chat || LLMChat.create!(model: model)
     seed_chat_messages(chat, sanitized_text)
-    full_output = Streamer.call(chat, model, block)
-    record_response(chat, span, model, full_output)
-  end
-
-  def record_response(chat, span, model, full_output)
-    chat.llm_messages.create!(role: "assistant", content: full_output) if full_output.present?
-    span.add_event("received_llm_response", attributes: {})
-    { success: true, model: model.model_id, output: full_output }
+    message = Streamer.call(chat, model, block)
+    { success: true, model: model.model_id, output: ResponseRecorder.call(chat, model, message, span) }
   end
 
   # If untrusted_text was provided and this is a new/empty chat, establish
