@@ -32,7 +32,25 @@ case "$file_path" in
     fi
     ;;
   *.erb)
+    # erb_lint -a has been observed mangling multi-line embedded
+    # <script> tags (truncated JS strings, deleted closing tags) with
+    # no test catching it, since request specs assert on raw response
+    # body content, not browser-parsed DOM structure. Guard by
+    # comparing open/close HTML tag counts before and after; if
+    # autocorrect changed the tag structure, revert it and report
+    # instead of silently applying a possibly-corrupting change.
+    before_tags="$(grep -oE '</?[a-zA-Z][a-zA-Z0-9]*' "$file_path" | sort | uniq -c)"
+    backup="$(mktemp)"
+    cp "$file_path" "$backup"
     bundle exec erb_lint "$file_path" -a >/dev/null 2>&1
+    after_tags="$(grep -oE '</?[a-zA-Z][a-zA-Z0-9]*' "$file_path" | sort | uniq -c)"
+    if [ "$before_tags" != "$after_tags" ]; then
+      cp "$backup" "$file_path"
+      rm -f "$backup"
+      echo "erb_lint autocorrect changed HTML tag structure in $file_path -- reverted, left unformatted. Review and fix manually." >&2
+      exit 2
+    fi
+    rm -f "$backup"
     remaining="$(bundle exec erb_lint "$file_path" 2>&1)"
     if ! echo "$remaining" | grep -q "No errors were found in ERB files"; then
       echo "erb_lint offenses remain in $file_path after autocorrect:" >&2
