@@ -19,12 +19,13 @@ RSpec.describe "Outbound Links" do
     end
 
     it "blocks open redirects to untrusted URLs" do
-      expect(Rails.logger).to receive(:warn).with(/SECURITY: Blocked attempt/)
+      allow(Rails.logger).to receive(:warn).and_call_original
 
       get outbound_link_path(id: "tracking", url: "https://malicious-site.com/steal-data")
 
       expect(response).to redirect_to(root_path)
       expect(flash[:alert]).to include("Security Exception")
+      expect(Rails.logger).to have_received(:warn).with(/SECURITY: Blocked attempt/)
     end
   end
 end
