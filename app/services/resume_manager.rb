@@ -12,16 +12,17 @@ module ResumeManager
     DiffService.new(resume_a, resume_b).call
   end
 
+  EXPORT_METHODS = {
+    json: :to_json,
+    markdown: :to_markdown,
+    text: :to_text,
+    mcp: :to_mcp,
+    pdf: :to_pdf
+  }.freeze
+
   def self.export(resume, format:)
-    exporter = ResumeExportService.new(resume)
-    case format.to_sym
-    when :json then exporter.to_json
-    when :markdown then exporter.to_markdown
-    when :text then exporter.to_text
-    when :mcp then exporter.to_mcp
-    when :pdf then exporter.to_pdf
-    else raise ArgumentError, "Unsupported export format: #{format}"
-    end
+    method_name = EXPORT_METHODS.fetch(format.to_sym) { raise ArgumentError, "Unsupported export format: #{format}" }
+    ResumeExportService.new(resume).public_send(method_name)
   end
 
   def self.import(user, url:, name: "Imported Resume")
