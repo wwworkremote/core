@@ -2,6 +2,15 @@
 
 class CreateContacts < ActiveRecord::Migration[8.0]
   def change
+    create_contacts_table
+  end
+
+  private
+
+  # Column list is one cohesive table definition -- splitting it further
+  # would obscure the schema, not simplify it.
+  # rubocop:disable Metrics/MethodLength
+  def create_contacts_table
     create_table :contacts do |t|
       t.string :name
       t.string :email
@@ -13,4 +22,5 @@ class CreateContacts < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
+  # rubocop:enable Metrics/MethodLength
 end
