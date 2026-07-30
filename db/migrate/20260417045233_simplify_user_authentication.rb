@@ -2,7 +2,16 @@
 
 class SimplifyUserAuthentication < ActiveRecord::Migration[8.0]
   def change
-    # Remove Devise columns (Safety assured for local simplification)
+    remove_devise_columns
+    add_column :users, :password_digest, :string
+  end
+
+  private
+
+  # One cohesive list of Devise columns being removed -- splitting it
+  # further would obscure it, not simplify it.
+  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  def remove_devise_columns
     safety_assured do
       remove_column :users, :encrypted_password, :string, default: "", null: false
       remove_column :users, :reset_password_token, :string
@@ -21,8 +30,6 @@ class SimplifyUserAuthentication < ActiveRecord::Migration[8.0]
       remove_column :users, :unlock_token, :string
       remove_column :users, :locked_at, :datetime
     end
-
-    # Add standard ActiveModel::SecurePassword column
-    add_column :users, :password_digest, :string
   end
+  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

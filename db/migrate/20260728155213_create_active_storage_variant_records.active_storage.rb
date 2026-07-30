@@ -5,7 +5,14 @@ class CreateActiveStorageVariantRecords < ActiveRecord::Migration[6.0]
   def change
     return unless table_exists?(:active_storage_blobs)
 
-    # Use Active Record's configured type for primary key
+    create_active_storage_variant_records_table
+  end
+
+  private
+
+  # Use Active Record's configured type for primary key
+  # rubocop:disable Metrics/MethodLength
+  def create_active_storage_variant_records_table
     create_table :active_storage_variant_records, id: primary_key_type, if_not_exists: true do |t|
       t.belongs_to :blob, null: false, index: false, type: blobs_primary_key_type
       t.string :variation_digest, null: false
@@ -14,8 +21,7 @@ class CreateActiveStorageVariantRecords < ActiveRecord::Migration[6.0]
       t.foreign_key :active_storage_blobs, column: :blob_id
     end
   end
-
-  private
+  # rubocop:enable Metrics/MethodLength
 
   def primary_key_type
     config = Rails.configuration.generators
