@@ -61,7 +61,9 @@ module JobPosting::StatusWorkflow
       end
 
       event :archive do
-        transitions from: %i[favorited applied interview offered], to: :archived
+        # :none is included so LinkMonitorJob can archive postings whose
+        # links go dead before any user ever acts on them.
+        transitions from: %i[none favorited applied interview offered], to: :archived
       end
     end
 

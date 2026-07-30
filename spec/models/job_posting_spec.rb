@@ -85,6 +85,12 @@ RSpec.describe JobPosting do
       job.purge!
       expect(job.reload.embedding).to be_nil
     end
+
+    it "permits archiving directly from none, for link-monitor-detected dead links" do
+      expect(job.may_archive?).to be true
+      job.archive!
+      expect(job.status).to eq("archived")
+    end
   end
 
   describe "#company=" do
