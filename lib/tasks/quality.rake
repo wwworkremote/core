@@ -2,7 +2,7 @@
 
 require "English"
 namespace :quality do
-  desc "Run all static analysis tools (RuboCop, Brakeman, Reek, Flay, RailsBestPractices, Bundle-Audit)"
+  desc "Run all static analysis tools (RuboCop, Brakeman, Reek, Flay, Flog, RailsBestPractices, Bundle-Audit)"
   task all: :environment do
     errors = []
 
@@ -35,6 +35,9 @@ namespace :quality do
 
     puts "\n👯 Running Flay..."
     errors << "Flay failed" unless system("bundle exec flay app/")
+
+    puts "\n🐸 Running Flog..."
+    errors << "Flog failed" unless system("bundle exec flog app/")
 
     puts "\n🛤️ Running Rails Best Practices..."
     errors << "Rails Best Practices failed" unless system("bundle exec rails_best_practices .")
