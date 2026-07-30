@@ -8,25 +8,48 @@ class ResumeManager::DiffService
 
   def call
     {
-      name_changed: @resume_a.name != @resume_b.name,
+      name_changed: name_changed?,
       version_diff: @resume_b.version - @resume_a.version,
-      content_diff: calculate_content_diff,
-      skills_added: @resume_b.skills.pluck(:name) - @resume_a.skills.pluck(:name),
-      skills_removed: @resume_a.skills.pluck(:name) - @resume_b.skills.pluck(:name)
-    }
+      content_diff: calculate_content_diff
+    }.merge(skills_diff)
   end
 
   private
 
-  def calculate_content_diff
-    # A simple structural diff of the JSONB content
-    # In a real app, we might use a library or more sophisticated deep-diff logic
-    a = @resume_a.content || {}
-    b = @resume_b.content || {}
+  def skills_diff
+    {
+      skills_added: skill_names(@resume_b) - skill_names(@resume_a),
+      skills_removed: skill_names(@resume_a) - skill_names(@resume_b)
+    }
+  end
 
-    all_keys = (a.keys + b.keys).uniq
-    all_keys.each_with_object({}) do |key, diff|
-      diff[key] = { from: a[key], to: b[key] } if a[key] != b[key]
-    end
+  def name_changed?
+    @resume_a.name != @resume_b.name
+  end
+
+  def skill_names(resume)
+    resume.skills.pluck(:name)
+  end
+
+  # A simple structural diff of the JSONB content. In a real app, we might
+  # use a library or more sophisticated deep-diff logic.
+  def calculate_content_diff
+    content_keys.each_with_object({}) { |key, diff| add_content_key_diff(diff, key) }
+  end
+
+  def add_content_key_diff(diff, key)
+    diff[key] = { from: content_a[key], to: content_b[key] } if content_a[key] != content_b[key]
+  end
+
+  def content_keys
+    (content_a.keys + content_b.keys).uniq
+  end
+
+  def content_a
+    @resume_a.content || {}
+  end
+
+  def content_b
+    @resume_b.content || {}
   end
 end
