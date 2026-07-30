@@ -19,13 +19,15 @@ class Quality::InsightEmbeddingJob < ApplicationJob
     return unless insight
     return if insight.embedding.present?
 
-    text = construct_text(insight)
-    embedding = JobBoards::Embedder.embed_text(text)
+    embedding = JobBoards::Embedder.embed_text(construct_text(insight))
+    apply_embedding(insight, embedding)
+  end
 
+  def apply_embedding(insight, embedding)
     if embedding
-      insight.update_column(:embedding, embedding)
+      insight.update!(embedding: embedding)
     else
-      Rails.logger.error "[InsightEmbeddingJob] Failed to generate embedding for Insight #{id}"
+      Rails.logger.error "[InsightEmbeddingJob] Failed to generate embedding for Insight #{insight.id}"
     end
   end
 
@@ -37,11 +39,11 @@ class Quality::InsightEmbeddingJob < ApplicationJob
   end
 
   def construct_text(insight)
-    [
-      "Tool: #{insight.tool}",
-      "File: #{insight.file_path}",
-      "Severity: #{insight.severity}",
-      "Message: #{insight.message}"
-    ].join("\n")
+    text_lines(insight).join("\n")
+  end
+
+  def text_lines(insight)
+    ["Tool: #{insight.tool}", "File: #{insight.file_path}"] +
+      ["Severity: #{insight.severity}", "Message: #{insight.message}"]
   end
 end

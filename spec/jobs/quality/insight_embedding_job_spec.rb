@@ -39,24 +39,27 @@ RSpec.describe Quality::InsightEmbeddingJob do
 
   it "logs an error if embedding generation fails" do
     allow(JobBoards::Embedder).to receive(:embed_text).and_return(nil)
-
-    expect(Rails.logger).to receive(:error).with(/Failed to generate embedding for Insight #{insight.id}/)
+    allow(Rails.logger).to receive(:error)
 
     described_class.perform_now(insight.id)
+
     expect(insight.reload.embedding).to be_nil
+    expect(Rails.logger).to have_received(:error).with(/Failed to generate embedding for Insight #{insight.id}/)
   end
 
   it "skips if insight no longer exists" do
-    expect(JobBoards::Embedder).not_to receive(:embed_text)
     expect {
       described_class.perform_now(0) # Non-existent ID
     }.not_to raise_error
+
+    expect(JobBoards::Embedder).not_to have_received(:embed_text)
   end
 
   it "skips if embedding already present" do
     insight.update!(embedding: mock_embedding)
-    expect(JobBoards::Embedder).not_to receive(:embed_text)
 
     described_class.perform_now(insight.id)
+
+    expect(JobBoards::Embedder).not_to have_received(:embed_text)
   end
 end
