@@ -11,13 +11,21 @@ class Charts::Data::PipelineController < ApplicationController
   end
 
   def funnel
-    # Processing distribution
-    counts = {
+    render json: processing_funnel_counts.to_a
+  end
+
+  private
+
+  # Processing distribution -- one cohesive hash literal, splitting it
+  # further would obscure it, not simplify it.
+  # rubocop:disable Metrics/MethodLength
+  def processing_funnel_counts
+    {
       "Raw Documents" => JobBoards::Document.count,
       "Job Postings" => JobPosting.count,
       "AI Classified" => JobPosting.where("data->>'ai_category' IS NOT NULL").count,
       "Vector Indexed" => JobPosting.where.not(embedding: nil).count
     }
-    render json: counts.to_a
   end
+  # rubocop:enable Metrics/MethodLength
 end

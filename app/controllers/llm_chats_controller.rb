@@ -18,18 +18,11 @@ class LLMChatsController < ApplicationController
   end
 
   def create
-    prompt = params.dig(:llm_chat, :prompt)
-    model_record = Model.find_by(id: params.dig(:llm_chat, :model_id))
+    @prompt = params.dig(:llm_chat, :prompt)
+    @model_record = Model.find_by(id: params.dig(:llm_chat, :model_id))
+    return start_chat if @prompt.present? && @model_record
 
-    if prompt.present? && model_record
-      @llm_chat = LLMChat.create!(model: model_record)
-      @llm_chat.llm_messages.create!(role: "user", content: prompt)
-      LLMChatResponseJob.perform_later(@llm_chat.id, prompt)
-
-      redirect_to @llm_chat, notice: "Neural link established."
-    else
-      redirect_to new_llm_chat_path, alert: "Invalid model or empty prompt."
-    end
+    redirect_to new_llm_chat_path, alert: "Invalid model or empty prompt."
   end
 
   def destroy
@@ -38,6 +31,13 @@ class LLMChatsController < ApplicationController
   end
 
   private
+
+  def start_chat
+    @llm_chat = LLMChat.create!(model: @model_record)
+    @llm_chat.llm_messages.create!(role: "user", content: @prompt)
+    LLMChatResponseJob.perform_later(@llm_chat.id, @prompt)
+    redirect_to @llm_chat, notice: "Neural link established."
+  end
 
   def set_llm_chat
     @llm_chat = LLMChat.find(params.expect(:id))
