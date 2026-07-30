@@ -20,20 +20,12 @@ class Admin::SkillsController < Admin::ApplicationController
 
   def create
     @skill = Skill.new(skill_params)
-    if @skill.save
-      redirect_to admin_skills_path, notice: "Skill created."
-    else
-      render :new, status: :unprocessable_content
-    end
+    @skill.save ? redirect_on_skill_created : render(:new, status: :unprocessable_content)
   end
 
   def update
     @skill = Skill.find(params.expect(:id))
-    if @skill.update(skill_params)
-      redirect_to admin_skill_path(@skill), notice: "Skill updated."
-    else
-      render :edit, status: :unprocessable_content
-    end
+    @skill.update(skill_params) ? redirect_on_skill_updated : render(:edit, status: :unprocessable_content)
   end
 
   def destroy
@@ -43,6 +35,14 @@ class Admin::SkillsController < Admin::ApplicationController
   end
 
   private
+
+  def redirect_on_skill_created
+    redirect_to admin_skills_path, notice: "Skill created."
+  end
+
+  def redirect_on_skill_updated
+    redirect_to admin_skill_path(@skill), notice: "Skill updated."
+  end
 
   def skill_params
     params.expect(skill: %i[name category description])

@@ -14,15 +14,15 @@ class Api::V0::GeoController < ApiController
   end
 
   def lookup_by_ip(ip)
-    if ip
-      begin
-        GEOIP.city(ip) || { ip: ip }
-      rescue StandardError => e
-        Rails.logger.warn("[GeoController] geoip_lookup_error=#{e.class} ip=#{ip.inspect} message=#{e.message.inspect}")
-        { ip: ip }
-      end
-    else
-      { message: "You didn't supply an IP to geocode." }
-    end
+    return { message: "You didn't supply an IP to geocode." } unless ip
+
+    geocode(ip)
+  end
+
+  def geocode(ip)
+    GEOIP.city(ip) || { ip: ip }
+  rescue StandardError => e
+    Rails.logger.warn("[GeoController] geoip_lookup_error=#{e.class} ip=#{ip.inspect} message=#{e.message.inspect}")
+    { ip: ip }
   end
 end
