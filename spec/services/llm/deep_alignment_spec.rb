@@ -2,12 +2,15 @@
 
 require "rails_helper"
 
+# Integration coverage across the LLM alignment pipeline, not a single
+# class -- RSpec/DescribeClass's convention doesn't apply.
+# rubocop:disable RSpec/DescribeClass
 RSpec.describe "Deep AI Career Alignment (V2)" do
   let(:user) { User.create!(email: "tester@example.com", name: "Tester", password: "password") }
-  let(:job1) {
+  let(:ruby_job) {
     JobPosting.create!(title: "Ruby Engineer", company: "RemoteCo", body: "We love Ruby and Rails.", signature: "job1")
   }
-  let(:job2) {
+  let(:legacy_rails_job) {
     JobPosting.create!(title: "Rails Architect", company: "BigCorp", body: "Legacy systems, 10% Rails.",
                        signature: "job2")
   }
@@ -33,10 +36,12 @@ RSpec.describe "Deep AI Career Alignment (V2)" do
 
       allow(LLM::Orchestrator).to receive(:call).and_return({
                                                               success: true,
-                                                              output: "MATCH_CONFIDENCE: 90%\nINTERVIEW_PREP:\n1. Question: How do you handle forking?\nAnswer: STAR format..."
+                                                              output: "MATCH_CONFIDENCE: 90%\nINTERVIEW_PREP:\n" \
+                                                                      "1. Question: How do you handle forking?\n" \
+                                                                      "Answer: STAR format..."
                                                             })
 
-      result = described_class.call(user, job1)
+      result = described_class.call(user, ruby_job)
 
       expect(result[:success]).to be true
       expect(result[:output]).to include("INTERVIEW_PREP")
@@ -53,9 +58,10 @@ RSpec.describe "Deep AI Career Alignment (V2)" do
                                                               output: "RANKING:\n1. Job1\n2. Job2"
                                                             })
 
-      result = described_class.call(user, [job1, job2])
+      result = described_class.call(user, [ruby_job, legacy_rails_job])
       expect(result[:success]).to be true
       expect(result[:output]).to include("RANKING")
     end
   end
 end
+# rubocop:enable RSpec/DescribeClass
