@@ -34,6 +34,10 @@ AllCops:
     - 'Capfile'
   Exclude:
     - 'db/schema.rb'
+    # Archived planning docs -- code fences are illustrative snippets from
+    # a point in time, not live code; Sandi-Metz extraction on prose
+    # examples would relocate lines to satisfy the linter, not clean code.
+    - 'docs/history/**/*'
     - 'db/cache_schema.rb'
     - 'node_modules/**/*'
     - 'bin/**/*'
