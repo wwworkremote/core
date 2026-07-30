@@ -17,18 +17,24 @@ class JobPostingsController < ApplicationController
     @query = params[:q]
     @company = params[:company]
     @source_id = params[:source_id]
+    @tier = params[:tier]
   end
 
   def filtered_job_postings
     scope = base_job_postings
     scope = scope.where(company_name: @company) if @company.present?
     scope = scope.where(source_id: @source_id) if @source_id.present?
+    apply_query_and_tier(scope)
+  end
+
+  def apply_query_and_tier(scope)
     scope = scope.search(@query) if @query.present?
+    scope = scope.management_tier if @tier == "management"
     scope
   end
 
   def base_job_postings
-    scope = JobPosting.recent.includes(:company, source: :origin)
+    scope = JobPosting.recent.includes(source: :origin)
     scope = scope.where.not(status: %w[ignored purged expired]) if params[:status].blank?
     scope
   end

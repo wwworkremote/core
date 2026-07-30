@@ -56,6 +56,14 @@ RSpec.describe "Job Postings" do
       expect(null_index).to be_present
       expect(recent_index).to be < null_index
     end
+
+    it "filters to management-tier titles when tier=management" do
+      create(:job_posting, signature: "manager-1", title: "Engineering Manager, Platform", published_at: Time.current)
+
+      get job_postings_path, params: { tier: "management" }
+      expect(response.body).to include("Engineering Manager, Platform")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
   end
 
   describe "GET /job_postings/:id" do

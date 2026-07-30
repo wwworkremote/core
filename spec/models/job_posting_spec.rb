@@ -114,6 +114,16 @@ RSpec.describe JobPosting do
     end
   end
 
+  describe ".management_tier" do
+    it "matches management and senior-architecture titles" do
+      manager = create(:job_posting, title: "Engineering Manager, Payments")
+      architect = create(:job_posting, title: "Global Head of Specialist Solutions Architecture")
+      create(:job_posting, title: "Senior Software Engineer")
+
+      expect(described_class.management_tier).to contain_exactly(manager, architect)
+    end
+  end
+
   describe "#company_record" do
     it "finds the Company matching the current company name" do
       company = create(:company, name: "Acme Corp")
