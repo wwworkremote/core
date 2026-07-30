@@ -2,22 +2,34 @@
 
 class JobPostingsController < ApplicationController
   def index
-    @query = params[:q]
-    @company = params[:company]
-    @source_id = params[:source_id]
-
-    @job_postings = JobPosting.recent.includes(source: :origin)
-    @job_postings = @job_postings.where.not(status: %w[ignored purged]) if params[:status].blank?
-
-    @job_postings = @job_postings.where(company_name: @company) if @company.present?
-    @job_postings = @job_postings.where(source_id: @source_id) if @source_id.present?
-    @job_postings = @job_postings.search(@query) if @query.present?
-
-    @job_postings = @job_postings.page(params[:page]).per(20)
+    assign_filter_params
+    @job_postings = filtered_job_postings.page(params[:page]).per(20)
   end
 
   def show
     @job_posting = JobPosting.includes(:contacts).find(params.expect(:id))
     ahoy.track "Viewed Job Posting", job_posting_id: @job_posting.id, title: @job_posting.title
+  end
+
+  private
+
+  def assign_filter_params
+    @query = params[:q]
+    @company = params[:company]
+    @source_id = params[:source_id]
+  end
+
+  def filtered_job_postings
+    scope = base_job_postings
+    scope = scope.where(company_name: @company) if @company.present?
+    scope = scope.where(source_id: @source_id) if @source_id.present?
+    scope = scope.search(@query) if @query.present?
+    scope
+  end
+
+  def base_job_postings
+    scope = JobPosting.recent.includes(:company, source: :origin)
+    scope = scope.where.not(status: %w[ignored purged expired]) if params[:status].blank?
+    scope
   end
 end

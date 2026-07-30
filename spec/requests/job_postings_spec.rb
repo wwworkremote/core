@@ -36,13 +36,25 @@ RSpec.describe "Job Postings" do
       expect(response.body).not_to include("Python Architect")
     end
 
-    it "filters out ignored and purged jobs by default" do
+    it "filters out ignored, purged, and expired jobs by default" do
       create(:job_posting, signature: "ignored-1", title: "Ignored Job", status: "ignored")
       create(:job_posting, signature: "purged-1", title: "Purged Job", status: "purged")
+      create(:job_posting, signature: "expired-1", title: "Expired Job", status: "expired", published_at: 1.year.ago)
 
       get job_postings_path
       expect(response.body).not_to include("Ignored Job")
       expect(response.body).not_to include("Purged Job")
+      expect(response.body).not_to include("Expired Job")
+    end
+
+    it "orders postings with a null published_at after ones with a value" do
+      create(:job_posting, signature: "null-published", title: "Null Published Job", status: "none", published_at: nil)
+
+      get job_postings_path
+      null_index = response.body.index("Null Published Job")
+      recent_index = response.body.index("Senior Ruby Developer")
+      expect(null_index).to be_present
+      expect(recent_index).to be < null_index
     end
   end
 

@@ -36,7 +36,7 @@ class JobPosting < ApplicationRecord
     location.present? && (saved_change_to_location? || latitude.nil?)
   }
 
-  scope :recent, -> { order(published_at: :desc) }
+  scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
 
   public
 
