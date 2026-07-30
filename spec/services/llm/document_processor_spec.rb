@@ -17,17 +17,41 @@ RSpec.describe LLM::DocumentProcessor do
     it "delegates to extract_pdf_text for PDFs" do
       blob = double(content_type: "application/pdf", filename: "test.pdf")
       allow(blob).to receive(:open).and_yield(double(path: "/tmp/test.pdf"))
-      expect(described_class).to receive(:extract_pdf_text).with("/tmp/test.pdf").and_return("PDF Content")
+      allow(described_class).to receive(:extract_pdf_text).with("/tmp/test.pdf").and_return("PDF Content")
 
       expect(described_class.extract_text(blob)).to eq("PDF Content")
+      expect(described_class).to have_received(:extract_pdf_text).with("/tmp/test.pdf")
+    end
+
+    it "delegates to extract_docx_text for docx files" do
+      docx_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      blob = double(content_type: docx_type, filename: "test.docx")
+      allow(blob).to receive(:open).and_yield(double(path: "/tmp/test.docx"))
+      allow(described_class).to receive(:extract_docx_text).with("/tmp/test.docx").and_return("Docx Content")
+
+      expect(described_class.extract_text(blob)).to eq("Docx Content")
+      expect(described_class).to have_received(:extract_docx_text).with("/tmp/test.docx")
     end
 
     it "handles extraction errors gracefully" do
       blob = double(content_type: "application/pdf", filename: "test.pdf")
       allow(blob).to receive(:open).and_raise(StandardError.new("Corrupt"))
+      allow(Rails.logger).to receive(:error)
 
-      expect(Rails.logger).to receive(:error).with(/Failed to extract text from test.pdf: Corrupt/)
       expect(described_class.extract_text(blob)).to be_nil
+      expect(Rails.logger).to have_received(:error).with(/Failed to extract text from test.pdf: Corrupt/)
+    end
+  end
+
+  describe ".extract_pdf_text_for_all" do
+    it "extracts text for each resume attached to the career profile" do
+      resume = double(filename: "resume.pdf")
+      allow(career_profile).to receive(:resumes).and_return([resume])
+      allow(described_class).to receive(:extract_text).with(resume).and_return("Resume text")
+
+      result = described_class.extract_pdf_text_for_all(career_profile)
+
+      expect(result).to eq([{ filename: "resume.pdf", content: "Resume text" }])
     end
   end
 
