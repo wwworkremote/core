@@ -16,6 +16,6 @@ class HackerNews::FetchBackfillJobstories
 
     ap jobstory_ids.minmax
 
-    FetchJobstories.new(jobstory_ids:).call
+    HackerNews::FetchJobstories.new(jobstory_ids:).call
   end
 end
