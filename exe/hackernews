@@ -37,6 +37,7 @@ item_ids.each_with_object(documents) do |item_id, arr|
       signature:
     )
   rescue ActiveRecord::RecordNotUnique
+    # Already imported on a previous run -- safe to skip.
   end
 end
 

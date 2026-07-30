@@ -3,6 +3,9 @@
 require "rails_helper"
 
 RSpec.describe "HackerNews Live Contract", type: :request do
+  # One linear live-check flow -- splitting it further would obscure it,
+  # not simplify it.
+  # rubocop:disable RSpec/ExampleLength
   it "fetches valid jobstory IDs from HackerNews", :live do
     VCR.turned_off do
       WebMock.allow_net_connect!
@@ -27,4 +30,5 @@ RSpec.describe "HackerNews Live Contract", type: :request do
       WebMock.disable_net_connect!
     end
   end
+  # rubocop:enable RSpec/ExampleLength
 end

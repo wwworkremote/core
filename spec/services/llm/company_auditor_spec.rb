@@ -12,22 +12,23 @@ RSpec.describe LLM::CompanyAuditor do
     allow(LLM::Registry).to receive(:default_model).and_return(model)
   end
 
+  # Realistic SSE format for RubyLLM
+  def stub_audit_response(llm_json)
+    sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{llm_json.to_json.inspect}}}]}\n\ndata: [DONE]\n"
+    stub_request(:post, "http://localhost:11500/v1/chat/completions")
+      .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+  end
+
   describe "#call" do
     it "updates the company with LLM audit data" do
-      llm_json = {
+      stub_audit_response(
         disposition: "Toxic",
         sentiment_score: 0.2,
         toxic_culture_flag: true,
         summary: "High burnout risk detected.",
         top_pros: ["Good pay"],
         top_cons: %w[Micromanagement Overtime]
-      }.to_json
-
-      # Realistic SSE format for RubyLLM
-      sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{llm_json.inspect}}}]}\n\ndata: [DONE]\n"
-
-      stub_request(:post, "http://localhost:11500/v1/chat/completions")
-        .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+      )
 
       result = auditor.call
 

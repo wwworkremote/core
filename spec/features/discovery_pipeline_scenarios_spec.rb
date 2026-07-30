@@ -14,13 +14,13 @@ RSpec.describe "The Discovery & Ingestion Flow", :live, type: :system do
     JobBoards::Source.find_or_create_by!(slug: "cord", name: "Cord")
 
     # Mock the Syncer to prevent long-running ingestion in tests
-    allow(JobBoards::Syncer).to receive(:new).and_return(double("Syncer", call: true))
+    allow(JobBoards::Syncer).to receive(:new).and_return(instance_double(JobBoards::Syncer, call: true))
 
     # 1. Pipeline Control
     visit data_fetchers_path
 
     row = find(".group", text: /\ACord\b/i, wait: 15)
-    row.find("button", text: "FORCE").click
+    within(row) { click_button "FORCE" }
 
     expect(page).to have_text(/successfully/i, wait: 20)
 

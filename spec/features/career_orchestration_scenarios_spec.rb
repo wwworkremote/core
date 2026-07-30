@@ -14,6 +14,11 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
     WebMock.allow_net_connect!
   end
 
+  # One continuous user journey across 3 dependent phases in a single
+  # browser session -- splitting into separate examples would mean
+  # re-establishing browser/DB state for each phase, obscuring the flow
+  # rather than simplifying it.
+  # rubocop:disable RSpec/ExampleLength
   scenario "User synchronizes identity and analyzes a match" do
     # 1. Identity Synchronization
     # Mock YamlImporter to avoid absolute path dependency and slow sync
@@ -48,16 +53,18 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
 
     # Mock LLM Match Analysis
     mock_analysis = "MATCH_CONFIDENCE: 92%"
-    expect(LLM::Orchestrator).to receive(:call).at_least(:once).and_return({ success: true, output: mock_analysis })
+    allow(LLM::Orchestrator).to receive(:call).and_return({ success: true, output: mock_analysis })
 
     # Use a very specific button matcher
     click_button "RUN_ALIGNMENT_SCAN"
     expect(page).to have_text(/scan complete/i)
     expect(page).to have_text("MATCH_CONFIDENCE: 92%")
+    expect(LLM::Orchestrator).to have_received(:call).at_least(:once)
 
     # 3. Priority Recognition
     visit root_path
     expect(page).to have_text(job_posting.title)
     expect(page).to have_text(/HIGH_CONFIDENCE/i)
   end
+  # rubocop:enable RSpec/ExampleLength
 end

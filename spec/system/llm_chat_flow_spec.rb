@@ -12,17 +12,18 @@ RSpec.describe "Neural Dialogue UX", :js do
   let!(:model) { create(:model, name: "Llama Local", model_id: "llama3.2:latest") }
   let(:user) { User.find_or_create_by!(email: "mike@just3ws.com") { |u| u.name = "Mike"; u.password = "password" } }
 
+  def stub_llm_response(content)
+    sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{content.to_json}}}]}\n\ndata: [DONE]\n"
+    stub_request(:post, "http://localhost:11500/v1/chat/completions")
+      .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+  end
+
   it "allows a user to start a dialogue and receive a simulated response" do
     visit new_llm_chat_path
 
     select model.name, from: "llm_chat[model_id]"
     fill_in "llm_chat[prompt]", with: "Explain Ruby blocks."
-
-    # Mock LLM for the initial prompt
-    mock_output = "Ruby blocks are chunks of code."
-    sse_body = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_output.to_json}}}]}\n\ndata: [DONE]\n"
-    stub_request(:post, "http://localhost:11500/v1/chat/completions")
-      .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+    stub_llm_response("Ruby blocks are chunks of code.")
 
     click_button "Establish Neural Link"
     expect(page).to have_text(/Neural link established/i)
@@ -36,12 +37,7 @@ RSpec.describe "Neural Dialogue UX", :js do
 
     # Send a follow up
     fill_in "Describe your objective...", with: "Give an example."
-
-    # Mock LLM for follow up
-    mock_example = "3.times { puts 'hello' }"
-    sse_example = "data: {\"choices\":[{\"delta\":{\"content\":#{mock_example.to_json}}}]}\n\ndata: [DONE]\n"
-    stub_request(:post, "http://localhost:11500/v1/chat/completions")
-      .to_return(status: 200, body: sse_example, headers: { "Content-Type" => "text/event-stream" })
+    stub_llm_response("3.times { puts 'hello' }")
 
     click_on "Send"
 
