@@ -19,6 +19,17 @@ RSpec.describe Geo::GeoipClient do
       client = described_class.build
       expect(client).to be_a(described_class)
     end
+
+    it "returns a NullClient and logs when initialization raises" do
+      allow(File).to receive(:exist?).and_return(true)
+      allow(MaxMind::GeoIP2::Reader).to receive(:new).and_raise(StandardError.new("boom"))
+      logger = instance_double(Logger, error: nil)
+
+      client = described_class.build(logger: logger)
+
+      expect(client).to be_a(Geo::GeoipClient::NullClient)
+      expect(logger).to have_received(:error).with(/Failed to initialize: boom/)
+    end
   end
 
   describe "#city" do
@@ -44,6 +55,14 @@ RSpec.describe Geo::GeoipClient do
     it "handles AddressNotFoundError" do
       allow(mock_reader).to receive(:city).and_raise(MaxMind::GeoIP2::AddressNotFoundError.new("Not found"))
       expect(client.city("0.0.0.0")).to be_nil
+    end
+
+    it "logs and returns nil on unexpected errors" do
+      allow(mock_reader).to receive(:city).and_raise(StandardError.new("connection reset"))
+      allow(Rails.logger).to receive(:error)
+
+      expect(client.city("2.2.2.2")).to be_nil
+      expect(Rails.logger).to have_received(:error).with(/Lookup error for 2.2.2.2: connection reset/)
     end
   end
 end

@@ -24,14 +24,20 @@ module Geo
 
     def self.build(logger: Rails.logger)
       path = resolved_city_db_path
-      unless File.exist?(path)
-        logger.warn "[GeoipClient] Database not found at #{path}. Geocoding will be disabled."
-        return NullClient.new
-      end
+      return missing_database(logger, path) unless File.exist?(path)
 
       new(reader: MaxMind::GeoIP2::Reader.new(database: path))
     rescue StandardError => e
-      logger.error "[GeoipClient] Failed to initialize: #{e.message}"
+      failed_initialization(logger, e)
+    end
+
+    def self.missing_database(logger, path)
+      logger.warn "[GeoipClient] Database not found at #{path}. Geocoding will be disabled."
+      NullClient.new
+    end
+
+    def self.failed_initialization(logger, error)
+      logger.error "[GeoipClient] Failed to initialize: #{error.message}"
       NullClient.new
     end
 
@@ -59,24 +65,36 @@ module Geo
     end
 
     def city(ip)
-      result = @reader.city(ip)
+      extract_city_data(@reader.city(ip))
+    rescue MaxMind::GeoIP2::AddressNotFoundError
+      nil
+    rescue StandardError => e
+      log_lookup_error(ip, e)
+    end
+
+    private
+
+    def log_lookup_error(ip, error)
+      Rails.logger.error "[GeoipClient] Lookup error for #{ip}: #{error.message}"
+      nil
+    end
+
+    def extract_city_data(result)
+      identity_fields(result).merge(location_fields(result))
+    end
+
+    def identity_fields(result)
+      { city: dig(result, :city, :name), region: region_name(result) }
+        .merge(country: dig(result, :country, :iso_code), postal_code: dig(result, :postal, :code))
+    end
+
+    def location_fields(result)
       {
-        city: dig(result, :city, :name),
-        region: region_name(result),
-        country: dig(result, :country, :iso_code),
-        postal_code: dig(result, :postal, :code),
         latitude: dig(result, :location, :latitude),
         longitude: dig(result, :location, :longitude),
         time_zone: dig(result, :location, :time_zone)
       }
-    rescue MaxMind::GeoIP2::AddressNotFoundError
-      nil
-    rescue StandardError => e
-      Rails.logger.error "[GeoipClient] Lookup error for #{ip}: #{e.message}"
-      nil
     end
-
-    private
 
     def dig(obj, *methods)
       methods.reduce(obj) do |memo, method|
