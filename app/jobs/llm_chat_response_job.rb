@@ -7,10 +7,17 @@ class LLMChatResponseJob < ApplicationJob
 
   def perform(llm_chat_id, content)
     llm_chat = LLMChat.find(llm_chat_id)
+    result = request_response(llm_chat, content)
+    handle_result(llm_chat, result)
+  end
 
-    # Use Orchestrator for guardrails, safety, and streaming.
-    # Orchestrator now handles placeholder creation and internal streaming broadcasts.
-    result = LLM::Orchestrator.call(
+  private
+
+  # Use Orchestrator for guardrails, safety, and streaming. Orchestrator
+  # now handles placeholder creation and internal streaming broadcasts.
+  # rubocop:disable Metrics/MethodLength
+  def request_response(llm_chat, content)
+    LLM::Orchestrator.call(
       untrusted_text: content,
       chat: llm_chat,
       model: llm_chat.model,
@@ -18,13 +25,18 @@ class LLMChatResponseJob < ApplicationJob
       task_instructions: "Respond to the user's message based on our conversation history.",
       metadata: { llm_chat_id: llm_chat.id }
     )
+  end
+  # rubocop:enable Metrics/MethodLength
 
-    if result[:success]
-      # After streaming is complete, replace the entire message with the fully rendered markdown version
-      final_message = llm_chat.llm_messages.where(role: "assistant").last
-      final_message&.broadcast_replace_to "llm_chat_#{llm_chat.id}"
-    else
-      Rails.logger.error "[LLMChatResponseJob] Orchestrator failed: #{result[:error]}"
-    end
+  def handle_result(llm_chat, result)
+    return broadcast_final_message(llm_chat) if result[:success]
+
+    Rails.logger.error "[LLMChatResponseJob] Orchestrator failed: #{result[:error]}"
+  end
+
+  # After streaming is complete, replace the entire message with the fully rendered markdown version
+  def broadcast_final_message(llm_chat)
+    final_message = llm_chat.llm_messages.where(role: "assistant").last
+    final_message&.broadcast_replace_to "llm_chat_#{llm_chat.id}"
   end
 end

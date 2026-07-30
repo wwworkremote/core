@@ -31,9 +31,8 @@ class ApplicationJob < ActiveJob::Base
 
   def check_cancellation!
     return unless SystemSetting.job_cancelled?(job_id)
-    Rails.logger.info "[CancelSignal] Job #{self.class.name} (#{job_id}) terminating mid-performance."
-    SystemSetting.clear_job_cancellation!(job_id)
-    throw :abort
+
+    abort_due_to_cancellation!
   end
 
   # Solid Queue Concurrency Helpers
@@ -60,5 +59,13 @@ class ApplicationJob < ActiveJob::Base
     # The key proc receives the JOB ARGUMENTS as separate arguments
     key_proc ||= ->(*args) { "#{job_class}/#{args.join('-')}" }
     limits_concurrency key: key_proc
+  end
+
+  private
+
+  def abort_due_to_cancellation!
+    Rails.logger.info "[CancelSignal] Job #{self.class.name} (#{job_id}) terminating mid-performance."
+    SystemSetting.clear_job_cancellation!(job_id)
+    throw :abort
   end
 end
