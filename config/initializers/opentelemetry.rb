@@ -19,6 +19,12 @@ Rails.application.config.after_initialize do
       c.use "OpenTelemetry::Instrumentation::PG"
       c.use "OpenTelemetry::Instrumentation::Faraday"
       c.use "OpenTelemetry::Instrumentation::RubyLLM"
+      # Enqueue-side spans (previously invisible -- only perform.active_job
+      # was covered, by the custom Solid Queue subscriber below, which adds
+      # queue_wait_ms this gem can't compute on its own). No Redis/ActionCable
+      # instrumentation gem applies: this app uses solid_cable/solid_queue
+      # (Postgres-backed), not Redis.
+      c.use "OpenTelemetry::Instrumentation::ActiveJob"
     end
   rescue StandardError => e
     Rails.logger.warn "[OTel] Failed to initialize: #{e.message}"
