@@ -32,9 +32,23 @@ class Api::JobPostingsController < ApplicationController
     )
   end
 
+  # rubocop:disable Metrics/MethodLength
   def extracted
-    @extracted ||= params[:extracted]&.to_unsafe_h || {}
+    return {} if params[:extracted].blank?
+
+    raw = params[:extracted]
+    ac_params = raw.is_a?(ActionController::Parameters) ? raw : ActionController::Parameters.new(raw)
+
+    ac_params.permit(
+      :title, :company, :location, :apply_url, :posted_at, :skills,
+      :salary_min, :salary_max, :salary_currency, :salary_unit, :salary,
+      :employment_type, :remote, :experience, :valid_through,
+      :education, :qualifications, :responsibilities, :benefits,
+      :company_logo_url, :industry, :description_text, :description_html,
+      skills: []
+    ).to_h
   end
+  # rubocop:enable Metrics/MethodLength
 
   def apply_enrichment!
     attrs = JobPostingEnrichment::AttributeBuilder.new(job_posting, extracted, markdown_body).call

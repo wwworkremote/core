@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_04_232042) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -116,6 +116,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
     t.text "skills"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_career_profiles_on_embedding_hnsw", using: :hnsw
     t.index ["user_id"], name: "index_career_profiles_on_user_id"
   end
 
@@ -176,6 +177,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
     t.bigint "root_domain_id"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_domains_on_name", unique: true
+    t.index ["root_domain_id"], name: "index_domains_on_root_domain_id"
   end
 
   create_table "email_import_records", force: :cascade do |t|
@@ -368,6 +370,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
     t.string "target_url"
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_job_postings_on_embedding_hnsw", using: :hnsw
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["company", "published_at"], name: "index_job_postings_on_company_and_published_at", order: { published_at: :desc }
     t.index ["company_id"], name: "index_job_postings_on_company_id"
@@ -515,6 +518,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.integer "version", default: 1, null: false
+    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_resumes_on_embedding_hnsw", using: :hnsw
     t.index ["parent_id"], name: "index_resumes_on_parent_id"
     t.index ["user_id", "name", "version"], name: "index_resumes_on_user_id_and_name_and_version", unique: true
     t.index ["user_id"], name: "index_resumes_on_user_id"
@@ -527,6 +531,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
     t.vector "embedding", limit: 3584
     t.string "name", null: false
     t.datetime "updated_at", null: false
+    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_skills_on_embedding_hnsw", using: :hnsw
     t.index ["name"], name: "index_skills_on_name", unique: true
   end
 
@@ -694,6 +699,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
     t.integer "severity"
     t.integer "tool"
     t.datetime "updated_at", null: false
+    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_system_insights_on_embedding_hnsw", using: :hnsw
     t.index ["active"], name: "index_system_insights_on_active"
     t.index ["file_path"], name: "index_system_insights_on_file_path"
   end
@@ -824,6 +830,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_125728) do
   add_foreign_key "target_domains", "job_postings"
   add_foreign_key "tool_calls", "llm_messages"
   add_foreign_key "user_job_postings", "job_postings"
+  add_foreign_key "user_job_postings", "job_searches", validate: false
   add_foreign_key "user_job_postings", "users"
   add_foreign_key "work_experiences", "career_profiles"
 end

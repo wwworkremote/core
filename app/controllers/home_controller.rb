@@ -6,7 +6,6 @@ class HomeController < ApplicationController
   def index
     assign_top_matches
     assign_priority_inbox
-    @latest_jobs = JobPosting.recent.limit(6)
     @source_stats = top_source_stats
   end
 

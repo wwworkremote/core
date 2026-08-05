@@ -177,13 +177,6 @@
 #                        root GET    /                                                              mission_control/jobs/queues#index
 
 Rails.application.routes.draw do
-  get "resumes/index"
-  get "resumes/show"
-  get "resumes/new"
-  get "resumes/create"
-  get "resumes/edit"
-  get "resumes/update"
-  get "resumes/destroy"
   resources :user_job_postings, only: %i[index create update destroy] do
     collection do
       post :analyze_match
@@ -196,10 +189,6 @@ Rails.application.routes.draw do
     end
   end
   resources :companies, only: %i[index show]
-  get "company_pipeline_steps/create"
-  get "contacts/create"
-  get "contacts/destroy"
-  get "pipeline_steps/create"
   resources :llm_chats do
     resources :llm_messages, only: %i[create]
   end
