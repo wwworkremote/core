@@ -13,11 +13,10 @@ RSpec.describe JobBoards::ContentEnrichmentJob do
   end
 
   before do
+    ActiveJob::Base.queue_adapter = :test
     allow(JobFetchers::UrlResolver).to receive(:resolve).and_return(job.target_url)
     page_fetch = instance_double(JobFetchers::PageFetch, call: fetch_result)
     allow(JobFetchers::PageFetch).to receive(:new).and_return(page_fetch)
-    allow(JobBoards::Categorizer).to receive(:new).and_return(instance_double(JobBoards::Categorizer, call: true))
-    allow(JobBoards::Embedder).to receive(:new).and_return(instance_double(JobBoards::Embedder, call: true))
   end
 
   it "skips entirely when pipelines are paused" do
@@ -31,14 +30,12 @@ RSpec.describe JobBoards::ContentEnrichmentJob do
   it "enriches, categorizes, and embeds a job when a description is found" do
     stub_extraction(description: "<p>Great <b>role</b>.</p>")
 
-    described_class.perform_now
+    expect { described_class.perform_now }.to have_enqueued_job(JobBoards::AnalysisJob).with(job.id)
 
     job.reload
     expect(job.body).to eq("Great **role**.")
     expect(job.crawl_status).to eq("enriched")
     expect(job.enriched_at).to be_present
-    expect(JobBoards::Categorizer).to have_received(:new).with(job)
-    expect(JobBoards::Embedder).to have_received(:new).with(job)
   end
 
   it "marks the job blocked when extraction returns nil" do

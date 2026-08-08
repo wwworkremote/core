@@ -112,8 +112,7 @@ class JobBoards::Syncer
   def enrich_if_needed(job_posting)
     return if job_posting.ignored? || job_posting.data["ai_category"].present?
 
-    JobBoards::Categorizer.new(job_posting).call
-    JobBoards::Embedder.new(job_posting).call
+    JobBoards::AnalysisJob.perform_later(job_posting.id)
   end
 
   # If it failed validation but it was a uniqueness error on signature, we

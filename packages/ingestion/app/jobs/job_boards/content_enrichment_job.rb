@@ -75,8 +75,7 @@ class JobBoards::ContentEnrichmentJob < ApplicationJob
   end
 
   def trigger_analysis(job)
-    JobBoards::Categorizer.new(job).call
-    JobBoards::Embedder.new(job).call
+    JobBoards::AnalysisJob.perform_later(job.id)
   end
 
   def handle_error(job, error)
