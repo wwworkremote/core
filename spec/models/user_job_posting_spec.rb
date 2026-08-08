@@ -24,6 +24,7 @@
 # Foreign Keys
 #
 #  fk_rails_...  (job_posting_id => job_postings.id)
+#  fk_rails_...  (job_search_id => job_searches.id)
 #  fk_rails_...  (user_id => users.id)
 #
 require "rails_helper"

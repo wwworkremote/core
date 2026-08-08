@@ -20,7 +20,8 @@
 #
 # Indexes
 #
-#  index_career_profiles_on_user_id  (user_id)
+#  index_career_profiles_on_embedding_hnsw  (((embedding)::halfvec(3584)) halfvec_cosine_ops) USING hnsw
+#  index_career_profiles_on_user_id         (user_id)
 #
 # Foreign Keys
 #

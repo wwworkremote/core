@@ -14,7 +14,8 @@
 #
 # Indexes
 #
-#  index_skills_on_name  (name) UNIQUE
+#  index_skills_on_embedding_hnsw  (((embedding)::halfvec(3584)) halfvec_cosine_ops) USING hnsw
+#  index_skills_on_name            (name) UNIQUE
 #
 FactoryBot.define do
   factory :skill do
