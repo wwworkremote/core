@@ -1,9 +1,11 @@
 ---
 id: TASK-32.3
 title: Role-family title taxonomy map (shared data artifact)
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - claude
 created_date: '2026-08-08 15:49'
+updated_date: '2026-08-08 16:36'
 labels: []
 milestone: m-0
 dependencies: []
@@ -27,9 +29,46 @@ Keep this lazy: a role-family list is a lookup table, not an ML classifier or an
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 A defined, named set of role families exists in the codebase (e.g. as a Ruby constant/module or config file), each mapping a family identifier to a list of title-string aliases/patterns
-- [ ] #2 The role-family set covers at minimum: staff-plus IC titles, engineering management titles (superseding the exact strings currently in MANAGEMENT_TIER_TITLE_PATTERN), and at least one additional adjacent family relevant to this codebase's job domain (e.g. product/design/data leadership) -- reviewed against real title strings already present in JobPosting data, not invented from scratch
-- [ ] #3 A lookup method exists that, given a title string, returns which family (if any) it belongs to, and given a family identifier, returns its alias list
-- [ ] #4 RSpec coverage for the lookup method covering exact matches, case-insensitivity, and titles that belong to no family
-- [ ] #5 No existing behavior changes yet -- MANAGEMENT_TIER_TITLE_PATTERN and management_tier scope remain functional and untouched by this task
+- [x] #1 A defined, named set of role families exists in the codebase (e.g. as a Ruby constant/module or config file), each mapping a family identifier to a list of title-string aliases/patterns
+- [x] #2 The role-family set covers at minimum: staff-plus IC titles, engineering management titles (superseding the exact strings currently in MANAGEMENT_TIER_TITLE_PATTERN), and at least one additional adjacent family relevant to this codebase's job domain (e.g. product/design/data leadership) -- reviewed against real title strings already present in JobPosting data, not invented from scratch
+- [x] #3 A lookup method exists that, given a title string, returns which family (if any) it belongs to, and given a family identifier, returns its alias list
+- [x] #4 RSpec coverage for the lookup method covering exact matches, case-insensitivity, and titles that belong to no family
+- [x] #5 No existing behavior changes yet -- MANAGEMENT_TIER_TITLE_PATTERN and management_tier scope remain functional and untouched by this task
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+Researched real title strings before designing the taxonomy (per AC #2's "not invented from scratch"): sampled 4000 random JobPosting titles from the dev DB and grep-tested candidate family patterns against them. All 5 target families have real, plentiful matches (engineering management: 15+ distinct real titles like "Engineering Manager, Contracting Platform"; staff-plus IC: real examples included "Member of Technical Staff" and "Senior Staff Software Engineer", which I hadn't anticipated and are now included; product/design/data leadership: all represented).
+
+Module: `app/services/role_family.rb`, `module RoleFamily` -- matches the existing sibling convention of `app/services/vector_intelligence.rb` (plain top-level module, no namespace, no persistence).
+
+`RoleFamily::FAMILIES` is a Hash of `family_symbol => [alias strings]` (multi-word literal phrases, not single generic words like bare "Director" -- avoids false-positive collisions across families). `RoleFamily.for(title)` does case-insensitive substring matching of each alias against the title, returns the first matching family symbol or nil. `RoleFamily.aliases_for(family)` returns that family's alias list (empty array for unknown family).
+
+5 families: staff_plus_ic, engineering_management, product_leadership, design_leadership, data_leadership -- exceeds AC #2's minimum of 2 (staff-plus IC + engineering management) plus 1 more.
+
+Note on AC #2's "supersedes MANAGEMENT_TIER_TITLE_PATTERN": that old pattern flatly mixes IC roles (principal engineer, staff+) with real management (director/VP/chief officer/engineering manager) with architecture leads (platform lead, solutions architect) into one bucket. This taxonomy intentionally decomposes that into separate families rather than reproducing one flat bucket -- that's the actual point of replacing a binary tier with a taxonomy. "platform lead" and "solutions? architect" from the old pattern are not carried forward as their own family (too niche a bucket on their own) and are not force-fit into staff_plus_ic either, since real-world usage of those titles is genuinely closer to IC-track architecture than engineering seniority -- leaving them out is a deliberate scope call, not an oversight, and a future alias addition could fold them in if a concrete need shows up.
+
+Tests: `spec/services/role_family_spec.rb` (new file, matches existing top-level `app/services/*.rb` -> `spec/services/*_spec.rb` convention) covering `.for` (exact real-title match per family, case-insensitivity, a title matching no family -> nil, blank title -> nil) and `.aliases_for` (known family returns its list, unknown family returns empty array).
+
+Does not touch JobPosting, BoardQuery, CrawlDefaults, or JobPostingsController -- confirmed those are out of scope per the task description; downstream tasks 32.4/32.5 consume this module.
+<!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added `RoleFamily` (app/services/role_family.rb), a plain lookup module grouping adjacent job titles into 5 families: staff_plus_ic, engineering_management, product_leadership, design_leadership, data_leadership. Each family maps to a literal alias-phrase list reviewed against 4000 real sampled JobPosting titles (not invented) -- e.g. staff_plus_ic includes "Member of Technical Staff", found only by checking real data, not something I'd have guessed.
+
+**API:** `RoleFamily.for(title)` -- case-insensitive substring match against all families' aliases, returns the first matching family symbol or nil. `RoleFamily.aliases_for(family)` -- returns that family's alias list, empty array for an unknown family.
+
+**Changed:** app/services/role_family.rb (new), spec/services/role_family_spec.rb (new, 7 examples).
+
+**Verified:**
+- New spec: real-title matches for two families, case-insensitivity, no-match -> nil, blank/nil -> nil, alias lookup for known and unknown families.
+- Confirmed zero diff to app/models/job_posting.rb or app/controllers/job_postings_controller.rb -- MANAGEMENT_TIER_TITLE_PATTERN and management_tier untouched, per this task's explicit scope boundary.
+- Full RSpec suite (root + packages/ingestion): 610 examples, 0 failures.
+
+**Scope note:** intentionally did not carry forward "platform lead"/"solutions? architect" from the old MANAGEMENT_TIER_TITLE_PATTERN as their own family or fold them into staff_plus_ic -- see plan for reasoning. This taxonomy decomposes the old flat management-tier bucket into distinct families rather than reproducing it 1:1, which is the actual point of this task.
+
+**Ready for downstream consumption:** task-32.4 (ingestion query expansion) and task-32.5 (UI filter) can now build on `RoleFamily`.
+<!-- SECTION:FINAL_SUMMARY:END -->
