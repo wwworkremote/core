@@ -17,7 +17,11 @@ case "$file_path" in
     # Strip trailing whitespace -- matches overcommit's TrailingWhitespace
     # pre-commit hook, which otherwise blocks on lines untouched by the
     # current edit but pre-existing in the same file.
-    sed -i '' -E 's/[ \t]+$//' "$file_path" 2>/dev/null
+    # NOTE: BSD sed (macOS) does not expand \t inside a bracket expression --
+    # it reads literal backslash+t, so `[ \t]` was matching trailing "t"
+    # characters and eating the last letter of any line ending in one
+    # (e.g. "be_present" -> "be_presen"). [[:blank:]] is the portable fix.
+    sed -i '' -E 's/[[:blank:]]+$//' "$file_path" 2>/dev/null
     ;;
 esac
 
