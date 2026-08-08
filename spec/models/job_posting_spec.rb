@@ -125,6 +125,39 @@ RSpec.describe JobPosting do
     end
   end
 
+  describe ".hybrid_search" do
+    let(:query_embedding) { Array.new(3584) { rand } }
+
+    before do
+      # rails_helper stubs VectorIntelligence.embed to an all-zero vector
+      # globally; override here to a specific vector so cosine distance
+      # against the vector-only fixture below is meaningful (zero vs zero
+      # is degenerate).
+      allow(VectorIntelligence).to receive(:embed).and_return(query_embedding)
+    end
+
+    it "returns none for a blank query" do
+      expect(described_class.hybrid_search("")).to be_empty
+    end
+
+    it "returns none when neither the keyword nor vector path finds anything" do
+      create(:job_posting, title: "Totally Unrelated Posting")
+
+      expect(described_class.hybrid_search("Zorblexicon")).to be_empty
+    end
+
+    it "fuses a keyword-only match and a vector-only match, excluding a non-match" do
+      keyword_match = create(:job_posting, title: "Senior Zorblexicon Specialist")
+      vector_match = create(:job_posting, title: "Generic Analyst Role", embedding: query_embedding)
+      control = create(:job_posting)
+
+      results = described_class.hybrid_search("Zorblexicon")
+
+      expect(results).to include(keyword_match, vector_match)
+      expect(results).not_to include(control)
+    end
+  end
+
   describe "#company_record" do
     it "finds the Company matching the current company name" do
       company = create(:company, name: "Acme Corp")

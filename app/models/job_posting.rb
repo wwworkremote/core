@@ -75,6 +75,40 @@ class JobPosting < ApplicationRecord
     VectorIntelligence.search(query_text, target_class: self, limit: limit)
   end
 
+  # Fuses keyword (pg_search) and vector (pgvector cosine) result orderings
+  # via Reciprocal Rank Fusion -- score[id] += 1/(rrf_k + rank) per list, no
+  # score normalization needed since only rank position is used.
+  def self.hybrid_search(query_text, limit: 10)
+    return none if query_text.blank?
+
+    ranked_ids = fused_candidate_ids(query_text, limit)
+    return none if ranked_ids.empty?
+
+    where(id: ranked_ids).in_order_of(:id, ranked_ids)
+  end
+
+  def self.fused_candidate_ids(query_text, limit)
+    pool = limit * 3
+    keyword_ids = search(query_text).limit(pool).pluck(:id)
+    vector_ids = semantic_search(query_text, limit: pool).pluck(:id)
+    fuse_rankings(keyword_ids, vector_ids).first(limit)
+  end
+  private_class_method :fused_candidate_ids
+
+  def self.fuse_rankings(*ranked_id_lists, rrf_k: 60)
+    rank_scores(ranked_id_lists, rrf_k).sort_by { |_id, score| -score }.map(&:first)
+  end
+  private_class_method :fuse_rankings
+
+  def self.rank_scores(ranked_id_lists, rrf_k)
+    scores = Hash.new(0.0)
+    ranked_id_lists.each do |ids|
+      ids.each_with_index { |id, idx| scores[id] += 1.0 / (rrf_k + idx + 1) }
+    end
+    scores
+  end
+  private_class_method :rank_scores
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[id title company location published_at target_url source_id created_at updated_at latitude longitude]
   end
