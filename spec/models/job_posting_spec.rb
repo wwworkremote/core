@@ -115,13 +115,25 @@ RSpec.describe JobPosting do
     end
   end
 
-  describe ".management_tier" do
-    it "matches management and senior-architecture titles" do
+  describe ".by_role_family" do
+    it "matches titles in the given family" do
       manager = create(:job_posting, title: "Engineering Manager, Payments")
-      architect = create(:job_posting, title: "Global Head of Specialist Solutions Architecture")
       create(:job_posting, title: "Senior Software Engineer")
 
-      expect(described_class.management_tier).to contain_exactly(manager, architect)
+      expect(described_class.by_role_family(:engineering_management)).to contain_exactly(manager)
+    end
+
+    it "matches a different family independently" do
+      staff_ic = create(:job_posting, title: "Staff Software Engineer, Platform")
+      create(:job_posting, title: "Engineering Manager, Payments")
+
+      expect(described_class.by_role_family(:staff_plus_ic)).to contain_exactly(staff_ic)
+    end
+
+    it "returns none for an unknown family" do
+      create(:job_posting, title: "Engineering Manager, Payments")
+
+      expect(described_class.by_role_family(:not_a_family)).to be_empty
     end
   end
 

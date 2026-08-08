@@ -24,13 +24,6 @@ class JobPosting < ApplicationRecord
   has_many :interview_sessions, dependent: :destroy
   has_many :interview_tasks, dependent: :destroy
 
-  # Plain (non-extended) pattern string -- passed straight through to
-  # Postgres's ~* operator, which doesn't support Ruby's /x free-spacing mode.
-  MANAGEMENT_TIER_TITLE_PATTERN =
-    "director|head of|vp[\\s,]|vice president|chief \\w+ officer|" \
-    "principal engineer|staff\\+|engineering manager|group engineering|" \
-    "platform lead|solutions? architect"
-
   private
 
   def add_pipeline_note(note, link: nil)
@@ -47,9 +40,15 @@ class JobPosting < ApplicationRecord
   after_commit :enforce_commute_zone, on: :update, if: -> { saved_change_to_latitude? || saved_change_to_longitude? }
 
   scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
-  scope :management_tier, -> { where("title ~* ?", MANAGEMENT_TIER_TITLE_PATTERN) }
 
   public
+
+  def self.by_role_family(family)
+    aliases = RoleFamily.aliases_for(family)
+    return none if aliases.empty?
+
+    where(aliases.map { "title ILIKE ?" }.join(" OR "), *aliases.map { |a| "%#{a}%" })
+  end
 
   def freshness
     return :unknown if published_at.nil?

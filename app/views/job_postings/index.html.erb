@@ -2,13 +2,18 @@
   <div class="max-w-2xl">
     <h1 class="text-4xl font-black tracking-tight text-white mb-2 uppercase">Neural Job Market</h1>
     <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Real-time aggregation of the global remote ecosystem</p>
-    <% if @tier == "management" %>
-      <%= link_to "✕ Management/Leadership", job_postings_path(q: @query, company: @company, source_id: @source_id),
-          class: "btn btn-sm btn-warning rounded-lg font-black tracking-widest text-[10px] mt-3" %>
-    <% else %>
-      <%= link_to "🎯 Management/Leadership", job_postings_path(q: @query, company: @company, source_id: @source_id, tier: "management"),
-          class: "btn btn-sm btn-outline btn-warning rounded-lg font-black tracking-widest text-[10px] mt-3" %>
-    <% end %>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <% role_family_labels.each do |family, label| %>
+        <% if @role_family == family.to_s %>
+          <%= link_to "✕ #{label}", job_postings_path(q: @query, company: @company, source_id: @source_id),
+              class: "btn btn-xs btn-warning rounded-lg font-black tracking-widest text-[10px]" %>
+        <% else %>
+          <%= link_to "🎯 #{label}",
+              job_postings_path(q: @query, company: @company, source_id: @source_id, role_family: family),
+              class: "btn btn-xs btn-outline btn-warning rounded-lg font-black tracking-widest text-[10px]" %>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 
   <div class="w-full lg:max-w-md">
@@ -24,31 +29,31 @@
   </div>
 </div>
 
-<% if @company.present? || @source_id.present? || @query.present? || @tier.present? %>
+<% if @company.present? || @source_id.present? || @query.present? || @role_family.present? %>
   <div class="mb-10 flex flex-wrap items-center gap-3">
     <span class="text-[10px] font-black text-base-content/30 uppercase tracking-widest">Active_Filters:</span>
-    <% if @tier.present? %>
+    <% if @role_family.present? %>
       <div class="badge badge-outline border-warning/30 text-warning gap-2 p-3 font-bold text-[10px] uppercase">
-        Tier: Management/Leadership
+        Role: <%= role_family_labels[@role_family.to_sym] %>
         <%= link_to job_postings_path(q: @query, company: @company, source_id: @source_id), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @company.present? %>
       <div class="badge badge-outline border-primary/30 text-primary gap-2 p-3 font-bold text-[10px] uppercase">
         Company: <%= @company %>
-        <%= link_to job_postings_path(q: @query, source_id: @source_id, tier: @tier), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(q: @query, source_id: @source_id, role_family: @role_family), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @source_id.present? %>
       <div class="badge badge-outline border-secondary/30 text-secondary gap-2 p-3 font-bold text-[10px] uppercase">
         Source_ID: <%= @source_id %>
-        <%= link_to job_postings_path(q: @query, company: @company, tier: @tier), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(q: @query, company: @company, role_family: @role_family), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @query.present? %>
       <div class="badge badge-outline border-accent/30 text-accent gap-2 p-3 font-bold text-[10px] uppercase">
         Query: <%= @query %>
-        <%= link_to job_postings_path(company: @company, source_id: @source_id, tier: @tier), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(company: @company, source_id: @source_id, role_family: @role_family), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <%= link_to "PURGE_FILTERS", job_postings_path, class: "text-[10px] font-black text-error hover:underline ml-2 uppercase tracking-widest" %>

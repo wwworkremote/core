@@ -57,12 +57,26 @@ RSpec.describe "Job Postings" do
       expect(recent_index).to be < null_index
     end
 
-    it "filters to management-tier titles when tier=management" do
+    it "filters to a role family when role_family=engineering_management" do
       create(:job_posting, signature: "manager-1", title: "Engineering Manager, Platform", published_at: Time.current)
 
-      get job_postings_path, params: { tier: "management" }
+      get job_postings_path, params: { role_family: "engineering_management" }
       expect(response.body).to include("Engineering Manager, Platform")
       expect(response.body).not_to include("Senior Ruby Developer")
+    end
+
+    it "filters to a different role family when role_family=staff_plus_ic" do
+      create(:job_posting, signature: "staff-1", title: "Staff Software Engineer, Platform", published_at: Time.current)
+
+      get job_postings_path, params: { role_family: "staff_plus_ic" }
+      expect(response.body).to include("Staff Software Engineer, Platform")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
+
+    it "ignores an unrecognized role_family value rather than erroring" do
+      get job_postings_path, params: { role_family: "not-a-real-family" }
+      expect(response).to be_successful
+      expect(response.body).to include("Senior Ruby Developer")
     end
   end
 
