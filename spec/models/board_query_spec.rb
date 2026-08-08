@@ -139,4 +139,31 @@ RSpec.describe BoardQuery do
       expect(bq.build_remoteok_url).to eq("https://remoteok.com/remote-ruby-engineer-jobs")
     end
   end
+
+  describe ".create_for_role_family!" do
+    it "creates one row per alias in the family" do
+      queries = described_class.create_for_role_family!(:staff_plus_ic, board_name: "indeed", query_params: {})
+
+      expect(queries.size).to eq(RoleFamily.aliases_for(:staff_plus_ic).size)
+      expect(queries.map(&:terms)).to eq(RoleFamily.aliases_for(:staff_plus_ic).zip)
+    end
+
+    it "produces distinct URLs across builders, avoiding idempotency-key collisions" do
+      indeed_queries = described_class.create_for_role_family!(:engineering_management, board_name: "indeed",
+                                                                                        query_params: {})
+      dice_queries = described_class.create_for_role_family!(:engineering_management, board_name: "dice",
+                                                                                      query_params: {})
+
+      expect(indeed_queries.map(&:build_url).uniq.size).to eq(indeed_queries.size)
+      expect(dice_queries.map(&:build_url).uniq.size).to eq(dice_queries.size)
+    end
+
+    it "leaves unrelated single-term BoardQuery rows unaffected" do
+      untouched = create(:board_query, board_name: "cord", terms: ["Ruby"])
+
+      described_class.create_for_role_family!(:data_leadership, board_name: "indeed", query_params: {})
+
+      expect(untouched.reload.terms).to eq(["Ruby"])
+    end
+  end
 end

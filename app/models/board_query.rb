@@ -29,6 +29,15 @@ class BoardQuery < ApplicationRecord
     builder ? send(builder) : nil
   end
 
+  # One row per role-family alias so CrawlRunner (which already enqueues
+  # one crawl job per BoardQuery row for a board) fetches every adjacent
+  # title wording, not just one literal term.
+  def self.create_for_role_family!(family, board_name:, **attrs)
+    RoleFamily.aliases_for(family).map do |alias_title|
+      create!(board_name: board_name, terms: [alias_title], **attrs)
+    end
+  end
+
   def build_cord_url
     query = { filters: cord_filters.to_json, v: { label: "Positions", value: "listing" }.to_json,
               resultType: "all" }
