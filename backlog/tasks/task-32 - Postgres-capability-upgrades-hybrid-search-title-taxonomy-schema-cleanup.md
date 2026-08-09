@@ -1,9 +1,10 @@
 ---
 id: TASK-32
 title: 'Postgres capability upgrades: hybrid search, title taxonomy, schema cleanup'
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-08 15:46'
+updated_date: '2026-08-08 22:08'
 labels: []
 milestone: m-0
 dependencies: []
@@ -32,8 +33,27 @@ Subtasks are sequenced from most commonly valuable shared functionality (benefit
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All non-deferred subtasks under this parent are Done with their own acceptance criteria independently verified
-- [ ] #2 No regression in existing JobPosting search/match behavior (existing specs for JobPosting#search, VectorIntelligence, JobSearchManager::MatcherService, GeocodingJob/board_query flows still pass)
-- [ ] #3 Full RSpec suite (root spec/ and packages/ingestion/spec/) green after each subtask lands
-- [ ] #4 Schema/extension decisions (ltree) are either adopted with a real caller or the extension is removed -- not left in the ambiguous unused-but-enabled state found in the audit
+- [x] #1 All non-deferred subtasks under this parent are Done with their own acceptance criteria independently verified
+- [x] #2 No regression in existing JobPosting search/match behavior (existing specs for JobPosting#search, VectorIntelligence, JobSearchManager::MatcherService, GeocodingJob/board_query flows still pass)
+- [x] #3 Full RSpec suite (root spec/ and packages/ingestion/spec/) green after each subtask lands
+- [x] #4 Schema/extension decisions (ltree) are either adopted with a real caller or the extension is removed -- not left in the ambiguous unused-but-enabled state found in the audit
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+All 6 subtasks Done, executed sequentially from most commonly shared functionality down to the narrowest new capability, per the DAG:
+
+1. **task-32.1** -- Hybrid search fusion (keyword + vector) for JobPosting via Reciprocal Rank Fusion. Zero dependencies, benefits every search/match path.
+2. **task-32.2** -- Removed the unused `ltree` extension after investigation showed zero callers (and that the one hierarchy it could have served, `domains.root_domain_id`, is itself unused).
+3. **task-32.3** -- `RoleFamily` title-taxonomy lookup module, 5 families, aliases reviewed against real sampled JobPosting titles.
+4. **task-32.4** -- `BoardQuery.create_for_role_family!`, generating ingestion queries from a role family (discovered ApiGuard doesn't govern this path; corrected the task's own premise before implementing).
+5. **task-32.5** -- Generalized the binary management-tier filter into 5-family role filtering in the JobPostings UI; deleted the now-fully-dead old mechanism rather than leaving it orphaned.
+6. **task-32.6** -- Weekly job-posting-volume trend rollup sliced by role family, with a scheduled daily refresh job.
+
+Three real corrections to this parent task's and its subtasks' own initial assumptions surfaced and were documented in-place during execution (ltree/root_domain_id not backing the company blocklist; ApiGuard not governing the crawl path; a stray flaky-test scare traced to pre-existing Capybara nondeterminism, not a regression) -- verify-before-trust held throughout, including against my own prior writing.
+
+draft-1 (graph-query capability spike) remains intentionally Draft/unscheduled -- no concrete driving use case exists yet, per its own text.
+
+All changes are committed to main in small, reviewable, task-scoped commits (one feature commit + one backlog-tracking commit per subtask). Full RSpec suite (root + packages/ingestion) was green after every subtask.
+<!-- SECTION:FINAL_SUMMARY:END -->
