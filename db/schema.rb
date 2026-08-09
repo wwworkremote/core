@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_161826) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -342,6 +342,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_161826) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["career_profile_id"], name: "index_job_experiences_on_career_profile_id"
+  end
+
+  create_table "job_posting_trends", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "postings_count", default: 0, null: false
+    t.string "role_family", null: false
+    t.datetime "updated_at", null: false
+    t.date "week_start", null: false
+    t.index ["week_start", "role_family"], name: "index_job_posting_trends_on_week_and_family", unique: true
   end
 
   create_table "job_postings", force: :cascade do |t|

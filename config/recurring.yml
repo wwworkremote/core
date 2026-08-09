@@ -41,6 +41,10 @@ development:
     class: JobLifecycle::ExpirySweepJob
     schedule: every day at 4:30am
 
+  job_posting_trend_rollup:
+    class: JobPostingTrendRollupJob
+    schedule: every day at 5am
+
 
 production:
   fetch_all_jobs:
@@ -83,3 +87,7 @@ production:
   expire_stale_postings:
     class: JobLifecycle::ExpirySweepJob
     schedule: every day at 4:30am
+
+  job_posting_trend_rollup:
+    class: JobPostingTrendRollupJob
+    schedule: every day at 5am
