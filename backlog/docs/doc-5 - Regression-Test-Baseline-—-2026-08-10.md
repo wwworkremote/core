@@ -52,21 +52,22 @@ Routes (expect HTTP 200 on all):
 
 Backend capability checks (via `bin/rails runner`):
 ```ruby
-JobPosting.hybrid_search("staff engineer", limit: 5)          # returns relevant results, fused keyword+vector
+JobPosting.hybrid_search("staff engineer", limit: 5) # returns relevant results, fused keyword+vector
 RoleFamily.for("Staff Software Engineer")                      # => :staff_plus_ic
 RoleFamily.for("Random Nonsense Title")                        # => nil
-BoardQuery.create_for_role_family!(:staff_plus_ic, board_name: "indeed", query_params: {})  # creates N rows, N == RoleFamily.aliases_for(:staff_plus_ic).size
-JobPostingTrendRollup.call; JobPostingTrend.count              # > 0, real weekly/family-bucketed rows
+# creates N rows, N == RoleFamily.aliases_for(:staff_plus_ic).size
+BoardQuery.create_for_role_family!(:staff_plus_ic, board_name: "indeed", query_params: {})
+JobPostingTrendRollup.call; JobPostingTrend.count # > 0, real weekly/family-bucketed rows
 ```
 All confirmed working against live data on 2026-08-10.
 
 ## Queue/Scheduler Health
 
 ```ruby
-SolidQueue::Process.all.map { |p| [p.kind, p.last_heartbeat_at] }   # all recent
-SolidQueue::ReadyExecution.count                                     # expect near-0 (backlog drained)
+SolidQueue::Process.all.map { |p| [p.kind, p.last_heartbeat_at] } # all recent
+SolidQueue::ReadyExecution.count # expect near-0 (backlog drained)
 SolidQueue::FailedExecution.joins(:job).group("solid_queue_jobs.class_name").count
-SolidQueue::RecurringTask.pluck(:key)                                 # compare against config/recurring.yml keys
+SolidQueue::RecurringTask.pluck(:key) # compare against config/recurring.yml keys
 ```
 
 **Baseline (2026-08-10):** 8 processes healthy (recent heartbeats), 0 ready/pending jobs. 284 failed jobs, ALL `SolidQueue::Processes::ProcessPrunedError`/`ProcessMissingError` (worker-restart artifacts, already covered by `ApplicationJob`'s `retry_on` — not a functional regression, historical accumulation).
