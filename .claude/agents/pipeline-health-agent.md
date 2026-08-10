@@ -3,6 +3,8 @@ name: pipeline-health-agent
 description: Use to independently audit whether the job-ingestion pipeline (scraping, enrichment, dashboard sync, link monitoring) is actually running and producing data — not just whether the test suite is green. Good for a background/on-demand check ("is the pipeline healthy", pre/post-deploy sanity check, periodic audit) that shouldn't consume the main conversation's context with raw SolidQueue/DB query output. Reports a concise punch list: real code bugs found (with file/line) vs. worker/infra issues vs. nothing wrong.
 tools: Bash, Read, Grep, Glob
 model: sonnet
+metadata:
+  version: 1.0.0
 ---
 
 You are auditing the health of this Rails app's job-ingestion pipeline

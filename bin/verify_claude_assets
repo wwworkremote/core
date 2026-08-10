@@ -1,0 +1,125 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Self-check for .claude/skills/**/SKILL.md and .claude/agents/*.md.
+# Validates that every skill/agent is self-describing per the Agent Skills
+# spec (required frontmatter present, versioned, referenced scripts exist
+# and parse) so a human or CI doesn't have to eyeball each one by hand.
+#
+# Usage: bin/verify_claude_assets
+
+require 'yaml'
+require 'find'
+
+root = File.expand_path('..', __dir__)
+errors = []
+
+def frontmatter(path)
+  text = File.read(path)
+  return nil unless text.start_with?('---')
+
+  _, fm, body = text.split(/^---\s*$/, 3)
+  [YAML.safe_load(fm), body.to_s]
+rescue Psych::SyntaxError
+  # Frontmatter values (e.g. descriptions) often contain a bare ": " that
+  # trips strict YAML but is accepted by Claude Code's own loader. Fall back
+  # to a permissive top-level "key: value" line scan instead of rewriting
+  # working prose just to satisfy this checker.
+  [lenient_parse(fm), body.to_s]
+end
+
+def lenient_parse(fm)
+  result = {}
+  current_nested_key = nil
+  fm.to_s.each_line do |line|
+    next if line.strip.empty?
+
+    if line.start_with?(/\s/)
+      key, value = line.strip.split(':', 2)
+      result[current_nested_key] ||= {} if current_nested_key
+      result[current_nested_key][key.strip] = value.to_s.strip if current_nested_key
+    else
+      key, value = line.split(':', 2)
+      key = key.to_s.strip
+      value = value.to_s.strip
+      if value.empty?
+        current_nested_key = key
+      else
+        current_nested_key = nil
+        result[key] = value
+      end
+    end
+  end
+  result
+end
+
+def check_ruby_scripts(dir, errors, label)
+  Find.find(dir).each do |path|
+    next unless path.end_with?('.rb')
+
+    unless system('ruby', '-c', path, out: File::NULL)
+      errors << "#{label}: #{path} fails `ruby -c` syntax check"
+    end
+  end
+end
+
+# Skills: .claude/skills/<name>/SKILL.md
+Dir.glob(File.join(root, '.claude/skills/*/SKILL.md')).each do |path|
+  dir_name = File.basename(File.dirname(path))
+  fm, body = frontmatter(path)
+  label = "skill '#{dir_name}'"
+
+  if fm.nil?
+    errors << "#{label}: SKILL.md has no YAML frontmatter"
+    next
+  elsif fm == :invalid_yaml
+    errors << "#{label}: SKILL.md frontmatter is invalid YAML (#{body})"
+    next
+  end
+
+  errors << "#{label}: missing required 'name' field" unless fm['name']
+  errors << "#{label}: 'name' (#{fm['name']}) does not match directory name" if fm['name'] && fm['name'] != dir_name
+  errors << "#{label}: missing required 'description' field" if fm['description'].to_s.empty?
+  errors << "#{label}: missing metadata.version" unless fm.dig('metadata', 'version')
+
+  scripts_dir = File.join(File.dirname(path), 'scripts')
+  check_ruby_scripts(scripts_dir, errors, label) if File.directory?(scripts_dir)
+
+  # Any relative script path referenced in the body should actually exist.
+  body.to_s.scan(%r{\.claude/skills/[\w./-]+}).uniq.each do |ref|
+    full = File.join(root, ref)
+    errors << "#{label}: references '#{ref}' which does not exist" unless File.exist?(full)
+  end
+end
+
+# Agents: .claude/agents/*.md
+Dir.glob(File.join(root, '.claude/agents/*.md')).each do |path|
+  file_name = File.basename(path, '.md')
+  fm, body = frontmatter(path)
+  label = "agent '#{file_name}'"
+
+  if fm.nil?
+    errors << "#{label}: has no YAML frontmatter"
+    next
+  elsif fm == :invalid_yaml
+    errors << "#{label}: frontmatter is invalid YAML (#{body})"
+    next
+  end
+
+  errors << "#{label}: missing required 'name' field" unless fm['name']
+  errors << "#{label}: 'name' (#{fm['name']}) does not match filename" if fm['name'] && fm['name'] != file_name
+  errors << "#{label}: missing required 'description' field" if fm['description'].to_s.empty?
+  errors << "#{label}: missing required 'tools' field" if fm['tools'].to_s.empty?
+  errors << "#{label}: missing metadata.version" unless fm.dig('metadata', 'version')
+end
+
+if errors.empty?
+  skill_count = Dir.glob(File.join(root, '.claude/skills/*/SKILL.md')).size
+  agent_count = Dir.glob(File.join(root, '.claude/agents/*.md')).size
+  puts "OK: #{skill_count} skill(s), #{agent_count} agent(s) self-describing and valid."
+  exit 0
+else
+  puts "FAILED (#{errors.size}):"
+  errors.each { |e| puts "  - #{e}" }
+  exit 1
+end
