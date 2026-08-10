@@ -101,6 +101,13 @@ PreCommit:
       - 'node_modules/**/*'
       - 'vendor/**/*'
 
+  ClaudeAssets:
+    enabled: true
+    description: 'Validate .claude/skills and .claude/agents are self-describing'
+    include:
+      - '.claude/skills/**/*'
+      - '.claude/agents/**/*'
+
   RSpec:
     enabled: true
     # Explicit dirs, not a bare `rspec` -- packages/*/spec (the ingestion
