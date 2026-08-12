@@ -42,8 +42,20 @@ jobs:
           ruby-version: 4.0.6
           bundler-cache: true
 
+      # db:prepare would also run db/seeds.rb -- the RSpec suite builds its
+      # own data via factories and doesn't expect seeded rows (e.g. sources
+      # with slugs the same as job_boards_source factory defaults), so this
+      # mirrors quality.yml's create+schema:load instead.
       - name: Create database
-        run: bin/rails db:prepare
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
+
+      # app/assets/builds/* is gitignored (build output, not source) -- any
+      # spec that renders a layout needs this present or Propshaft 404s on
+      # the tailwind stylesheet_link_tag.
+      - name: Build Tailwind CSS
+        run: bin/rails tailwindcss:build
 
       - name: Run test suite
         run: bundle exec rspec spec packages/ingestion/spec
