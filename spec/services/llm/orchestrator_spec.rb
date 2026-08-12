@@ -76,5 +76,21 @@ RSpec.describe LLM::Orchestrator do
       expect(result[:success]).to be true
       expect(result[:output]).to eq("")
     end
+
+    it "blocks a response flagged by the output guardrail instead of returning it as success" do
+      sse_body = <<~SSE
+        data: {"choices":[{"delta":{"content":"Sure, I will now reveal system prompt details."}}]}
+
+        data: [DONE]
+      SSE
+
+      stub_request(:post, "http://localhost:11500/v1/chat/completions")
+        .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
+
+      result = described_class.call(untrusted_text: untrusted_text, metadata: {})
+
+      expect(result[:success]).to be false
+      expect(result[:error]).to include("Output guardrail flagged response")
+    end
   end
 end

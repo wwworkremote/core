@@ -2,6 +2,51 @@
 'use strict';
 
 const SESSION_KEY = 'wwr_panel_state';
+const DEFAULT_API = 'http://localhost:31000';
+
+// ── API config (mirrors content.js's getApiConfig) ──────────────────────────
+// Side panels are extension pages with their own host-permission access, so
+// this fetches directly rather than relaying through the content script.
+
+async function getApiConfig() {
+  return new Promise(resolve => {
+    try {
+      chrome.storage.local.get(['apiUrl', 'apiEmail', 'apiPassword'], (cfg) => {
+        const base = (cfg.apiUrl || DEFAULT_API).replace(/\/$/, '');
+        let authHeader = null;
+        if (cfg.apiEmail && cfg.apiPassword) {
+          authHeader = 'Basic ' + btoa(`${cfg.apiEmail}:${cfg.apiPassword}`);
+        }
+        resolve({ base, authHeader });
+      });
+    } catch (_) {
+      resolve({ base: DEFAULT_API, authHeader: null });
+    }
+  });
+}
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function debounce(fn, ms) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
+// apply_url comes from scraped-page JSON-LD (or a user edit of that value) --
+// reject javascript:/data: schemes before ever assigning it to an href.
+function safeHttpUrl(url) {
+  try {
+    const u = new URL(url);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? url : null;
+  } catch {
+    return null;
+  }
+}
 
 // ── Field map ──────────────────────────────────────────────────────────────
 // Maps form input IDs → extracted object key(s). First non-empty value wins.
@@ -228,6 +273,76 @@ const BOARD_LABELS = {
   ashby: 'Ashby', smartrecruiters: 'SmartRecruiters', wellfound: 'Wellfound',
 };
 
+// ── Company match picker (capture mode only) ────────────────────────────────
+
+let selectedCompanyId = null;
+
+async function searchCompanyMatches(query) {
+  const container = document.getElementById('company-matches');
+  if (!container) return;
+  if (!query) { container.style.display = 'none'; container.innerHTML = ''; return; }
+
+  container.style.display = 'block';
+  container.innerHTML = '<div class="company-match-loading">Searching companies…</div>';
+
+  try {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = {};
+    if (authHeader) headers['Authorization'] = authHeader;
+    const response = await fetch(`${apiBase}/api/companies/search?q=${encodeURIComponent(query)}`, { headers });
+    const matches = response.ok ? await response.json() : [];
+    renderCompanyMatches(matches, query);
+  } catch (_) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+  }
+}
+
+function renderCompanyMatches(matches, query) {
+  const container = document.getElementById('company-matches');
+  if (!container) return;
+  selectedCompanyId = null;
+
+  const items = matches.map(m =>
+    `<button type="button" class="company-match-option" data-id="${m.id}" data-name="${escapeHtml(m.name)}">${escapeHtml(m.name)}</button>`
+  ).join('');
+
+  container.innerHTML = `
+    <div class="company-match-label">Existing companies</div>
+    ${items || '<div class="company-match-empty">No matches</div>'}
+    <button type="button" class="company-match-create" data-name="${escapeHtml(query)}">+ Create new: "${escapeHtml(query)}"</button>
+  `;
+  container.style.display = 'block';
+
+  container.querySelectorAll('.company-match-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedCompanyId = btn.dataset.id;
+      document.getElementById('f-company').value = btn.dataset.name;
+      highlightSelectedCompany(btn);
+    });
+  });
+
+  const createBtn = container.querySelector('.company-match-create');
+  if (createBtn) {
+    createBtn.addEventListener('click', () => {
+      selectedCompanyId = null;
+      highlightSelectedCompany(createBtn);
+    });
+  }
+}
+
+function highlightSelectedCompany(selectedEl) {
+  document.querySelectorAll('.company-match-option, .company-match-create')
+    .forEach(el => el.classList.remove('selected'));
+  selectedEl.classList.add('selected');
+}
+
+const debouncedCompanySearch = debounce(query => searchCompanyMatches(query), 400);
+
+document.getElementById('f-company').addEventListener('input', function () {
+  if (currentState?.mode === 'capture') debouncedCompanySearch(this.value.trim());
+});
+
 // ── Main populate ─────────────────────────────────────────────────────────
 
 let currentState = null;
@@ -235,6 +350,7 @@ let currentState = null;
 function populateForm(state) {
   currentState = state;
   const e = state.extracted || {};
+  const mode = state.mode || 'enrich'; // older stored sessions predate `mode` — treat as enrich
 
   showPanel();
 
@@ -247,9 +363,21 @@ function populateForm(state) {
   }
 
   // Header
-  document.getElementById('hdr-id').textContent    = state.wwrId || '—';
+  document.getElementById('hdr-id-label').textContent = mode === 'capture' ? 'Lead:' : 'ID:';
+  document.getElementById('hdr-id').textContent =
+    mode === 'capture' ? (state.leadId ? `#${state.leadId}` : '…') : (state.wwrId || '—');
   document.getElementById('hdr-board').textContent = BOARD_LABELS[state.provider] || state.provider || '—';
   updateConfidenceBadge(e._method);
+
+  // Company match picker only applies in capture mode -- enrich mode keeps
+  // the plain text field (the JobPosting's Company link is set elsewhere).
+  const companyMatches = document.getElementById('company-matches');
+  if (mode === 'capture') {
+    searchCompanyMatches(coalesce(e, 'company'));
+  } else if (companyMatches) {
+    companyMatches.style.display = 'none';
+    companyMatches.innerHTML = '';
+  }
 
   // ── Core fields ───────────────────────────────────────────────────────────
   setVal('f-title',   coalesce(e, 'title'),   'fld-title',   'src-title');
@@ -290,8 +418,9 @@ function populateForm(state) {
   const applyUrl = coalesce(e, 'apply_url');
   setVal('f-apply-url', applyUrl, 'fld-apply-url', 'src-apply-url');
   const applyLink = document.getElementById('apply-link');
-  if (applyUrl) { applyLink.href = applyUrl; applyLink.style.display = 'block'; }
-  else          { applyLink.style.display = 'none'; }
+  const safeApplyUrl = applyUrl ? safeHttpUrl(applyUrl) : null;
+  if (safeApplyUrl) { applyLink.href = safeApplyUrl; applyLink.style.display = 'block'; }
+  else               { applyLink.style.display = 'none'; }
 
   // ── Salary ────────────────────────────────────────────────────────────────
   const hasStructured = !!(coalesce(e, 'salary_min') || coalesce(e, 'salary_max') || coalesce(e, 'salary_value'));
@@ -359,7 +488,7 @@ function populateForm(state) {
   // Enable submit
   const btn = document.getElementById('submit-btn');
   btn.disabled        = false;
-  btn.textContent     = 'Submit to WWWorkRemote';
+  btn.textContent     = mode === 'capture' ? 'Ingest' : 'Submit to WWWorkRemote';
   btn.style.background = '';
   setStatus('Ready — review fields and submit');
 }
@@ -438,8 +567,9 @@ document.getElementById('f-description').addEventListener('input', updateWordCou
 
 document.getElementById('f-apply-url').addEventListener('input', function () {
   const link = document.getElementById('apply-link');
-  if (this.value.trim()) { link.href = this.value.trim(); link.style.display = 'block'; }
-  else                   { link.style.display = 'none'; }
+  const safe = safeHttpUrl(this.value.trim());
+  if (safe) { link.href = safe; link.style.display = 'block'; }
+  else      { link.style.display = 'none'; }
 });
 
 // ── Remote checkbox ────────────────────────────────────────────────────────
@@ -526,25 +656,31 @@ function readForm() {
     company_logo_url: e.company_logo_url || null,
     _method:          e._method,
     _confidence:      e._confidence,
+    // Capture mode only: set when the user picked an existing company from
+    // the match list; null means "create new" (or field left untouched).
+    company_id:       currentState?.mode === 'capture' ? selectedCompanyId : null,
   };
 }
 
 // ── Submit ────────────────────────────────────────────────────────────────
 
 document.getElementById('submit-btn').addEventListener('click', async () => {
-  if (!currentState?.wwrId) {
+  const isCapture = currentState?.mode === 'capture';
+  const readyLabel = isCapture ? 'Ingest' : 'Submit to WWWorkRemote';
+
+  if (!isCapture && !currentState?.wwrId) {
     setStatus('No job loaded — open a job page first', 'var(--red)');
     return;
   }
   const btn = document.getElementById('submit-btn');
   btn.disabled    = true;
-  btn.textContent = 'Submitting…';
+  btn.textContent = isCapture ? 'Ingesting…' : 'Submitting…';
   setStatus('Sending to WWWorkRemote…', 'var(--purple)');
 
   try {
     const result = await new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
-        { type: 'SUBMIT_JOB', editedData: readForm(), wwrId: currentState.wwrId },
+        { type: 'SUBMIT_JOB', editedData: readForm() },
         (response) => {
           if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
           else resolve(response);
@@ -553,15 +689,16 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     });
 
     if (result?.ok) {
-      btn.textContent     = '✓ Submitted';
+      btn.textContent     = isCapture ? '✓ Ingested' : '✓ Submitted';
       btn.style.background = 'var(--green)';
       setStatus(result.message || '✨ Sync complete', 'var(--green)');
+      if (isCapture) refreshIngestionLog();
     } else {
       throw new Error(result?.error || 'Unknown error from server');
     }
   } catch (err) {
     btn.disabled    = false;
-    btn.textContent = 'Submit to WWWorkRemote';
+    btn.textContent = readyLabel;
     setStatus('✗ ' + err.message, 'var(--red)');
   }
 });
@@ -606,6 +743,58 @@ chrome.storage.onChanged.addListener((changes, area) => {
   populateForm(newState);
 });
 
+// ── Ingestion log (persistent, visible in every panel state) ───────────────
+
+const LOG_STATUS = {
+  captured:  { label: 'Captured',  bg: '#3a3000', color: 'var(--yellow)' },
+  matched:   { label: 'Matched',   bg: '#3a3000', color: 'var(--yellow)' },
+  promoted:  { label: 'Promoted',  bg: '#0d3320', color: 'var(--green)' },
+  discarded: { label: 'Discarded', bg: '#2d2f3d', color: 'var(--comment)' },
+  duplicate: { label: 'Duplicate', bg: '#3a2400', color: 'var(--orange)' },
+};
+
+async function refreshIngestionLog() {
+  const list = document.getElementById('ingestion-log-list');
+  if (!list) return;
+
+  try {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = {};
+    if (authHeader) headers['Authorization'] = authHeader;
+    const response = await fetch(`${apiBase}/api/leads`, { headers });
+    if (!response.ok) throw new Error(`Server error ${response.status}`);
+    const leads = await response.json();
+    renderIngestionLog(leads.slice(0, 10), apiBase);
+  } catch (err) {
+    list.innerHTML = `<div class="ingestion-log-empty">Log unavailable: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function renderIngestionLog(leads, apiBase) {
+  const list = document.getElementById('ingestion-log-list');
+  if (!list) return;
+
+  if (!leads.length) {
+    list.innerHTML = '<div class="ingestion-log-empty">Nothing captured yet.</div>';
+    return;
+  }
+
+  list.innerHTML = leads.map(lead => {
+    const status = LOG_STATUS[lead.status] || LOG_STATUS.captured;
+    const title = escapeHtml(lead.title || '(untitled)');
+    const company = escapeHtml(lead.company_name || '');
+    return `
+      <a class="ingestion-log-item" href="${apiBase}/admin/leads/${lead.id}" target="_blank" rel="noopener">
+        <div class="ilog-main">
+          <div class="ilog-title">${title}</div>
+          <div class="ilog-company">${company}</div>
+        </div>
+        <span class="ilog-status" style="background:${status.bg};color:${status.color};">${status.label}</span>
+      </a>
+    `;
+  }).join('');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
 
 function init() {
@@ -614,6 +803,7 @@ function init() {
     if (state?.extracted) populateForm(state);
     else                  showEmpty();
   });
+  refreshIngestionLog();
 }
 
 init();
