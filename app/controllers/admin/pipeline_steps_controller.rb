@@ -1,7 +1,18 @@
 # frozen_string_literal: true
 
 class Admin::PipelineStepsController < Admin::ApplicationController
-  ALLOWED_STATUS_EVENTS = %w[favorite apply interview offer archive].freeze
+  # Explicit literal-symbol dispatch table, not dynamic send("#{params[:status]}!") --
+  # Brakeman flags any send/public_send built from user input as unsafe reflection
+  # even when pre-checked against an allowlist, since it can't verify the check
+  # happens on every call path. A fixed hash keeps the AASM event names as literals.
+  STATUS_EVENTS = {
+    "favorite" => %i[favorite! may_favorite?],
+    "apply" => %i[apply! may_apply?],
+    "interview" => %i[interview! may_interview?],
+    "offer" => %i[offer! may_offer?],
+    "archive" => %i[archive! may_archive?],
+    "ignore" => %i[ignore! may_ignore?]
+  }.freeze
 
   def create
     @job_posting = JobPosting.find(params.expect(:job_posting_id))
@@ -20,11 +31,15 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     end
   end
 
-  # Whitelist AASM events to prevent dangerous send
+  # Checks the transition is actually legal from the current state -- a
+  # double-click or stale page (e.g. two "Not interested" clicks before the
+  # card is removed) would otherwise raise AASM::InvalidTransition instead
+  # of just no-op'ing.
   def apply_status_event
-    return unless ALLOWED_STATUS_EVENTS.include?(params[:status])
+    bang, guard = STATUS_EVENTS[params[:status]]
+    return unless bang && @job_posting.public_send(guard)
 
-    @job_posting.send("#{params[:status]}!")
+    @job_posting.public_send(bang)
     log_status_change_step
   end
 
