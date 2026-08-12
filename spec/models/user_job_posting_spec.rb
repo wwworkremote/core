@@ -9,6 +9,7 @@
 #  notes          :text
 #  priority_flag  :boolean
 #  status         :string
+#  strategy       :jsonb            not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  job_posting_id :bigint           not null

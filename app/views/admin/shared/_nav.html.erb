@@ -21,8 +21,10 @@
       <div class="flex items-center gap-4">
         <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-600">Engine</span>
         <%= link_to "Sources", admin_sources_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'sources' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Leads", admin_leads_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'leads' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
         <%= link_to "Jobs", admin_jobs_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'jobs' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
         <%= link_to "Registry", admin_models_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'models' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
+        <%= link_to "Prompts", admin_pipeline_prompts_path, class: "text-xs font-bold uppercase tracking-widest #{controller_name == 'pipeline_prompts' ? 'text-blue-400' : 'text-slate-500 hover:text-white transition-colors'}" %>
       </div>
 
       <div class="w-px h-3 bg-white/10 hidden md:block"></div>

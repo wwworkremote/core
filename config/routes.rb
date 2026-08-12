@@ -207,6 +207,7 @@ Rails.application.routes.draw do
   resources :job_searches
   namespace :admin do
     resources :skills
+    resources :pipeline_prompts
     root to: "dashboard#index"
     post "toggle_pause" => "dashboard#toggle_pause"
     get "observability" => "observability#index"
@@ -247,6 +248,7 @@ Rails.application.routes.draw do
     resources :tasks, only: %i[index create update destroy]
 
     resources :sources, only: %i[index show]
+    resources :leads, only: %i[index show]
     resources :queries, only: %i[index show]
     resources :documents, only: %i[index show destroy]
     resources :domains, only: %i[index show destroy]
@@ -305,7 +307,14 @@ Rails.application.routes.draw do
         post :enrich
       end
     end
-    # ... other api routes ...
+
+    resources :leads, only: %i[index show create] do
+      member do
+        post :promote
+      end
+    end
+
+    get "companies/search" => "companies#search"
   end
 
   scope :mounts do

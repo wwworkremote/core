@@ -18,8 +18,9 @@
 #
 # Indexes
 #
-#  index_companies_on_name  (name) UNIQUE
-#  index_companies_on_slug  (slug) UNIQUE
+#  index_companies_on_name       (name) UNIQUE
+#  index_companies_on_name_trgm  (name) USING gin
+#  index_companies_on_slug       (slug) UNIQUE
 #
 FactoryBot.define do
   factory :company do

@@ -146,6 +146,29 @@
     .checkbox-row label { margin: 0; font-size: 12px; color: var(--fg);
       text-transform: none; letter-spacing: normal; cursor: pointer; }
 
+    /* ── Company match picker (capture mode only) ───────────────────────────── */
+    #company-matches {
+      margin-top: 6px; padding: 6px; background: var(--bg-dark);
+      border: 1px solid var(--bg-mid); border-radius: var(--radius);
+    }
+    .company-match-label {
+      font-size: 9px; color: var(--comment); text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 4px;
+    }
+    .company-match-empty { font-size: 11px; color: var(--comment); padding: 3px 0; }
+    .company-match-option, .company-match-create {
+      display: block; width: 100%; text-align: left;
+      background: none; border: 1px solid transparent; border-radius: 4px;
+      color: var(--fg); font-family: var(--font); font-size: 11px;
+      padding: 4px 6px; margin-bottom: 2px; cursor: pointer;
+    }
+    .company-match-option:hover, .company-match-create:hover { background: var(--bg-mid); }
+    .company-match-option.selected, .company-match-create.selected {
+      border-color: var(--purple); background: var(--bg-mid);
+    }
+    .company-match-create { color: var(--purple); }
+    .company-match-loading { font-size: 11px; color: var(--comment); }
+
     #desc-meta { font-size: 10px; color: var(--comment); margin-top: 3px; text-align: right; }
 
     #apply-link {
@@ -168,7 +191,7 @@
     /* ── Empty state ──────────────────────────────────────────────────────── */
     #empty-state {
       display: none; flex-direction: column; align-items: center;
-      justify-content: center; height: 100%; gap: 10px;
+      justify-content: center; flex: 1; min-height: 0; gap: 10px;
       color: var(--comment); text-align: center; padding: 20px;
     }
     #empty-state .icon { font-size: 32px; }
@@ -177,6 +200,33 @@
       color: var(--yellow); background: var(--bg-dark);
       padding: 1px 5px; border-radius: 3px;
     }
+
+    /* ── Ingestion log (persistent, always visible) ─────────────────────────── */
+    #ingestion-log {
+      flex-shrink: 0; background: var(--bg-dark);
+      border-top: 1px solid var(--bg-mid);
+      padding: 8px 14px 10px; max-height: 160px; overflow-y: auto;
+    }
+    #ingestion-log-header {
+      font-size: 9px; color: var(--comment); text-transform: uppercase;
+      letter-spacing: 0.8px; margin-bottom: 6px;
+    }
+    .ingestion-log-item {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--bg-mid);
+      font-size: 10px; text-decoration: none;
+    }
+    .ingestion-log-item:last-child { border-bottom: none; }
+    .ingestion-log-item .ilog-main { min-width: 0; }
+    .ingestion-log-item .ilog-title {
+      color: var(--fg); font-weight: bold; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    .ingestion-log-item .ilog-company { color: var(--comment); font-size: 9px; }
+    .ingestion-log-item .ilog-status {
+      font-size: 9px; padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+    }
+    .ingestion-log-empty { font-size: 10px; color: var(--comment); padding: 4px 0; }
 
     /* ── Footer ───────────────────────────────────────────────────────────── */
     #footer {
@@ -208,8 +258,9 @@
   <!-- Empty state -->
   <div id="empty-state">
     <div class="icon">🔍</div>
-    <p>Open a job posting with <code>?wwr_id=NNN</code> appended,<br>
-    or click <strong>Source &amp; Enrich</strong> from a<br>WWWorkRemote job page.</p>
+    <p>On a supported job board's posting page, click<br>
+    <strong>↗ Capture This Job</strong> in the overlay. Or click<br>
+    <strong>Source &amp; Enrich</strong> from a WWWorkRemote job page.</p>
   </div>
 
   <!-- Staleness banner -->
@@ -225,7 +276,7 @@
       <span id="confidence-badge">—</span>
     </div>
     <div id="header-meta">
-      <span>ID: <b id="hdr-id">—</b></span>
+      <span><span id="hdr-id-label">ID:</span> <b id="hdr-id">—</b></span>
       <span>Board: <b id="hdr-board">—</b></span>
     </div>
     <div id="header-actions">
@@ -251,6 +302,7 @@
     <div class="field" id="fld-company">
       <div class="field-header"><label><span class="src missing" id="src-company"></span>Company</label></div>
       <input type="text" id="f-company" placeholder="Company name…" maxlength="255">
+      <div id="company-matches" style="display:none;"></div>
     </div>
 
     <div class="field" id="fld-location">
@@ -390,6 +442,12 @@
   <div id="footer" style="display:none">
     <button id="submit-btn" disabled>Submit to WWWorkRemote</button>
     <div id="status-line">Waiting for job data…</div>
+  </div>
+
+  <!-- Ingestion log — persistent, visible in every panel state -->
+  <div id="ingestion-log">
+    <div id="ingestion-log-header">Recent Ingestions</div>
+    <div id="ingestion-log-list"></div>
   </div>
 
 </div>

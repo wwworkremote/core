@@ -102,9 +102,20 @@
   <hr class="divider">
 
   <div class="note">
-    Opens on any job URL containing
-    <span style="color:#f1fa8c;">?wwr_id=NNN</span>
+    Shows a capture button on any supported board's job-detail page — click it
+    to ingest. Also opens on a URL containing
+    <span style="color:#f1fa8c;">?wwr_id=NNN</span> to enrich an existing posting.
   </div>
+
+  <hr class="divider">
+
+  <button class="save-btn" id="scan-page-btn" style="width:100%;padding:7px;">🔍 SCAN THIS PAGE</button>
+  <div class="note" style="margin-top:4px;">
+    For sites not in the supported list below. Scans <strong>only</strong> the
+    current tab, <strong>only</strong> when you click this — nothing runs
+    automatically on unsupported sites.
+  </div>
+  <div class="save-status" id="scan-status"></div>
 
   <hr class="divider">
 
@@ -147,7 +158,7 @@
     <li>Ashby</li>
     <li>SmartRecruiters</li>
     <li>Wellfound</li>
-    <li class="dim">+ generic fallback</li>
+    <li class="dim">+ any site, via Scan This Page</li>
   </ul>
 
   <script src="popup.js"></script>

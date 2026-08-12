@@ -1,0 +1,102 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1"><%= @lead.title.presence || "(untitled)" %></h1>
+    <p class="text-slate-500 font-bold text-sm"><%= @lead.company_name %></p>
+  </div>
+  <div>
+    <%= link_to admin_leads_path, class: "btn-neural text-sm" do %>
+      Back
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="lg:col-span-1 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-4">Details</h3>
+      <dl class="space-y-4 font-mono text-xs">
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Status</dt>
+          <dd><%= render "admin/leads/status_badge", lead: @lead %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Board</dt>
+          <dd class="text-white font-bold"><%= @lead.provider&.humanize %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Found At</dt>
+          <dd class="text-slate-400"><%= @lead.found_at&.strftime("%Y-%m-%d %H:%M:%S") %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Original Posting</dt>
+          <dd>
+            <%= link_to @lead.url, safe_job_url(@lead.url), target: "_blank", rel: "noopener",
+                        class: "text-blue-400 hover:text-blue-300 break-all" %>
+            <i class="bi bi-box-arrow-up-right text-xs text-slate-500 ml-1"></i>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-4">Linked Records</h3>
+      <dl class="space-y-4 font-mono text-xs">
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Job Posting</dt>
+          <dd>
+            <% if @lead.job_posting %>
+              <%= link_to "##{@lead.job_posting.id} — #{@lead.job_posting.title}",
+                          admin_job_posting_path(@lead.job_posting),
+                          class: "text-blue-400 hover:text-blue-300 font-bold" %>
+            <% else %>
+              <span class="text-slate-600">Not yet promoted</span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Company</dt>
+          <dd>
+            <% if @lead.company %>
+              <%= link_to @lead.company.name, admin_company_path(@lead.company),
+                          class: "text-blue-400 hover:text-blue-300 font-bold" %>
+            <% else %>
+              <span class="text-slate-600">None</span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Source</dt>
+          <dd class="text-white font-bold">
+            <%= @lead.source&.origin&.name || @lead.source&.name || "None" %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-6">Discovery Metadata</h3>
+      <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400 whitespace-pre-wrap overflow-x-auto leading-relaxed">
+<%= JSON.pretty_generate(@lead.discovery) %>
+      </div>
+    </div>
+
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-2">Raw Page Snapshot</h3>
+      <p class="text-slate-600 text-xs mb-4">
+        Captured HTML at the time of ingestion (may be truncated) — for reviewing extraction
+        quality and refining/adding board selectors over time.
+      </p>
+      <% if @lead.raw_html.present? %>
+        <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400 whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-[32rem] overflow-y-auto">
+<%= @lead.raw_html %>
+        </div>
+      <% else %>
+        <span class="text-slate-600 text-xs">No snapshot captured for this lead.</span>
+      <% end %>
+    </div>
+  </div>
+</div>

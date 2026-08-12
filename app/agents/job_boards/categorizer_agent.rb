@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class JobBoards::CategorizerAgent < RubyLLM::Agent
-  # The instructions macro will look for:
-  # app/prompts/job_boards/categorizer_agent/instructions.txt.erb
-  instructions
+  PROMPT_KEY = "job_boards_categorizer"
 
   # One cohesive orchestrator call -- splitting it further would obscure
   # it, not simplify it.
@@ -19,7 +17,22 @@ class JobBoards::CategorizerAgent < RubyLLM::Agent
   end
   # rubocop:enable Metrics/MethodLength
 
+  # LLM::Orchestrator#default_task_instructions calls this when a caller
+  # doesn't pass task_instructions: explicitly (see #call above) -- this
+  # is the actual prompt the categorization LLM call runs on. Admin-editable
+  # via PipelinePrompt (key: "job_boards_categorizer"); falls back to
+  # app/prompts/job_boards/categorizer_agent/instructions.txt.erb when no
+  # active override exists.
+  def render_instructions
+    PipelinePrompt.render_for(PROMPT_KEY) { default_instructions }
+  end
+
   private
+
+  def default_instructions
+    path = Rails.root.join("app/prompts/job_boards/categorizer_agent/instructions.txt.erb")
+    ERB.new(File.read(path)).result(binding)
+  end
 
   # One cohesive schema definition -- splitting it further would
   # obscure it, not simplify it.

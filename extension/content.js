@@ -1,8 +1,13 @@
 // WWWorkRemote Content Script — Rich Context Extraction
 //
-// Activated when a job board URL contains ?wwr_id=NNN.
-// The Rails app appends this parameter when the user clicks
-// SOURCE_ORIGIN_VERIFY_&_ENRICH on a job posting show page.
+// Two trigger modes:
+//   enrich  — URL contains ?wwr_id=NNN, appended by the Rails app when the
+//             user clicks SOURCE_ORIGIN_VERIFY_&_ENRICH on a job posting show
+//             page. Enriches that existing JobPosting.
+//   capture — free browsing, no wwr_id. Auto-detects a supported job board's
+//             detail page (confirmed via provider.readySelector) and creates
+//             a Lead, later promoted to a JobPosting once the user reviews
+//             and submits the panel.
 //
 // Extraction priority chain (highest confidence first):
 //   1. JSON-LD  Schema.org JobPosting — structured, authoritative, zero selector drift
@@ -14,9 +19,19 @@
 (function () {
   'use strict';
 
+  // Manual "Scan This Page" (popup.js) can inject this file more than once
+  // into the same tab -- avoid stacking duplicate overlays/listeners.
+  if (document.getElementById('wwr-enrichment-overlay')) return;
+
   const urlParams = new URLSearchParams(window.location.search);
   const wwrId = urlParams.get('wwr_id');
-  if (!wwrId) return;
+
+  // Set by popup.js's "Scan This Page" button immediately before injecting
+  // this file, via a separate executeScript call -- allows generic capture
+  // on a non-curated host for this one on-demand injection only. Consumed
+  // (cleared) immediately so it can't linger across any future re-injection.
+  const manualScan = !!window.__wwrManualScan;
+  window.__wwrManualScan = false;
 
   // ─── Structured console logger ─────────────────────────────────────────────
   // All logs prefixed [WWWR HH:MM:SS.mmm] — filter DevTools console by [WWWR].
@@ -31,8 +46,6 @@
     fn();
     console.groupEnd();
   };
-
-  LOG('Enrichment mode active — Job ID:', wwrId, '| URL:', window.location.href);
 
   // ─── Provider definitions ──────────────────────────────────────────────────
   //
@@ -314,6 +327,21 @@
 
   LOG('Provider detected:', provider ? provider.label : 'none — generic fallback');
 
+  // ─── Capture mode ──────────────────────────────────────────────────────────
+  // ?wwr_id=NNN means the Rails app linked us here to enrich a known posting
+  // (existing flow, trusted — proceeds regardless of provider match). With no
+  // wwr_id we're free-browsing: only proceed on a curated board, OR when this
+  // injection came from the "Scan This Page" popup button (manualScan) --
+  // this file is only ever injected on other sites via that explicit,
+  // one-tab, one-click action, never automatically.
+
+  const captureMode = wwrId ? 'enrich' : 'capture';
+  if (captureMode === 'capture' && !provider && !manualScan) return;
+
+  LOG(captureMode === 'enrich'
+    ? `Enrichment mode active — Job ID: ${wwrId} | URL: ${window.location.href}`
+    : `Capture mode active — provider: ${provider ? provider.label : 'generic (manual scan)'} | URL: ${window.location.href}`);
+
   // ─── Auto-expand truncated content ────────────────────────────────────────
   //
   // LinkedIn and Indeed truncate the job description behind a "Show more" button.
@@ -398,6 +426,27 @@
   // Legacy shim — keep callers that only need the URL working
   async function getApiBase() {
     return (await getApiConfig()).base;
+  }
+
+  // ─── API fetch (proxied through background) ────────────────────────────────
+  // Content scripts run in the page's own context, and some sites' CSP
+  // blocks their fetch() calls entirely (observed on LinkedIn: "TypeError:
+  // Failed to fetch"). The background service worker isn't subject to any
+  // page's CSP, so all API calls are relayed through it via API_FETCH.
+
+  function apiFetch(url, { method = 'GET', headers = {}, body, timeoutMs = 20000 } = {}) {
+    const messagePromise = new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'API_FETCH', url, method, headers, body }, response => {
+        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+        else if (!response) reject(new Error('No response from background'));
+        else if (response.ok === false && response.error) reject(new Error(response.error));
+        else resolve(response);
+      });
+    });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Timeout — is Rails running at ${url}?`)), timeoutMs)
+    );
+    return Promise.race([messagePromise, timeoutPromise]);
   }
 
   // ─── Extraction chain ──────────────────────────────────────────────────────
@@ -639,7 +688,9 @@
 
     <div id="wwr-body" style="padding:12px 12px 10px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-        <span style="color:#6272a4;">ID: <span style="color:#50fa7b;">#${esc(wwrId)}</span></span>
+        <span style="color:#6272a4;">${captureMode === 'enrich'
+          ? `ID: <span style="color:#50fa7b;">#${esc(wwrId)}</span>`
+          : '<span id="wwr-lead-status" style="color:#6272a4;">Not yet captured</span>'}</span>
         <span style="color:#6272a4;">Board:
           <span id="wwr-board" style="color:${provider ? '#f1fa8c' : '#ff5555'};">
             ${esc(provider ? provider.label : 'Unknown')}
@@ -649,7 +700,7 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;min-height:20px;">
         <span id="wwr-badge" style="font-size:10px;padding:2px 6px;border-radius:3px;background:#44475a;color:#6272a4;">
-          scanning…
+          ${captureMode === 'capture' ? 'ready' : 'scanning…'}
         </span>
         <span id="wwr-field-count" style="font-size:10px;color:#6272a4;"></span>
       </div>
@@ -667,10 +718,10 @@
         border:none; border-radius:4px;
         font-weight:bold; cursor:pointer; margin-bottom:8px;
         font-family:monospace; font-size:11px; letter-spacing:1px;
-      ">↗ OPEN REVIEW PANEL</button>
+      ">${captureMode === 'capture' ? '↗ CAPTURE THIS JOB' : '↗ OPEN REVIEW PANEL'}</button>
 
       <div id="wwr-status" style="text-align:center;font-size:10px;color:#6272a4;min-height:14px;">
-        Extracting…
+        ${captureMode === 'capture' ? 'Click to capture' : 'Extracting…'}
       </div>
 
       <div id="wwr-api-indicator" style="text-align:center;font-size:9px;color:#44475a;margin-top:5px;">
@@ -805,49 +856,101 @@
     return map[t] || t;
   }
 
-  // ─── Pre-extraction preview (fires immediately on page load) ───────────────
+  // ─── Extraction preview ─────────────────────────────────────────────────────
+  // Enrich mode: runs immediately on page load (trusted trigger). Capture
+  // mode: only runs when the user clicks the overlay button (see below).
 
   async function previewExtraction() {
     // Step 1: Auto-expand any truncated content
     await expandContent(provider);
 
-    // Step 2: Wait for SPA to render key elements
+    // Step 2: Wait for SPA to render key elements. A timeout here does NOT
+    // mean "not a job page" -- LinkedIn in particular is slow/inconsistent
+    // about this selector appearing even on genuine job-detail pages -- so
+    // we proceed with whatever the DOM has and let extraction itself decide.
     if (provider?.readySelector) {
       await waitForContent(provider.readySelector, provider.readyTimeout);
     }
 
     // Step 3: Run extraction chain and show preview
     const extracted = Extractor.run(document, provider);
+
+    // Step 3b: In capture mode, bail out only if extraction found essentially
+    // nothing -- a far more reliable "is this really a job page" signal than
+    // one CSS selector's timing, since JSON-LD/meta/generic fallbacks can
+    // still find a title even when the readySelector is slow or stale.
+    if (captureMode === 'capture' && !extracted.title && wordCount(extracted.description_text) < 20) {
+      LOG_WARN('No title or description found — not a job detail page.');
+      return null;
+    }
+
     setBadge(extracted._method, countFields(extracted));
     renderPreview(extracted);
     return extracted;
   }
 
   let cachedExtraction = null;
+  let leadId = null;
+  let leadCapturePromise = null;
 
-  // Run extraction then auto-open the panel
-  previewExtraction().then(e => {
-    cachedExtraction = e;
-    notifyPanel(e);
-  });
+  if (captureMode === 'enrich') {
+    // Trusted flow (user explicitly clicked "Source & Enrich" in the app) —
+    // extract and open the panel immediately, same as before.
+    previewExtraction().then(e => {
+      cachedExtraction = e;
+      notifyPanel(e);
+    });
+  }
+  // In capture mode, nothing runs automatically -- extraction, lead capture,
+  // and the panel all wait for the manual click below. Free browsing means
+  // this content script fires on every matching-hostname page, including
+  // search/listing pages, so a silent auto-run was too unreliable in practice.
 
-  // Manual trigger — opens/re-opens the panel (fallback if auto-open fails,
-  // or if user closed the panel and wants it back)
+  const EXTRACTING_PLACEHOLDER = { title: 'Extracting…', description_text: '', _method: 'pending', _confidence: 'low' };
+  const NOT_FOUND_PLACEHOLDER = {
+    title: '(not found)',
+    description_text: 'No job content found on this page.',
+    _method: 'pending', _confidence: 'low',
+  };
+
   document.getElementById('wwr-capture-btn').addEventListener('click', () => {
-    notifyPanel(cachedExtraction);
+    if (captureMode === 'enrich' || cachedExtraction) {
+      notifyPanel(cachedExtraction);
+      return;
+    }
+
+    // Open the panel synchronously, within this click's gesture window --
+    // chrome.sidePanel.open() rejects once any awaited work (extraction can
+    // take several seconds) pushes past the gesture's validity. Open first
+    // with a loading placeholder, then patch in real data once ready.
+    notifyPanel(EXTRACTING_PLACEHOLDER);
+    setStatus('Extracting…', '#bd93f9');
+
+    previewExtraction().then(e => {
+      if (!e) {
+        setStatus('No job content found on this page', '#ff5555');
+        notifyPanel(NOT_FOUND_PLACEHOLDER, { alreadyOpen: true });
+        return;
+      }
+      cachedExtraction = e;
+      captureLead(e);
+      notifyPanel(e, { alreadyOpen: true });
+    });
   });
 
   // ─── Open side panel ───────────────────────────────────────────────────────
   // Sends extraction state to the background service worker, which stores it
-  // in chrome.storage.session and calls chrome.sidePanel.open({ tabId }).
-  // Requires Chrome 116+ for auto-open without user gesture.
+  // in chrome.storage.session. First call per capture opens the panel
+  // (chrome.sidePanel.open); subsequent calls (alreadyOpen) just patch data.
 
-  function notifyPanel(extracted) {
+  function notifyPanel(extracted, { alreadyOpen = false } = {}) {
     if (!extracted) return;
-    setStatus('↗ Opening panel…', '#bd93f9');
+    if (!alreadyOpen) setStatus('↗ Opening panel…', '#bd93f9');
     chrome.runtime.sendMessage({
-      type:       'OPEN_PANEL',
+      type:       alreadyOpen ? 'UPDATE_PANEL_DATA' : 'OPEN_PANEL',
+      mode:       captureMode,
       wwrId,
+      leadId,
       extracted,
       provider:   provider ? provider.key : 'generic',
       pageUrl:    window.location.href,
@@ -855,13 +958,65 @@
     }, response => {
       if (chrome.runtime.lastError || !response?.ok) {
         const err = chrome.runtime.lastError?.message || response?.error || 'Could not open panel';
-        LOG_WARN('Panel open failed:', err);
-        setStatus('Panel unavailable — see console', '#ff5555');
-      } else {
+        LOG_WARN('Panel update failed:', err);
+        if (!alreadyOpen) setStatus('Panel unavailable — see console', '#ff5555');
+      } else if (!alreadyOpen) {
         setStatus('Panel open — review and submit', '#50fa7b');
         LOG_OK('Side panel opened');
       }
     });
+  }
+
+  // ─── Lead capture (capture mode only) ──────────────────────────────────────
+  // Fires the instant a job-detail page is confirmed, well before the user
+  // opens the panel. Idempotent server-side on the URL signature.
+
+  function captureLead(extracted) {
+    leadCapturePromise = performLeadCapture(extracted);
+    return leadCapturePromise;
+  }
+
+  async function performLeadCapture(extracted) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const { rawHtml, htmlTruncated } = captureHtmlSnapshot();
+    const payload = {
+      url:      window.location.href,
+      provider: provider ? provider.key : 'generic',
+      title:    extracted.title,
+      company_name: extracted.company,
+      location: extracted.location,
+      raw_html: rawHtml,
+      discovery: {
+        referrer:              document.referrer,
+        search_context:        window.location.search,
+        extraction_confidence: extracted._confidence,
+        extraction_method:     extracted._method,
+        html_truncated:        htmlTruncated,
+      },
+    };
+
+    LOG(`POST → ${apiBase}/api/leads`);
+    const headers = { 'Content-Type': 'application/json' };
+    if (authHeader) headers['Authorization'] = authHeader;
+
+    try {
+      const { ok, status, data } = await apiFetch(`${apiBase}/api/leads`, {
+        method: 'POST', headers, body: JSON.stringify(payload),
+      });
+      if (!ok || !data.success) throw new Error(data.error || `Server error ${status}`);
+
+      leadId = data.id;
+      LOG_OK(`Lead captured — #${leadId}`);
+      updateLeadStatus('Lead captured ✓', '#50fa7b');
+    } catch (err) {
+      LOG_ERR('Lead capture failed:', err);
+      updateLeadStatus('Lead capture failed', '#ff5555');
+    }
+  }
+
+  function updateLeadStatus(text, color) {
+    const el = document.getElementById('wwr-lead-status');
+    if (el) { el.textContent = text; el.style.color = color; }
   }
 
   // ─── Message handlers (from background, relayed from side panel) ──────────
@@ -870,7 +1025,7 @@
 
     // PANEL_SUBMIT: user clicked Submit in the panel — post to Rails API
     if (msg.type === 'PANEL_SUBMIT') {
-      handlePanelSubmit(msg.editedData, msg.wwrId)
+      handlePanelSubmit(msg.editedData)
         .then(result => sendResponse(result))
         .catch(err   => sendResponse({ ok: false, error: err.message }));
       return true;
@@ -883,6 +1038,10 @@
       setStatus(descOnly ? '↺ Re-reading description…' : '↺ Re-reading page…', '#bd93f9');
 
       previewExtraction().then(freshExtracted => {
+        if (!freshExtracted) {
+          sendResponse({ ok: false, error: 'Job content not found on this page.' });
+          return;
+        }
         cachedExtraction = freshExtracted;
         if (descOnly) {
           // Merge only description fields into existing panel state without clobbering edits
@@ -926,10 +1085,16 @@
   // Max HTML payload size — avoids hitting Rack's body limit on large SPAs
   const HTML_MAX_BYTES = 512 * 1024; // 512 KB
 
-  async function handlePanelSubmit(editedData, id) {
-    const { base: apiBase, authHeader } = await getApiConfig();
+  async function handlePanelSubmit(editedData) {
+    if (captureMode === 'capture') {
+      await leadCapturePromise;
+      if (!leadId) return { ok: false, error: 'Lead capture failed — cannot submit.' };
+      return submitPromote(editedData);
+    }
+    return submitEnrich(editedData);
+  }
 
-    // Truncate DOM snapshot if oversized
+  function captureHtmlSnapshot() {
     let rawHtml = document.body.innerHTML;
     let htmlTruncated = false;
     if (new Blob([rawHtml]).size > HTML_MAX_BYTES) {
@@ -938,56 +1103,92 @@
       rawHtml = new TextDecoder().decode(bytes.slice(0, HTML_MAX_BYTES));
       htmlTruncated = true;
     }
+    return { rawHtml, htmlTruncated };
+  }
 
-    LOG('Panel submit — editedData fields:', countFields(editedData),
+  async function submitEnrich(editedData) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const { rawHtml, htmlTruncated } = captureHtmlSnapshot();
+
+    LOG('Panel submit (enrich) — editedData fields:', countFields(editedData),
       '| desc words:', wordCount(editedData.description_text),
       '| html kb:', kbSize(rawHtml), htmlTruncated ? '(truncated)' : '',
       '| api:', apiBase);
 
     const payload = {
-      id,
-      html:      rawHtml,
+      id: wwrId,
+      html: rawHtml,
       html_truncated: htmlTruncated,
-      url:       window.location.href,
-      title:     document.title,
-      provider:  provider ? provider.key : 'generic',
+      url: window.location.href,
+      title: document.title,
+      provider: provider ? provider.key : 'generic',
       extracted: editedData,
     };
 
-    LOG(`POST → ${apiBase}/api/job_postings/${id}/enrich`);
+    return postJson(`${apiBase}/api/job_postings/${wwrId}/enrich`, payload, authHeader,
+      data => data.message || `Sync complete — Job #${wwrId} enriched`);
+  }
 
+  // ─── Promote (capture mode: Lead → JobPosting) ─────────────────────────────
+  // Mirrors JobPostingEnrichment::AttributeBuilder::JSONB_KEYS server-side so
+  // the same extracted fields land in JobPosting#data either way.
+  const PROMOTE_DATA_KEYS = [
+    'salary_min', 'salary_max', 'salary_currency', 'salary_unit', 'salary',
+    'employment_type', 'remote', 'experience', 'valid_through',
+    'education', 'qualifications', 'responsibilities', 'benefits',
+    'company_logo_url', 'industry',
+  ];
+
+  function buildPromotePayload(editedData) {
+    const data = {};
+    for (const key of PROMOTE_DATA_KEYS) {
+      if (editedData[key] !== undefined && editedData[key] !== null && editedData[key] !== '') {
+        data[key] = editedData[key];
+      }
+    }
+    if (editedData.skills) data.skills = editedData.skills;
+
+    const payload = {
+      title: editedData.title,
+      location: editedData.location,
+      target_url: editedData.apply_url || window.location.href,
+      body: editedData.description_text,
+      data,
+    };
+    if (editedData.company_id) {
+      payload.company_id = editedData.company_id;
+    } else if (editedData.company) {
+      payload.company = { name: editedData.company };
+    }
+    return payload;
+  }
+
+  async function submitPromote(editedData) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+
+    LOG('Panel submit (capture) — editedData fields:', countFields(editedData), '| api:', apiBase);
+
+    const payload = buildPromotePayload(editedData);
+    return postJson(`${apiBase}/api/leads/${leadId}/promote`, payload, authHeader,
+      data => `Sync complete — Job #${data.job_posting_id} created`);
+  }
+
+  async function postJson(url, payload, authHeader, successMessage) {
+    LOG(`POST → ${url}`);
     const headers = { 'Content-Type': 'application/json' };
     if (authHeader) headers['Authorization'] = authHeader;
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 20000);
-
     try {
-      const response = await fetch(`${apiBase}/api/job_postings/${id}/enrich`, {
-        method:  'POST',
-        headers,
-        body:    JSON.stringify(payload),
-        signal:  controller.signal,
-      });
-      clearTimeout(timer);
+      const { ok, status, data } = await apiFetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
+      if (!ok) throw new Error(data.error || `Server error ${status}`);
 
-      let data = {};
-      try { data = await response.json(); } catch (_) {}
-
-      if (response.ok) {
-        LOG_OK(`Sync complete — Job #${id} enriched`);
-        setStatus('✨ SYNC COMPLETE', '#50fa7b');
-        return { ok: true, message: data.message };
-      } else {
-        throw new Error(data.error || `Server error ${response.status}`);
-      }
+      const message = successMessage(data);
+      LOG_OK(message);
+      setStatus('✨ SYNC COMPLETE', '#50fa7b');
+      return { ok: true, message };
     } catch (err) {
-      clearTimeout(timer);
-      const msg = err.name === 'AbortError'
-        ? `Timeout — is Rails running at ${apiBase}?`
-        : err.message;
       LOG_ERR('Panel submit failed:', err);
-      return { ok: false, error: msg };
+      return { ok: false, error: err.message };
     }
   }
 

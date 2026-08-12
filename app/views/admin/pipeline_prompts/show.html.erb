@@ -1,0 +1,43 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1"><%= @pipeline_prompt.name %></h1>
+    <p class="text-slate-500 font-bold text-sm font-mono"><%= @pipeline_prompt.key %></p>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_admin_pipeline_prompt_path(@pipeline_prompt), class: "btn btn-primary rounded-xl px-10 font-bold" %>
+    <%= link_to "Back", admin_pipeline_prompts_path, class: "btn-neural text-sm" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="card-neural p-6">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Details</h3>
+    <dl class="space-y-4 font-mono text-xs">
+       <div>
+          <dt class="text-slate-500 font-bold mb-1">Stage</dt>
+          <dd class="text-white font-bold"><%= @pipeline_prompt.stage %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Status</dt>
+          <dd class="<%= @pipeline_prompt.active? ? 'text-emerald-400' : 'text-slate-500' %> font-bold">
+            <%= @pipeline_prompt.active? ? "Active" : "Inactive" %>
+          </dd>
+        </div>
+        <% if @pipeline_prompt.description.present? %>
+          <div>
+            <dt class="text-slate-500 font-bold mb-1">Description</dt>
+            <dd class="text-slate-300 font-sans"><%= @pipeline_prompt.description %></dd>
+          </div>
+        <% end %>
+    </dl>
+  </div>
+
+  <div class="lg:col-span-2 card-neural p-6">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Prompt Body</h3>
+    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-300 whitespace-pre-wrap overflow-x-auto leading-relaxed">
+      <%= @pipeline_prompt.body %>
+    </div>
+  </div>
+</div>

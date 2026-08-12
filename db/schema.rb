@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -131,6 +131,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
     t.boolean "toxic_culture_flag"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_companies_on_name", unique: true
+    t.index ["name"], name: "index_companies_on_name_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["slug"], name: "index_companies_on_slug", unique: true
   end
 
@@ -405,6 +406,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
     t.index ["user_id"], name: "index_job_searches_on_user_id"
   end
 
+  create_table "leads", force: :cascade do |t|
+    t.bigint "company_id"
+    t.string "company_name"
+    t.datetime "created_at", null: false
+    t.jsonb "discovery", default: {}, null: false
+    t.datetime "found_at", null: false
+    t.bigint "job_posting_id"
+    t.string "location"
+    t.string "provider", null: false
+    t.text "raw_html"
+    t.string "signature", null: false
+    t.bigint "source_id"
+    t.string "status", default: "captured", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.index ["company_id"], name: "index_leads_on_company_id"
+    t.index ["discovery"], name: "index_leads_on_discovery", opclass: :jsonb_path_ops, using: :gin
+    t.index ["job_posting_id"], name: "index_leads_on_job_posting_id"
+    t.index ["signature"], name: "index_leads_on_signature", unique: true
+    t.index ["source_id"], name: "index_leads_on_source_id"
+    t.index ["status"], name: "index_leads_on_status"
+  end
+
   create_table "llm_chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "model_id"
@@ -490,6 +515,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
     t.float "total_time"
     t.text "user"
     t.index ["database", "captured_at"], name: "index_pghero_query_stats_on_database_and_captured_at"
+  end
+
+  create_table "pipeline_prompts", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "key", null: false
+    t.string "name", null: false
+    t.string "stage", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_pipeline_prompts_on_key", unique: true
   end
 
   create_table "pipeline_steps", force: :cascade do |t|
@@ -750,6 +787,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
     t.text "notes"
     t.boolean "priority_flag"
     t.string "status"
+    t.jsonb "strategy", default: {}, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
@@ -818,6 +856,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_174429) do
   add_foreign_key "job_postings", "sources"
   add_foreign_key "job_searches", "resumes"
   add_foreign_key "job_searches", "users"
+  add_foreign_key "leads", "companies"
+  add_foreign_key "leads", "job_postings"
+  add_foreign_key "leads", "sources"
   add_foreign_key "llm_chats", "models"
   add_foreign_key "llm_messages", "llm_chats"
   add_foreign_key "llm_messages", "models"

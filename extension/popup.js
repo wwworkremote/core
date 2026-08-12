@@ -50,4 +50,40 @@ document.addEventListener('DOMContentLoaded', () => {
   [urlInput, emailInput, passInput].forEach(el => {
     el.addEventListener('keydown', e => { if (e.key === 'Enter') save(); });
   });
+
+  // ── Scan This Page ─────────────────────────────────────────────────────
+  // On-demand only: injects content.js into the current tab, once, right
+  // now. Uses activeTab (temporary, gesture-scoped access to just this tab)
+  // rather than any broad host permission -- nothing runs on any other site,
+  // ever, unless this button is clicked on that specific tab.
+  const scanBtn    = document.getElementById('scan-page-btn');
+  const scanStatus = document.getElementById('scan-status');
+
+  scanBtn.addEventListener('click', async () => {
+    scanStatus.textContent = 'Scanning…';
+    scanStatus.style.color = '#bd93f9';
+
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab?.id) throw new Error('No active tab');
+
+      // Flag read by content.js to allow generic (non-curated-board) capture
+      // for this one injection only.
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => { window.__wwrManualScan = true; },
+      });
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js'],
+      });
+
+      scanStatus.textContent = '✓ Scanning tab — check the page';
+      scanStatus.style.color = '#50fa7b';
+      setTimeout(() => window.close(), 900);
+    } catch (err) {
+      scanStatus.textContent = '✗ ' + err.message;
+      scanStatus.style.color = '#ff5555';
+    }
+  });
 });

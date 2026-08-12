@@ -3,6 +3,8 @@
 # Service to audit a company's reputation based on Glassdoor feedback and statistics.
 # It identifies favorable/neutral/toxic dispositions and flags cultural red flags.
 class LLM::CompanyAuditor
+  PROMPT_KEY = "company_auditor"
+
   def self.call(company, raw_feedback)
     new(company, raw_feedback).call
   end
@@ -64,7 +66,15 @@ class LLM::CompanyAuditor
   end
   # rubocop:enable Metrics/MethodLength
 
+  # Admin-editable via PipelinePrompt (key: "company_auditor"); falls back
+  # to #default_audit_prompt when no active override exists.
   def audit_prompt
+    PipelinePrompt.render_for(PROMPT_KEY, company_name: @company.name, raw_feedback: @raw_feedback) do
+      default_audit_prompt
+    end
+  end
+
+  def default_audit_prompt
     <<~PROMPT
       [SYSTEM_OBJECTIVE]
       Analyze the following Glassdoor feedback for company: #{@company.name}.

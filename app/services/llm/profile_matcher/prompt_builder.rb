@@ -5,6 +5,8 @@
 # context against a JobPosting -- split out to keep ProfileMatcher itself
 # under Metrics/ClassLength.
 class LLM::ProfileMatcher::PromptBuilder
+  PROMPT_KEY = "profile_matcher_deep_scan"
+
   def self.call(...)
     new(...).call
   end
@@ -14,12 +16,29 @@ class LLM::ProfileMatcher::PromptBuilder
     @job_posting = job_posting
   end
 
+  # Admin-editable via PipelinePrompt (key: "profile_matcher_deep_scan");
+  # falls back to #default_prompt when no active override exists.
+  def call
+    PipelinePrompt.render_for(PROMPT_KEY, prompt_locals) { default_prompt }
+  end
+
+  private
+
+  def prompt_locals
+    { profile: @profile, job_posting: @job_posting, experiences_context: experiences_context,
+      github_synthesis: github_synthesis, extra_documents: extra_documents }
+  end
+
+  def github_synthesis
+    @profile.github_context&.dig("synthesis") || "No GitHub context available."
+  end
+
   # One cohesive template with many interpolated fields -- splitting it
   # would fragment a single prompt into unreadable pieces for no real
   # simplification, so the AbcSize overage here is accepted rather than
   # mechanically chased.
   # rubocop:disable Metrics/AbcSize
-  def call
+  def default_prompt
     <<~PROMPT
       [SYSTEM_OBJECTIVE]
       Perform a deep semantic alignment scan between the following CANDIDATE_PROFILE and JOB_POSTING.
@@ -59,8 +78,6 @@ class LLM::ProfileMatcher::PromptBuilder
     PROMPT
   end
   # rubocop:enable Metrics/AbcSize
-
-  private
 
   def experiences_context
     top_experiences.map { |exp| experience_block(exp) }.join("\n\n")
