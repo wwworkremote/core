@@ -30,6 +30,5 @@ admin = User
         .create_with(name:, email:, password:, password_confirmation:)
         .find_or_initialize_by(slug:)
 
-admin.skip_confirmation!
 admin.save!
 puts " - Admin: #{email} / #{password}"
