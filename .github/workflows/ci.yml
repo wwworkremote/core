@@ -42,6 +42,17 @@ jobs:
           ruby-version: 4.0.6
           bundler-cache: true
 
+      # tailwindcss:build resolves plugins (daisyui) via Node module
+      # resolution, not RubyGems -- needs node_modules present first.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install JS dependencies
+        run: npm ci
+
       # db:prepare would also run db/seeds.rb -- the RSpec suite builds its
       # own data via factories and doesn't expect seeded rows (e.g. sources
       # with slugs the same as job_boards_source factory defaults), so this
