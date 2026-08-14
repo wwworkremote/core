@@ -17,8 +17,8 @@ RSpec.describe "User Pipeline UX" do
     visit job_posting_path(job)
 
     # 1. Favorite the job
-    click_on "MARK_AS_FAVORITE"
-    expect(page).to have_text(/RECORD_FAVORITED/i)
+    click_on "Mark Favorite"
+    expect(page).to have_text(/Job status updated/i)
 
     # 2. Run AI Match (Mocked)
     mock_output = "### AI ANALYSIS\n- **MATCH_CONFIDENCE**: 95%\n- **STRENGTHS**: Expert level."
@@ -26,13 +26,13 @@ RSpec.describe "User Pipeline UX" do
     stub_request(:post, "http://localhost:11500/v1/chat/completions")
       .to_return(status: 200, body: sse_body, headers: { "Content-Type" => "text/event-stream" })
 
-    click_on "RUN_ALIGNMENT_SCAN"
+    click_on "Check Match"
     expect(page).to have_text(/AI alignment scan complete/i)
     expect(page).to have_text(/Expert level/i)
 
     # 3. Add a personal note
-    fill_in "APPEND_PRIVATE_CONTEXT...", with: "I know the CTO here."
-    click_on "SAVE_INTERNAL_NOTES"
+    fill_in "Add a personal note...", with: "I know the CTO here."
+    click_on "Save Note"
     expect(page).to have_text(/Job record updated/i)
   end
 

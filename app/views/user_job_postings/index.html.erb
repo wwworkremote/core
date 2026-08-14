@@ -1,20 +1,20 @@
 <div class="max-w-6xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
       <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">User_Job_Orchestration</span>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white">Saved Jobs</span>
     </div>
   </div>
 
   <header class="mb-12">
-    <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none">My Jobs</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Tracked opportunities and application pipeline.</p>
+    <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none">My Jobs</h1>
+    <p class="text-slate-500 font-bold text-sm">Jobs you've favorited or applied to.</p>
   </header>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
     <div class="space-y-6">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b border-primary/10 pb-4">Favorited_Opportunities</h3>
+      <h3 class="text-xs font-bold text-primary border-b border-primary/10 pb-4">Favorites</h3>
       <% if @favorites.any? %>
         <div class="space-y-4">
           <% @favorites.each do |user_job| %>
@@ -22,56 +22,56 @@
             <div class="card-neural p-6 hover:border-primary/50 transition-all group">
               <div class="flex justify-between items-start">
                 <div>
-                  <div class="text-[9px] font-black uppercase text-slate-500 mb-1"><%= job.company_name %></div>
+                  <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
                   <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors"><%= link_to job.title, job_posting_path(job) %></h4>
 
                   <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                     <% if job.data['is_remote'] %>
-                      <span class="text-[9px] font-black uppercase text-emerald-500 flex items-center gap-1">
-                        <i class="bi bi-broadcast"></i> Actually_Remote
+                      <span class="text-xs font-bold text-emerald-500 flex items-center gap-1">
+                        <i class="bi bi-broadcast"></i> Remote
                       </span>
                     <% end %>
 
                     <% if job.data['salary_min'] || job.data['salary_max'] %>
-                      <span class="text-[9px] font-black uppercase text-amber-500 flex items-center gap-1">
+                      <span class="text-xs font-bold text-amber-500 flex items-center gap-1">
                         <i class="bi bi-cash-stack"></i> <%= number_to_currency(job.data['salary_min'], precision: 0) %> - <%= number_to_currency(job.data['salary_max'], precision: 0) %>
                       </span>
                     <% end %>
                   </div>
                 </div>
-                <%= button_to "X", user_job_posting_path(user_job), method: :delete, class: "text-rose-500 text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity" %>
+                <%= button_to "×", user_job_posting_path(user_job), method: :delete, class: "text-rose-500 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity", title: "Remove" %>
               </div>
               <div class="mt-4 flex gap-2">
-                <%= button_to "MARK_APPLIED", user_job_postings_path(job_posting_id: job.id, status: 'applied'), class: "btn btn-xs rounded-lg bg-emerald-900/20 text-emerald-500 border-none font-black text-[9px]" %>
+                <%= button_to "Mark Applied", user_job_postings_path(job_posting_id: job.id, status: 'applied'), class: "btn btn-xs rounded-lg bg-emerald-900/20 text-emerald-500 border-none font-bold" %>
               </div>
             </div>
           <% end %>
         </div>
       <% else %>
-        <div class="text-center py-10 card-neural border-dashed opacity-50">
-          <div class="text-[10px] font-black uppercase tracking-widest">No favorites yet.</div>
+        <div class="text-center py-10 card-neural border-dashed opacity-60">
+          <div class="text-sm font-bold">No favorites yet.</div>
         </div>
       <% end %>
     </div>
 
     <div class="space-y-6">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-accent border-b border-accent/10 pb-4">Application_Pipeline</h3>
+      <h3 class="text-xs font-bold text-accent border-b border-accent/10 pb-4">Applications</h3>
       <% if @applied.any? %>
         <div class="space-y-4">
           <% @applied.each do |user_job| %>
             <% job = user_job.job_posting %>
             <div class="card-neural p-6 border-accent/20">
-              <div class="text-[9px] font-black uppercase text-slate-500 mb-1"><%= job.company_name %></div>
+              <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
               <h4 class="text-lg font-black text-white"><%= link_to job.title, job_posting_path(job) %></h4>
               <div class="mt-4 flex gap-2">
-                <span class="px-2 py-1 rounded bg-accent/20 text-accent text-[9px] font-black uppercase tracking-widest border border-accent/10">APPLIED</span>
+                <span class="px-2 py-1 rounded bg-accent/20 text-accent text-xs font-bold border border-accent/10">Applied</span>
               </div>
             </div>
           <% end %>
         </div>
       <% else %>
-        <div class="text-center py-10 card-neural border-dashed opacity-50">
-          <div class="text-[10px] font-black uppercase tracking-widest">No active applications.</div>
+        <div class="text-center py-10 card-neural border-dashed opacity-60">
+          <div class="text-sm font-bold">No active applications.</div>
         </div>
       <% end %>
     </div>

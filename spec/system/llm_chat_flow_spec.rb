@@ -25,7 +25,7 @@ RSpec.describe "Neural Dialogue UX", :js do
     fill_in "llm_chat[prompt]", with: "Explain Ruby blocks."
     stub_llm_response("Ruby blocks are chunks of code.")
 
-    click_button "Establish Neural Link"
+    click_button "Start Chat"
     expect(page).to have_text(/Neural link established/i)
 
     # Manually trigger the response job
@@ -36,7 +36,7 @@ RSpec.describe "Neural Dialogue UX", :js do
     expect(chat.llm_messages.where(role: "assistant").last.content).to include("Ruby blocks are chunks of code")
 
     # Send a follow up
-    fill_in "Describe your objective...", with: "Give an example."
+    fill_in "Type a message…", with: "Give an example."
     stub_llm_response("3.times { puts 'hello' }")
 
     click_on "Send"

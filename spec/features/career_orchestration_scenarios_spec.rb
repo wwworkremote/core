@@ -37,7 +37,7 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
     allow(Resume::EmbeddingJob).to receive(:perform_later)
 
     visit career_profile_path
-    click_button "SYNC_FROM_YAML", wait: 10
+    click_button "Sync from File", wait: 10
 
     # Verify sync by checking for content that should be in the DB after sync
     expect(page).to have_text(/Career Profile/i)
@@ -56,7 +56,7 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
     allow(LLM::Orchestrator).to receive(:call).and_return({ success: true, output: mock_analysis })
 
     # Use a very specific button matcher
-    click_button "RUN_ALIGNMENT_SCAN"
+    click_button "Check Match"
     expect(page).to have_text(/scan complete/i)
     expect(page).to have_text("MATCH_CONFIDENCE: 92%")
     expect(LLM::Orchestrator).to have_received(:call).at_least(:once)
@@ -64,7 +64,7 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
     # 3. Priority Recognition
     visit root_path
     expect(page).to have_text(job_posting.title)
-    expect(page).to have_text(/HIGH_CONFIDENCE/i)
+    expect(page).to have_text(/High Match/i)
   end
   # rubocop:enable RSpec/ExampleLength
 end

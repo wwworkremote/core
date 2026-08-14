@@ -1,18 +1,18 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
-    <h1 class="text-4xl font-black text-white mb-2 uppercase italic tracking-tight">System_Administration</h1>
-    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Direct control over the core database registry</p>
+    <h1 class="text-4xl font-black text-white mb-2 tracking-tight">Admin Dashboard</h1>
+    <p class="text-slate-400 font-bold text-sm">Manage the database and ingestion pipeline.</p>
   </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
   <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Job_Signals</div>
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Job Postings</div>
       <div class="stat-value text-primary text-5xl font-black tracking-tighter"><%= @job_postings_count %></div>
       <div class="stat-actions mt-6">
-        <%= link_to admin_job_postings_path, class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
-          MANAGE_POSTINGS
+        <%= link_to admin_job_postings_path, class: "btn btn-primary btn-sm rounded-lg font-bold text-xs w-full shadow-lg" do %>
+          Manage Postings
         <% end %>
       </div>
     </div>
@@ -20,11 +20,11 @@
 
   <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Managed_Entities</div>
-      <div class="stat-value text-dracula-cyan text-5xl font-black tracking-tighter"><%= Company.count %></div>
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Companies</div>
+      <div class="stat-value text-kanagawa-accent text-5xl font-black tracking-tighter"><%= Company.count %></div>
       <div class="stat-actions mt-6">
-        <%= link_to admin_companies_path, class: "btn btn-ghost border-white/20 btn-sm rounded-lg font-black tracking-widest text-xs w-full" do %>
-          ENTITY_CONTROL
+        <%= link_to admin_companies_path, class: "btn btn-ghost border-white/20 btn-sm rounded-lg font-bold text-xs w-full" do %>
+          Manage Companies
         <% end %>
       </div>
     </div>
@@ -32,11 +32,11 @@
 
   <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Raw_Corpus</div>
-      <div class="stat-value text-dracula-green text-5xl font-black tracking-tighter"><%= @sources_count %></div>
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Sources</div>
+      <div class="stat-value text-kanagawa-green text-5xl font-black tracking-tighter"><%= @sources_count %></div>
       <div class="stat-actions mt-6">
-        <button disabled class="btn btn-disabled btn-sm rounded-lg font-black tracking-widest text-xs w-full opacity-40">
-          DOC_VIEW_LOCKED
+        <button disabled class="btn btn-disabled btn-sm rounded-lg font-bold text-xs w-full opacity-50">
+          View Disabled
         </button>
       </div>
     </div>
@@ -44,62 +44,50 @@
 
   <div class="stats bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
-      <div class="stat-title text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Active_Nodes</div>
-      <div class="stat-value text-dracula-pink text-5xl font-black tracking-tighter"><%= @active_fetchers_count %></div>
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Active Sources</div>
+      <div class="stat-value text-kanagawa-yellow text-5xl font-black tracking-tighter"><%= @active_fetchers_count %></div>
       <div class="stat-actions mt-6">
-        <%= link_to data_fetchers_path, class: "btn btn-ghost border-white/20 btn-sm rounded-lg font-black tracking-widest text-xs w-full" do %>
-          INGESTION_CONTROL
+        <%= link_to data_fetchers_path, class: "btn btn-ghost border-white/20 btn-sm rounded-lg font-bold text-xs w-full" do %>
+          Manage Sources
         <% end %>
       </div>
     </div>
   </div>
 </div>
 
-<article class="bg-base-200 border border-white/10 rounded-2xl p-10 shadow-2xl">
-  <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-8 pb-4 border-b border-white/10">Administration_Protocol</h2>
-  <div class="prose max-w-none text-sm font-semibold text-slate-300 leading-relaxed">
-    <p>This administrative environment is tuned for high-density legibility and **A11y compliance**. All metrics use the official **Dracula Pro** palette with reinforced font weights for maximum stroke visibility.</p>
-    <ul class="list-disc pl-5 space-y-3 mt-6 text-xs font-black uppercase tracking-widest text-slate-400">
-      <li>Subpixel-antialiased typography for sharp technical data</li>
-      <li>Official Dracula Pro palette with verified contrast ratios</li>
-      <li>Functional, high-contrast UI components for daily operations</li>
-    </ul>
-  </div>
-</article>
-
 <div class="mt-16">
-  <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-8 pb-4 border-b border-white/10">System_Mounts</h2>
+  <h2 class="text-xs font-bold text-slate-400 mb-8 pb-4 border-b border-white/10">System Tools</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <div class="card-admin p-8 flex flex-col justify-between">
       <div>
-        <div class="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Database_Intelligence</div>
-        <h3 class="text-xl font-black mb-4 italic uppercase">PgHero_Node</h3>
+        <div class="text-xs font-bold text-primary mb-2">Database</div>
+        <h3 class="text-xl font-black mb-4">PgHero</h3>
         <p class="text-xs text-slate-500 font-bold leading-relaxed mb-6">Real-time query analysis and database health monitoring.</p>
       </div>
-      <%= link_to "/mounts/pghero", class: "btn btn-primary btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
-        ACCESS_PGHERO
+      <%= link_to "/mounts/pghero", class: "btn btn-primary btn-sm rounded-lg font-bold text-xs w-full shadow-lg" do %>
+        Open PgHero
       <% end %>
     </div>
 
     <div class="card-admin p-8 flex flex-col justify-between">
       <div>
-        <div class="text-[10px] font-black text-secondary uppercase tracking-widest mb-2">Job_Orchestration</div>
-        <h3 class="text-xl font-black mb-4 italic uppercase">Mission_Control</h3>
+        <div class="text-xs font-bold text-secondary mb-2">Background Jobs</div>
+        <h3 class="text-xl font-black mb-4">Job Queue</h3>
         <p class="text-xs text-slate-500 font-bold leading-relaxed mb-6">Solid Queue supervisor for monitoring and managing background workers.</p>
       </div>
-      <%= link_to "/mounts/jobs", class: "btn btn-secondary btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
-        ACCESS_JOBS
+      <%= link_to "/mounts/jobs", class: "btn btn-secondary btn-sm rounded-lg font-bold text-xs w-full shadow-lg" do %>
+        Open Job Queue
       <% end %>
     </div>
 
     <div class="card-admin p-8 flex flex-col justify-between">
       <div>
-        <div class="text-[10px] font-black text-accent uppercase tracking-widest mb-2">Behavioral_Telemetry</div>
-        <h3 class="text-xl font-black mb-4 italic uppercase">Ahoy_Captain</h3>
+        <div class="text-xs font-bold text-accent mb-2">Analytics</div>
+        <h3 class="text-xl font-black mb-4">Analytics</h3>
         <p class="text-xs text-slate-500 font-bold leading-relaxed mb-6">Visual analytics for visits, events, and user conversion funnels.</p>
       </div>
-      <%= link_to "/mounts/analytics", class: "btn btn-accent btn-sm rounded-lg font-black tracking-widest text-xs w-full shadow-lg" do %>
-        ACCESS_ANALYTICS
+      <%= link_to "/mounts/analytics", class: "btn btn-accent btn-sm rounded-lg font-bold text-xs w-full shadow-lg" do %>
+        Open Analytics
       <% end %>
     </div>
   </div>

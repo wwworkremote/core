@@ -1,49 +1,49 @@
 <div class="max-w-4xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
-      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <%= link_to "Resume_Registry", resumes_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">Configure_Node</span>
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <%= link_to t('.breadcrumb_resumes'), resumes_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white"><%= @resume.new_record? ? t('.breadcrumb_new') : t('.breadcrumb_edit') %></span>
     </div>
   </div>
 
   <div class="mb-12">
-    <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none mb-3">
-      <%= @resume.new_record? ? "Initiate New Version" : "Reconfigure Version" %>
+    <h1 class="text-4xl font-black text-white tracking-tight leading-none mb-3">
+      <%= @resume.new_record? ? t('.new_title') : t('.edit_title') %>
     </h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Define the professional context for this neural node.</p>
+    <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
   </div>
 
   <div class="card-neural p-8">
     <%= form_with(model: @resume, class: "space-y-8") do |f| %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="form-control">
-          <%= f.label :name, "TRACK_NAME", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+          <%= f.label :name, t('.name_label'), class: "label text-xs font-bold text-slate-500" %>
           <%= f.text_field :name, placeholder: "e.g., Senior Backend Engineer", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
           <label class="label">
-            <span class="label-text-alt text-[9px] text-slate-600">Group versions by track name.</span>
+            <span class="label-text-alt text-xs text-slate-500"><%= t('.name_helper') %></span>
           </label>
         </div>
 
         <div class="form-control">
-          <%= f.label :status, "DEPLOYMENT_STATUS", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
-          <%= f.select :status, Resume.statuses.keys.map { |s| [s.humanize.upcase, s] }, {}, class: "select select-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
+          <%= f.label :status, t('.status_label'), class: "label text-xs font-bold text-slate-500" %>
+          <%= f.select :status, Resume.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "select select-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
         </div>
       </div>
 
       <div class="form-control">
-        <%= f.label :content, "STRUCTURED_JSON_CONTEXT", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+        <%= f.label :content, t('.content_label'), class: "label text-xs font-bold text-slate-500" %>
         <%= f.text_area :content, value: @resume.content.to_json, rows: 15, class: "textarea textarea-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white font-mono text-xs leading-relaxed", placeholder: '{"summary": "...", "experience": []}' %>
         <label class="label">
-          <span class="label-text-alt text-[9px] text-slate-600">Provide structured resume data for multi-format projection and neural embedding.</span>
+          <span class="label-text-alt text-xs text-slate-500"><%= t('.content_helper') %></span>
         </label>
       </div>
 
       <div class="pt-6 border-t border-white/5 flex justify-end gap-4">
-        <%= link_to "ABORT_CONFIGURATION", resumes_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px]" %>
-        <%= f.submit (@resume.new_record? ? "CREATE_VERSION" : "UPDATE_VERSION"), class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+        <%= link_to t('.cancel'), resumes_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold" %>
+        <%= f.submit (@resume.new_record? ? t('.create') : t('.update')), class: "btn btn-primary rounded-xl px-10 font-bold" %>
       </div>
     <% end %>
   </div>

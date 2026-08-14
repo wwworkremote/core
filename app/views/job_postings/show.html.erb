@@ -1,10 +1,10 @@
 <% content_for :title, "#{@job_posting.title} | WWWorkRemote" %>
 
-<div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+<div class="mb-10 text-xs font-bold opacity-60">
   <div class="flex items-center gap-3">
-    <%= link_to "Job_Market", job_postings_path, class: "hover:text-primary transition-all" %>
-    <i class="bi bi-chevron-right text-[8px]"></i>
-    <span class="text-white">Neural_Node_<%= @job_posting.id %></span>
+    <%= link_to t('.breadcrumb_root'), job_postings_path, class: "hover:text-primary transition-all" %>
+    <i class="bi bi-chevron-right text-xs"></i>
+    <span class="text-white"><%= truncate(@job_posting.title, length: 48) %></span>
   </div>
 </div>
 
@@ -16,77 +16,77 @@
       </div>
 
       <div class="relative z-10">
-        <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none"><%= @job_posting.title %></h1>
-        <p class="text-xl font-bold text-secondary mb-8 tracking-widest uppercase">
+        <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= @job_posting.title %></h1>
+        <p class="text-xl font-bold text-secondary mb-8">
           <%= link_to @job_posting.company_name, job_postings_path(company: @job_posting.company_name), class: "hover:underline" %>
         </p>
 
-        <div class="flex flex-wrap gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">
+        <div class="flex flex-wrap gap-6 text-xs font-bold text-base-content/60">
           <div class="flex items-center gap-2">
             <%= heroicon "map-pin", variant: :solid, options: { class: "w-4 h-4 text-primary" } %>
-            <span class="text-white"><%= @job_posting.location || "GLOBAL_REMOTE" %></span>
+            <span class="text-white"><%= @job_posting.location.presence || t('.remote_fallback') %></span>
           </div>
           <div class="flex items-center gap-2">
             <%= heroicon "calendar-days", options: { class: "w-4 h-4 text-accent" } %>
-            <span class="text-white">SYNCED_<%= @job_posting.published_at&.strftime("%Y_%m_%d") || "NULL" %></span>
+            <span class="text-white"><%= t('.posted_prefix') %> <%= @job_posting.published_at&.strftime("%b %-d, %Y") || t('.posted_unknown') %></span>
           </div>
           <div class="flex items-center gap-2">
             <%= heroicon "clock", options: { class: "w-4 h-4 text-warning" } %>
-            <span class="text-white">FRESHNESS: <%= @job_posting.freshness.upcase %></span>
+            <span class="text-white"><%= t('.freshness_label') %>: <%= @job_posting.freshness.to_s.humanize %></span>
           </div>
           <div class="flex items-center gap-2">
             <%= heroicon "eye", options: { class: "w-4 h-4 text-success" } %>
-            <span class="text-white">SEEN_COUNT: <%= @job_posting.seen_count %></span>
+            <span class="text-white"><%= t('.views_count', count: @job_posting.seen_count) %></span>
           </div>
         </div>
       </div>
     </header>
 
     <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
-      <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-base-content/30 mb-10 pb-4 border-b border-white/5">Position_Intelligence</h2>
+      <h2 class="text-xs font-bold text-base-content/50 mb-10 pb-4 border-b border-white/5"><%= t('.description_heading') %></h2>
 
       <div class="prose-invert max-w-none text-sm font-medium leading-relaxed text-base-content/80">
         <% if @job_posting.body.present? %>
           <%= markdown(@job_posting.body) %>
         <% else %>
           <div class="bg-white/5 border border-dashed border-white/10 rounded-xl p-8 text-center">
-            <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">NO_DESCRIPTION_AVAILABLE</div>
-            <p class="text-[10px] text-slate-600 uppercase tracking-widest">ENRICHMENT_PENDING_OR_SOURCE_UNREACHABLE</p>
+            <div class="text-sm font-bold text-slate-400 mb-2"><%= t('.no_description_title') %></div>
+            <p class="text-xs text-slate-500"><%= t('.no_description_body') %></p>
           </div>
         <% end %>
       </div>
 
       <% if @job_posting.target_url.present? %>
         <div class="mt-16 pt-10 border-t border-white/5 flex flex-wrap gap-4">
-          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" do %>
-            INITIATE_APPLICATION_LINK
+          <%= link_to outbound_link_path(url: @job_posting.target_url, job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-primary rounded-xl px-10 font-bold" do %>
+            <%= t('.apply_on_site') %>
           <% end %>
 
-          <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] text-base-content/40 hover:text-white" do %>
-            SOURCE_ORIGIN_VERIFY_&_ENRICH
+          <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold text-base-content/60 hover:text-white" do %>
+            <%= t('.open_source_listing') %>
           <% end %>
         </div>
       <% end %>
     </div>
 
-    <!-- Interview Laboratory -->
+    <!-- Interview notes -->
     <div class="card-neural p-10 shadow-2xl relative overflow-hidden">
       <div class="absolute top-0 right-0 p-8 opacity-5">
         <%= heroicon "beaker", options: { class: "w-24 h-24" } %>
       </div>
 
-      <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-base-content/30 mb-10 pb-4 border-b border-white/5">Interview_Laboratory</h2>
+      <h2 class="text-xs font-bold text-base-content/50 mb-10 pb-4 border-b border-white/5"><%= t('.interview_notes.heading') %></h2>
 
       <div class="space-y-12">
         <!-- New Session Form -->
         <div class="bg-white/5 rounded-2xl p-6 border border-white/5">
-          <h3 class="text-[9px] font-black uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
-            <i class="bi bi-plus-circle-fill"></i> Log_New_Interview_Session
+          <h3 class="text-sm font-bold text-primary mb-6 flex items-center gap-2">
+            <i class="bi bi-plus-circle-fill"></i> <%= t('.interview_notes.log_session') %>
           </h3>
           <%= form_with url: admin_job_posting_interview_sessions_path(@job_posting), class: "grid grid-cols-1 md:grid-cols-3 gap-4" do |f| %>
-            <%= f.select :session_type, InterviewSession::SESSION_TYPES, {}, class: "select select-bordered bg-base-300 rounded-xl text-[10px] font-mono" %>
-            <%= f.datetime_field :scheduled_at, class: "input input-bordered bg-base-300 rounded-xl text-[10px] font-mono" %>
-            <%= f.submit "INITIALIZE_SESSION", class: "btn btn-primary btn-sm rounded-xl font-black tracking-widest text-[9px]" %>
+            <%= f.select :session_type, InterviewSession::SESSION_TYPES, {}, class: "select select-bordered bg-base-300 rounded-xl text-sm font-mono" %>
+            <%= f.datetime_field :scheduled_at, class: "input input-bordered bg-base-300 rounded-xl text-sm font-mono" %>
+            <%= f.submit t('.interview_notes.add_session'), class: "btn btn-primary btn-sm rounded-xl font-bold" %>
           <% end %>
         </div>
 
@@ -98,24 +98,24 @@
 
               <div class="flex justify-between items-start mb-4">
                 <div>
-                  <div class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">
-                    <%= session.scheduled_at.strftime("%Y_%m_%d | %H:%M") %>
+                  <div class="text-xs font-bold text-slate-400 mb-1">
+                    <%= session.scheduled_at.strftime("%b %-d, %Y · %H:%M") %>
                   </div>
-                  <h4 class="text-lg font-black text-white uppercase italic tracking-tight"><%= session.session_type %></h4>
+                  <h4 class="text-lg font-black text-white tracking-tight"><%= session.session_type.humanize %></h4>
                 </div>
-                <div class="badge badge-outline border-primary/40 text-primary text-[8px] font-black uppercase tracking-widest">
-                  VIBE: <%= session.vibe || "PENDING" %>
+                <div class="badge badge-outline border-primary/40 text-primary text-xs font-bold">
+                  <%= t('.interview_notes.vibe_label') %>: <%= session.vibe || t('.interview_notes.vibe_pending') %>
                 </div>
               </div>
 
               <!-- Questions in this session -->
               <div class="mt-6 space-y-4">
-                <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-4">Knowledge_Extraction</div>
+                <div class="text-xs font-bold text-slate-500 mb-4"><%= t('.interview_notes.qa_heading') %></div>
                 <% session.interview_questions.each do |q| %>
                   <div class="bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                    <div class="text-[8px] font-black text-primary uppercase mb-2"><%= q.category %>_QUERY</div>
-                    <p class="text-[11px] text-white font-bold mb-3 italic">"<%= q.question_text %>"</p>
-                    <div class="text-[10px] text-base-content/60 leading-relaxed border-t border-white/5 pt-3">
+                    <div class="text-xs font-bold text-primary mb-2"><%= q.category&.humanize %></div>
+                    <p class="text-sm text-white font-bold mb-3 italic">"<%= q.question_text %>"</p>
+                    <div class="text-xs text-base-content/60 leading-relaxed border-t border-white/5 pt-3">
                       <%= q.answer_text %>
                     </div>
                   </div>
@@ -124,9 +124,9 @@
                 <!-- Add Question Inline -->
                 <%= form_with url: admin_interview_session_interview_questions_path(session), class: "mt-4" do |f| %>
                   <div class="flex gap-2">
-                    <%= f.text_field :question_text, placeholder: "QUESTION_ASKED...", class: "input input-bordered input-sm bg-base-300 flex-1 rounded-lg text-[9px] font-mono" %>
-                    <%= f.select :category, InterviewQuestion::CATEGORIES, {}, class: "select select-bordered select-sm bg-base-300 rounded-lg text-[9px] font-mono" %>
-                    <%= f.submit "LOG_QUERY", class: "btn btn-ghost btn-sm border-white/10 rounded-lg font-black tracking-widest text-[8px]" %>
+                    <%= f.text_field :question_text, placeholder: t('.interview_notes.question_placeholder'), class: "input input-bordered input-sm bg-base-300 flex-1 rounded-lg text-sm font-mono" %>
+                    <%= f.select :category, InterviewQuestion::CATEGORIES, {}, class: "select select-bordered select-sm bg-base-300 rounded-lg text-sm font-mono" %>
+                    <%= f.submit t('.interview_notes.add_question'), class: "btn btn-ghost btn-sm border-white/10 rounded-lg font-bold" %>
                   </div>
                 <% end %>
               </div>
@@ -140,30 +140,30 @@
   <aside class="space-y-8">
     <% if @job_posting.company_record %>
       <div class="card-neural p-8 border-l-4 <%= @job_posting.company_record.toxic_culture_flag ? 'border-l-rose-500 bg-rose-500/5' : 'border-l-emerald-500 bg-emerald-500/5' %> shadow-2xl">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex justify-between items-center text-white/40">
-          <span>Company_Intelligence</span>
-          <span class="text-[8px] opacity-40 font-mono">GLASSDOOR_AUDIT</span>
+        <h3 class="text-xs font-bold mb-6 flex justify-between items-center text-white/60">
+          <span><%= t('.company.heading') %></span>
+          <span class="text-xs opacity-50 font-mono"><%= t('.company.audit_label') %></span>
         </h3>
 
         <div class="space-y-6">
           <div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Current_Disposition</div>
-            <div class="text-lg font-black <%= @job_posting.company_record.toxic_culture_flag ? 'text-rose-400' : 'text-emerald-400' %> uppercase italic">
-              <%= @job_posting.company_record.disposition || "UNAUDITED" %>
+            <div class="text-xs font-bold text-slate-400 mb-1"><%= t('.company.reputation_label') %></div>
+            <div class="text-lg font-black <%= @job_posting.company_record.toxic_culture_flag ? 'text-rose-400' : 'text-emerald-400' %>">
+              <%= @job_posting.company_record.disposition&.humanize || t('.company.not_reviewed') %>
             </div>
           </div>
 
           <% if @job_posting.company_record.toxic_culture_flag %>
-            <div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-300 font-bold leading-relaxed">
-              <i class="bi bi-exclamation-octagon-fill mr-1 text-rose-500"></i> CRITICAL: HIGH_TOXICITY_SIGNALS_DETECTED
+            <div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 font-bold leading-relaxed">
+              <i class="bi bi-exclamation-octagon-fill mr-1 text-rose-500"></i> <%= t('.company.toxicity_flag') %>
             </div>
           <% end %>
 
           <% if audit = @job_posting.company_record.glassdoor_data&.dig('reputation_audit') %>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Core_Pros</div>
-                <ul class="text-[9px] space-y-1 text-slate-400 font-medium">
+                <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.company.pros') %></div>
+                <ul class="text-xs space-y-1 text-slate-400 font-medium">
                   <% Array(audit['top_pros']).first(3).each do |pro| %>
                     <li class="flex gap-2">
                       <span class="text-emerald-500 font-black">+</span>
@@ -173,8 +173,8 @@
                 </ul>
               </div>
               <div>
-                <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Core_Cons</div>
-                <ul class="text-[9px] space-y-1 text-slate-400 font-medium">
+                <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.company.cons') %></div>
+                <ul class="text-xs space-y-1 text-slate-400 font-medium">
                   <% Array(audit['top_cons']).first(3).each do |con| %>
                     <li class="flex gap-2">
                       <span class="text-rose-500 font-black">-</span>
@@ -184,7 +184,7 @@
                 </ul>
               </div>
             </div>
-            <p class="text-[10px] text-slate-500 italic border-t border-white/5 pt-4 mt-4 leading-relaxed">
+            <p class="text-xs text-slate-500 italic border-t border-white/5 pt-4 mt-4 leading-relaxed">
               "<%= audit['summary'] %>"
             </p>
           <% end %>
@@ -192,19 +192,19 @@
       </div>
     <% end %>
 
-    <!-- Personal Tracking -->
+    <!-- Your activity -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30">My_Interaction</h3>
+        <h3 class="text-xs font-bold text-base-content/50"><%= t('.activity.heading') %></h3>
         <% user_job = current_user.user_job_postings.find_by(job_posting: @job_posting) %>
         <div class="flex items-center gap-4">
           <% if user_job&.status == 'favorited' %>
-            <div class="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
-              <%= heroicon "heart", variant: :solid, options: { class: "w-3 h-3" } %> RECORD_FAVORITED
+            <div class="text-xs font-bold text-primary flex items-center gap-2">
+              <%= heroicon "heart", variant: :solid, options: { class: "w-3 h-3" } %> <%= t('.activity.favorited') %>
             </div>
           <% else %>
-            <%= button_to user_job_postings_path(job_posting_id: @job_posting.id, status: 'favorite'), class: "group flex items-center gap-2 text-[9px] font-black text-slate-500 hover:text-primary transition-colors uppercase tracking-widest" do %>
-              <%= heroicon "heart", options: { class: "w-3 h-3 group-hover:scale-125 transition-transform" } %> MARK_AS_FAVORITE
+            <%= button_to user_job_postings_path(job_posting_id: @job_posting.id, status: 'favorite'), class: "group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary transition-colors" do %>
+              <%= heroicon "heart", options: { class: "w-3 h-3 group-hover:scale-125 transition-transform" } %> <%= t('.activity.mark_favorite') %>
             <% end %>
           <% end %>
         </div>
@@ -213,24 +213,24 @@
       <!-- AI Match Analysis -->
       <div class="space-y-6 mb-10">
         <div class="flex items-center justify-between">
-          <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20">AI_Profile_Alignment</div>
+          <div class="text-xs font-bold text-base-content/40"><%= t('.activity.match_heading') %></div>
           <% if current_user.career_profile&.resume_text.present? || current_user.career_profile&.work_experiences&.any? %>
-            <%= button_to "RUN_ALIGNMENT_SCAN", analyze_match_user_job_postings_path(job_posting_id: @job_posting.id), class: "text-[8px] font-black text-primary hover:text-white underline uppercase" %>
+            <%= button_to t('.activity.check_match'), analyze_match_user_job_postings_path(job_posting_id: @job_posting.id), class: "text-xs font-bold text-primary hover:text-white underline" %>
           <% else %>
-            <%= link_to "SETUP_PROFILE_FOR_MATCHING", edit_career_profile_path, class: "text-[8px] font-black text-slate-500 hover:text-white underline" %>
+            <%= link_to t('.activity.setup_profile'), edit_career_profile_path, class: "text-xs font-bold text-slate-400 hover:text-white underline" %>
           <% end %>
         </div>
 
         <div class="p-4 rounded-xl bg-white/5 border border-white/5 border-dashed">
           <% if user_job&.match_analysis.present? %>
-            <div class="prose-invert text-[10px] leading-relaxed mb-6">
+            <div class="prose-invert text-xs leading-relaxed mb-6">
               <%= markdown(user_job.match_analysis) %>
             </div>
-            <%= button_to "GENERATE_APPLICATION_PACK", generate_artifacts_user_job_postings_path(job_posting_id: @job_posting.id), class: "w-full py-2 rounded-xl bg-primary/20 text-primary border border-primary/20 text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all" %>
+            <%= button_to t('.activity.generate_pack'), generate_artifacts_user_job_postings_path(job_posting_id: @job_posting.id), class: "w-full py-2 rounded-xl bg-primary/20 text-primary border border-primary/20 text-xs font-bold hover:bg-primary hover:text-white transition-all" %>
           <% else %>
             <div class="text-center py-4">
-              <div class="text-[9px] font-black uppercase text-slate-600 tracking-tighter mb-1 italic">MATCH_DATA_PENDING_GENERATION</div>
-              <p class="text-[8px] text-slate-700">Ensure your resume is updated in your profile to enable personalized analysis.</p>
+              <div class="text-xs font-bold text-slate-500 mb-1"><%= t('.activity.no_match_yet') %></div>
+              <p class="text-xs text-slate-500"><%= t('.activity.match_helper') %></p>
             </div>
           <% end %>
         </div>
@@ -238,36 +238,42 @@
 
       <!-- Personal Notes -->
       <div class="space-y-4">
-        <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20">Personal_Internal_Notes</div>
+        <div class="text-xs font-bold text-base-content/40"><%= t('.activity.notes_heading') %></div>
         <%= form_with model: user_job || current_user.user_job_postings.build(job_posting: @job_posting), url: (user_job ? user_job_posting_path(user_job) : user_job_postings_path), class: "space-y-2" do |f| %>
           <%= f.hidden_field :job_posting_id, value: @job_posting.id %>
-          <%= f.text_area :notes, placeholder: "APPEND_PRIVATE_CONTEXT...", class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-[10px] font-mono", rows: 3 %>
-          <%= f.submit "SAVE_INTERNAL_NOTES", class: "w-full py-2 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all" %>
+          <%= f.text_area :notes, placeholder: t('.activity.note_placeholder'), class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-sm font-mono", rows: 3 %>
+          <%= f.submit t('.activity.save_note'), class: "w-full py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all" %>
         <% end %>
       </div>
     </div>
 
-    <!-- Pipeline Control -->
+    <!-- Application status -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Research_Pipeline</h3>
+      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.pipeline.heading') %></h3>
 
       <!-- Status Transitions -->
-      <div class="flex flex-wrap gap-2 mb-8">
-        <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
-          <% if @job_posting.send("may_#{event}?") %>
-            <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all" %>
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-8">
+        <div class="flex flex-wrap gap-2">
+          <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
+            <% if @job_posting.send("may_#{event}?") %>
+              <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all" %>
+            <% end %>
           <% end %>
+        </div>
+
+        <% if @job_posting.may_ignore? %>
+          <%= button_to t('.pipeline.not_interested'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'ignore' }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
         <% end %>
       </div>
 
       <!-- Activity Logger -->
       <%= form_with url: admin_job_posting_pipeline_steps_path(@job_posting), multipart: true, class: "space-y-3 mb-10" do |f| %>
-        <%= f.text_area :note, placeholder: "LOG_RESEARCH_CONTEXT...", class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-[10px] font-mono", rows: 2 %>
+        <%= f.text_area :note, placeholder: t('.pipeline.note_placeholder'), class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-sm font-mono", rows: 2 %>
         <div class="grid grid-cols-1 gap-2">
-          <%= f.text_field :link, placeholder: "EXTERNAL_LINK_URL...", class: "input input-bordered bg-base-300 w-full rounded-xl text-[10px] font-mono" %>
-          <%= f.file_field :artifacts, multiple: true, class: "file-input file-input-bordered bg-base-300 w-full rounded-xl text-[10px] font-mono" %>
+          <%= f.text_field :link, placeholder: t('.pipeline.link_placeholder'), class: "input input-bordered bg-base-300 w-full rounded-xl text-sm font-mono" %>
+          <%= f.file_field :artifacts, multiple: true, class: "file-input file-input-bordered bg-base-300 w-full rounded-xl text-sm font-mono" %>
         </div>
-        <%= f.submit "APPEND_TO_TIMELINE", class: "w-full py-2 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all" %>
+        <%= f.submit t('.pipeline.add_update'), class: "w-full py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all" %>
       <% end %>
 
       <!-- Timeline -->
@@ -275,9 +281,9 @@
         <% @job_posting.pipeline_steps.order(created_at: :desc).each do |step| %>
           <div class="relative pl-6 border-l border-white/5">
             <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-primary/30"></div>
-            <div class="text-[8px] font-black uppercase text-base-content/30 mb-1"><%= step.created_at.strftime("%Y_%m_%d | %H:%M") %></div>
-            <div class="text-[10px] font-bold text-white uppercase tracking-wider"><%= step.status.humanize %></div>
-            <% if step.note.present? %><p class="text-[10px] text-base-content/60 mt-1 leading-tight"><%= step.note %></p><% end %>
+            <div class="text-xs font-bold text-base-content/40 mb-1"><%= step.created_at.strftime("%b %-d, %Y · %H:%M") %></div>
+            <div class="text-sm font-bold text-white"><%= step.status.humanize %></div>
+            <% if step.note.present? %><p class="text-xs text-base-content/60 mt-1 leading-tight"><%= step.note %></p><% end %>
 
             <% if step.artifacts.attached? %>
               <div class="flex flex-wrap gap-2 mt-3">
@@ -296,24 +302,23 @@
               </div>
             <% end %>
 
-            <% if step.link.present? %><%= link_to "SOURCE_VIEW", step.link, class: "text-[8px] text-primary hover:underline mt-2 inline-block font-black" %><% end %>
+            <% if step.link.present? %><%= link_to t('.pipeline.view_source'), step.link, class: "text-xs text-primary hover:underline mt-2 inline-block font-bold" %><% end %>
           </div>
         <% end %>
       </div>
     </div>
 
-    <!-- Mission Control (Job Specific) -->
+    <!-- Tasks -->
     <div class="card-neural p-8 border-l-4 border-l-primary shadow-2xl">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex justify-between items-center text-primary/60">
-        <span>Mission_Control</span>
-        <span class="text-[8px] opacity-40 font-mono">TASK_ORCHESTRATOR</span>
+      <h3 class="text-xs font-bold mb-6 flex justify-between items-center text-primary/70">
+        <span><%= t('.tasks.heading') %></span>
       </h3>
 
       <div class="space-y-6">
         <!-- New Task Form -->
         <%= form_with url: admin_job_posting_interview_tasks_path(@job_posting), class: "space-y-2 mb-6" do |f| %>
-          <%= f.text_field :title, placeholder: "NEW_ACTION_REQUIRED...", class: "input input-bordered input-sm bg-base-300 w-full rounded-lg text-[9px] font-mono" %>
-          <%= f.submit "REGISTER_TASK", class: "w-full py-1.5 rounded-lg bg-primary/10 text-primary text-[8px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all" %>
+          <%= f.text_field :title, placeholder: t('.tasks.placeholder'), class: "input input-bordered input-sm bg-base-300 w-full rounded-lg text-sm font-mono" %>
+          <%= f.submit t('.tasks.add_task'), class: "w-full py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-all" %>
         <% end %>
 
         <!-- Active Tasks -->
@@ -321,8 +326,8 @@
           <% @job_posting.interview_tasks.where.not(status: 'completed').each do |task| %>
             <div class="flex items-start justify-between gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
               <div class="flex-1">
-                <div class="text-[10px] font-bold text-white leading-tight"><%= task.title %></div>
-                <div class="text-[8px] font-black text-slate-500 uppercase mt-1"><%= task.status %></div>
+                <div class="text-sm font-bold text-white leading-tight"><%= task.title %></div>
+                <div class="text-xs font-bold text-slate-400 mt-1"><%= task.status.humanize %></div>
               </div>
               <%= button_to admin_task_path(task, status: 'completed'), method: :patch, class: "text-emerald-500 hover:scale-125 transition-transform" do %>
                 <%= heroicon "check-circle", variant: :solid, options: { class: "w-4 h-4" } %>
@@ -333,51 +338,51 @@
       </div>
     </div>
 
-    <!-- Contact Manager -->
+    <!-- Contacts -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Contact_Registry</h3>
+      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.contacts.heading') %></h3>
 
       <div class="space-y-4 mb-8">
         <% @job_posting.contacts.each do |contact| %>
           <div class="bg-base-300 p-4 rounded-xl relative group">
-            <div class="text-xs font-bold text-white"><%= contact.name %></div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-base-content/40 mt-1"><%= contact.role %></div>
-            <%= button_to admin_job_posting_contact_path(@job_posting, contact), method: :delete, class: "absolute top-2 right-2 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity text-[8px] font-black", data: { turbo_confirm: "Delete contact?" } do %>X<% end %>
+            <div class="text-sm font-bold text-white"><%= contact.name %></div>
+            <div class="text-xs font-bold text-base-content/50 mt-1"><%= contact.role %></div>
+            <%= button_to admin_job_posting_contact_path(@job_posting, contact), method: :delete, class: "absolute top-2 right-2 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold", data: { turbo_confirm: "Delete contact?" } do %>X<% end %>
           </div>
         <% end %>
       </div>
 
       <%= form_with model: [@job_posting, Contact.new], url: admin_job_posting_contacts_path(@job_posting), class: "space-y-2" do |f| %>
-        <%= f.text_field :name, placeholder: "NAME...", class: "input input-bordered w-full rounded-xl text-[10px] font-mono" %>
-        <%= f.text_field :role, placeholder: "ROLE (RECRUITER/MANAGER)...", class: "input input-bordered w-full rounded-xl text-[10px] font-mono" %>
-        <%= f.submit "ADD_CONTACT_NODE", class: "w-full py-2 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all" %>
+        <%= f.text_field :name, placeholder: t('.contacts.name_placeholder'), class: "input input-bordered w-full rounded-xl text-sm font-mono" %>
+        <%= f.text_field :role, placeholder: t('.contacts.role_placeholder'), class: "input input-bordered w-full rounded-xl text-sm font-mono" %>
+        <%= f.submit t('.contacts.add_contact'), class: "w-full py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all" %>
       <% end %>
     </div>
 
-    <!-- Telemetry & Synthesis -->
+    <!-- Details & history -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 mb-8 pb-4 border-b border-white/5">Operational_Telemetry</h3>
+      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.details.heading') %></h3>
 
       <div class="space-y-8">
         <div>
-          <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-3">Neural_Category</div>
+          <div class="text-xs font-bold text-base-content/40 mb-3"><%= t('.details.ai_category_label') %></div>
           <% category = @job_posting.data&.[]('ai_category') %>
           <div class="flex items-center justify-between">
-            <div class="inline-flex items-center gap-2 text-accent font-black text-[10px] uppercase tracking-wider">
-              <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> <%= category || "PENDING_SYNTHESIS" %>
+            <div class="inline-flex items-center gap-2 text-accent font-bold text-sm">
+              <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> <%= category&.humanize || t('.details.not_categorized') %>
             </div>
             <% if category.blank? || params[:reprocess] %>
-              <%= button_to "RE-SYNTHESIZE", admin_job_posting_path(@job_posting), params: { action_type: 'synthesize' }, method: :patch, class: "text-[8px] font-black text-primary hover:text-white underline" %>
+              <%= button_to t('.details.recategorize'), admin_job_posting_path(@job_posting), params: { action_type: 'synthesize' }, method: :patch, class: "text-xs font-bold text-primary hover:text-white underline" %>
             <% end %>
           </div>
         </div>
 
         <div>
-          <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-3">Audit_History</div>
+          <div class="text-xs font-bold text-base-content/40 mb-3"><%= t('.details.history_label') %></div>
           <div class="space-y-2">
             <% @job_posting.versions.reverse.first(5).each do |version| %>
-              <div class="text-[8px] font-mono text-base-content/40">
-                <span class="text-white"><%= version.event.upcase %></span>_BY_<%= version.whodunnit || "SYSTEM" %> | <%= version.created_at.strftime("%H:%M:%S") %>
+              <div class="text-xs font-mono text-base-content/50">
+                <%= t('.details.history_entry', event: version.event.humanize, who: version.whodunnit || t('.details.system'), time: version.created_at.strftime("%b %-d, %H:%M")) %>
               </div>
             <% end %>
           </div>

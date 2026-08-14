@@ -10,7 +10,7 @@ RSpec.describe "Admin::Observability" do
 
       get admin_observability_path
       expect(response).to be_successful
-      expect(response.body).to include("Golden Signals")
+      expect(response.body).to include("Pipeline Performance")
     end
   end
 end

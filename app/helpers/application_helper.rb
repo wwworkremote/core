@@ -40,7 +40,8 @@ module ApplicationHelper
       no_intra_emphasis: true,
       fenced_code_blocks: true,
       strikethrough: true,
-      superscript: true
+      superscript: true,
+      tables: true
     }
   end
   # rubocop:enable Metrics/MethodLength

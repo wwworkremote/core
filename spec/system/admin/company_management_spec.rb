@@ -12,19 +12,19 @@ RSpec.describe "Admin Company Management" do
     expect(page).to have_text(/Cyberdyne/i)
 
     # 1. Pause Ingestion
-    click_button "PAUSE_INGESTION"
+    click_button "Pause Ingestion"
 
     # Use specific selector and wait
     expect(page).to have_css(".alert-success", text: /Ingestion disabled for Cyberdyne/i, wait: 10)
-    expect(page).to have_text(/OFFLINE/i)
+    expect(page).to have_text(/Disabled/i)
 
     # Verify side-effect: cascade purge
     expect(job.reload.status).to eq("purged")
 
     # 2. Resume Ingestion
-    click_button "RESUME_INGESTION"
+    click_button "Resume Ingestion"
     expect(page).to have_css(".alert-success", text: /Ingestion resumed for Cyberdyne/i, wait: 10)
-    expect(page).to have_text(/ACTIVE_SYNC/i)
+    expect(page).to have_text(/Active/i)
 
     company.reload
     expect(company.ingestion_enabled?).to be true

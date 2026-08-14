@@ -2,41 +2,41 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Domain Normalization</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Canonical Link Authority</p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Domains</h1>
+    <p class="text-slate-500 font-bold text-sm">Canonical domains extracted from job posting links.</p>
   </div>
 </div>
 
 <div class="card-neural mb-6">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
-      <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+      <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
         <tr>
-          <th class="px-6 py-4">Domain Name</th>
-          <th class="px-6 py-4">Root Domain</th>
-          <th class="px-6 py-4 text-center">Reference Count</th>
+          <th class="px-6 py-4">Domain</th>
+          <th class="px-6 py-4">Type</th>
+          <th class="px-6 py-4 text-center">Postings</th>
           <th class="px-6 py-4 text-right">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+      <tbody class="divide-y divide-white/5 font-mono text-xs">
         <% @domains.each do |domain| %>
           <tr class="group hover:bg-white/[0.03] transition-colors">
-            <td class="px-6 py-4 text-white font-bold italic">
+            <td class="px-6 py-4 text-white font-bold">
               <%= domain.name %>
             </td>
             <td class="px-6 py-4">
-              <span class="text-slate-400"><%= domain.root_domain_id.present? ? "SUBDOMAIN" : "ROOT" %></span>
+              <span class="text-slate-400"><%= domain.root_domain_id.present? ? "Subdomain" : "Root Domain" %></span>
             </td>
             <td class="px-6 py-4 text-center">
               <span class="text-blue-400 font-bold"><%= domain.job_postings.count %></span>
             </td>
             <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2 text-[10px]">
-                <%= link_to admin_domain_path(domain), class: "px-3 py-1 rounded font-black border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
-                  INSPECT
+              <div class="flex items-center justify-end gap-2 text-xs">
+                <%= link_to admin_domain_path(domain), class: "px-3 py-1 rounded font-bold border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
+                  View
                 <% end %>
-                <%= button_to admin_domain_path(domain), method: :delete, form: { class: "inline-block" }, class: "px-3 py-1 rounded font-black border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all", data: { turbo_confirm: "Permanently purge this domain and all links?" } do %>
-                  PURGE
+                <%= button_to admin_domain_path(domain), method: :delete, form: { class: "inline-block" }, class: "px-3 py-1 rounded font-bold border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all", data: { turbo_confirm: "Permanently delete this domain and all links?" } do %>
+                  Delete
                 <% end %>
               </div>
             </td>

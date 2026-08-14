@@ -2,34 +2,34 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Model Config</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Registry ID: <%= @model.model_id %></p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Model</h1>
+    <p class="text-slate-500 font-bold text-sm"><%= @model.model_id %></p>
   </div>
   <div>
-    <%= link_to admin_models_path, class: "btn-neural text-[10px]" do %>
-      BACK_TO_REGISTRY
+    <%= link_to admin_models_path, class: "btn-neural text-sm" do %>
+      Back
     <% end %>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
   <div class="card-neural p-6">
-    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Core Configuration</h3>
-    <dl class="space-y-4 font-mono text-[11px]">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Configuration</h3>
+    <dl class="space-y-4 font-mono text-xs">
        <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Provider</dt>
+          <dt class="text-slate-500 font-bold mb-1">Provider</dt>
           <dd class="text-violet-400 font-bold"><%= @model.provider %></dd>
         </div>
         <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Context Window</dt>
+          <dt class="text-slate-500 font-bold mb-1">Context Window</dt>
           <dd class="text-white"><%= number_with_delimiter(@model.context_window) %> tokens</dd>
         </div>
     </dl>
   </div>
 
   <div class="card-neural p-6">
-    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Extended Metadata</h3>
-    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-[10px] text-slate-400">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Metadata</h3>
+    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400">
       <%= JSON.pretty_generate(@model.metadata) rescue "{}" %>
     </div>
   </div>

@@ -1,37 +1,45 @@
 <%= render "admin/shared/nav" %>
 
-<div class="flex items-center gap-2 text-slate-500 font-bold text-[10px] uppercase tracking-widest mb-10">
-  <%= link_to admin_job_postings_path, class: "hover:text-white transition-colors" do %>Registry<% end %>
-  <i class="bi bi-chevron-right text-[8px]"></i>
-  <span class="text-white">Record_<%= @job_posting.id %></span>
+<div class="flex items-center gap-2 text-slate-500 font-bold text-sm mb-10">
+  <%= link_to admin_job_postings_path, class: "hover:text-white transition-colors" do %>Job Postings<% end %>
+  <i class="bi bi-chevron-right text-xs"></i>
+  <span class="text-white">#<%= @job_posting.id %></span>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
   <div class="lg:col-span-2 space-y-6">
     <div class="card-neural p-8 border-t-4 border-t-violet-500">
-      <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-tight"><%= @job_posting.title %></h1>
-      <p class="text-blue-400 font-black text-xs uppercase tracking-[0.2em] mb-6"><%= @job_posting.company_name %></p>
+      <h1 class="text-2xl font-black text-white mb-2 tracking-tight">
+        <%= @job_posting.title %>
+        <% if @job_posting.leads.any? %>
+          <%= link_to admin_lead_path(@job_posting.leads.first), title: "Captured via the extension -- click to view the Lead",
+                      class: "badge badge-outline border-accent/40 text-accent text-xs font-bold align-middle ml-1" do %>
+            <%= @job_posting.leads.first.provider&.humanize || "extension" %>
+          <% end %>
+        <% end %>
+      </h1>
+      <p class="text-blue-400 font-bold text-sm mb-6"><%= @job_posting.company_name %></p>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-white/5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-white/5 font-mono text-xs font-bold text-slate-500">
         <div>
-          <div class="mb-1 text-slate-600">Sync_Signature</div>
+          <div class="mb-1 text-slate-500">Signature</div>
           <div class="truncate text-white" title="<%= @job_posting.signature %>"><%= @job_posting.signature[0..12] %>...</div>
         </div>
         <div>
-          <div class="mb-1 text-slate-600">External_ID</div>
-          <div class="text-white"><%= @job_posting.external_id || "NULL" %></div>
+          <div class="mb-1 text-slate-500">External ID</div>
+          <div class="text-white"><%= @job_posting.external_id || "None" %></div>
         </div>
         <div>
-          <div class="mb-1 text-slate-600">Location_Vectors</div>
+          <div class="mb-1 text-slate-500">Coordinates</div>
           <div class="text-white"><%= @job_posting.latitude || "0.0" %>, <%= @job_posting.longitude || "0.0" %></div>
         </div>
         <div>
-          <div class="mb-1 text-slate-600">Published_At</div>
-          <div class="text-white"><%= @job_posting.published_at&.strftime("%Y-%m-%d") || "NULL" %></div>
+          <div class="mb-1 text-slate-500">Published</div>
+          <div class="text-white"><%= @job_posting.published_at&.strftime("%Y-%m-%d") || "Unknown" %></div>
         </div>
       </div>
 
-      <div class="mt-8 prose-invert text-slate-300 leading-relaxed text-xs font-medium">
+      <div class="mt-8 prose-invert text-slate-300 leading-relaxed text-sm font-medium">
         <%= markdown(@job_posting.body) %>
       </div>
     </div>
@@ -39,11 +47,11 @@
 
   <div class="space-y-6">
     <div class="card-neural p-6">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Pipeline Activity</h3>
+      <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Activity</h3>
 
       <!-- Status Actions -->
       <div class="flex flex-wrap gap-2 mb-6">
-        <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
+        <% ['favorite', 'apply', 'interview', 'offer', 'archive', 'ignore'].each do |event| %>
           <% if @job_posting.send("may_#{event}?") %>
             <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "btn-admin bg-primary/20 text-primary border-primary/20 hover:bg-primary/40" %>
           <% end %>
@@ -53,7 +61,7 @@
 
       <!-- Activity Form -->
       <%= form_with url: admin_job_posting_pipeline_steps_path(@job_posting), class: "mb-8 space-y-2" do |f| %>
-        <%= f.text_area :note, placeholder: "Log research note...", class: "textarea textarea-bordered bg-base-300 w-full rounded-lg text-xs" %>
+        <%= f.text_area :note, placeholder: "Add a note…", class: "textarea textarea-bordered bg-base-300 w-full rounded-lg text-xs" %>
         <%= f.text_field :link, placeholder: "Link (optional)", class: "input input-bordered bg-base-300 w-full rounded-lg text-xs" %>
         <%= f.submit "Log Activity", class: "btn-admin bg-white/5 w-full" %>
       <% end %>
@@ -62,25 +70,25 @@
       <div class="space-y-4">
         <% @job_posting.pipeline_steps.order(created_at: :desc).each do |step| %>
           <div class="border-l-2 border-white/10 pl-4 py-2">
-            <div class="text-[9px] font-black uppercase text-slate-500"><%= step.created_at.strftime("%b %d, %H:%M") %></div>
+            <div class="text-xs font-bold text-slate-500"><%= step.created_at.strftime("%b %d, %H:%M") %></div>
             <div class="text-xs font-bold text-white"><%= step.status.humanize %></div>
-            <% if step.note.present? %><p class="text-[10px] text-slate-400 mt-1"><%= step.note %></p><% end %>
-            <% if step.link.present? %><%= link_to "View Link", step.link, class: "text-[9px] text-blue-400 hover:underline block" %><% end %>
+            <% if step.note.present? %><p class="text-xs text-slate-400 mt-1"><%= step.note %></p><% end %>
+            <% if step.link.present? %><%= link_to "View Link", step.link, class: "text-xs text-blue-400 hover:underline block" %><% end %>
           </div>
         <% end %>
       </div>
     </div>
 
     <div class="card-neural p-6">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Contacts</h3>
+      <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Contacts</h3>
       <div class="space-y-4 mb-6">
         <% @job_posting.contacts.each do |contact| %>
           <div class="bg-base-300 p-4 rounded-lg flex justify-between items-start">
             <div>
               <div class="font-bold text-white text-xs"><%= contact.name %></div>
-              <div class="text-[9px] text-slate-400"><%= contact.role %> (<%= contact.relationship_type %>)</div>
+              <div class="text-xs text-slate-400"><%= contact.role %> (<%= contact.relationship_type %>)</div>
             </div>
-            <%= button_to "X", admin_job_posting_contact_path(@job_posting, contact), method: :delete, class: "text-rose-500 font-black text-[9px] hover:text-white" %>
+            <%= button_to "×", admin_job_posting_contact_path(@job_posting, contact), method: :delete, class: "text-rose-500 font-bold text-xs hover:text-white" %>
           </div>
         <% end %>
       </div>

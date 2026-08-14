@@ -2,22 +2,22 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Pipeline Orchestration</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Data Ingestion & Fetcher Registry</p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Data Sources</h1>
+    <p class="text-slate-500 font-bold text-sm">Manage where job postings are ingested from.</p>
   </div>
   <div class="flex gap-4">
     <% pending_enrichment = JobPosting.where(body: [nil, ""]).where.not(status: "archived").count %>
     <% if pending_enrichment > 0 %>
       <div class="card-neural bg-amber-900/10 border-amber-900/30 px-6 py-2 flex items-center gap-4">
         <div>
-          <div class="text-[8px] font-black text-amber-500 uppercase">Pending Enrichment</div>
+          <div class="text-xs font-bold text-amber-500">Pending Enrichment</div>
           <div class="text-lg font-black text-white"><%= pending_enrichment %></div>
         </div>
-        <%= button_to "START_ENRICHMENT", enrich_data_fetchers_path, class: "btn btn-xs rounded-lg bg-amber-500 text-black border-none font-black text-[9px]" %>
+        <%= button_to "Start Enrichment", enrich_data_fetchers_path, class: "btn btn-xs rounded-lg bg-amber-500 text-black border-none font-bold" %>
       </div>
     <% end %>
 
-    <%= button_to "RUN_AUDIT", audit_data_fetchers_path, class: "btn-admin bg-white/5 hover:bg-white/10" %>
+    <%= button_to "Run Audit", audit_data_fetchers_path, class: "btn-admin bg-white/5 hover:bg-white/10" %>
   </div>
 </div>
 
@@ -25,7 +25,7 @@
   <% Ingestion::AdapterRegistry.all.group_by { |_, c| c[:type] }.each do |type, fetchers| %>
     <div class="card-neural p-6">
       <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-primary"><%= type %> Pipelines</h3>
+        <h3 class="text-xs font-bold text-primary"><%= type %> Sources</h3>
         <%= button_to "Run All #{type}", run_all_by_type_data_fetchers_path, params: { type: type }, class: "btn-admin bg-primary/20 hover:bg-primary/40 text-primary border-none" %>
       </div>
 
@@ -36,19 +36,19 @@
           <div class="bg-base-300 p-4 rounded-lg flex items-center justify-between group">
             <div>
               <div class="font-bold text-white text-xs"><%= config[:name] %></div>
-              <div class="text-[9px] text-slate-500 font-mono">Sync: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
-              <div class="text-[9px] text-slate-500 font-mono">Ingest: <%= status[:last_ingested_at]&.strftime("%b %d, %H:%M") || "NEVER" %></div>
+              <div class="text-xs text-slate-500 font-mono">Last fetched: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "Never" %></div>
+              <div class="text-xs text-slate-500 font-mono">Last ingested: <%= status[:last_ingested_at]&.strftime("%b %d, %H:%M") || "Never" %></div>
             </div>
             <div class="flex items-center gap-2">
               <% if status[:can_fetch] %>
                 <%= button_to "Run", run_data_fetchers_path, params: { slug: slug }, class: "btn-admin bg-white/5 hover:bg-white/10" %>
               <% else %>
-                <button class="btn-admin bg-base-200 text-slate-600 cursor-not-allowed" disabled>
+                <button class="btn-admin bg-base-200 text-slate-500 cursor-not-allowed" disabled>
                   <%
                     reset_val = status[:time_until_reset].to_f
                     minutes = (reset_val / 60).round
                   %>
-                  <%= minutes > 0 ? "#{minutes}m" : "LOCKED" %>
+                  <%= minutes > 0 ? "#{minutes}m" : "Locked" %>
                 </button>
               <% end %>
               <%= button_to "Force", run_data_fetchers_path, params: { slug: slug, force: true }, class: "btn-admin bg-rose-900/20 text-rose-500 hover:bg-rose-900/40 border-none" %>

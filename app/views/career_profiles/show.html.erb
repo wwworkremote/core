@@ -1,33 +1,33 @@
 <div class="max-w-4xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
-      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">Career_Profile_Node</span>
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white"><%= t('.breadcrumb_current') %></span>
     </div>
   </div>
 
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
     <div>
-      <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none">Career Profile</h1>
-      <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Leveraged by AI for deep job matching.</p>
+      <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= t('.title') %></h1>
+      <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
     </div>
     <div class="flex gap-4">
       <% if @career_profile.github_url.present? %>
-        <%= button_to sync_github_career_profile_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-blue-400 hover:border-blue-400/50" do %>
-          <i class="bi bi-github mr-2"></i> SYNC_GITHUB_EVIDENCE
+        <%= button_to sync_github_career_profile_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold hover:text-blue-400 hover:border-blue-400/50" do %>
+          <i class="bi bi-github mr-2"></i> <%= t('.sync_github') %>
         <% end %>
       <% end %>
-      <%= button_to "SYNC_FROM_YAML", career_profile_path(sync: true), method: :patch, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-primary hover:border-primary/50" %>
-      <%= button_to "SYNC_NEURAL_VECTORS", career_profile_path(embed: true), method: :patch, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-accent hover:border-accent/50" %>
-      <%= link_to "RECONFIGURE_PROFILE", edit_career_profile_path, class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+      <%= button_to t('.sync_from_file'), career_profile_path(sync: true), method: :patch, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold hover:text-primary hover:border-primary/50" %>
+      <%= button_to t('.rebuild_match_index'), career_profile_path(embed: true), method: :patch, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold hover:text-accent hover:border-accent/50" %>
+      <%= link_to t('.edit_profile'), edit_career_profile_path, class: "btn btn-primary rounded-xl px-10 font-bold" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <div class="md:col-span-2 space-y-8">
       <div class="card-neural p-8">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Career_Timeline</h3>
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6"><%= t('.work_history_heading') %></h3>
         <div class="space-y-12">
           <% @career_profile.work_experiences.order(start_date: :desc).each do |exp| %>
             <div class="relative pl-8 border-l-2 border-white/5">
@@ -35,14 +35,14 @@
 
               <div class="flex justify-between items-start mb-2">
                 <div>
-                  <h4 class="text-xl font-black text-white uppercase tracking-tight"><%= exp.title %></h4>
-                  <div class="text-sm font-bold text-primary tracking-widest uppercase"><%= exp.company_name %></div>
+                  <h4 class="text-xl font-black text-white"><%= exp.title %></h4>
+                  <div class="text-sm font-bold text-primary"><%= exp.company_name %></div>
                 </div>
                 <div class="text-right">
-                  <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                    <%= exp.start_date&.strftime("%b %Y") %> &mdash; <%= exp.end_date&.strftime("%b %Y") || 'PRESENT' %>
+                  <div class="text-xs font-bold text-slate-400">
+                    <%= exp.start_date&.strftime("%b %Y") %> &mdash; <%= exp.end_date&.strftime("%b %Y") || t('.present') %>
                   </div>
-                  <div class="badge badge-neutral bg-white/5 border-none text-[8px] font-black uppercase tracking-widest mt-1">
+                  <div class="badge badge-neutral bg-white/5 border-none text-xs font-bold mt-1">
                     <%= exp.employment_type %>
                   </div>
                 </div>
@@ -50,28 +50,28 @@
 
               <div class="mt-6 space-y-6">
                 <div>
-                  <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-2">Narrative_Context</div>
+                  <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.context_label') %></div>
                   <p class="text-sm text-base-content/70 leading-relaxed font-medium"><%= exp.context %></p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-2">Strategy_Action</div>
-                    <p class="text-[11px] text-base-content/60 leading-relaxed"><%= exp.action %></p>
+                    <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.action_label') %></div>
+                    <p class="text-sm text-base-content/60 leading-relaxed"><%= exp.action %></p>
                   </div>
                   <div>
-                    <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-2">Business_Impact</div>
-                    <p class="text-[11px] text-base-content/60 leading-relaxed"><%= exp.impact %></p>
+                    <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.impact_label') %></div>
+                    <p class="text-sm text-base-content/60 leading-relaxed"><%= exp.impact %></p>
                   </div>
                 </div>
 
                 <div>
-                  <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mb-4">Impact_Highlights</div>
+                  <div class="text-xs font-bold text-slate-500 mb-4"><%= t('.highlights_label') %></div>
                   <div class="grid grid-cols-1 gap-3">
                     <% exp.experience_highlights.each do |h| %>
                       <div class="bg-white/[0.02] p-3 rounded-lg border border-white/5 flex gap-4">
-                        <span class="text-[8px] font-black text-primary uppercase tracking-tighter mt-1 whitespace-nowrap"><%= h.label %></span>
-                        <p class="text-[11px] text-base-content/70"><%= h.text %></p>
+                        <span class="text-xs font-bold text-primary mt-1 whitespace-nowrap"><%= h.label %></span>
+                        <p class="text-sm text-base-content/70"><%= h.text %></p>
                       </div>
                     <% end %>
                   </div>
@@ -84,17 +84,17 @@
 
     <div class="space-y-8">
       <div class="card-neural p-8">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Identity_Metrics</h3>
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6"><%= t('.summary_heading') %></h3>
         <div class="space-y-4">
           <div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-1 text-slate-500">Tier</div>
-            <div class="text-white font-bold text-lg uppercase"><%= @career_profile.experience_level || "UNDEFINED" %></div>
+            <div class="text-xs font-bold text-slate-500 mb-1"><%= t('.tier_label') %></div>
+            <div class="text-white font-bold text-lg"><%= @career_profile.experience_level || t('.not_set') %></div>
           </div>
           <div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-base-content/20 mb-1 text-slate-500">Neural_Skills</div>
+            <div class="text-xs font-bold text-slate-500 mb-1"><%= t('.skills_label') %></div>
             <div class="flex flex-wrap gap-2 mt-2">
               <% (@career_profile.skills || "").split(",").each do |skill| %>
-                <span class="px-3 py-1 rounded bg-white/5 border border-white/5 text-[9px] font-black text-slate-400 uppercase tracking-widest"><%= skill.strip %></span>
+                <span class="px-3 py-1 rounded bg-white/5 border border-white/5 text-xs font-bold text-slate-400"><%= skill.strip %></span>
               <% end %>
             </div>
           </div>
@@ -103,21 +103,20 @@
 
       <% if @career_profile.github_context.present? %>
         <div class="card-neural p-8 border-l-4 border-l-blue-500 bg-blue-500/5 shadow-2xl">
-          <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex justify-between items-center text-white/40">
-            <span>GitHub_Intelligence</span>
-            <span class="text-[8px] opacity-40 font-mono">TECHNICAL_PROOF</span>
+          <h3 class="text-xs font-bold mb-6 flex justify-between items-center text-white/60">
+            <span><%= t('.github_heading') %></span>
           </h3>
 
           <div class="space-y-6">
-            <div class="prose-invert text-[11px] leading-relaxed">
+            <div class="prose-invert text-sm leading-relaxed">
               <%= markdown(@career_profile.github_context['synthesis']) %>
             </div>
 
             <div class="pt-4 border-t border-white/5">
-              <div class="text-[8px] font-black uppercase text-slate-600 mb-2">Analyzed_Repositories</div>
+              <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.repos_analyzed_label') %></div>
               <div class="flex flex-wrap gap-2">
                 <% Array(@career_profile.github_context['repos']).each do |repo| %>
-                  <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[9px] font-mono text-slate-400">
+                  <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400">
                     <%= repo['name'] %>
                   </span>
                 <% end %>
@@ -128,12 +127,12 @@
       <% end %>
 
       <div class="card-neural p-8">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Match_Intelligence</h3>
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6"><%= t('.matching_heading') %></h3>
         <div class="text-center py-6">
-          <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
-            AI_READY: <%= @career_profile.resume_text.present? ? "TRUE" : "FALSE" %>
+          <div class="text-sm font-bold text-slate-400 leading-relaxed">
+            <%= @career_profile.resume_text.present? ? t('.matching_ready') : t('.matching_not_ready') %>
           </div>
-          <p class="text-[9px] text-slate-600 mt-4 italic">Your profile will be used to generate personalized match scores on job detail pages.</p>
+          <p class="text-xs text-slate-500 mt-4 italic"><%= t('.matching_helper') %></p>
         </div>
       </div>
     </div>

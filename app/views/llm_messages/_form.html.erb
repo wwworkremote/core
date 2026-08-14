@@ -10,10 +10,10 @@
   <% end %>
 
   <div class="flex-1">
-    <%= form.text_area :content, rows: 1, placeholder: "Describe your objective...", autofocus: true,
+    <%= form.text_area :content, rows: 1, placeholder: "Type a message…", autofocus: true,
         class: "textarea textarea-bordered bg-base-300 border-white/10 w-full focus:outline-primary font-medium text-sm rounded-xl py-4",
         onkeydown: "if (event.keyCode == 13 && !event.shiftKey) { event.preventDefault(); this.form.requestSubmit(); }" %>
   </div>
 
-  <%= form.submit "Send", class: "btn btn-primary rounded-xl px-8 font-bold uppercase tracking-widest text-[10px]" %>
+  <%= form.submit "Send", class: "btn btn-primary rounded-xl px-8 font-bold" %>
 <% end %>

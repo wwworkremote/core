@@ -1,15 +1,14 @@
 <div id="llm_message_<%= tool_calls.id %>" class="chat chat-start group">
-  <div class="chat-header opacity-50 text-[10px] font-bold uppercase tracking-widest mb-1">
-    Tool Invocation
+  <div class="chat-header opacity-60 text-xs font-bold mb-1">
+    Tool Call
   </div>
   <div class="chat-bubble bg-base-300/50 text-base-content border border-dashed border-white/10 shadow-lg text-sm leading-relaxed p-4">
     <div class="flex items-center gap-2 mb-2">
-      <div class="badge badge-accent badge-xs opacity-50 uppercase font-bold tracking-widest text-[8px]">Call</div>
-      <span class="font-black tracking-tighter text-accent uppercase"><%= tool_call.name %></span>
+      <span class="font-bold text-accent"><%= tool_call.name %></span>
     </div>
-    <pre class="bg-black/20 p-3 rounded-lg text-[10px] font-mono opacity-70 overflow-x-auto"><%= tool_call.arguments.map { |k, v| "#{k}: #{v.inspect}" }.join("\n") %></pre>
+    <pre class="bg-black/20 p-3 rounded-lg text-xs font-mono opacity-80 overflow-x-auto"><%= tool_call.arguments.map { |k, v| "#{k}: #{v.inspect}" }.join("\n") %></pre>
   </div>
-  <div class="chat-footer opacity-20 text-[8px] font-bold uppercase tracking-widest mt-1">
+  <div class="chat-footer opacity-40 text-xs font-bold mt-1">
     <%= tool_calls.created_at&.strftime("%I:%M %p") %>
   </div>
 </div>

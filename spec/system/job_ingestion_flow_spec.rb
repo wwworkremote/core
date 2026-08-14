@@ -112,7 +112,7 @@ RSpec.describe "Ingestion Pipeline Hardening" do
     expect(page).to have_text(/Pending Enrichment/i)
 
     expect {
-      click_on "START_ENRICHMENT"
+      click_on "Start Enrichment"
     }.to have_enqueued_job(JobBoards::ContentEnrichmentJob)
 
     perform_enqueued_jobs

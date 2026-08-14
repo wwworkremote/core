@@ -1,46 +1,46 @@
 <%= render "admin/shared/nav" %>
 
 <div class="max-w-4xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
-      <%= link_to "Registry", admin_skills_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">Configure_Label</span>
+      <%= link_to "Skills", admin_skills_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white"><%= skill.new_record? ? "New Skill" : "Edit Skill" %></span>
     </div>
   </div>
 
   <div class="mb-12">
-    <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none mb-3">
-      <%= @skill.new_record? ? "Register New Skill" : "Reconfigure Skill" %>
+    <h1 class="text-4xl font-black text-white tracking-tight leading-none mb-3">
+      <%= skill.new_record? ? "New Skill" : "Edit Skill" %>
     </h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Define the semantic attributes of this technical node.</p>
+    <p class="text-slate-500 font-bold text-sm">Define this skill for AI matching.</p>
   </div>
 
   <div class="card-neural p-8">
-    <%= form_with(model: [:admin, @skill], class: "space-y-8") do |f| %>
+    <%= form_with(model: [:admin, skill], class: "space-y-8") do |f| %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="form-control">
-          <%= f.label :name, "LABEL_NAME", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+          <%= f.label :name, "Name", class: "label text-xs font-bold text-slate-500" %>
           <%= f.text_field :name, placeholder: "e.g., Ruby on Rails", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
         </div>
 
         <div class="form-control">
-          <%= f.label :category, "TAXONOMY_CATEGORY", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
+          <%= f.label :category, "Category", class: "label text-xs font-bold text-slate-500" %>
           <%= f.text_field :category, placeholder: "e.g., Framework", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
         </div>
       </div>
 
       <div class="form-control">
-        <%= f.label :description, "SEMANTIC_DESCRIPTION", class: "label text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" %>
-        <%= f.text_area :description, rows: 6, class: "textarea textarea-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white text-sm leading-relaxed", placeholder: "Explain the nuance of this skill for the LLM..." %>
+        <%= f.label :description, "Description", class: "label text-xs font-bold text-slate-500" %>
+        <%= f.text_area :description, rows: 6, class: "textarea textarea-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white text-sm leading-relaxed", placeholder: "Explain what this skill covers…" %>
         <label class="label">
-          <span class="label-text-alt text-[9px] text-slate-600">This text is used to generate the neural embedding for semantic discovery.</span>
+          <span class="label-text-alt text-xs text-slate-500">Used to generate the AI embedding for matching.</span>
         </label>
       </div>
 
       <div class="pt-6 border-t border-white/5 flex justify-end gap-4">
-        <%= link_to "ABORT", admin_skills_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px]" %>
-        <%= f.submit (@skill.new_record? ? "REGISTER_LABEL" : "UPDATE_LABEL"), class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+        <%= link_to "Cancel", admin_skills_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold" %>
+        <%= f.submit (skill.new_record? ? "Create Skill" : "Update Skill"), class: "btn btn-primary rounded-xl px-10 font-bold" %>
       </div>
     <% end %>
   </div>

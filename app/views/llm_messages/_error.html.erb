@@ -1,14 +1,14 @@
 <div id="llm_message_<%= llm_message.id %>" class="chat chat-start group">
-  <div class="chat-header opacity-50 text-[10px] font-bold uppercase tracking-widest mb-1">
-    System Exception
+  <div class="chat-header opacity-60 text-xs font-bold mb-1">
+    Error
   </div>
   <div class="chat-bubble chat-bubble-error shadow-lg text-sm leading-relaxed p-4">
     <div class="flex items-center gap-2 mb-2">
-      <div class="badge badge-outline badge-xs opacity-50 uppercase font-bold tracking-widest text-[8px] text-error-content"><%= title.presence || "Error" %></div>
+      <div class="badge badge-outline badge-xs opacity-60 font-bold text-xs text-error-content"><%= title.presence || "Error" %></div>
     </div>
-    <pre class="bg-black/20 p-3 rounded-lg text-[10px] font-mono opacity-70 overflow-x-auto text-error-content"><%= error_message %></pre>
+    <pre class="bg-black/20 p-3 rounded-lg text-xs font-mono opacity-80 overflow-x-auto text-error-content"><%= error_message %></pre>
   </div>
-  <div class="chat-footer opacity-20 text-[8px] font-bold uppercase tracking-widest mt-1">
+  <div class="chat-footer opacity-40 text-xs font-bold mt-1">
     <%= llm_message.created_at&.strftime("%I:%M %p") %>
   </div>
 </div>

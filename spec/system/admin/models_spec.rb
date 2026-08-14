@@ -12,7 +12,7 @@ RSpec.describe "Admin::Models" do
   describe "GET /admin/models" do
     it "displays the model registry" do
       visit admin_models_path
-      expect(page).to have_text("LLM Model Registry")
+      expect(page).to have_text("AI Models")
       expect(page).to have_css("tr")
     end
   end

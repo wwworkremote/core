@@ -2,15 +2,15 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Background Pipeline</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Solid Queue Execution Registry</p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Background Jobs</h1>
+    <p class="text-slate-500 font-bold text-sm">Solid Queue job execution and worker status.</p>
   </div>
   <div class="flex gap-4">
-    <%= button_to prune_admin_jobs_path, method: :post, class: "btn btn-outline border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-[10px] font-black tracking-widest", data: { turbo_confirm: "Force prune all dead worker heartbeats?" } do %>
-      <i class="bi bi-scissors"></i> FORCE_PRUNE_DEAD
+    <%= button_to prune_admin_jobs_path, method: :post, class: "btn btn-outline border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-sm font-bold", data: { turbo_confirm: "Force prune all dead worker heartbeats?" } do %>
+      <i class="bi bi-scissors"></i> Prune Dead Workers
     <% end %>
     <%= link_to "/jobs", class: "btn-neural !bg-slate-800 !text-white flex items-center gap-2", target: "_blank" do %>
-      <i class="bi bi-box-arrow-up-right"></i> MISSION_CONTROL_DEEP_LINK
+      <i class="bi bi-box-arrow-up-right"></i> Open Job Queue
     <% end %>
   </div>
 </div>
@@ -18,24 +18,24 @@
 <!-- Golden Signals -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
   <div class="card-neural p-6 border-l-4 border-l-blue-500">
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Latency (Oldest Ready)</div>
+    <div class="text-xs font-bold text-slate-500 mb-1">Latency (Oldest Ready)</div>
     <div class="text-2xl font-black text-white"><%= @latency %>s</div>
   </div>
   <div class="card-neural p-6 border-l-4 border-l-emerald-500">
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Throughput (RPM)</div>
-    <div class="text-2xl font-black text-white"><%= @throughput %> <small class="text-[10px] opacity-40 uppercase">jobs/m</small></div>
+    <div class="text-xs font-bold text-slate-500 mb-1">Throughput</div>
+    <div class="text-2xl font-black text-white"><%= @throughput %> <small class="text-xs opacity-60">jobs/min</small></div>
   </div>
   <div class="card-neural p-6 border-l-4 border-l-rose-500">
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Error Rate (1h)</div>
+    <div class="text-xs font-bold text-slate-500 mb-1">Error Rate (1h)</div>
     <div class="text-2xl font-black text-white"><%= @error_rate %>%</div>
   </div>
   <div class="card-neural p-6 border-l-4 border-l-amber-500">
-    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Saturation</div>
+    <div class="text-xs font-bold text-slate-500 mb-1">Saturation</div>
     <div class="text-2xl font-black text-white"><%= @saturation %>%</div>
   </div>
 </div>
 
-<!-- Queue Depletion Intelligence -->
+<!-- Queue Depletion -->
 <div class="card-neural mb-8 p-6 bg-blue-900/10 border border-blue-500/20">
   <div class="flex items-center justify-between gap-6">
     <div class="flex items-center gap-4">
@@ -43,25 +43,25 @@
         <i class="bi bi-hourglass-split text-2xl"></i>
       </div>
       <div>
-        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Queue_Depletion_Intelligence</h3>
+        <h3 class="text-xs font-bold text-blue-400 mb-1">Queue Depletion</h3>
         <div class="flex items-center gap-6">
           <div>
-            <span class="text-[8px] text-slate-500 uppercase font-black">Remaining_Jobs</span>
+            <span class="text-xs text-slate-500 font-bold">Remaining Jobs</span>
             <div class="text-xl font-black text-white"><%= number_with_delimiter(@ready_count) %></div>
           </div>
           <div class="w-[1px] h-8 bg-white/10"></div>
           <div>
-            <span class="text-[8px] text-slate-500 uppercase font-black">Current_Throughput</span>
-            <div class="text-xl font-black text-white"><%= @throughput_per_min %> <small class="text-[10px] opacity-40 uppercase">jobs/m</small></div>
+            <span class="text-xs text-slate-500 font-bold">Throughput</span>
+            <div class="text-xl font-black text-white"><%= @throughput_per_min %> <small class="text-xs opacity-60">jobs/min</small></div>
           </div>
           <div class="w-[1px] h-8 bg-white/10"></div>
           <div>
-            <span class="text-[8px] text-slate-500 uppercase font-black">ETA_To_Empty</span>
+            <span class="text-xs text-slate-500 font-bold">ETA to Empty</span>
             <div class="text-xl font-black text-emerald-400">
               <% if @eta_minutes %>
                 <%= @eta_minutes > 60 ? "#{(@eta_minutes/60).round(1)} hours" : "#{@eta_minutes} mins" %>
               <% else %>
-                INFINITY_OR_STALLED
+                Unknown
               <% end %>
             </div>
           </div>
@@ -69,7 +69,7 @@
       </div>
     </div>
     <div class="hidden md:block">
-      <div class="text-[8px] text-slate-500 uppercase font-black mb-1">Dynamic_depletion_rate</div>
+      <div class="text-xs text-slate-500 font-bold mb-1">Load</div>
       <div class="h-2 w-48 bg-white/5 rounded-full overflow-hidden">
         <div class="h-full bg-blue-500 animate-pulse" style="width: <%= [@saturation, 100].min %>%"></div>
       </div>
@@ -80,63 +80,63 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
   <div class="card-neural p-4 text-center bg-white/5">
     <div class="text-xl font-black text-white mb-1"><%= number_with_delimiter(@ready_count) %></div>
-    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Ready</div>
+    <div class="text-xs font-bold text-slate-500">Ready</div>
   </div>
   <div class="card-neural p-4 text-center bg-white/5">
     <div class="text-xl font-black text-blue-400 mb-1"><%= number_with_delimiter(@scheduled_count) %></div>
-    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Scheduled</div>
+    <div class="text-xs font-bold text-slate-500">Scheduled</div>
   </div>
   <div class="card-neural p-4 text-center bg-white/5">
     <div class="text-xl font-black text-amber-500 mb-1"><%= number_with_delimiter(@blocked_count) %></div>
-    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Blocked</div>
+    <div class="text-xs font-bold text-slate-500">Blocked</div>
   </div>
   <div class="card-neural p-4 text-center bg-white/5 border-rose-900/30">
     <div class="text-xl font-black text-rose-500 mb-1"><%= number_with_delimiter(@failed_count) %></div>
-    <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Failed</div>
+    <div class="text-xs font-bold text-slate-500">Failed</div>
   </div>
 </div>
 
-<!-- Task Orchestration -->
+<!-- Scheduled Tasks -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
   <% [:utilities, :pipeline].each do |group| %>
     <div class="card-neural overflow-hidden">
       <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-          <%= group.to_s.gsub('_', ' ') %>_Registry
+        <h3 class="text-xs font-bold text-slate-400">
+          <%= group.to_s.humanize %>
         </h3>
-        <span class="badge badge-outline badge-xs opacity-50"><%= @scheduler_info[group].count %> TASKS</span>
+        <span class="badge badge-outline badge-xs opacity-70"><%= @scheduler_info[group].count %> tasks</span>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
-          <thead class="bg-white/[0.02] border-b border-white/5 text-[8px] font-black uppercase tracking-[0.2em] text-slate-500">
+          <thead class="bg-white/[0.02] border-b border-white/5 text-xs font-bold text-slate-500">
             <tr>
-              <th class="px-6 py-3">Identifier</th>
+              <th class="px-6 py-3">Task</th>
               <th class="px-6 py-3">Schedule</th>
-              <th class="px-6 py-3 text-right">Last_Run</th>
+              <th class="px-6 py-3 text-right">Last Run</th>
               <th class="px-6 py-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-white/5 font-mono text-[10px]">
+          <tbody class="divide-y divide-white/5 font-mono text-xs">
             <% @scheduler_info[group].each do |task| %>
               <tr class="group hover:bg-white/[0.03] transition-colors">
                 <td class="px-6 py-4">
                   <div class="text-white font-bold"><%= task[:id] %></div>
-                  <div class="text-[8px] text-slate-600 truncate max-w-[120px]"><%= task[:class_name] %></div>
+                  <div class="text-xs text-slate-500 truncate max-w-[120px]"><%= task[:class_name] %></div>
                 </td>
                 <td class="px-6 py-4">
                   <span class="text-slate-500"><%= task[:schedule] %></span>
                 </td>
                 <td class="px-6 py-4 text-right">
                   <% if task[:last_run] %>
-                    <div class="text-emerald-500/80"><%= time_ago_in_words(task[:last_run]) %> ago</div>
-                    <div class="text-[8px] text-slate-700 uppercase"><%= task[:status] %></div>
+                    <div class="text-emerald-500/90"><%= time_ago_in_words(task[:last_run]) %> ago</div>
+                    <div class="text-xs text-slate-500"><%= task[:status] %></div>
                   <% else %>
-                    <span class="text-slate-700">NEVER</span>
+                    <span class="text-slate-500">Never</span>
                   <% end %>
                 </td>
                 <td class="px-6 py-4 text-center">
                   <%= button_to trigger_admin_jobs_path(task_id: task[:id]), class: "btn btn-ghost btn-xs text-blue-500 hover:text-blue-400", data: { turbo_confirm: "Trigger #{task[:id]} now?" } do %>
-                    <i class="bi bi-play-fill"></i> RUN
+                    <i class="bi bi-play-fill"></i> Run
                   <% end %>
                 </td>
               </tr>
@@ -151,14 +151,14 @@
 <% if @running_too_long.any? %>
   <div class="card-neural mb-12 border-rose-500/20 bg-rose-500/5">
     <div class="p-4 border-b border-rose-500/10 flex justify-between items-center">
-      <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400">
-        Stalled_Pipeline_Executions
+      <h3 class="text-xs font-bold text-rose-400">
+        Stalled Jobs
       </h3>
-      <span class="badge badge-error badge-xs"><%= @running_too_long.count %> STALLED</span>
+      <span class="badge badge-error badge-xs"><%= @running_too_long.count %> stalled</span>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
-        <thead class="bg-rose-500/[0.02] border-b border-rose-500/10 text-[8px] font-black uppercase tracking-[0.2em] text-rose-500/50">
+        <thead class="bg-rose-500/[0.02] border-b border-rose-500/10 text-xs font-bold text-rose-400/70">
           <tr>
             <th class="px-6 py-3">Job ID</th>
             <th class="px-6 py-3">Class</th>
@@ -167,7 +167,7 @@
             <th class="px-6 py-3 text-center">Action</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-rose-500/10 font-mono text-[10px]">
+        <tbody class="divide-y divide-rose-500/10 font-mono text-xs">
           <% @running_too_long.each do |claimed| %>
             <tr class="hover:bg-rose-500/[0.03]">
               <td class="px-6 py-4">
@@ -184,20 +184,20 @@
                     <% end %>
                     <div class="modal-action p-4 bg-slate-900 border-t border-white/5 mt-0">
                       <form method="dialog">
-                        <button class="btn btn-sm btn-ghost uppercase tracking-widest text-[10px]">Close_Inspector</button>
+                        <button class="btn btn-sm btn-ghost text-sm">Close</button>
                       </form>
                     </div>
                   </div>
                 </dialog>
               </td>
               <td class="px-6 py-4 text-slate-300"><%= claimed.job.class_name %></td>
-              <td class="px-6 py-4 text-right font-black text-rose-500 uppercase tracking-tighter">
+              <td class="px-6 py-4 text-right font-bold text-rose-500">
                 <%= ((Time.current - claimed.created_at)/60).round(1) %> mins
               </td>
               <td class="px-6 py-4 text-right text-slate-500"><%= claimed.created_at.strftime("%H:%M:%S") %></td>
               <td class="px-6 py-4 text-center">
-                <%= button_to cancel_admin_job_path(claimed.job_id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", data: { turbo_confirm: "Signal mid-performance cancellation for Job ##{claimed.job_id}?" } do %>
-                  <i class="bi bi-stop-circle"></i> CANCEL
+                <%= button_to cancel_admin_job_path(claimed.job_id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", data: { turbo_confirm: "Cancel Job ##{claimed.job_id}?" } do %>
+                  <i class="bi bi-stop-circle"></i> Cancel
                 <% end %>
               </td>
             </tr>
@@ -206,8 +206,8 @@
       </table>
     </div>
     <div class="p-4 bg-rose-500/5">
-      <p class="text-[9px] text-rose-400/60 uppercase tracking-widest text-center">
-        These jobs are claimed but have not reported completion. Use Mission Control or <strong>Force Prune</strong> to release them.
+      <p class="text-xs text-rose-400/80 text-center">
+        These jobs are claimed but have not reported completion. Use the job queue mount or <strong>Prune Dead Workers</strong> to release them.
       </p>
     </div>
   </div>
@@ -217,29 +217,29 @@
   <div class="lg:col-span-1 space-y-8">
     <div class="card-neural">
       <div class="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Process Heartbeats</h3>
+        <h3 class="text-xs font-bold text-slate-400">Worker Processes</h3>
         <span class="badge badge-success badge-xs"></span>
       </div>
-      <div class="divide-y divide-white/5 font-mono text-[10px]">
+      <div class="divide-y divide-white/5 font-mono text-xs">
         <% if @active_processes.any? %>
           <% @active_processes.each do |proc| %>
             <div class="px-4 py-3 group hover:bg-white/[0.03]">
               <div class="flex justify-between items-start mb-1">
                 <span class="text-white font-bold"><%= proc.kind %></span>
-                <span class="text-[8px] text-slate-600">PID: <%= proc.pid %></span>
+                <span class="text-xs text-slate-500">PID: <%= proc.pid %></span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-[8px] text-slate-500 truncate max-w-[120px]"><%= proc.hostname %></span>
-                <span class="text-[8px] <%= proc.last_heartbeat_at > 1.minute.ago ? 'text-emerald-500' : 'text-rose-500' %>">
+                <span class="text-xs text-slate-500 truncate max-w-[120px]"><%= proc.hostname %></span>
+                <span class="text-xs <%= proc.last_heartbeat_at > 1.minute.ago ? 'text-emerald-500' : 'text-rose-500' %>">
                   <%= time_ago_in_words(proc.last_heartbeat_at) %> ago
                 </span>
               </div>
             </div>
           <% end %>
         <% else %>
-          <div class="px-6 py-8 text-center text-rose-500 font-black text-[9px] uppercase tracking-widest">
-            0_ACTIVE_PROCESSES
-            <div class="text-[8px] text-slate-600 mt-1 font-normal lowercase italic">Queue is currently orphaned.</div>
+          <div class="px-6 py-8 text-center text-rose-500 font-bold text-sm">
+            No active workers
+            <div class="text-xs text-slate-500 mt-1 font-normal">Queue is currently orphaned.</div>
           </div>
         <% end %>
       </div>
@@ -247,18 +247,18 @@
 
     <div class="card-neural">
       <div class="p-4 border-b border-white/5 bg-white/5">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Queue Depth</h3>
+        <h3 class="text-xs font-bold text-slate-400">Queue Depth</h3>
       </div>
-      <div class="divide-y divide-white/5 font-mono text-[11px]">
+      <div class="divide-y divide-white/5 font-mono text-xs">
         <% if @queues.any? %>
           <% @queues.each do |name, count| %>
             <div class="px-6 py-4 flex items-center justify-between group hover:bg-white/[0.03]">
-              <span class="text-white font-bold uppercase tracking-tight"><%= name %></span>
-              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-black"><%= count %></span>
+              <span class="text-white font-bold"><%= name %></span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold"><%= count %></span>
             </div>
           <% end %>
         <% else %>
-          <div class="px-6 py-8 text-center text-slate-600 italic">No active queues found.</div>
+          <div class="px-6 py-8 text-center text-slate-500 italic">No active queues found.</div>
         <% end %>
       </div>
     </div>
@@ -266,13 +266,13 @@
     <% if @stalled_jobs.any? %>
       <div class="card-neural border-rose-900/30">
         <div class="p-4 border-b border-rose-900/30 bg-rose-900/10">
-          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">Stalled Pipelines (> 24h)</h3>
+          <h3 class="text-xs font-bold text-rose-400">Stalled Pipelines (&gt; 24h)</h3>
         </div>
-        <div class="divide-y divide-white/5 font-mono text-[10px]">
+        <div class="divide-y divide-white/5 font-mono text-xs">
           <% @stalled_jobs.each do |class_name, last_run| %>
             <div class="px-6 py-4 flex flex-col gap-1">
               <span class="text-white font-bold"><%= class_name %></span>
-              <span class="text-rose-400 opacity-80">Last seen: <%= time_ago_in_words(last_run) %> ago</span>
+              <span class="text-rose-400/90">Last seen: <%= time_ago_in_words(last_run) %> ago</span>
             </div>
           <% end %>
         </div>
@@ -282,43 +282,43 @@
 
   <div class="lg:col-span-2">
     <div role="tablist" class="tabs tabs-lifted mb-4">
-      <input type="radio" name="job_tabs" role="tab" class="tab font-black uppercase tracking-widest text-[9px]" aria-label="Recent Executions" checked>
+      <input type="radio" name="job_tabs" role="tab" class="tab font-bold text-xs" aria-label="Recent Executions" checked>
       <div role="tabpanel" class="tab-content card-neural p-0 border-white/10 mt-2">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
-            <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+            <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
               <tr>
-                <th class="px-6 py-4">Job ID / Class</th>
+                <th class="px-6 py-4">Job / Class</th>
                 <th class="px-6 py-4">Queue</th>
                 <th class="px-6 py-4 text-center">Status</th>
                 <th class="px-6 py-4 text-right">Age</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+            <tbody class="divide-y divide-white/5 font-mono text-xs">
               <% @recent_jobs.each do |job| %>
                 <tr class="group hover:bg-white/[0.03] transition-colors">
                   <td class="px-6 py-4">
                     <div class="text-white font-bold mb-0.5">#<%= job.id %></div>
-                    <div class="text-blue-400 font-bold text-[9px] truncate max-w-xs"><%= job.class_name %></div>
+                    <div class="text-blue-400 font-bold text-xs truncate max-w-xs"><%= job.class_name %></div>
                   </td>
                   <td class="px-6 py-4">
-                    <span class="text-slate-500"><%= job.queue_name&.upcase %></span>
+                    <span class="text-slate-500"><%= job.queue_name %></span>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <% if job.failed? %>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[9px] font-black">FAILED</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 text-xs font-bold">Failed</span>
                     <% elsif job.finished? %>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[9px] font-black">FINISHED</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-bold">Finished</span>
                     <% else %>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black">PENDING</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">Pending</span>
                     <% end %>
                   </td>
-                  <td class="px-6 py-4 text-right text-slate-600">
+                  <td class="px-6 py-4 text-right text-slate-500">
                     <%= job.created_at ? time_ago_in_words(job.created_at) : 'N/A' %>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <% unless job.finished? %>
-                      <%= button_to cancel_admin_job_path(job.id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", title: "Cancel Job", data: { turbo_confirm: "Signal mid-performance cancellation for Job ##{job.id}?" } do %>
+                      <%= button_to cancel_admin_job_path(job.id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", title: "Cancel Job", data: { turbo_confirm: "Cancel Job ##{job.id}?" } do %>
                         <i class="bi bi-stop-circle text-lg"></i>
                       <% end %>
                     <% end %>
@@ -330,33 +330,33 @@
         </div>
       </div>
 
-      <input type="radio" name="job_tabs" role="tab" class="tab font-black uppercase tracking-widest text-[9px]" aria-label="Failed Jobs (<%= @failed_count %>)">
+      <input type="radio" name="job_tabs" role="tab" class="tab font-bold text-xs" aria-label="Failed Jobs (<%= @failed_count %>)">
       <div role="tabpanel" class="tab-content card-neural p-0 border-white/10 mt-2">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
-            <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">
+            <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-rose-500">
               <tr>
-                <th class="px-6 py-4">Job ID / Error</th>
+                <th class="px-6 py-4">Job / Error</th>
                 <th class="px-6 py-4">Exception</th>
                 <th class="px-6 py-4 text-right">Failed At</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+            <tbody class="divide-y divide-white/5 font-mono text-xs">
               <% if @failed_jobs.any? %>
                 <% @failed_jobs.each do |job| %>
                   <% failed_exec = job.failed_execution %>
                   <tr class="group hover:bg-rose-500/[0.03] transition-colors">
                     <td class="px-6 py-4">
                       <div class="text-white font-bold mb-0.5">#<%= job.id %></div>
-                      <div class="text-slate-500 text-[9px] truncate max-w-xs"><%= job.class_name %></div>
+                      <div class="text-slate-500 text-xs truncate max-w-xs"><%= job.class_name %></div>
                     </td>
                     <td class="px-6 py-4">
                       <div class="text-rose-400 font-bold truncate max-w-xs" title="<%= failed_exec.error&.fetch('message', 'No message') %>">
                         <%= failed_exec.error&.fetch('exception_class', 'UnknownError') %>
                       </div>
-                      <div class="text-rose-900 text-[9px] truncate max-w-md"><%= failed_exec.error&.fetch('message', 'N/A') %></div>
+                      <div class="text-rose-400/60 text-xs truncate max-w-md"><%= failed_exec.error&.fetch('message', 'N/A') %></div>
                     </td>
-                    <td class="px-6 py-4 text-right text-slate-600">
+                    <td class="px-6 py-4 text-right text-slate-500">
                       <%= time_ago_in_words(failed_exec.created_at) %> ago
                     </td>
                   </tr>
@@ -364,8 +364,8 @@
               <% else %>
                 <tr>
                   <td colspan="3" class="px-6 py-12 text-center">
-                    <div class="text-emerald-500 font-black text-xs uppercase tracking-[0.2em]">0_FAILED_EXECUTIONS</div>
-                    <div class="text-[9px] text-slate-600 mt-2">Pipeline is running cleanly.</div>
+                    <div class="text-emerald-500 font-bold text-sm">No failed executions</div>
+                    <div class="text-xs text-slate-500 mt-2">The pipeline is running cleanly.</div>
                   </td>
                 </tr>
               <% end %>

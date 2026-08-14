@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* Official Dracula Pro Hex Palette - Tuned for A11y */
@@ -8,7 +9,7 @@
   --color-dracula-bg-light: #454158;
   --color-dracula-fg: #f8f8f2;
   --color-dracula-comment: #9590c5; /* Slightly lightened for better contrast */
-  
+
   --color-dracula-cyan: #80ffea;
   --color-dracula-green: #8aff80;
   --color-dracula-orange: #ffca80;
@@ -34,7 +35,7 @@
 
     --color-primary: var(--color-dracula-purple);
     --color-primary-content: #000000; /* Max contrast for buttons */
-    
+
     --color-secondary: var(--color-dracula-pink);
     --color-secondary-content: #000000;
 
@@ -53,7 +54,7 @@
     -webkit-font-smoothing: subpixel-antialiased;
     letter-spacing: -0.01em;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-extrabold tracking-tight text-white;
   }
@@ -63,7 +64,7 @@
   .card-admin {
     @apply bg-base-200 border border-white/10 rounded-xl shadow-2xl overflow-hidden;
   }
-  
+
   .table-admin {
     @apply w-full text-left border-collapse text-sm;
   }

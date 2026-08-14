@@ -1,19 +1,19 @@
-<% content_for :title, "Neural Models" %>
+<% content_for :title, "AI Models" %>
 
 <div class="flex justify-between items-center mb-12">
   <div>
-    <h1 class="text-4xl font-black uppercase tracking-tighter italic">Neural <span class="text-primary">Models</span></h1>
-    <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 mt-1">The hardware-agnostic registry of supported LLM architecture</p>
+    <h1 class="text-4xl font-black tracking-tight">AI Models</h1>
+    <p class="text-sm font-bold opacity-60 mt-1">Every AI model available to this app</p>
   </div>
 
   <div class="flex gap-2">
-    <%= link_to llm_chats_path, class: "btn btn-ghost btn-sm rounded-xl gap-2 font-bold uppercase tracking-widest text-[10px]" do %>
+    <%= link_to llm_chats_path, class: "btn btn-ghost btn-sm rounded-xl gap-2 font-bold" do %>
       <%= heroicon "chat-bubble-left-right", variant: :solid, options: { class: "w-3 h-3" } %>
-      Dialogues
+      AI Chats
     <% end %>
-    <%= button_to refresh_models_path, method: :post, class: "btn btn-primary btn-sm rounded-xl gap-2 font-bold uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20" do %>
+    <%= button_to refresh_models_path, method: :post, class: "btn btn-primary btn-sm rounded-xl gap-2 font-bold shadow-lg shadow-primary/20" do %>
       <%= heroicon "arrow-path", variant: :solid, options: { class: "w-3 h-3" } %>
-      Refresh Registry
+      Refresh
     <% end %>
   </div>
 </div>
@@ -23,10 +23,10 @@
     <table class="table table-zebra table-md w-full border-collapse">
       <thead>
         <tr class="bg-base-300/50 border-b border-white/5">
-          <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Provider</th>
-          <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Architecture</th>
-          <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Context Window</th>
-          <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Tokenization $/1M</th>
+          <th class="px-6 py-4 text-xs font-bold opacity-60">Provider</th>
+          <th class="px-6 py-4 text-xs font-bold opacity-60">Model</th>
+          <th class="px-6 py-4 text-xs font-bold opacity-60">Context Window</th>
+          <th class="px-6 py-4 text-xs font-bold opacity-60">Price per 1M Tokens</th>
           <th class="px-6 py-4"></th>
         </tr>
       </thead>
@@ -38,8 +38,8 @@
         <% else %>
           <tr>
             <td colspan="5" class="py-24 text-center">
-              <%= heroicon "cpu-chip", variant: :solid, options: { class: "w-12 h-12 text-base-300 mx-auto mb-4 opacity-20" } %>
-              <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">No neural models detected in active registry.</p>
+              <%= heroicon "cpu-chip", variant: :solid, options: { class: "w-12 h-12 text-base-300 mx-auto mb-4 opacity-40" } %>
+              <p class="text-sm font-bold opacity-60">No models found.</p>
             </td>
           </tr>
         <% end %>

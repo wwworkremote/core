@@ -2,52 +2,52 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">User Visits</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Ahoy Session Intelligence</p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Visits</h1>
+    <p class="text-slate-500 font-bold text-sm">Site visit and session activity.</p>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
   <div class="card-neural p-8">
-    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Session_Velocity</h3>
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Visits Over Time</h3>
     <div class="h-64">
       <%= line_chart charts_data_behavior_visits_path,
           height: "100%",
-          colors: ["#9580FF"],
+          colors: ["#7E9CD8"],
           library: {
             plugins: { legend: { display: false } },
             scales: {
-              y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#7970a9" } },
-              x: { grid: { display: false }, border: { display: false }, ticks: { color: "#7970a9" } }
+              y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#C8C093" } },
+              x: { grid: { display: false }, border: { display: false }, ticks: { color: "#C8C093" } }
             }
           } %>
     </div>
   </div>
 
   <div class="card-neural p-8">
-    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Acquisition_Sources</h3>
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Referrers</h3>
     <div class="h-64">
       <%= pie_chart charts_data_behavior_referrers_path,
           height: "100%",
-          colors: ["#80FFEA", "#8AFF80", "#FFCA80", "#FF80BF", "#9580FF"],
+          colors: ["#7E9CD8", "#98BB6C", "#E6C384", "#C34043", "#DCD7BA"],
           library: {
             plugins: {
-              legend: { position: 'bottom', labels: { color: "#7970a9", font: { weight: 'bold', size: 10 } } }
+              legend: { position: 'bottom', labels: { color: "#C8C093", font: { weight: 'bold', size: 10 } } }
             }
           } %>
     </div>
   </div>
   <div class="card-neural p-8">
-    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 border-b border-white/5 pb-4">Engagement_Events</h3>
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Events</h3>
     <div class="h-64">
       <%= column_chart charts_data_behavior_events_path,
           height: "100%",
-          colors: ["#80FFEA"],
+          colors: ["#98BB6C"],
           library: {
             plugins: { legend: { display: false } },
             scales: {
-              y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#7970a9" } },
-              x: { grid: { display: false }, border: { display: false }, ticks: { color: "#7970a9", font: { size: 8 } } }
+              y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { display: false }, ticks: { color: "#C8C093" } },
+              x: { grid: { display: false }, border: { display: false }, ticks: { color: "#C8C093", font: { size: 9 } } }
             }
           } %>
     </div>
@@ -57,7 +57,7 @@
 <div class="card-neural mb-12">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
-      <thead class="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+      <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
         <tr>
           <th class="px-6 py-4">Session / IP</th>
           <th class="px-6 py-4">Location</th>
@@ -66,12 +66,12 @@
           <th class="px-6 py-4 text-right">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-white/5 font-mono text-[11px]">
+      <tbody class="divide-y divide-white/5 font-mono text-xs">
         <% @visits.each do |visit| %>
           <tr class="group hover:bg-white/[0.03] transition-colors">
             <td class="px-6 py-4">
               <div class="text-white font-bold mb-0.5"><%= visit.visit_token %></div>
-              <div class="text-slate-500 text-[10px] font-bold"><%= visit.ip %></div>
+              <div class="text-slate-500 text-xs font-bold"><%= visit.ip %></div>
             </td>
             <td class="px-6 py-4">
               <span class="text-slate-400">
@@ -79,15 +79,15 @@
               </span>
             </td>
             <td class="px-6 py-4">
-              <div class="text-slate-500 text-[9px]"><%= visit.os %> / <%= visit.browser %></div>
+              <div class="text-slate-500 text-xs"><%= visit.os %> / <%= visit.browser %></div>
             </td>
             <td class="px-6 py-4 text-center">
               <span class="text-blue-400 font-bold"><%= visit.events.count %></span>
             </td>
             <td class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2 text-[10px]">
-                <%= link_to admin_visit_path(visit), class: "px-3 py-1 rounded font-black border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
-                  TRACE
+              <div class="flex items-center justify-end gap-2 text-xs">
+                <%= link_to admin_visit_path(visit), class: "px-3 py-1 rounded font-bold border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
+                  View
                 <% end %>
               </div>
             </td>

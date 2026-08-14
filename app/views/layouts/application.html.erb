@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dracula" class="bg-base-100">
+<html lang="en" data-theme="dark" class="bg-base-100">
   <head>
     <title>WWWorkRemote | Admin</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -27,36 +27,36 @@
       </div>
 
       <div class="flex-none">
-        <ul class="menu menu-horizontal px-1 gap-2 font-bold uppercase tracking-widest text-[10px]">
-          <li><%= link_to 'Intelligence', root_path %></li>
-          <li><%= link_to 'Entities', companies_path %></li>
-          <li><%= link_to 'Market', job_postings_path %></li>
-          <li><%= link_to 'Pipeline', user_job_postings_path %></li>
+        <ul class="menu menu-horizontal px-1 gap-2 font-bold text-sm">
+          <li><%= link_to t('.nav.dashboard'), root_path %></li>
+          <li><%= link_to t('.nav.companies'), companies_path %></li>
+          <li><%= link_to t('.nav.job_postings'), job_postings_path %></li>
+          <li><%= link_to t('.nav.saved_jobs'), user_job_postings_path %></li>
 
           <li class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded text-primary">Identity</div>
+            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded text-primary"><%= t('.nav.profile_menu') %></div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
-              <li><%= link_to 'Career Profile', career_profile_path %></li>
-              <li><%= link_to 'Resume Versions', resumes_path %></li>
-              <li><%= link_to 'Search Campaigns', job_searches_path %></li>
-              <li><%= link_to 'Neural Dialogues', llm_chats_path %></li>
-              <li><%= link_to 'Model Registry', models_path %></li>
+              <li><%= link_to t('.nav.career_profile'), career_profile_path %></li>
+              <li><%= link_to t('.nav.resume_versions'), resumes_path %></li>
+              <li><%= link_to t('.nav.saved_searches'), job_searches_path %></li>
+              <li><%= link_to t('.nav.ai_chats'), llm_chats_path %></li>
+              <li><%= link_to t('.nav.ai_models'), models_path %></li>
             </ul>
           </li>
 
           <li class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded">Control</div>
+            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded"><%= t('.nav.admin_menu') %></div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-64 mt-4 border border-white/5">
-              <li class="menu-title text-[8px] opacity-40">Administrative_Ops</li>
-              <li><%= link_to 'Admin Dashboard', admin_root_path %></li>
-              <li><%= link_to 'Observability', admin_observability_path %></li>
-              <li><%= link_to 'Background Jobs', admin_jobs_path %></li>
-              <li><%= link_to 'Ingestion Control', data_fetchers_path %></li>
+              <li class="menu-title text-xs opacity-60"><%= t('.nav.admin_section_label') %></li>
+              <li><%= link_to t('.nav.admin_dashboard'), admin_root_path %></li>
+              <li><%= link_to t('.nav.system_health'), admin_observability_path %></li>
+              <li><%= link_to t('.nav.background_jobs'), admin_jobs_path %></li>
+              <li><%= link_to t('.nav.data_sources'), data_fetchers_path %></li>
               <div class="divider my-1 opacity-10"></div>
-              <li class="menu-title text-[8px] opacity-40">System_Mounts</li>
-              <li><%= link_to 'PgHero', '/mounts/pghero' %></li>
-              <li><%= link_to 'Mission Control', '/mounts/jobs' %></li>
-              <li><%= link_to 'Analytics', '/mounts/analytics' %></li>
+              <li class="menu-title text-xs opacity-60"><%= t('.nav.tools_section_label') %></li>
+              <li><%= link_to t('.nav.pghero'), '/mounts/pghero' %></li>
+              <li><%= link_to t('.nav.job_queue'), '/mounts/jobs' %></li>
+              <li><%= link_to t('.nav.analytics'), '/mounts/analytics' %></li>
             </ul>
           </li>
         </ul>
@@ -76,19 +76,19 @@
 
     <footer class="footer p-10 bg-base-200 text-base-content border-t border-white/5">
       <nav>
-        <h6 class="footer-title text-white opacity-40 uppercase tracking-[0.2em] font-black text-[9px]">Operational Intelligence</h6>
-        <%= link_to 'Project Genesis (About)', about_path, class: "link link-hover text-xs font-bold text-slate-400" %>
-        <%= link_to 'Source Code (GitHub)', 'https://github.com/wwworkremote/core', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
-        <%= link_to 'Primary Node (just3ws.com)', 'https://www.just3ws.com', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
+        <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.links_heading') %></h6>
+        <%= link_to t('.footer.about'), about_path, class: "link link-hover text-xs font-bold text-slate-400" %>
+        <%= link_to t('.footer.source_code'), 'https://github.com/wwworkremote/core', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
+        <%= link_to 'just3ws.com', 'https://www.just3ws.com', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
       </nav>
       <nav>
-        <h6 class="footer-title text-white opacity-40 uppercase tracking-[0.2em] font-black text-[9px]">Partner Projects</h6>
-        <%= link_to 'Phalanx Duel', 'https://phalanxduel.com', class: "link link-hover text-xs font-bold text-primary italic", target: "_blank" %>
+        <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.also_built_heading') %></h6>
+        <%= link_to 'Phalanx Duel', 'https://phalanxduel.com', class: "link link-hover text-xs font-bold text-primary", target: "_blank" %>
       </nav>
       <aside class="md:justify-self-end">
         <p class="font-black uppercase tracking-tighter text-xl text-right">WWWork<span class="text-primary">Remote</span></p>
-        <p class="text-[10px] opacity-20 text-right uppercase tracking-widest font-bold">
-          &copy; <%= Time.current.year %> &mdash; The Autonomous Remote Job Synthesis Engine
+        <p class="text-xs opacity-50 text-right font-bold">
+          &copy; <%= Time.current.year %> &mdash; <%= t('.footer.tagline') %>
         </p>
       </aside>
     </footer>

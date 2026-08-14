@@ -1,15 +1,15 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">
-      <%= @status == 'purged' ? "RECYCLE_BIN" : "JOB_POSTINGS_REGISTRY" %>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">
+      <%= @status == 'purged' ? "Deleted Postings" : "Job Postings" %>
     </h1>
-    <p class="text-base-content/40 font-bold uppercase tracking-widest text-[10px]">Administrative CRUD Control Layer</p>
+    <p class="text-base-content/60 font-bold text-sm">Manage job postings.</p>
   </div>
   <div class="flex items-center gap-2">
     <% if @status == 'purged' %>
-      <%= link_to "VIEW_ACTIVE_REGISTRY", admin_job_postings_path, class: "btn btn-ghost btn-sm rounded-lg font-black tracking-widest text-[10px] border border-white/5" %>
+      <%= link_to "View Active Postings", admin_job_postings_path, class: "btn btn-ghost btn-sm rounded-lg font-bold border border-white/5" %>
     <% else %>
-      <%= link_to "VIEW_RECYCLE_BIN", admin_job_postings_path(status: 'purged'), class: "btn btn-ghost btn-sm rounded-lg font-black tracking-widest text-[10px] border border-error/20 text-error/60" %>
+      <%= link_to "View Deleted", admin_job_postings_path(status: 'purged'), class: "btn btn-ghost btn-sm rounded-lg font-bold border border-error/20 text-error/70" %>
     <% end %>
   </div>
 </div>
@@ -20,29 +20,28 @@
     <div class="bg-base-300/80 px-6 py-4 border-b border-white/10 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <input type="checkbox" class="checkbox checkbox-xs checkbox-primary" onclick="toggleAll(this)">
-        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Selection_Control</span>
+        <span class="text-xs font-bold text-slate-500">Select all</span>
       </div>
 
       <div class="flex items-center gap-2">
-        <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 mr-2">Batch_Command:</span>
         <% if @status == 'purged' %>
-          <button type="submit" name="bulk_operation" value="restore" class="btn btn-xs btn-success rounded font-black tracking-widest text-[9px]">RESTORE_SELECTED</button>
-          <button type="submit" name="bulk_operation" value="delete" class="btn btn-xs btn-error rounded font-black tracking-widest text-[9px]" data-turbo-confirm="Permanently delete selected records?">PURGE_PERMANENTLY</button>
+          <button type="submit" name="bulk_operation" value="restore" class="btn btn-xs btn-success rounded font-bold">Restore Selected</button>
+          <button type="submit" name="bulk_operation" value="delete" class="btn btn-xs btn-error rounded font-bold" data-turbo-confirm="Permanently delete selected records?">Delete Permanently</button>
         <% else %>
-          <button type="submit" name="bulk_operation" value="purge" class="btn btn-xs btn-warning rounded font-black tracking-widest text-[9px]">MOVE_TO_TRASH</button>
+          <button type="submit" name="bulk_operation" value="purge" class="btn btn-xs btn-warning rounded font-bold">Delete Selected</button>
         <% end %>
       </div>
     </div>
 
     <div class="overflow-x-auto">
-      <table class="table table-sm w-full font-mono text-[10px]">
+      <table class="table table-sm w-full font-mono text-xs">
         <thead class="bg-base-300/30 border-b border-white/5">
-          <tr class="text-base-content/20 uppercase tracking-[0.2em] font-black">
+          <tr class="text-base-content/40 font-bold">
             <th class="w-10"></th>
-            <th class="px-6 py-4 font-black">Title_Company</th>
-            <th class="px-6 py-4 font-black text-center">Neural_Status</th>
-            <th class="px-6 py-4 font-black text-center">Vectors</th>
-            <th class="px-6 py-4 font-black text-right">Execution</th>
+            <th class="px-6 py-4 font-bold">Title / Company</th>
+            <th class="px-6 py-4 font-bold text-center">AI Category</th>
+            <th class="px-6 py-4 font-bold text-center">Indexed</th>
+            <th class="px-6 py-4 font-bold text-right">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-white/5">
@@ -52,41 +51,49 @@
                 <input type="checkbox" name="job_ids[]" value="<%= job.id %>" class="checkbox checkbox-xs border-white/20">
               </td>
               <td class="px-6 py-5">
-                <div class="text-white font-black text-sm uppercase tracking-tight mb-0.5 truncate max-w-md"><%= job.title %></div>
-                <div class="text-primary font-black uppercase tracking-widest text-[9px]"><%= job.company_name %></div>
+                <div class="text-white font-bold text-sm mb-0.5 truncate max-w-md">
+                  <%= job.title %>
+                  <% if job.leads.any? %>
+                    <%= link_to admin_lead_path(job.leads.first), title: "Captured via the extension -- click to view the Lead",
+                                class: "badge badge-outline border-accent/40 text-accent text-[10px] font-bold align-middle ml-1" do %>
+                      <%= job.leads.first.provider&.humanize || "extension" %>
+                    <% end %>
+                  <% end %>
+                </div>
+                <div class="text-primary font-bold text-xs"><%= job.company_name %></div>
               </td>
               <td class="px-6 py-5 text-center align-middle">
                 <% category = job.data&.[]('ai_category') %>
                 <% if category.present? %>
-                  <div class="badge badge-primary bg-primary/10 text-primary border-primary/20 font-black text-[9px] uppercase tracking-tighter">
-                    <%= category.upcase %>
+                  <div class="badge badge-primary bg-primary/10 text-primary border-primary/20 font-bold text-xs">
+                    <%= category %>
                   </div>
                 <% elsif job.status == 'purged' %>
-                  <span class="opacity-40 text-error font-black uppercase">VECTORS_WIPED</span>
+                  <span class="opacity-60 text-error font-bold">Cleared</span>
                 <% else %>
-                  <span class="opacity-20 italic">PENDING_SYNTHESIS</span>
+                  <span class="opacity-40 italic">Pending</span>
                 <% end %>
               </td>
               <td class="px-6 py-5 text-center align-middle">
                 <% if job.embedding.present? %>
-                  <span class="text-accent shadow-[0_0_8px_#8be9fd]"><%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %></span>
+                  <span class="text-accent"><%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %></span>
                 <% else %>
-                  <span class="opacity-10"><%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %></span>
+                  <span class="opacity-20"><%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %></span>
                 <% end %>
               </td>
               <td class="px-6 py-5 text-right align-middle">
                 <div class="flex items-center justify-end gap-2">
-                  <%= link_to admin_job_posting_path(job), class: "btn btn-ghost btn-xs border border-white/10 rounded font-black tracking-widest text-base-content/40 hover:text-white" do %>
-                    READ
+                  <%= link_to admin_job_posting_path(job), class: "btn btn-ghost btn-xs border border-white/10 rounded font-bold text-base-content/60 hover:text-white" do %>
+                    View
                   <% end %>
 
                   <% if job.status == 'purged' %>
-                    <%= button_to restore_admin_job_posting_path(job), method: :post, class: "btn btn-ghost btn-xs border border-success/20 text-success/60 hover:bg-success hover:text-white rounded font-black tracking-widest" do %>
-                      RESTORE
+                    <%= button_to restore_admin_job_posting_path(job), method: :post, class: "btn btn-ghost btn-xs border border-success/20 text-success/70 hover:bg-success hover:text-white rounded font-bold" do %>
+                      Restore
                     <% end %>
                   <% else %>
-                    <%= button_to purge_admin_job_posting_path(job), method: :post, class: "btn btn-ghost btn-xs border border-warning/20 text-warning/60 hover:bg-warning hover:text-white rounded font-black tracking-widest" do %>
-                      TRASH
+                    <%= button_to purge_admin_job_posting_path(job), method: :post, class: "btn btn-ghost btn-xs border border-warning/20 text-warning/70 hover:bg-warning hover:text-white rounded font-bold" do %>
+                      Delete
                     <% end %>
                   <% end %>
                 </div>
@@ -99,11 +106,11 @@
   </div>
 <% end %>
 
-<div class="flex flex-col md:flex-row items-center justify-between gap-6 opacity-60">
+<div class="flex flex-col md:flex-row items-center justify-between gap-6 opacity-80">
   <%= paginate @job_postings %>
 
-  <%= link_to admin_root_path, class: "flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-base-content/50 hover:text-primary transition-all" do %>
-    <%= heroicon "chevron-left", options: { class: "w-3 h-3" } %> ESCAPE_TO_ADMIN_PORTAL
+  <%= link_to admin_root_path, class: "flex items-center gap-3 text-sm font-bold text-base-content/60 hover:text-primary transition-all" do %>
+    <%= heroicon "chevron-left", options: { class: "w-3 h-3" } %> Back to Admin Dashboard
   <% end %>
 </div>
 

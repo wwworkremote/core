@@ -2,34 +2,34 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Query Detail</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Pipeline Directive: #<%= @query.id %></p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Query</h1>
+    <p class="text-slate-500 font-bold text-sm">#<%= @query.id %></p>
   </div>
   <div>
-    <%= link_to admin_queries_path, class: "btn-neural text-[10px]" do %>
-      BACK_TO_QUERIES
+    <%= link_to admin_queries_path, class: "btn-neural text-sm" do %>
+      Back
     <% end %>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
   <div class="card-neural p-6">
-    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Source Context</h3>
-    <dl class="space-y-4 font-mono text-[11px]">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Source</h3>
+    <dl class="space-y-4 font-mono text-xs">
        <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Source</dt>
+          <dt class="text-slate-500 font-bold mb-1">Source</dt>
           <dd class="text-blue-400 font-bold"><%= @query.job_boards_source&.name %></dd>
         </div>
         <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">State</dt>
-          <dd class="text-white"><%= @query.aasm_state&.upcase || "ACTIVE" %></dd>
+          <dt class="text-slate-500 font-bold mb-1">Status</dt>
+          <dd class="text-white"><%= @query.aasm_state&.humanize || "Active" %></dd>
         </div>
     </dl>
   </div>
 
   <div class="card-neural p-6">
-    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Query Parameters</h3>
-    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-[10px] text-slate-400">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Parameters</h3>
+    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400">
       <%= JSON.pretty_generate(@query.data) rescue "{}" %>
     </div>
   </div>

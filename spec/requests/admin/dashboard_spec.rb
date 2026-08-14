@@ -7,7 +7,7 @@ RSpec.describe "Admin::Dashboard" do
     it "returns a success response" do
       get admin_root_path
       expect(response).to be_successful
-      expect(response.body).to include("System_Administration")
+      expect(response.body).to include("Admin Dashboard")
     end
   end
 

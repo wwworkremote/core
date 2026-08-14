@@ -1,58 +1,58 @@
 <%= render "admin/shared/nav" if current_user.admin? %>
 
 <div class="max-w-6xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
-      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">Campaign_Registry</span>
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white"><%= t('.breadcrumb_current') %></span>
     </div>
   </div>
 
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
     <div>
-      <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none">Job Search Campaigns</h1>
-      <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Strategic groupings of opportunities bound to specific resume versions.</p>
+      <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= t('.title') %></h1>
+      <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
     </div>
     <div class="flex gap-4">
-      <%= link_to "INITIATE_NEW_CAMPAIGN", new_job_search_path, class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+      <%= link_to t('.new_search'), new_job_search_path, class: "btn btn-primary rounded-xl px-10 font-bold" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    <% @job_searches.each do |campaign| %>
-      <div class="card-neural p-8 border-t-2 <%= campaign.active? ? 'border-primary' : 'border-slate-800' %>">
+    <% @job_searches.each do |search| %>
+      <div class="card-neural p-8 border-t-2 <%= search.active? ? 'border-primary' : 'border-slate-800' %>">
         <div class="flex justify-between items-start mb-4">
-          <h3 class="text-xl font-black text-white uppercase tracking-tight"><%= campaign.name %></h3>
-          <span class="badge badge-neutral bg-white/5 border-none text-[8px] font-black uppercase tracking-widest"><%= campaign.status %></span>
+          <h3 class="text-xl font-black text-white tracking-tight"><%= search.name %></h3>
+          <span class="badge badge-neutral bg-white/5 border-none text-xs font-bold"><%= search.status %></span>
         </div>
 
         <div class="space-y-6">
           <div class="p-4 bg-white/5 rounded-xl border border-white/5">
-            <div class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Bound_Resume</div>
-            <% if campaign.resume %>
+            <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.resume_label') %></div>
+            <% if search.resume %>
               <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-white"><%= campaign.resume.name %></span>
-                <span class="text-[10px] font-black text-primary/50">V<%= campaign.resume.version %></span>
+                <span class="text-xs font-bold text-white"><%= search.resume.name %></span>
+                <span class="text-xs font-bold text-primary/60">V<%= search.resume.version %></span>
               </div>
             <% else %>
-              <div class="text-xs font-bold text-slate-600">NO_RESUME_BOUND</div>
+              <div class="text-xs font-bold text-slate-500"><%= t('.no_resume') %></div>
             <% end %>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div class="text-center p-4 bg-white/5 rounded-xl border border-white/5">
-              <div class="text-2xl font-black text-white"><%= campaign.user_job_postings.count %></div>
-              <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Jobs_Linked</div>
+              <div class="text-2xl font-black text-white"><%= search.user_job_postings.count %></div>
+              <div class="text-xs font-bold text-slate-500 mt-1"><%= t('.jobs_linked') %></div>
             </div>
             <div class="text-center p-4 bg-white/5 rounded-xl border border-white/5">
-              <div class="text-2xl font-black text-primary"><%= campaign.user_job_postings.where(status: 'applied').count %></div>
-              <div class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Applications</div>
+              <div class="text-2xl font-black text-primary"><%= search.user_job_postings.where(status: 'applied').count %></div>
+              <div class="text-xs font-bold text-slate-500 mt-1"><%= t('.applications') %></div>
             </div>
           </div>
 
           <div class="pt-4 border-t border-white/5">
-            <%= link_to "VIEW_CAMPAIGN_INTELLIGENCE", job_search_path(campaign), class: "btn btn-ghost border-white/10 btn-block btn-sm font-black tracking-widest text-[9px] hover:bg-primary/10 hover:text-primary" %>
+            <%= link_to t('.view_search'), job_search_path(search), class: "btn btn-ghost border-white/10 btn-block btn-sm font-bold hover:bg-primary/10 hover:text-primary" %>
           </div>
         </div>
       </div>

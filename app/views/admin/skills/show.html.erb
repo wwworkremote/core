@@ -1,48 +1,47 @@
 <%= render "admin/shared/nav" %>
 
 <div class="max-w-4xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
-      <%= link_to "Registry", admin_skills_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">Skill_Intelligence</span>
+      <%= link_to "Skills", admin_skills_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white"><%= @skill.name %></span>
     </div>
   </div>
 
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
     <div>
-      <h1 class="text-4xl font-black text-white uppercase tracking-tight leading-none mb-3"><%= @skill.name %></h1>
-      <span class="badge badge-primary bg-primary/10 border-primary/20 text-[9px] font-black uppercase tracking-widest px-4 py-3"><%= @skill.category || "UNCLASSIFIED" %></span>
+      <h1 class="text-4xl font-black text-white tracking-tight leading-none mb-3"><%= @skill.name %></h1>
+      <span class="badge badge-primary bg-primary/10 border-primary/20 text-xs font-bold px-4 py-3"><%= @skill.category || "Uncategorized" %></span>
     </div>
     <div class="flex gap-4">
-      <%= link_to "RECONFIGURE_LABEL", edit_admin_skill_path(@skill), class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+      <%= link_to "Edit", edit_admin_skill_path(@skill), class: "btn btn-primary rounded-xl px-10 font-bold" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <div class="md:col-span-2 space-y-8">
       <div class="card-neural p-8">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Semantic_Definition</h3>
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6">Description</h3>
         <p class="text-base text-white/80 leading-relaxed font-medium">
-          <%= @skill.description.present? ? @skill.description : "No description provided for this technical label." %>
+          <%= @skill.description.present? ? @skill.description : "No description provided." %>
         </p>
       </div>
 
       <div class="card-neural p-8 border-l-4 border-accent">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex justify-between items-center">
-          <span>Nearest_Neighbors</span>
-          <span class="text-[8px] opacity-40 font-mono">VECTOR_SIMILARITY</span>
+        <h3 class="text-xs font-bold text-white/60 mb-6 flex justify-between items-center">
+          <span>Related Skills</span>
         </h3>
         <div class="space-y-4">
           <% if @nearest_skills.any? %>
             <% @nearest_skills.each do |neighbor| %>
               <%= link_to admin_skill_path(neighbor), class: "flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-accent transition-all" do %>
-                <span class="text-xs font-black text-white uppercase tracking-tight"><%= neighbor.name %></span>
-                <span class="text-[9px] font-bold text-slate-500 uppercase"><%= neighbor.category %></span>
+                <span class="text-sm font-bold text-white"><%= neighbor.name %></span>
+                <span class="text-xs font-bold text-slate-500"><%= neighbor.category %></span>
               <% end %>
             <% end %>
           <% else %>
-            <div class="text-[10px] text-slate-600 italic py-4 text-center">No semantically related labels identified.</div>
+            <div class="text-sm text-slate-500 italic py-4 text-center">No related skills found.</div>
           <% end %>
         </div>
       </div>
@@ -50,18 +49,18 @@
 
     <div class="space-y-8">
       <div class="card-neural p-8">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/30 pb-4 border-b border-white/5 mb-6">Telemetry</h3>
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6">Details</h3>
         <div class="space-y-6">
           <div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Neural_Status</div>
+            <div class="text-xs font-bold text-slate-500 mb-2">Indexed for matching</div>
             <div class="flex items-center gap-2">
               <div class="w-2 h-2 rounded-full <%= @skill.embedding.present? ? 'bg-success' : 'bg-warning' %> animate-pulse"></div>
-              <span class="text-[10px] font-black text-white uppercase"><%= @skill.embedding.present? ? "VECTORIZED" : "PENDING" %></span>
+              <span class="text-sm font-bold text-white"><%= @skill.embedding.present? ? "Yes" : "Pending" %></span>
             </div>
           </div>
           <div>
-            <div class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2">Created</div>
-            <div class="text-[10px] font-mono text-slate-500 uppercase"><%= @skill.created_at.strftime("%Y_%m_%d | %H:%M") %></div>
+            <div class="text-xs font-bold text-slate-500 mb-2">Created</div>
+            <div class="text-xs font-mono text-slate-500"><%= @skill.created_at.strftime("%Y-%m-%d %H:%M") %></div>
           </div>
         </div>
       </div>

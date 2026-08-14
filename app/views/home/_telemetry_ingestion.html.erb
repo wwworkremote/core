@@ -1,19 +1,19 @@
 <div id="source_stats" class="stats stats-vertical md:stats-horizontal w-full bg-base-200 shadow-xl border border-white/5">
   <div class="stat">
-    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Sync_1H</div>
-    <div class="stat-value text-dracula-purple text-3xl"><%= Source.where(created_at: 1.hour.ago..).count %></div>
-    <div class="stat-desc font-bold text-[9px] text-dracula-purple/50 uppercase tracking-tighter">Live_Signals</div>
+    <div class="stat-title text-xs font-bold opacity-60"><%= t('.last_hour') %></div>
+    <div class="stat-value text-kanagawa-accent text-3xl"><%= Source.where(created_at: 1.hour.ago..).count %></div>
+    <div class="stat-desc font-bold text-xs text-kanagawa-accent/60"><%= t('.jobs_fetched') %></div>
   </div>
 
   <div class="stat">
-    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Payload_24H</div>
-    <div class="stat-value text-dracula-pink text-3xl"><%= Source.where(created_at: 1.day.ago..).count %></div>
-    <div class="stat-desc font-bold text-[9px] text-dracula-pink/50 uppercase tracking-tighter">Sync_Nodes</div>
+    <div class="stat-title text-xs font-bold opacity-60"><%= t('.last_24h') %></div>
+    <div class="stat-value text-kanagawa-yellow text-3xl"><%= Source.where(created_at: 1.day.ago..).count %></div>
+    <div class="stat-desc font-bold text-xs text-kanagawa-yellow/60"><%= t('.jobs_fetched') %></div>
   </div>
 
   <div class="stat !border-none">
-    <div class="stat-title text-[10px] font-black uppercase tracking-widest opacity-40">Growth_7D</div>
-    <div class="stat-value text-dracula-cyan text-3xl"><%= Source.where(created_at: 1.week.ago..).count %></div>
-    <div class="stat-desc font-bold text-[9px] text-dracula-cyan/50 uppercase tracking-tighter">Network_Expansion</div>
+    <div class="stat-title text-xs font-bold opacity-60"><%= t('.last_7d') %></div>
+    <div class="stat-value text-kanagawa-green text-3xl"><%= Source.where(created_at: 1.week.ago..).count %></div>
+    <div class="stat-desc font-bold text-xs text-kanagawa-green/60"><%= t('.jobs_fetched') %></div>
   </div>
 </div>

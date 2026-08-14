@@ -1,48 +1,48 @@
 <%= render "admin/shared/nav" if current_user.admin? %>
 
 <div class="max-w-6xl mx-auto py-10 px-6">
-  <div class="mb-10 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+  <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
-      <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-[8px]"></i>
-      <span class="text-white">Resume_Registry</span>
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <i class="bi bi-chevron-right text-xs"></i>
+      <span class="text-white"><%= t('.breadcrumb_current') %></span>
     </div>
   </div>
 
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
     <div>
-      <h1 class="text-4xl font-black text-white mb-3 uppercase tracking-tight leading-none">Resume Versions</h1>
-      <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Manage versioned artifacts and strategic tracks.</p>
+      <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= t('.title') %></h1>
+      <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
     </div>
     <div class="flex gap-4">
-      <%= button_to "IMPORT_FROM_JUST3WS", resumes_path(import_url: "https://just3ws.github.io/resume.json"), class: "btn btn-ghost border-white/10 rounded-xl px-10 font-black tracking-widest text-[10px] hover:text-accent hover:border-accent/50" %>
-      <%= link_to "NEW_BASE_RESUME", new_resume_path, class: "btn btn-primary rounded-xl px-10 font-black tracking-widest text-[10px]" %>
+      <%= button_to t('.import'), resumes_path(import_url: "https://just3ws.github.io/resume.json"), class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold hover:text-accent hover:border-accent/50" %>
+      <%= link_to t('.new_resume'), new_resume_path, class: "btn btn-primary rounded-xl px-10 font-bold" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <% @resumes.group_by(&:name).each do |name, versions| %>
       <div class="card-neural p-8 border-t-2 border-primary/20">
-        <h3 class="text-xl font-black text-white uppercase tracking-tight mb-2"><%= name %></h3>
-        <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6"><%= versions.count %> Versions_Found</div>
+        <h3 class="text-xl font-black text-white tracking-tight mb-2"><%= name %></h3>
+        <div class="text-xs font-bold text-slate-500 mb-6"><%= t('.versions_count', count: versions.count) %></div>
 
         <div class="space-y-4">
           <% versions.each do |resume| %>
             <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-primary/30 transition-all group">
               <div>
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-black text-white">v<%= resume.version %></span>
+                  <span class="text-xs font-bold text-white">v<%= resume.version %></span>
                   <% if resume.active? %>
-                    <span class="badge badge-success badge-xs text-[8px] font-black uppercase tracking-tighter">ACTIVE</span>
+                    <span class="badge badge-success badge-xs text-xs font-bold"><%= t('.active') %></span>
                   <% end %>
                 </div>
-                <div class="text-[9px] font-bold text-slate-500 uppercase"><%= resume.created_at.strftime("%Y_%m_%d") %></div>
+                <div class="text-xs font-bold text-slate-500"><%= resume.created_at.strftime("%b %-d, %Y") %></div>
               </div>
               <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <%= link_to resume_path(resume), class: "btn btn-square btn-ghost btn-xs text-primary" do %>
                   <i class="bi bi-eye"></i>
                 <% end %>
-                <%= button_to fork_resume_path(resume), method: :post, class: "btn btn-square btn-ghost btn-xs text-accent", title: "Fork" do %>
+                <%= button_to fork_resume_path(resume), method: :post, class: "btn btn-square btn-ghost btn-xs text-accent", title: t('.fork') do %>
                   <i class="bi bi-git"></i>
                 <% end %>
               </div>

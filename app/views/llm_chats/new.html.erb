@@ -1,4 +1,4 @@
-<% content_for :title, "Initiate Dialogue" %>
+<% content_for :title, t('.title') %>
 
 <div class="max-w-xl mx-auto py-12">
   <div class="bg-base-200 p-12 rounded-[3rem] border border-white/5 shadow-2xl relative overflow-hidden group">
@@ -6,15 +6,15 @@
 
     <header class="text-center mb-12 relative">
       <%= heroicon "plus-circle", variant: :solid, options: { class: "w-16 h-16 text-primary mx-auto mb-6 group-hover:scale-110 transition-transform duration-500" } %>
-      <h1 class="text-3xl font-black uppercase tracking-tighter italic">Initiate <span class="text-primary">Dialogue</span></h1>
-      <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 mt-1 max-w-[200px] mx-auto leading-relaxed">Select model and provide initial instruction</p>
+      <h1 class="text-3xl font-black tracking-tight"><%= t('.title') %></h1>
+      <p class="text-sm font-bold opacity-60 mt-1 max-w-[220px] mx-auto leading-relaxed"><%= t('.subtitle') %></p>
     </header>
 
     <%= render "form", llm_chat: @llm_chat %>
 
     <div class="mt-8 text-center">
-      <%= link_to llm_chats_path, class: "text-[10px] font-black uppercase tracking-[0.2em] opacity-20 hover:opacity-100 transition-opacity" do %>
-        &larr; Abort and Return
+      <%= link_to llm_chats_path, class: "text-sm font-bold opacity-40 hover:opacity-100 transition-opacity" do %>
+        &larr; <%= t('.cancel') %>
       <% end %>
     </div>
   </div>

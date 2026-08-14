@@ -2,39 +2,39 @@
 
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
   <div>
-    <h1 class="text-3xl font-black tracking-tight text-white mb-1 uppercase">Event Inspect</h1>
-    <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Neural Snapshot: <%= @event.name %></p>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Event</h1>
+    <p class="text-slate-500 font-bold text-sm"><%= @event.name %></p>
   </div>
   <div>
-    <%= link_to admin_events_path, class: "btn-neural text-[10px]" do %>
-      BACK_TO_EVENTS
+    <%= link_to admin_events_path, class: "btn-neural text-sm" do %>
+      Back
     <% end %>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
   <div class="card-neural p-6">
-    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Contextual Properties</h3>
-    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-[10px] text-slate-400">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Properties</h3>
+    <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400">
       <%= JSON.pretty_generate(@event.properties) rescue "{}" %>
     </div>
   </div>
 
   <div class="card-neural p-6">
-    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Session Association</h3>
-    <dl class="space-y-4 font-mono text-[11px]">
+    <h3 class="text-xs font-bold text-slate-500 mb-6">Session</h3>
+    <dl class="space-y-4 font-mono text-xs">
        <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Visit Token</dt>
+          <dt class="text-slate-500 font-bold mb-1">Visit Token</dt>
           <dd class="text-blue-400 font-bold"><%= @event.visit&.visit_token %></dd>
         </div>
         <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Time</dt>
+          <dt class="text-slate-500 font-bold mb-1">Time</dt>
           <dd class="text-white"><%= @event.time.strftime("%Y-%m-%d %H:%M:%S") %></dd>
         </div>
         <div>
-          <dt class="text-slate-500 uppercase font-black text-[9px] mb-1">Visit Details</dt>
+          <dt class="text-slate-500 font-bold mb-1">Visit Details</dt>
           <dd>
-            <%= link_to "VIEW_SESSION_TRACE", admin_visit_path(@event.visit), class: "text-emerald-500 hover:text-white transition-colors" if @event.visit %>
+            <%= link_to "View Visit", admin_visit_path(@event.visit), class: "text-emerald-500 hover:text-white transition-colors" if @event.visit %>
           </dd>
         </div>
     </dl>

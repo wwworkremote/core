@@ -67,7 +67,7 @@ class Admin::JobPostingsController < Admin::ApplicationController
   private
 
   def filtered_job_postings
-    scope = JobPosting.recent
+    scope = JobPosting.recent.includes(:leads)
     @status == "purged" ? scope.where(status: "purged") : scope.where.not(status: "purged")
   end
 
