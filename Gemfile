@@ -129,6 +129,7 @@ group :development do
 end
 
 group :test do
+  gem "committee", require: false
   gem "fuubar", "~> 2.5"
   gem "rails-controller-testing"
   gem "simplecov", require: false
