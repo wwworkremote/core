@@ -9,7 +9,18 @@
       "Bash(rtk ls *)",
       "Bash(rtk tail *)",
       "Bash(xcrun simctl list *)",
-      "Bash(curl -s -o /dev/null -w *)"
+      "Bash(curl -s -o /dev/null -w *)",
+      "Bash(bundle exec rspec *)",
+      "Bash(command grep *)",
+      "Bash(node --check *)",
+      "Bash(npm run lint:extension)",
+      "mcp__claude-in-chrome__read_console_messages",
+      "mcp__backlog__task_list",
+      "mcp__backlog__get_backlog_instructions",
+      "mcp__o2__o2_service",
+      "mcp__o2__o2_slow",
+      "mcp__claude-in-chrome__get_page_text",
+      "mcp__backlog__task_search"
     ]
   },
   "hooks": {
