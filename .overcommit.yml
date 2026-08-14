@@ -108,6 +108,12 @@ PreCommit:
       - '.claude/skills/**/*'
       - '.claude/agents/**/*'
 
+  EslintExtension:
+    enabled: true
+    description: 'Lint extension/ JS with ESLint'
+    include:
+      - 'extension/**/*.js'
+
   RSpec:
     enabled: true
     # Explicit dirs, not a bare `rspec` -- packages/*/spec (the ingestion

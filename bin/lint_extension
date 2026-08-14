@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Lints extension/**/*.js -- see eslint.config.js. Used directly and by the
+# EslintExtension overcommit pre-commit hook (.git-hooks/pre_commit/eslint_extension.rb).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+npx eslint extension "$@"

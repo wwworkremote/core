@@ -9,6 +9,12 @@ Standard roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-huma
 ### Domain docs
 Single-context layout at the root. See `docs/agents/domain.md`.
 
+### Chrome extension versioning
+Bump `version` in `extension/manifest.json` whenever any file under `extension/` changes (even a small fix), unless doing so would break something. Nothing in the codebase reads or depends on this value — it's for tracking which build is loaded in `chrome://extensions`. Full semver, `major.minor.patch`:
+- **patch** — copy/wording fixes, color/theme tweaks, selector adjustments, bug fixes that don't change behavior a user would notice as a new capability.
+- **minor** — new capability (a new provider/board, a new panel feature, a new message type between content/background/sidepanel).
+- **major** — breaking changes to the extension's own contract (e.g. incompatible message-passing shape between content.js/background.js/sidepanel.js, dropped provider support, storage schema change that isn't backward-read-compatible).
+
 <!-- BACKLOG.MD MCP GUIDELINES START -->
 
 <CRITICAL_INSTRUCTION>
