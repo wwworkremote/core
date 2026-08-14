@@ -78,6 +78,40 @@ RSpec.describe "Job Postings" do
       expect(response).to be_successful
       expect(response.body).to include("Senior Ruby Developer")
     end
+
+    it "filters by location text" do
+      create(:job_posting, signature: "chicago-1", title: "Chicago Loop Engineer",
+                           location: "Chicago, IL", published_at: Time.current)
+
+      get job_postings_path, params: { location: "Chicago" }
+      expect(response.body).to include("Chicago Loop Engineer")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
+
+    it "filters to remote postings via the structured data flag, not just location text" do
+      # Regression companion to Geo::CommuteZone's key fix -- the primary
+      # enrichment pipeline (extension captures included) writes
+      # data["remote"], and this filter needs to honor that even when the
+      # location string itself never says "remote".
+      create(:job_posting, signature: "remote-flagged", title: "Flagged Remote Engineer",
+                           location: "Austin, TX", data: { "remote" => true }, published_at: Time.current)
+
+      get job_postings_path, params: { remote: "1" }
+      expect(response.body).to include("Flagged Remote Engineer")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
+
+    it "combines location and remote as OR, not AND" do
+      create(:job_posting, signature: "chicago-2", title: "Chicago Onsite Engineer",
+                           location: "Chicago, IL", published_at: Time.current)
+      create(:job_posting, signature: "remote-2", title: "Fully Remote Engineer",
+                           location: "Remote", published_at: Time.current)
+
+      get job_postings_path, params: { location: "Chicago", remote: "1" }
+      expect(response.body).to include("Chicago Onsite Engineer")
+      expect(response.body).to include("Fully Remote Engineer")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
   end
 
   describe "GET /job_postings/:id" do

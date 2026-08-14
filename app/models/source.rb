@@ -22,6 +22,14 @@ class Source < ApplicationRecord
     %w[origin job_postings]
   end
 
+  # Mirrors Company#mark_not_interested! -- ignores this source's untouched
+  # postings (status: none), leaving anything already favorited/applied/etc
+  # alone. Queries JobPosting directly rather than through job_postings
+  # (declared readonly above) since #ignore! needs to save.
+  def mark_not_interested!
+    JobPosting.where(source: self, status: "none").find_each(&:ignore!)
+  end
+
   # rails_admin do
   #   list do
   #     field :event

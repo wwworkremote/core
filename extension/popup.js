@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!/^https?:\/\/.+/.test(url)) {
       status.textContent = '⚠ URL must start with http:// or https://';
-      status.style.color = '#ff5555';
+      status.style.color = '#ff9580';
       return;
     }
 
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       passInput.value    = '';
       passInput.placeholder = '(saved)';
       status.textContent = '✓ Saved';
-      status.style.color = '#50fa7b';
+      status.style.color = '#8aff80';
       setTimeout(() => { status.textContent = ''; }, 2500);
     });
   }
@@ -59,13 +59,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const scanBtn    = document.getElementById('scan-page-btn');
   const scanStatus = document.getElementById('scan-status');
 
+  // Only http(s) pages are real websites -- chrome://, chrome-extension://,
+  // the Chrome Web Store, file://, PDF viewers, etc. can't host job content
+  // and executeScript would just fail on most of them anyway. Disabling up
+  // front is clearer than letting the click happen and showing an error.
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    if (!/^https?:\/\//.test(tab?.url || '')) {
+      scanBtn.disabled = true;
+      scanBtn.style.opacity = '0.4';
+      scanBtn.style.cursor = 'not-allowed';
+      scanStatus.textContent = 'Not available on this page';
+      scanStatus.style.color = '#9590c5';
+    }
+  });
+
   scanBtn.addEventListener('click', async () => {
     scanStatus.textContent = 'Scanning…';
-    scanStatus.style.color = '#bd93f9';
+    scanStatus.style.color = '#9580ff';
 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab?.id) throw new Error('No active tab');
+      if (!/^https?:\/\//.test(tab.url || '')) throw new Error('Not a website');
 
       // Flag read by content.js to allow generic (non-curated-board) capture
       // for this one injection only.
@@ -79,11 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       scanStatus.textContent = '✓ Scanning tab — check the page';
-      scanStatus.style.color = '#50fa7b';
+      scanStatus.style.color = '#8aff80';
       setTimeout(() => window.close(), 900);
     } catch (err) {
       scanStatus.textContent = '✗ ' + err.message;
-      scanStatus.style.color = '#ff5555';
+      scanStatus.style.color = '#ff9580';
     }
   });
 });

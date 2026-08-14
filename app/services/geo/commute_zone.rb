@@ -54,8 +54,17 @@ class Geo::CommuteZone
 
   private
 
+  # "remote" is the key JobPostingEnrichment::AttributeBuilder writes (every
+  # extension capture/enrich and the standard scraper enrichment path);
+  # "is_remote" is a separate key JobBoards::CategorizerAgent writes on its
+  # own AI categorization pass. Checking only the latter (the original bug
+  # here) meant a posting flagged remote by the primary pipeline, with no
+  # literal "remote" in its free-text location, fell through to a real
+  # distance check against home/Loop coordinates -- and could get silently
+  # auto-ignored despite being remote. Check both; either is authoritative.
   def remote?
-    @job_posting.data["is_remote"] == true || @job_posting.location.to_s.match?(/remote/i)
+    @job_posting.data["remote"] == true || @job_posting.data["is_remote"] == true ||
+      @job_posting.location.to_s.match?(/remote/i)
   end
 
   def geocoded?

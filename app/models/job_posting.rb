@@ -4,6 +4,8 @@ class JobPosting < ApplicationRecord
   include PgSearch::Model
   include JobPosting::LegacyCompanyAccess
   include JobPosting::StatusWorkflow
+  include JobPosting::Geocoding
+  include JobPosting::LocationFiltering
 
   validates :signature, presence: true, uniqueness: true
 
@@ -30,15 +32,6 @@ class JobPosting < ApplicationRecord
   def add_pipeline_note(note, link: nil)
     pipeline_steps.create!(status: "noted", note: note, link: link)
   end
-
-  geocoded_by :location
-  # after_validation :geocode, if: ->(obj) { obj.location.present? && obj.location_changed? }
-  after_commit :enqueue_geocoding, on: %i[create update], if: lambda {
-    location.present? && (saved_change_to_location? || latitude.nil?)
-  }
-  # Geocoding is async (GeocodingJob), so this is the earliest point a
-  # non-remote posting's commute feasibility is actually knowable.
-  after_commit :enforce_commute_zone, on: :update, if: -> { saved_change_to_latitude? || saved_change_to_longitude? }
 
   scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
 
@@ -115,22 +108,6 @@ class JobPosting < ApplicationRecord
 
   def self.ransackable_associations(_auth_object = nil)
     %w[source domains target_domains]
-  end
-
-  def enqueue_geocoding
-    JobBoards::GeocodingJob.perform_later(id)
-  end
-
-  def enforce_commute_zone
-    return unless may_ignore?
-
-    ignore! if Geo::CommuteZone.call(self) == :blocked
-  end
-
-  def self.geocode_all
-    where(latitude: nil, longitude: nil).where.not(location: nil).find_each do |posting|
-      JobBoards::GeocodingJob.perform_later(posting.id)
-    end
   end
 
   # Real-time dashboard telemetry

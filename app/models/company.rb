@@ -18,8 +18,9 @@
 #
 # Indexes
 #
-#  index_companies_on_name  (name) UNIQUE
-#  index_companies_on_slug  (slug) UNIQUE
+#  index_companies_on_name       (name) UNIQUE
+#  index_companies_on_name_trgm  (name) USING gin
+#  index_companies_on_slug       (slug) UNIQUE
 #
 class Company < ApplicationRecord
   include AASM
@@ -77,6 +78,18 @@ class Company < ApplicationRecord
   def disable_ingestion!
     update!(ingestion_enabled: false)
     job_postings.where.not(status: %w[purged expired]).find_each(&:purge!)
+  end
+
+  # Softer sibling of disable_ingestion! for a company the user just isn't
+  # interested in (vs. a hard blocklist purge): stops future postings the
+  # same way (CompanyResolver already auto-ignores new postings when
+  # ingestion_enabled is false), but *ignores* rather than purges existing
+  # ones, matching the same "Not interested" semantics as a single job
+  # posting -- only untouched postings (status: none) are affected, so
+  # anything already favorited/applied/etc is left alone.
+  def mark_not_interested!
+    update!(ingestion_enabled: false)
+    job_postings.where(status: "none").find_each(&:ignore!)
   end
 
   def to_s

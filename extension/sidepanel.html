@@ -8,24 +8,24 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #282a36;
-      --bg-mid:    #44475a;
-      --bg-dark:   #1e2029;
-      --comment:   #6272a4;
+      --bg:        #22212c;
+      --bg-mid:    #454158;
+      --bg-dark:   #17161d;
+      --comment:   #9590c5;
       --fg:        #f8f8f2;
-      --purple:    #bd93f9;
-      --pink:      #ff79c6;
-      --green:     #50fa7b;
-      --yellow:    #f1fa8c;
-      --orange:    #ffb86c;
-      --red:       #ff5555;
-      --cyan:      #8be9fd;
+      --purple:    #9580ff;
+      --pink:      #ff80bf;
+      --green:     #8aff80;
+      --yellow:    #ffff80;
+      --orange:    #ffca80;
+      --red:       #ff9580;
+      --cyan:      #80ffea;
       --radius:    6px;
       --font:      'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
     }
 
     html, body { height: 100%; background: var(--bg); color: var(--fg);
-      font-family: var(--font); font-size: 12px; line-height: 1.5; }
+      font-family: var(--font); font-size: 14px; line-height: 1.5; }
 
     #app { display: flex; flex-direction: column; height: 100vh; }
 
@@ -35,7 +35,7 @@
       background: #3a3000;
       border-bottom: 1px solid var(--yellow);
       padding: 6px 14px;
-      font-size: 10px;
+      font-size: 12px;
       color: var(--yellow);
       flex-shrink: 0;
       display: none;
@@ -48,7 +48,7 @@
       border: none;
       border-radius: 3px;
       font-family: var(--font);
-      font-size: 10px;
+      font-size: 12px;
       padding: 2px 8px;
       cursor: pointer;
       font-weight: bold;
@@ -63,12 +63,12 @@
       flex-shrink: 0;
     }
     #header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    #header-title { font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; color: var(--pink); }
-    #confidence-badge { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: bold; }
-    #header-meta { display: flex; gap: 10px; font-size: 10px; color: var(--comment); }
+    #header-title { font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; color: var(--pink); }
+    #confidence-badge { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    #header-meta { display: flex; gap: 10px; font-size: 12px; color: var(--comment); }
     #header-meta span b { color: var(--fg); font-weight: normal; }
     #header-actions { display: flex; gap: 6px; margin-top: 5px; align-items: center; }
-    #field-summary { font-size: 10px; color: var(--comment); flex: 1; }
+    #field-summary { font-size: 12px; color: var(--comment); flex: 1; }
     #field-summary b { color: var(--green); }
     .reread-btn {
       background: var(--bg-dark);
@@ -76,7 +76,7 @@
       border-radius: 3px;
       color: var(--comment);
       font-family: var(--font);
-      font-size: 10px;
+      font-size: 12px;
       padding: 2px 8px;
       cursor: pointer;
       white-space: nowrap;
@@ -88,7 +88,7 @@
     #form-body { flex: 1; overflow-y: auto; padding: 12px 14px 8px; }
 
     .section-header {
-      font-size: 9px; font-weight: bold; text-transform: uppercase;
+      font-size: 11px; font-weight: bold; text-transform: uppercase;
       letter-spacing: 1.5px; color: var(--comment);
       border-bottom: 1px solid var(--bg-mid);
       padding-bottom: 4px; margin: 14px 0 8px;
@@ -100,19 +100,20 @@
     .field-header { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
     .field-header label {
       display: flex; align-items: center; gap: 5px;
-      font-size: 10px; color: var(--comment);
+      font-size: 12px; color: var(--comment);
       text-transform: uppercase; letter-spacing: 0.8px;
       flex: 1;
     }
     .src { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .src.found   { background: var(--green); }
     .src.missing { background: transparent; border: 1px solid var(--comment); }
+    .src.taught  { background: var(--purple); }
     .req { color: var(--red); margin-left: 1px; }
 
     /* Small inline action button (e.g. re-read description) */
     .field-action {
       background: none; border: none; color: var(--comment);
-      font-size: 11px; cursor: pointer; padding: 0 2px;
+      font-size: 13px; cursor: pointer; padding: 0 2px;
       line-height: 1; transition: color 0.15s;
     }
     .field-action:hover { color: var(--purple); }
@@ -122,7 +123,7 @@
     input[type="date"], input[type="email"], select, textarea {
       width: 100%; background: var(--bg-dark); color: var(--fg);
       border: 1px solid var(--bg-mid); border-radius: var(--radius);
-      padding: 6px 9px; font-family: var(--font); font-size: 12px;
+      padding: 6px 9px; font-family: var(--font); font-size: 14px;
       outline: none; transition: border-color 0.15s;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--purple); }
@@ -143,7 +144,7 @@
       border: 1px solid var(--bg-mid); border-radius: var(--radius); cursor: pointer;
     }
     .checkbox-row input[type="checkbox"] { width: auto; accent-color: var(--green); cursor: pointer; }
-    .checkbox-row label { margin: 0; font-size: 12px; color: var(--fg);
+    .checkbox-row label { margin: 0; font-size: 14px; color: var(--fg);
       text-transform: none; letter-spacing: normal; cursor: pointer; }
 
     /* ── Company match picker (capture mode only) ───────────────────────────── */
@@ -152,14 +153,14 @@
       border: 1px solid var(--bg-mid); border-radius: var(--radius);
     }
     .company-match-label {
-      font-size: 9px; color: var(--comment); text-transform: uppercase;
+      font-size: 11px; color: var(--comment); text-transform: uppercase;
       letter-spacing: 0.6px; margin-bottom: 4px;
     }
-    .company-match-empty { font-size: 11px; color: var(--comment); padding: 3px 0; }
+    .company-match-empty { font-size: 13px; color: var(--comment); padding: 3px 0; }
     .company-match-option, .company-match-create {
       display: block; width: 100%; text-align: left;
       background: none; border: 1px solid transparent; border-radius: 4px;
-      color: var(--fg); font-family: var(--font); font-size: 11px;
+      color: var(--fg); font-family: var(--font); font-size: 13px;
       padding: 4px 6px; margin-bottom: 2px; cursor: pointer;
     }
     .company-match-option:hover, .company-match-create:hover { background: var(--bg-mid); }
@@ -167,12 +168,12 @@
       border-color: var(--purple); background: var(--bg-mid);
     }
     .company-match-create { color: var(--purple); }
-    .company-match-loading { font-size: 11px; color: var(--comment); }
+    .company-match-loading { font-size: 13px; color: var(--comment); }
 
-    #desc-meta { font-size: 10px; color: var(--comment); margin-top: 3px; text-align: right; }
+    #desc-meta { font-size: 12px; color: var(--comment); margin-top: 3px; text-align: right; }
 
     #apply-link {
-      display: none; font-size: 10px; color: var(--cyan);
+      display: none; font-size: 12px; color: var(--cyan);
       margin-top: 3px; text-decoration: none; word-break: break-all;
     }
     #apply-link:hover { text-decoration: underline; }
@@ -181,7 +182,7 @@
     #details-toggle {
       width: 100%; background: none; border: 1px solid var(--bg-mid);
       border-radius: var(--radius); color: var(--comment);
-      font-family: var(--font); font-size: 10px; padding: 5px 9px;
+      font-family: var(--font); font-size: 12px; padding: 5px 9px;
       cursor: pointer; text-align: left; margin-top: 4px;
       transition: border-color 0.15s, color 0.15s;
     }
@@ -195,11 +196,17 @@
       color: var(--comment); text-align: center; padding: 20px;
     }
     #empty-state .icon { font-size: 32px; }
-    #empty-state p { font-size: 11px; line-height: 1.7; }
+    #empty-state p { font-size: 13px; line-height: 1.7; }
     #empty-state code {
       color: var(--yellow); background: var(--bg-dark);
       padding: 1px 5px; border-radius: 3px;
     }
+    #last-ingested {
+      display: none; font-size: 12px; color: var(--comment);
+      border-top: 1px solid var(--bg-mid); padding-top: 10px; margin-top: 4px;
+    }
+    #last-ingested a { color: var(--cyan); text-decoration: none; font-weight: bold; }
+    #last-ingested a:hover { text-decoration: underline; }
 
     /* ── Ingestion log (persistent, always visible) ─────────────────────────── */
     #ingestion-log {
@@ -208,13 +215,13 @@
       padding: 8px 14px 10px; max-height: 160px; overflow-y: auto;
     }
     #ingestion-log-header {
-      font-size: 9px; color: var(--comment); text-transform: uppercase;
+      font-size: 11px; color: var(--comment); text-transform: uppercase;
       letter-spacing: 0.8px; margin-bottom: 6px;
     }
     .ingestion-log-item {
       display: flex; justify-content: space-between; align-items: center;
       gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--bg-mid);
-      font-size: 10px; text-decoration: none;
+      font-size: 12px; text-decoration: none;
     }
     .ingestion-log-item:last-child { border-bottom: none; }
     .ingestion-log-item .ilog-main { min-width: 0; }
@@ -222,11 +229,41 @@
       color: var(--fg); font-weight: bold; overflow: hidden;
       text-overflow: ellipsis; white-space: nowrap;
     }
-    .ingestion-log-item .ilog-company { color: var(--comment); font-size: 9px; }
+    .ingestion-log-item .ilog-company { color: var(--comment); font-size: 11px; }
     .ingestion-log-item .ilog-status {
-      font-size: 9px; padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+      font-size: 11px; padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
     }
-    .ingestion-log-empty { font-size: 10px; color: var(--comment); padding: 4px 0; }
+    .ingestion-log-empty { font-size: 12px; color: var(--comment); padding: 4px 0; }
+
+    /* ── Diagnostics log (collapsible, below Recent Ingestions) ─────────────── */
+    #diag-toggle {
+      width: 100%; background: none; border: none; border-top: 1px solid var(--bg-mid);
+      color: var(--comment); font-family: var(--font); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 14px;
+      cursor: pointer; text-align: left; transition: color 0.15s;
+    }
+    #diag-toggle:hover { color: var(--purple); }
+    #diag-log {
+      display: none; flex-shrink: 0; background: var(--bg-dark);
+      border-top: 1px solid var(--bg-mid); padding: 6px 14px 10px;
+      max-height: 160px; overflow-y: auto; font-size: 12px;
+    }
+    .diag-entry { padding: 2px 0; }
+    .diag-entry-head { display: flex; gap: 6px; }
+    .diag-entry .diag-ts { color: var(--comment); flex-shrink: 0; }
+    .diag-entry .diag-text { word-break: break-word; }
+    .diag-entry.level-info .diag-text { color: var(--purple); }
+    .diag-entry.level-ok   .diag-text { color: var(--green); }
+    .diag-entry.level-warn .diag-text { color: var(--yellow); }
+    .diag-entry.level-err  .diag-text { color: var(--red); }
+    .diag-entry.level-panel .diag-text { color: var(--fg); }
+    .diag-detail { margin: 2px 0 4px 18px; }
+    .diag-detail summary { cursor: pointer; color: var(--comment); font-size: 11px; }
+    .diag-detail pre {
+      white-space: pre-wrap; word-break: break-word; font-size: 11px; color: var(--fg);
+      background: var(--bg); border-radius: 4px; padding: 6px; margin-top: 2px;
+      max-height: 220px; overflow-y: auto;
+    }
 
     /* ── Footer ───────────────────────────────────────────────────────────── */
     #footer {
@@ -236,14 +273,14 @@
     #submit-btn {
       width: 100%; padding: 10px; background: var(--purple); color: var(--bg);
       border: none; border-radius: var(--radius); font-family: var(--font);
-      font-size: 11px; font-weight: bold; letter-spacing: 1px;
+      font-size: 13px; font-weight: bold; letter-spacing: 1px;
       text-transform: uppercase; cursor: pointer;
       transition: background 0.15s, opacity 0.15s;
     }
-    #submit-btn:hover   { background: #caa8fc; }
-    #submit-btn:active  { background: #a070e8; }
+    #submit-btn:hover   { background: #ac9dff; }
+    #submit-btn:active  { background: #7a5ff0; }
     #submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #status-line { text-align: center; font-size: 10px; color: var(--comment); margin-top: 6px; min-height: 14px; }
+    #status-line { text-align: center; font-size: 12px; color: var(--comment); margin-top: 6px; min-height: 14px; }
 
     /* ── Scrollbar ────────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
@@ -261,6 +298,7 @@
     <p>On a supported job board's posting page, click<br>
     <strong>↗ Capture This Job</strong> in the overlay. Or click<br>
     <strong>Source &amp; Enrich</strong> from a WWWorkRemote job page.</p>
+    <div id="last-ingested"></div>
   </div>
 
   <!-- Staleness banner -->
@@ -272,7 +310,7 @@
   <!-- Header -->
   <div id="header" style="display:none">
     <div id="header-top">
-      <span id="header-title">Synthesis Panel</span>
+      <span id="header-title">Ingestion Panel</span>
       <span id="confidence-badge">—</span>
     </div>
     <div id="header-meta">
@@ -392,13 +430,13 @@
     <div class="field" id="fld-posted-at">
       <div class="field-header"><label><span class="src missing" id="src-posted-at"></span>Posted</label></div>
       <input type="date" id="f-posted-at">
-      <div id="posted-at-raw" style="font-size:10px;color:var(--comment);margin-top:2px;"></div>
+      <div id="posted-at-raw" style="font-size:12px;color:var(--comment);margin-top:2px;"></div>
     </div>
 
     <div class="field" id="fld-valid-through">
       <div class="field-header"><label><span class="src missing" id="src-valid-through"></span>Expires</label></div>
       <input type="date" id="f-valid-through">
-      <div id="valid-through-raw" style="font-size:10px;color:var(--comment);margin-top:2px;"></div>
+      <div id="valid-through-raw" style="font-size:12px;color:var(--comment);margin-top:2px;"></div>
     </div>
 
     <div class="section-header">Skills &amp; Tags</div>
@@ -449,6 +487,10 @@
     <div id="ingestion-log-header">Recent Ingestions</div>
     <div id="ingestion-log-list"></div>
   </div>
+
+  <!-- Diagnostics log — collapsed by default, mirrors LOG*/setStatus activity -->
+  <button id="diag-toggle">▸ Show diagnostics log</button>
+  <div id="diag-log"></div>
 
 </div>
 <script src="sidepanel.js"></script>

@@ -1,0 +1,130 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Filters</h1>
+    <p class="text-slate-500 font-bold text-sm">Every rule that decides what gets through the pipeline. Read-only -- these are defined in code, not the database.</p>
+  </div>
+  <div>
+    <%= link_to "Prompts", admin_pipeline_prompts_path, class: "btn-neural text-sm" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+  <!-- Active Sources -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Active Sources (<%= @adapters.count %>)</h3>
+    <p class="text-xs text-slate-500 mb-4">Only sources listed here are actually ingesting. A source not shown has been disabled in <code class="font-mono text-slate-400">config/initializers/ingestion_adapters.rb</code>.</p>
+    <div class="space-y-2">
+      <% @adapters.each do |slug, config| %>
+        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+          <div>
+            <span class="text-white font-bold text-sm"><%= config[:name] %></span>
+            <span class="text-slate-500 text-xs font-mono ml-2"><%= slug %></span>
+          </div>
+          <span class="badge badge-neutral bg-white/5 border-none text-xs font-bold text-slate-400"><%= config[:type] %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Role Families -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Role Families</h3>
+    <p class="text-xs text-slate-500 mb-4">Used by the job postings role-family filter. Titles are matched against these alias lists.</p>
+    <div class="space-y-4">
+      <% @role_families.each do |family, aliases| %>
+        <div>
+          <div class="text-xs font-bold text-primary mb-1"><%= family.to_s.humanize %></div>
+          <div class="text-xs text-slate-400"><%= aliases.join(", ") %></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Company Blocklist -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Big Tech Blocklist (<%= @big_tech_blocklist.count %>)</h3>
+    <p class="text-xs text-slate-500 mb-4">New companies matching one of these words start with ingestion disabled. Managed per-company on the <%= link_to "Companies", admin_companies_path, class: "text-primary hover:underline" %> page.</p>
+    <div class="flex flex-wrap gap-2">
+      <% @big_tech_blocklist.each do |name| %>
+        <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= name %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Quality Filter -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Quality Filter</h3>
+    <p class="text-xs text-slate-500 mb-4">A posting is dropped during ingestion if its title matches one of these, or its body mentions one of these phrases.</p>
+    <div class="space-y-4">
+      <div>
+        <div class="text-xs font-bold text-slate-400 mb-2">Banned titles</div>
+        <div class="flex flex-wrap gap-2">
+          <% @quality_banned_titles.each do |title| %>
+            <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= title %></span>
+          <% end %>
+        </div>
+      </div>
+      <div>
+        <div class="text-xs font-bold text-slate-400 mb-2">Banned keywords</div>
+        <div class="flex flex-wrap gap-2">
+          <% @quality_banned_keywords.each do |keyword| %>
+            <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= keyword %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commute Zone -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Commute Zone</h3>
+    <p class="text-xs text-slate-500 mb-4">Non-remote postings outside these radii are purged once geocoded. Home address stays in <code class="font-mono text-slate-400">.env.local</code>, never shown here.</p>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
+        <div class="text-lg font-black text-white"><%= @commute_hyperlocal_radius %> mi</div>
+        <div class="text-xs font-bold text-slate-500 mt-1">Home radius</div>
+      </div>
+      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
+        <div class="text-lg font-black text-white"><%= @commute_loop_radius %> mi</div>
+        <div class="text-xs font-bold text-slate-500 mt-1">Chicago Loop radius</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Category Taxonomy -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">AI Category Taxonomy</h3>
+    <p class="text-xs text-slate-500 mb-4">The fixed set of categories the categorization AI can assign to a posting. Change how categorization itself reasons on the <%= link_to "Prompts", admin_pipeline_prompts_path, class: "text-primary hover:underline" %> page.</p>
+    <div class="flex flex-wrap gap-2">
+      <% @categorizer_categories.each do |category| %>
+        <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= category %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Guardrails -->
+  <div class="card-neural p-8 lg:col-span-2">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">AI Input Guardrails</h3>
+    <p class="text-xs text-slate-500 mb-4">Every AI call scans its input for these patterns first and blocks the call if the combined score crosses a threshold -- a defense against prompt injection from scraped job content.</p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
+          <tr>
+            <th class="px-4 py-3">Pattern</th>
+            <th class="px-4 py-3 text-right">Weight</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 font-mono text-xs">
+          <% @guardrail_patterns.each do |pattern, weight| %>
+            <tr>
+              <td class="px-4 py-3 text-slate-300"><%= pattern %></td>
+              <td class="px-4 py-3 text-right text-slate-500"><%= weight %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -231,6 +231,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_010000) do
     t.datetime "updated_at", null: false
     t.bigint "work_experience_id", null: false
     t.index ["work_experience_id"], name: "index_experience_highlights_on_work_experience_id"
+  end
+
+  create_table "extraction_rule_observations", force: :cascade do |t|
+    t.string "candidate_selector"
+    t.datetime "created_at", null: false
+    t.text "element_html"
+    t.string "field_name", null: false
+    t.string "learned_selector", null: false
+    t.text "parent_html"
+    t.string "provider", null: false
+    t.string "source_url"
+    t.index ["provider", "field_name"], name: "index_extraction_rule_observations_on_provider_and_field_name"
+  end
+
+  create_table "extraction_rules", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "field_name", null: false
+    t.string "provider", null: false
+    t.text "sample_html"
+    t.string "selector", null: false
+    t.string "source_url"
+    t.datetime "updated_at", null: false
+    t.index ["provider", "field_name"], name: "index_extraction_rules_on_provider_and_field_name", unique: true
   end
 
   create_table "hacker_news_items", id: false, force: :cascade do |t|

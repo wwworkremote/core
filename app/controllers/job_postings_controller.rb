@@ -31,6 +31,12 @@ class JobPostingsController < ApplicationController
     @company = params[:company]
     @source_id = params[:source_id]
     @role_family = valid_role_family_param
+    assign_location_params
+  end
+
+  def assign_location_params
+    @location = params[:location]
+    @remote = params[:remote] == "1"
   end
 
   def valid_role_family_param
@@ -43,7 +49,24 @@ class JobPostingsController < ApplicationController
     scope = base_job_postings
     scope = scope.where(company_name: @company) if @company.present?
     scope = scope.where(source_id: @source_id) if @source_id.present?
+    scope = apply_location_filter(scope)
     apply_query_and_role_family(scope)
+  end
+
+  # Location text and "Remote" combine as OR, not AND -- "Chicago" + Remote
+  # checked means jobs near Chicago OR remote (either is accessible), the
+  # standard job-board convention, not jobs that are somehow both at once.
+  def apply_location_filter(scope)
+    filter = location_filter_scope
+    filter ? scope.merge(filter) : scope
+  end
+
+  def location_filter_scope
+    return nil if @location.blank? && !@remote
+    return JobPosting.remote_only if @location.blank?
+    return JobPosting.location_matches(@location) unless @remote
+
+    JobPosting.location_matches(@location).or(JobPosting.remote_only)
   end
 
   def apply_query_and_role_family(scope)

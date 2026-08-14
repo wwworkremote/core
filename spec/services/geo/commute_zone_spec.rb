@@ -22,9 +22,8 @@ RSpec.describe Geo::CommuteZone do
     described_class.instance_variable_set(:@geocode_cache, nil)
   end
 
-  def job_posting_at(lat, lng, location: "Somewhere, IL", is_remote: nil)
-    build_stubbed(:job_posting, location: location, latitude: lat, longitude: lng,
-                                data: is_remote.nil? ? {} : { "is_remote" => is_remote })
+  def job_posting_at(lat, lng, location: "Somewhere, IL", data: {})
+    build_stubbed(:job_posting, location: location, latitude: lat, longitude: lng, data: data)
   end
 
   describe ".call" do
@@ -34,8 +33,19 @@ RSpec.describe Geo::CommuteZone do
       expect(described_class.call(posting)).to eq(:allowed)
     end
 
-    it "allows postings the categorizer already flagged as remote" do
-      posting = job_posting_at(nil, nil, location: "Somewhere, IL", is_remote: true)
+    it "allows postings the categorizer already flagged as remote (is_remote key)" do
+      posting = job_posting_at(nil, nil, data: { "is_remote" => true })
+
+      expect(described_class.call(posting)).to eq(:allowed)
+    end
+
+    it "allows postings the primary enrichment pipeline flagged as remote (remote key)" do
+      # Regression: AttributeBuilder writes data["remote"], not
+      # data["is_remote"] -- this is the key every extension capture and
+      # standard scraper enrichment actually sets. Location text
+      # deliberately has no "remote" mention so only the structured flag
+      # can be doing the work here.
+      posting = job_posting_at(nil, nil, location: "Hockenheim", data: { "remote" => true })
 
       expect(described_class.call(posting)).to eq(:allowed)
     end

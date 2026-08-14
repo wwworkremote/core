@@ -10,17 +10,17 @@
       width: 270px;
       margin: 0;
       padding: 14px;
-      background: #282a36;
+      background: #22212c;
       color: #f8f8f2;
       font-family: monospace;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.6;
     }
     .title {
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #ff79c6;
+      color: #ff80bf;
       margin-bottom: 10px;
     }
     .row {
@@ -29,70 +29,70 @@
       align-items: center;
       margin-bottom: 4px;
     }
-    .label { color: #6272a4; }
-    .value { color: #50fa7b; }
+    .label { color: #9590c5; }
+    .value { color: #8aff80; }
     .divider {
       border: none;
-      border-top: 1px solid #44475a;
+      border-top: 1px solid #454158;
       margin: 10px 0;
     }
     .note {
-      font-size: 10px;
-      color: #6272a4;
+      font-size: 12px;
+      color: #9590c5;
       line-height: 1.5;
     }
     .board-list { margin: 6px 0 0 0; padding: 0; list-style: none; }
     .board-list li { color: #f8f8f2; }
-    .board-list li::before { content: "› "; color: #bd93f9; }
-    .board-list li.dim { color: #6272a4; }
-    .board-list li.dim::before { color: #44475a; }
+    .board-list li::before { content: "› "; color: #9580ff; }
+    .board-list li.dim { color: #9590c5; }
+    .board-list li.dim::before { color: #454158; }
 
     .section-label {
-      font-size: 10px;
-      color: #6272a4;
+      font-size: 12px;
+      color: #9590c5;
       margin-bottom: 4px;
     }
     .input-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
     .cfg-input {
       flex: 1;
-      background: #1e2029;
-      border: 1px solid #44475a;
+      background: #17161d;
+      border: 1px solid #454158;
       border-radius: 3px;
       color: #f8f8f2;
       font-family: monospace;
-      font-size: 10px;
+      font-size: 12px;
       padding: 4px 6px;
       outline: none;
       min-width: 0;
     }
-    .cfg-input:focus { border-color: #bd93f9; }
+    .cfg-input:focus { border-color: #9580ff; }
     .save-btn {
-      background: #44475a;
+      background: #454158;
       border: none;
       border-radius: 3px;
       color: #f8f8f2;
       font-family: monospace;
-      font-size: 10px;
+      font-size: 12px;
       padding: 4px 8px;
       cursor: pointer;
       white-space: nowrap;
     }
-    .save-btn:hover { background: #6272a4; }
+    .save-btn:hover { background: #9590c5; }
     .save-status {
-      font-size: 10px;
+      font-size: 12px;
       min-height: 14px;
       margin-top: 2px;
       text-align: right;
     }
     .auth-note {
-      font-size: 9px;
-      color: #44475a;
+      font-size: 11px;
+      color: #454158;
       margin-top: 2px;
     }
   </style>
 </head>
 <body>
-  <div class="title">Synthesis_Link</div>
+  <div class="title">WWWorkRemote_Ingestion</div>
 
   <div class="row">
     <span class="label">Status:</span>
@@ -104,7 +104,7 @@
   <div class="note">
     Shows a capture button on any supported board's job-detail page — click it
     to ingest. Also opens on a URL containing
-    <span style="color:#f1fa8c;">?wwr_id=NNN</span> to enrich an existing posting.
+    <span style="color:#ffff80;">?wwr_id=NNN</span> to enrich an existing posting.
   </div>
 
   <hr class="divider">

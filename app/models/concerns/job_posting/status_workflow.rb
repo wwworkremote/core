@@ -45,7 +45,11 @@ module JobPosting::StatusWorkflow
       end
 
       event :restore do
-        transitions from: :purged, to: :none
+        # :ignored is included alongside :purged so a posting wrongly
+        # auto-ignored (e.g. by a Geo::CommuteZone misclassification) can
+        # be brought back once the underlying cause is fixed -- otherwise
+        # ignored has no way back to :none at all.
+        transitions from: %i[purged ignored], to: :none
       end
 
       event :apply do

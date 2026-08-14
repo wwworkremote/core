@@ -31,3 +31,27 @@
 
 en:
   hello: "Hello world"
+  job_postings:
+    index:
+      title: "Job Postings"
+      subtitle: "Every posting ingested across your sources and boards."
+      search_placeholder: "Search title or description..."
+      search_submit: "Search"
+      location_placeholder: "City, state, or region"
+      remote_filter_label: "Remote"
+      active_filters_label: "Active filters:"
+      role_filter_label: "Role:"
+      company_filter_label: "Company:"
+      source_filter_label: "Source:"
+      query_filter_label: "Query:"
+      location_filter_label: "Location:"
+      remote_active_label: "Remote"
+      clear_filters: "Clear all"
+      mark_source_not_interested: "Mark all %{source} postings not interested"
+      not_interested: "Not interested"
+      network_fallback: "Direct"
+      posted_ago: "%{time} ago"
+      empty:
+        title: "No postings match"
+        body: "Try adjusting or clearing your filters."
+        reset: "Clear filters"

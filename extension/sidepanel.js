@@ -213,10 +213,10 @@ function showEmpty() {
 // ── Confidence badge ──────────────────────────────────────────────────────
 
 const CONFIDENCE = {
-  json_ld: { label: 'JSON-LD ✓', color: '#282a36', bg: '#50fa7b' },
-  css:     { label: 'CSS ◎',     color: '#282a36', bg: '#f1fa8c' },
-  meta:    { label: 'Meta ◎',    color: '#282a36', bg: '#ffb86c' },
-  generic: { label: 'Generic ⚠', color: '#f8f8f2', bg: '#ff5555' },
+  json_ld: { label: 'JSON-LD ✓', color: '#22212c', bg: '#8aff80' },
+  css:     { label: 'CSS ◎',     color: '#22212c', bg: '#ffff80' },
+  meta:    { label: 'Meta ◎',    color: '#22212c', bg: '#ffca80' },
+  generic: { label: 'Generic ⚠', color: '#f8f8f2', bg: '#ff9580' },
 };
 
 function updateConfidenceBadge(method) {
@@ -598,6 +598,9 @@ function setStatus(msg, color) {
   if (!el) return;
   el.textContent = msg;
   el.style.color = color || 'var(--comment)';
+  try {
+    chrome.runtime.sendMessage({ type: 'DIAG_LOG', level: 'panel', text: msg, ts: Date.now() });
+  } catch (_) { /* ignore */ }
 }
 
 // ── Re-read handlers ──────────────────────────────────────────────────────
@@ -692,7 +695,14 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
       btn.textContent     = isCapture ? '✓ Ingested' : '✓ Submitted';
       btn.style.background = 'var(--green)';
       setStatus(result.message || '✨ Sync complete', 'var(--green)');
-      if (isCapture) refreshIngestionLog();
+      if (isCapture) {
+        refreshIngestionLog();
+        if (result.leadId) await showLastIngestedLink(currentState?.extracted?.title, result.leadId);
+        // Brief pause so the "✓ Ingested" confirmation is actually seen
+        // before the panel resets for the next posting -- this is a
+        // one-job-at-a-time workflow, not a "leave it submitted" one.
+        setTimeout(resetForNextCapture, 1200);
+      }
     } else {
       throw new Error(result?.error || 'Unknown error from server');
     }
@@ -703,7 +713,43 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   }
 });
 
+// Shown in the empty state after a reset so the "did it work?" answer is
+// still visible (and clickable, to confirm on wwworkremote.localhost)
+// right up until the next capture overwrites it.
+async function showLastIngestedLink(title, leadId) {
+  const el = document.getElementById('last-ingested');
+  if (!el) return;
+  const { base: apiBase } = await getApiConfig();
+
+  el.innerHTML = '';
+  el.appendChild(document.createTextNode(`Last ingested: ${title || '(untitled)'} — `));
+  const link = document.createElement('a');
+  link.href = `${apiBase}/admin/leads/${leadId}`;
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.textContent = `View Lead #${leadId} →`;
+  el.appendChild(link);
+  el.style.display = 'block';
+}
+
+function resetForNextCapture() {
+  chrome.storage.session.remove(SESSION_KEY);
+  currentState = null;
+  // The next capture's diagnostics array starts fresh from storage's
+  // perspective (new session state) but the log itself stays on-screen
+  // (a running history, not a per-job one) -- resync the counter so new
+  // entries keep appending instead of looking like they're already "seen".
+  diagRenderedCount = 0;
+  showEmpty();
+}
+
 // ── Storage listeners ─────────────────────────────────────────────────────
+
+function stateWithoutDiagnostics(state) {
+  const copy = { ...state };
+  delete copy.diagnostics;
+  return copy;
+}
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'session') return;
@@ -711,6 +757,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (!change?.newValue) return;
 
   const newState = change.newValue;
+
+  renderNewDiagEntries(newState.diagnostics);
 
   // Description-only patch: update just the description textarea
   // without clobbering the rest of the user's edits.
@@ -739,9 +787,84 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
   }
 
+  // Element-picker result: content.js reports a taught field independently
+  // of any request/response cycle (the click can happen an arbitrary amount
+  // of time after PICKER_START), so this has to be handled here rather than
+  // as a direct message response.
+  if (newState.pickerResult) {
+    handlePickerResult(newState.pickerResult);
+    return;
+  }
+
+  // Diagnostics-only patch (a DIAG_LOG entry during extraction/submit, which
+  // patches the whole stored state including `extracted` even though it
+  // didn't actually change) -- already rendered above via
+  // renderNewDiagEntries. A capture fires ~8-10 of these in under a second;
+  // falling through to a full populateForm() for each one was re-triggering
+  // the live company search that many times, visibly jittering the panel.
+  if (currentState && JSON.stringify(stateWithoutDiagnostics(newState)) === JSON.stringify(stateWithoutDiagnostics(currentState))) {
+    return;
+  }
+
   // Full repopulate (new job or full re-read)
   populateForm(newState);
 });
+
+// ── Diagnostics log (collapsed by default, mirrors LOG*/setStatus) ─────────
+
+let diagRenderedCount = 0;
+
+document.getElementById('diag-toggle').addEventListener('click', () => {
+  const body   = document.getElementById('diag-log');
+  const toggle = document.getElementById('diag-toggle');
+  const open   = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  toggle.textContent = open ? '▸ Show diagnostics log' : '▾ Hide diagnostics log';
+});
+
+function appendDiagEntry(list, entry) {
+  const row = document.createElement('div');
+  row.className = `diag-entry level-${entry.level}`;
+
+  const head = document.createElement('div');
+  head.className = 'diag-entry-head';
+  const time = new Date(entry.ts).toLocaleTimeString([], { hour12: false });
+  const tsEl = document.createElement('span');
+  tsEl.className = 'diag-ts';
+  tsEl.textContent = time;
+  const textEl = document.createElement('span');
+  textEl.className = 'diag-text';
+  textEl.textContent = entry.text; // untrusted (may echo scraped page content) -- textContent only
+  head.append(tsEl, textEl);
+  row.append(head);
+
+  // entry.detail carries structured data (raw JSON-LD, extraction metadata)
+  // -- collapsed by default via native <details>, no extra JS needed.
+  if (entry.detail) {
+    const details = document.createElement('details');
+    details.className = 'diag-detail';
+    const summary = document.createElement('summary');
+    summary.textContent = 'detail';
+    const pre = document.createElement('pre');
+    pre.textContent = entry.detail; // untrusted (scraped page data) -- textContent only
+    details.append(summary, pre);
+    row.append(details);
+  }
+
+  list.appendChild(row);
+}
+
+// Renders only entries added since the last call -- diagnostics rides along
+// on every storage patch (background.js spreads it forward unchanged), not
+// just ones meant for the log, so this has to be additive, not a full redraw.
+function renderNewDiagEntries(diagnostics) {
+  if (!Array.isArray(diagnostics) || diagnostics.length <= diagRenderedCount) return;
+  const list = document.getElementById('diag-log');
+  if (!list) return;
+  diagnostics.slice(diagRenderedCount).forEach(entry => appendDiagEntry(list, entry));
+  diagRenderedCount = diagnostics.length;
+  list.scrollTop = list.scrollHeight;
+}
 
 // ── Ingestion log (persistent, visible in every panel state) ───────────────
 
@@ -795,6 +918,108 @@ function renderIngestionLog(leads, apiBase) {
   }).join('');
 }
 
+// ── Element picker ("Teach the extractor") ──────────────────────────────────
+// FIELD_MAP maps DOM input ids to extracted-data keys; teaching always
+// targets the first key (matches the same priority order content.js's own
+// coalesce() already uses when a field has more than one, e.g. skills/tags).
+
+const DATA_KEY_TO_INPUT = Object.fromEntries(
+  Object.entries(FIELD_MAP).map(([inputId, keys]) => [keys[0], inputId])
+);
+
+function fieldElId(inputId) {
+  return inputId.replace(/^f-/, 'fld-');
+}
+
+function markTaught(fieldId) {
+  const dot = document.getElementById(`src-${fieldId.replace(/^fld-/, '')}`);
+  if (!dot) return;
+  dot.classList.remove('found', 'missing');
+  dot.classList.add('taught');
+  dot.title = 'Taught via element picker';
+}
+
+function injectTeachButtons() {
+  for (const [inputId, keys] of Object.entries(FIELD_MAP)) {
+    const field  = document.getElementById(fieldElId(inputId));
+    const header = field?.querySelector('.field-header');
+    if (!header || header.querySelector('.teach-btn')) continue;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'field-action teach-btn';
+    btn.title = 'Teach: click here, then click the element on the page with the correct value';
+    btn.textContent = '🎯';
+    btn.addEventListener('click', () => startTeaching(keys[0], btn));
+    header.appendChild(btn);
+  }
+}
+
+function startTeaching(dataKey, btn) {
+  btn.disabled = true;
+  setStatus('Click the element on the page with the correct value… (Esc to cancel)', 'var(--purple)');
+  chrome.runtime.sendMessage({ type: 'PICKER_START', fieldName: dataKey }, (response) => {
+    if (!response?.ok) {
+      setStatus('✗ ' + (response?.error || 'Could not start picker'), 'var(--red)');
+      btn.disabled = false;
+    }
+    // On success, the button re-enables in handlePickerResult once the
+    // click (or Escape) comes back via storage — that can take any amount
+    // of time, so there's nothing more to do here.
+  });
+}
+
+function clearPickerResult() {
+  chrome.storage.session.get(SESSION_KEY, (data) => {
+    const state = data?.[SESSION_KEY];
+    if (state) chrome.storage.session.set({ [SESSION_KEY]: { ...state, pickerResult: null } });
+  });
+}
+
+async function handlePickerResult(result) {
+  const inputId = DATA_KEY_TO_INPUT[result.fieldName];
+  const btn = inputId ? document.querySelector(`#${fieldElId(inputId)} .teach-btn`) : null;
+  if (btn) btn.disabled = false;
+
+  if (result.cancelled) {
+    setStatus('Teach cancelled', 'var(--comment)');
+    clearPickerResult();
+    return;
+  }
+
+  if (inputId) {
+    setVal(inputId, result.value, fieldElId(inputId), null);
+    markTaught(fieldElId(inputId));
+  }
+  await saveExtractionRule(result);
+  clearPickerResult();
+}
+
+async function saveExtractionRule(result) {
+  setStatus('Saving learned rule…', 'var(--purple)');
+  try {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json' };
+    if (authHeader) headers['Authorization'] = authHeader;
+    const response = await fetch(`${apiBase}/api/extraction_rules`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        provider: currentState?.provider || 'generic',
+        field_name: result.fieldName,
+        element_html: result.elementHtml,
+        parent_html: result.parentHtml,
+        candidate_selector: result.candidateSelector,
+        source_url: currentState?.pageUrl,
+      }),
+    });
+    if (!response.ok) throw new Error(`Server error ${response.status}`);
+    setStatus('✓ Taught — future postings on this board will auto-fill this field', 'var(--green)');
+  } catch (e) {
+    setStatus('✗ Learned rule not saved: ' + e.message, 'var(--red)');
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
 
 function init() {
@@ -802,7 +1027,9 @@ function init() {
     const state = data?.[SESSION_KEY];
     if (state?.extracted) populateForm(state);
     else                  showEmpty();
+    renderNewDiagEntries(state?.diagnostics);
   });
+  injectTeachButtons();
   refreshIngestionLog();
 }
 

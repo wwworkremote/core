@@ -41,11 +41,23 @@ class Api::LeadsController < ApplicationController
   end
 
   def respond_with_save(lead)
-    if lead.save
-      render json: { success: true, id: lead.id, status: lead.status }, status: :created
-    else
-      render json: { success: false, errors: lead.errors.full_messages }, status: :unprocessable_content
+    unless lead.save
+      return render json: { success: false, errors: lead.errors.full_messages }, status: :unprocessable_content
     end
+
+    track_capture(lead)
+    render json: { success: true, id: lead.id, status: lead.status }, status: :created
+  end
+
+  # One event per capture, keyed on fields already sent in `discovery` --
+  # rolled up per-provider on Admin::ExtensionWorkflow to catch a board's
+  # extraction quality degrading over time, not just a single field's
+  # selector drift (that's what ExtractionRuleObservation is for).
+  def track_capture(lead)
+    ahoy.track "Captured Lead", provider: lead.provider,
+                                extraction_method: lead.discovery["extraction_method"],
+                                extraction_confidence: lead.discovery["extraction_confidence"],
+                                field_count: lead.discovery["field_count"]
   end
 
   def lead_params

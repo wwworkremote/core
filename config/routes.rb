@@ -211,6 +211,7 @@ Rails.application.routes.draw do
     root to: "dashboard#index"
     post "toggle_pause" => "dashboard#toggle_pause"
     get "observability" => "observability#index"
+    get "extension_workflow" => "extension_workflow#show"
     resources :jobs, only: [:index] do
       collection do
         post :trigger
@@ -225,8 +226,14 @@ Rails.application.routes.draw do
     resources :companies, only: %i[index show] do
       member do
         post :toggle_ingestion
+        post :mark_not_interested
       end
       resources :company_pipeline_steps, only: [:create]
+    end
+    resources :job_sources, only: [] do
+      member do
+        post :mark_not_interested
+      end
     end
     resources :job_postings, only: %i[index show update destroy] do
       member do
@@ -249,6 +256,7 @@ Rails.application.routes.draw do
 
     resources :sources, only: %i[index show]
     resources :leads, only: %i[index show]
+    resources :extraction_rules, only: %i[index show]
     resources :queries, only: %i[index show]
     resources :documents, only: %i[index show destroy]
     resources :domains, only: %i[index show destroy]
@@ -315,6 +323,8 @@ Rails.application.routes.draw do
     end
 
     get "companies/search" => "companies#search"
+
+    resources :extraction_rules, only: %i[index create]
   end
 
   scope :mounts do
