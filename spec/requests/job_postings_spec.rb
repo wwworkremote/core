@@ -23,6 +23,25 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Senior Ruby Developer")
     end
 
+    it "shows the linked Company's name when company_name is blank" do
+      company = create(:company, name: "Sparta Commodities")
+      JobPosting.create!(signature: "test-company-id-only", title: "Staff Backend Engineer",
+                         company_id: company.id, published_at: Time.current, status: "none")
+
+      get job_postings_path
+      expect(response.body).to include("Sparta Commodities")
+      expect(response.body).not_to include("/job_postings\">/job_postings")
+    end
+
+    it "falls back to a plain label instead of a broken link when no company is known" do
+      JobPosting.create!(signature: "test-no-company", title: "Mystery Role",
+                         published_at: Time.current, status: "none")
+
+      get job_postings_path
+      expect(response.body).to include("Unknown company")
+      expect(response.body).not_to include("/job_postings\">/job_postings")
+    end
+
     it "filters results by search query" do
       JobPosting.create!(
         signature: "test-2",

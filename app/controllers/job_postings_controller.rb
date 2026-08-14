@@ -76,7 +76,7 @@ class JobPostingsController < ApplicationController
   end
 
   def base_job_postings
-    scope = JobPosting.recent.includes(source: :origin)
+    scope = JobPosting.recent.includes(:company, source: :origin)
     scope = scope.where.not(status: %w[ignored purged expired]) if params[:status].blank?
     scope
   end

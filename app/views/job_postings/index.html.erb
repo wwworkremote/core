@@ -106,7 +106,11 @@
                 <%= link_to job.title, job_posting_path(job), class: "before:absolute before:inset-0" %>
               </h4>
               <p class="text-secondary font-bold text-sm mb-3 relative z-10">
-                <%= link_to job.company_name, job_postings_path(company: job.company_name), class: "hover:underline transition-all" %>
+                <% if (company_name = job.company.presence&.to_s) %>
+                  <%= link_to company_name, job_postings_path(company: company_name), class: "hover:underline transition-all" %>
+                <% else %>
+                  <span class="text-base-content/40 italic"><%= t('.unknown_company') %></span>
+                <% end %>
               </p>
 
               <% if job.location.present? %>

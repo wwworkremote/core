@@ -157,6 +157,7 @@ en:
       not_interested: "Not interested"
       network_fallback: "Direct"
       posted_ago: "%{time} ago"
+      unknown_company: "Unknown company"
       empty:
         title: "No postings match"
         body: "Try adjusting or clearing your filters."
