@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# bin/wwwr -- pipeline status, browsing postings, and pipeline actions from
+# outside the browser. See lib/wwwr/cli.rb for the actual logic.
+
+require_relative "../config/environment"
+require_relative "../lib/wwwr"
+require_relative "../lib/wwwr/cli"
+
+Wwwr::CLI.new.run(ARGV)

@@ -1,9 +1,10 @@
 ---
 id: TASK-42
 title: 'bin/wwwr CLI for pipeline status, browse, and pipeline actions'
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-14 17:31'
+updated_date: '2026-08-14 19:58'
 labels:
   - cli
   - ux
