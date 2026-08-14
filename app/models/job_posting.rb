@@ -34,6 +34,7 @@ class JobPosting < ApplicationRecord
   end
 
   scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
+  scope :contract_only, -> { where("data->>'employment_type' ILIKE ANY (ARRAY[?, ?])", "%contract%", "%temp%") }
 
   public
 

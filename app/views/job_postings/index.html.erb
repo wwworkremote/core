@@ -5,11 +5,10 @@
     <div class="flex flex-wrap gap-2 mt-3">
       <% role_family_labels.each do |family, label| %>
         <% if @role_family == family.to_s %>
-          <%= link_to "✕ #{label}", job_postings_path(q: @query, company: @company, source_id: @source_id, location: @location, remote: (@remote ? "1" : nil)),
+          <%= link_to "✕ #{label}", job_postings_path(active_filter_params.except(:role_family)),
               class: "btn btn-xs btn-warning rounded-lg font-bold" %>
         <% else %>
-          <%= link_to label,
-              job_postings_path(q: @query, company: @company, source_id: @source_id, role_family: family, location: @location, remote: (@remote ? "1" : nil)),
+          <%= link_to label, job_postings_path(active_filter_params.merge(role_family: family)),
               class: "btn btn-xs btn-outline btn-warning rounded-lg font-bold" %>
         <% end %>
       <% end %>
@@ -35,31 +34,35 @@
             <%= f.check_box :remote, { checked: @remote, class: "checkbox checkbox-xs checkbox-primary" }, "1", "0" %>
             <%= t('.remote_filter_label') %>
           </label>
+          <label class="flex items-center gap-1.5 text-xs font-bold text-base-content/70 cursor-pointer shrink-0">
+            <%= f.check_box :contract, { checked: @contract, class: "checkbox checkbox-xs checkbox-primary" }, "1", "0" %>
+            <%= t('.contract_filter_label') %>
+          </label>
         </div>
       <% end %>
     </div>
   </div>
 </div>
 
-<% if @company.present? || @source_id.present? || @query.present? || @role_family.present? || @location.present? || @remote %>
+<% if active_filter_params.values.any?(&:present?) %>
   <div class="mb-10 flex flex-wrap items-center gap-3">
     <span class="text-xs font-bold text-base-content/50"><%= t('.active_filters_label') %></span>
     <% if @role_family.present? %>
       <div class="badge badge-outline border-warning/30 text-warning gap-2 p-3 font-bold text-xs">
         <%= t('.role_filter_label') %> <%= role_family_labels[@role_family.to_sym] %>
-        <%= link_to job_postings_path(q: @query, company: @company, source_id: @source_id, location: @location, remote: (@remote ? "1" : nil)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(active_filter_params.except(:role_family)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @company.present? %>
       <div class="badge badge-outline border-primary/30 text-primary gap-2 p-3 font-bold text-xs">
         <%= t('.company_filter_label') %> <%= @company %>
-        <%= link_to job_postings_path(q: @query, source_id: @source_id, role_family: @role_family, location: @location, remote: (@remote ? "1" : nil)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(active_filter_params.except(:company)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @source_id.present? %>
       <div class="badge badge-outline border-secondary/30 text-secondary gap-2 p-3 font-bold text-xs">
         <%= t('.source_filter_label') %> <%= @source_name || "##{@source_id}" %>
-        <%= link_to job_postings_path(q: @query, company: @company, role_family: @role_family, location: @location, remote: (@remote ? "1" : nil)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(active_filter_params.except(:source_id)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
       <%= button_to t('.mark_source_not_interested', source: @source_name || "##{@source_id}"), mark_not_interested_admin_job_source_path(@source_id),
           class: "text-xs font-bold text-error hover:underline",
@@ -68,19 +71,25 @@
     <% if @query.present? %>
       <div class="badge badge-outline border-accent/30 text-accent gap-2 p-3 font-bold text-xs">
         <%= t('.query_filter_label') %> <%= @query %>
-        <%= link_to job_postings_path(company: @company, source_id: @source_id, role_family: @role_family, location: @location, remote: (@remote ? "1" : nil)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(active_filter_params.except(:q)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @location.present? %>
       <div class="badge badge-outline border-success/30 text-success gap-2 p-3 font-bold text-xs">
         <%= t('.location_filter_label') %> <%= @location %>
-        <%= link_to job_postings_path(q: @query, company: @company, source_id: @source_id, role_family: @role_family, remote: (@remote ? "1" : nil)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(active_filter_params.except(:location)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <% if @remote %>
       <div class="badge badge-outline border-success/30 text-success gap-2 p-3 font-bold text-xs">
         <%= t('.remote_active_label') %>
-        <%= link_to job_postings_path(q: @query, company: @company, source_id: @source_id, role_family: @role_family, location: @location), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+        <%= link_to job_postings_path(active_filter_params.except(:remote)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
+      </div>
+    <% end %>
+    <% if @contract %>
+      <div class="badge badge-outline border-success/30 text-success gap-2 p-3 font-bold text-xs">
+        <%= t('.contract_active_label') %>
+        <%= link_to job_postings_path(active_filter_params.except(:contract)), class: "hover:text-white" do %><%= heroicon "x-mark", options: { class: "w-3 h-3" } %><% end %>
       </div>
     <% end %>
     <%= link_to t('.clear_filters'), job_postings_path, class: "text-xs font-bold text-error hover:underline ml-2" %>

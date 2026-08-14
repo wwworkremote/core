@@ -34,6 +34,22 @@ namespace :job_filters do
     puts "Purged #{purged_count} geocoded posting(s) outside the acceptable commute zone."
   end
 
+  desc "Backfill data['employment_type'] on existing postings from their already-stored raw payload"
+  task backfill_employment_type: :environment do
+    extractors = JobBoards::Syncer::AttributeMapper::EMPLOYMENT_TYPE_EXTRACTORS
+    updated = 0
+    JobPosting.where("data->>'employment_type' IS NULL").includes(source: :origin).find_each do |posting|
+      origin_name = posting.source&.origin&.name
+      extractor = extractors[origin_name&.downcase]
+      value = extractor&.call(posting.data)
+      next if value.blank?
+
+      posting.update!(data: posting.data.merge("employment_type" => value))
+      updated += 1
+    end
+    puts "Backfilled employment_type on #{updated} posting(s)."
+  end
+
   desc "Run all job-filter backfills"
-  task backfill_all: %i[backfill_big_tech backfill_commute_zone]
+  task backfill_all: %i[backfill_big_tech backfill_commute_zone backfill_employment_type]
 end

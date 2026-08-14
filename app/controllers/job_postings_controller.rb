@@ -24,6 +24,19 @@ class JobPostingsController < ApplicationController
     ROLE_FAMILY_LABELS
   end
 
+  # Single source of truth for "every active filter, as URL params" -- the
+  # view builds every filter-badge/remove link off this hash (via #except /
+  # #merge) instead of hand-threading each param through every link_to, which
+  # silently drops filters whenever a new one is added and someone forgets a
+  # spot.
+  def active_filter_params
+    {
+      q: @query, company: @company, source_id: @source_id, role_family: @role_family,
+      location: @location, remote: (@remote ? "1" : nil), contract: (@contract ? "1" : nil)
+    }
+  end
+  helper_method :active_filter_params
+
   private
 
   def assign_filter_params
@@ -37,6 +50,7 @@ class JobPostingsController < ApplicationController
   def assign_location_params
     @location = params[:location]
     @remote = params[:remote] == "1"
+    @contract = params[:contract] == "1"
   end
 
   def valid_role_family_param
@@ -72,6 +86,7 @@ class JobPostingsController < ApplicationController
   def apply_query_and_role_family(scope)
     scope = scope.search(@query) if @query.present?
     scope = scope.by_role_family(@role_family.to_sym) if @role_family.present?
+    scope = scope.contract_only if @contract
     scope
   end
 

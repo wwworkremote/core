@@ -120,6 +120,15 @@ RSpec.describe "Job Postings" do
       expect(response.body).not_to include("Senior Ruby Developer")
     end
 
+    it "filters to contract postings when contract=1" do
+      create(:job_posting, signature: "contract-1", title: "Contract DevOps Engineer",
+                           data: { "employment_type" => "Contract" }, published_at: Time.current)
+
+      get job_postings_path, params: { contract: "1" }
+      expect(response.body).to include("Contract DevOps Engineer")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
+
     it "combines location and remote as OR, not AND" do
       create(:job_posting, signature: "chicago-2", title: "Chicago Onsite Engineer",
                            location: "Chicago, IL", published_at: Time.current)

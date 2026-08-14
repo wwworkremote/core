@@ -31,6 +31,21 @@ class JobBoards::Syncer::AttributeMapper
     "dice" => :map_scraped_html
   }.freeze
 
+  # Every provider's raw payload already lands in job_posting.data verbatim
+  # (see finalize_body) -- the employment-type signal just sits under a
+  # different key per provider instead of the canonical "employment_type"
+  # the extension/JSON-LD capture path already writes. Normalizing it here
+  # means the browse filter and any future backfill both key off one field
+  # regardless of source, and existing employment_type values (extension
+  # captures) are never clobbered.
+  EMPLOYMENT_TYPE_EXTRACTORS = {
+    "adzuna" => ->(data) { data["contract_time"] || data["contract_type"] },
+    "lever" => ->(data) { data.dig("categories", "commitment") },
+    "arbeitnow" => ->(data) { Array(data["job_types"]).first },
+    "jobicy" => ->(data) { Array(data["jobType"]).first },
+    "remotive" => ->(data) { data["job_type"] }
+  }.freeze
+
   def self.call(job_posting, data, slug)
     new.call(job_posting, data, slug)
   end
@@ -38,10 +53,19 @@ class JobBoards::Syncer::AttributeMapper
   def call(job_posting, data, slug)
     mapper = slug.match?(/^email/) ? :map_email : PROVIDER_MAPPERS.fetch(slug, :map_generic)
     send(mapper, job_posting, data)
+    normalize_employment_type(data, slug)
     finalize_body(job_posting, data)
   end
 
   private
+
+  def normalize_employment_type(data, slug)
+    return if data["employment_type"].present?
+
+    extractor = EMPLOYMENT_TYPE_EXTRACTORS[slug]
+    value = extractor&.call(data)
+    data["employment_type"] = value if value.present?
+  end
 
   def finalize_body(job_posting, data)
     # Preserve intersection data in the JobPosting payload
