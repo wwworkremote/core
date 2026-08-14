@@ -1,10 +1,10 @@
 ---
 id: TASK-40
 title: Normalize employment_type at ingestion + expose contract-role filter
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-08-14 17:31'
-updated_date: '2026-08-14 17:31'
+updated_date: '2026-08-14 19:20'
 labels:
   - ingestion
   - job_postings
@@ -27,3 +27,9 @@ Only 4 of 4,701 JobPostings have data["employment_type"] set, and those 4 are in
 - [ ] #3 JobPosting has a scope for filtering to contract-type postings
 - [ ] #4 job_postings#index exposes a contract filter checkbox mirroring the existing remote checkbox, with request spec coverage
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Normalized employment_type at the AttributeMapper level for adzuna/lever/arbeitnow/jobicy/remotive, backfilled 1752 existing postings from already-stored raw payload (1770 total now populated, up from 4), added JobPosting.contract_only scope, wired a contract filter checkbox into job_postings#index mirroring the remote filter, and refactored the view's repeated per-filter link_to param lists into one active_filter_params helper. Landed as 34d5b9b, full hook suite green.
+<!-- SECTION:FINAL_SUMMARY:END -->
