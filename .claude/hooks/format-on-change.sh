@@ -27,8 +27,8 @@ esac
 
 case "$file_path" in
   *.rb|*.rake)
-    bundle exec rubocop -A --no-color --format simple "$file_path" >/dev/null 2>&1
-    remaining="$(bundle exec rubocop --no-color --format simple "$file_path" 2>&1)"
+    bundle exec rubocop -A --force-exclusion --no-color --format simple "$file_path" >/dev/null 2>&1
+    remaining="$(bundle exec rubocop --force-exclusion --no-color --format simple "$file_path" 2>&1)"
     if ! echo "$remaining" | grep -q "no offenses detected"; then
       echo "RuboCop offenses remain in $file_path after autocorrect:" >&2
       echo "$remaining" >&2

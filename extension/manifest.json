@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WWWorkRemote Ingestion Assistant",
-  "version": "1.0",
+  "version": "1.9.0",
   "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
   "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
   "host_permissions": [
@@ -20,7 +20,8 @@
     "https://jobs.ashby.com/*",
     "https://*.ashbyhq.com/*",
     "https://jobs.smartrecruiters.com/*",
-    "https://wellfound.com/*"
+    "https://wellfound.com/*",
+    "https://www.dice.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -47,7 +48,8 @@
         "https://jobs.ashby.com/*",
         "https://*.ashbyhq.com/*",
         "https://jobs.smartrecruiters.com/*",
-        "https://wellfound.com/*"
+        "https://wellfound.com/*",
+        "https://www.dice.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_end"

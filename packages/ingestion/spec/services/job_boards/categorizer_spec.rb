@@ -45,6 +45,22 @@ RSpec.describe JobBoards::Categorizer do
       expect(job_posting.data["is_remote"]).to be true
     end
 
+    it "doesn't clobber salary data already on the posting when the LLM's response omits it" do
+      # Promote (e.g. from a structured SmartRecruiters posting) already
+      # wrote real salary data before the categorizer ever runs.
+      job_posting.update!(data: { "salary_min" => 110_000, "salary_max" => 120_000, "currency" => "USD" })
+      llm_json = { category: "Software Engineering", tags: %w[ruby rails] }.to_json
+      stub_llm_response(sse_body(llm_json))
+
+      categorizer.call
+
+      job_posting.reload
+      expect(job_posting.data["ai_category"]).to eq("Software Engineering")
+      expect(job_posting.data["salary_min"]).to eq(110_000)
+      expect(job_posting.data["salary_max"]).to eq(120_000)
+      expect(job_posting.data["currency"]).to eq("USD")
+    end
+
     it "handles malformed JSON from the LLM gracefully" do
       # LLM returns some chatter before/after valid JSON or just broken stuff
       chatter = "I am thinking... here is your data: { broken json"

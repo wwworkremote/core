@@ -47,8 +47,13 @@ class JobBoards::Categorizer
     { "ai_category" => parsed["category"] }.merge(optional_categorization_fields(parsed))
   end
 
+  # compact: an "optional" key the LLM didn't return (nil) must not
+  # overwrite a real value already on the JobPosting -- e.g. salary_min/max
+  # a promote already supplied from the source page's structured data.
+  # Hash#merge lets a nil value clobber; only merge keys the LLM actually
+  # answered.
   def optional_categorization_fields(parsed)
-    OPTIONAL_CATEGORIZATION_KEYS.index_with { |key| parsed[key] }
+    OPTIONAL_CATEGORIZATION_KEYS.index_with { |key| parsed[key] }.compact
   end
 
   def log_failure(error)
