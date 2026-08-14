@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class JobBoards::Embedder
-  # Using local llama.cpp / v1 API endpoint
-  API_URL = "#{ENV.fetch('OLLAMA_API_BASE', 'http://localhost:11500/v1')}/embeddings".freeze
+  # Dedicated embed-model llama-server -- OLLAMA_API_BASE (port 11500) is the
+  # chat model and doesn't run with --embeddings; embeddings live on a
+  # separate llama-server instance (nomic-embed-text, port 11501 by default).
+  API_URL = "#{ENV.fetch('OLLAMA_EMBED_API_BASE', 'http://localhost:11501/v1')}/embeddings".freeze
 
   def initialize(job_posting)
     @job_posting = job_posting

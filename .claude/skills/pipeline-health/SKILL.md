@@ -61,6 +61,23 @@ NameError is silently eating every run of some job class in production/dev.
    continuously on this machine) — surface them clearly but don't guess at a
    code change to paper over a dead worker.
 
+## Related scripts
+
+- **One JobPosting's downstream pipeline** — after a promote or a single
+  scrape, `bin/rails runner .claude/skills/pipeline-health/scripts/job_posting_pipeline_status.rb <id> [id...]`
+  reports that posting's `ai_category`/`embedding`/`latitude`/`longitude` plus
+  any matching SolidQueue job/failure rows. SolidQueue prunes finished job
+  rows fast on this box, so the JobPosting's own fields are the source of
+  truth, not the job history.
+- **Local LLM server health** — `bin/rails runner .claude/skills/pipeline-health/scripts/check_local_llm.rb`
+  checks both the chat (`OLLAMA_API_BASE`) and embed (`OLLAMA_EMBED_API_BASE`)
+  llama-server endpoints are reachable, and that the embed server's actual
+  output dimension matches `JobPosting.embedding`'s `vector(N)` schema column.
+  A mismatch here silently fails every embedding save (`ActiveRecord::RecordInvalid`,
+  caught and logged by `JobBoards::Embedder`, never raised) — this exact
+  failure mode is why the script exists. The embed server is a zdots-managed
+  service; if it's misconfigured, `zdots-issue`, don't reconfigure it here.
+
 ## Non-goals
 
 This is a snapshot, not monitoring. It doesn't set up alerting or dashboards

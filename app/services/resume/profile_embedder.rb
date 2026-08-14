@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Resume::ProfileEmbedder
-  API_URL = "#{ENV.fetch('OLLAMA_API_BASE', 'http://localhost:11500/v1')}/embeddings".freeze
+  # See JobBoards::Embedder -- embeddings live on a separate llama-server
+  # instance from the chat model (OLLAMA_API_BASE), not the same one.
+  API_URL = "#{ENV.fetch('OLLAMA_EMBED_API_BASE', 'http://localhost:11501/v1')}/embeddings".freeze
 
   def initialize(career_profile)
     @career_profile = career_profile
@@ -21,7 +23,7 @@ class Resume::ProfileEmbedder
   def fetch_embedding
     Faraday.post(API_URL) do |req|
       req.headers["Content-Type"] = "application/json"
-      req.body = { input: build_profile_text, model: "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf" }.to_json
+      req.body = { input: build_profile_text, model: "local" }.to_json
     end
   end
 
