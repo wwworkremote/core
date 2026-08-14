@@ -1,18 +1,56 @@
 # frozen_string_literal: true
 
 # Decides whether a non-remote job's location is within an acceptable
-# commute zone -- home-adjacent ("hyper local") or the Chicago Loop.
-# Distance-based rather than a hardcoded Metra station list: avoids
-# needing an exact, possibly-wrong list of station names, and needs no
-# maintenance as stations/lines change.
+# commute zone: home-adjacent ("hyperlocal"), anywhere along the Metra
+# UP-NW line (the only line reachable from home), or downtown Chicago
+# specifically within walking distance of Ogilvie or Union -- the two
+# UP-NW terminals -- not the Loop generally, since the rest of downtown
+# isn't reachable without a second transfer.
+#
+# Station/terminal coordinates are resolved through the same geocoder +
+# cache as home, rather than hardcoded lat/lngs -- one fewer thing to keep
+# in sync if a station's canonical address search result ever shifts.
 #
 # Configuration lives entirely in ENV, never in code -- HOME_LOCATION is
 # personal address information and must never be committed. Set it in
 # .env.local (gitignored), never in the tracked .env.
 class Geo::CommuteZone
   DEFAULT_HYPERLOCAL_RADIUS_MILES = 10.0
-  DEFAULT_CHICAGO_LOOP_RADIUS_MILES = 2.0
-  CHICAGO_LOOP_LOCATION = "Chicago Loop, Chicago, IL"
+  DEFAULT_STATION_RADIUS_MILES = 1.5
+  DEFAULT_TERMINAL_WALK_RADIUS_MILES = 0.75
+
+  # The two UP-NW downtown terminals -- a much tighter radius than the old
+  # flat "Chicago Loop" circle, since the constraint is walking distance
+  # from these two stations specifically, not the neighborhood generally.
+  TERMINALS = [
+    "Ogilvie Transportation Center, Chicago, IL",
+    "Union Station, Chicago, IL"
+  ].freeze
+
+  # Every UP-NW stop from Ogilvie out to Harvard, IL (the end of the line),
+  # minus the two terminals above. Minor stops omitted where they sit
+  # within a station radius of an adjacent named stop already in this list
+  # (Gladstone Park/Dee Road/Cumberland/Arlington Park/Pingree Road) --
+  # station_radius covers them without one geocode call each.
+  UP_NW_STATIONS = [
+    "Clybourn, Chicago, IL",
+    "Irving Park, Chicago, IL",
+    "Jefferson Park, Chicago, IL",
+    "Norwood Park, Chicago, IL",
+    "Edison Park, Chicago, IL",
+    "Park Ridge, IL",
+    "Des Plaines, IL",
+    "Mount Prospect, IL",
+    "Arlington Heights, IL",
+    "Palatine, IL",
+    "Barrington, IL",
+    "Fox River Grove, IL",
+    "Cary, IL",
+    "McHenry, IL",
+    "Crystal Lake, IL",
+    "Woodstock, IL",
+    "Harvard, IL"
+  ].freeze
 
   def self.call(job_posting)
     new(job_posting).call
@@ -72,7 +110,13 @@ class Geo::CommuteZone
   end
 
   def within_zone?
-    within_radius_of?(home_coords, hyperlocal_radius) || within_radius_of?(loop_coords, loop_radius)
+    within_radius_of?(home_coords, hyperlocal_radius) ||
+      near_any?(TERMINALS, terminal_radius) ||
+      near_any?(UP_NW_STATIONS, station_radius)
+  end
+
+  def near_any?(addresses, radius_miles)
+    addresses.any? { |address| within_radius_of?(self.class.geocode(address), radius_miles) }
   end
 
   def within_radius_of?(center, radius_miles)
@@ -89,15 +133,15 @@ class Geo::CommuteZone
     ENV.fetch("HYPERLOCAL_RADIUS_MILES", DEFAULT_HYPERLOCAL_RADIUS_MILES).to_f
   end
 
-  def loop_radius
-    ENV.fetch("CHICAGO_LOOP_RADIUS_MILES", DEFAULT_CHICAGO_LOOP_RADIUS_MILES).to_f
+  def station_radius
+    ENV.fetch("STATION_RADIUS_MILES", DEFAULT_STATION_RADIUS_MILES).to_f
+  end
+
+  def terminal_radius
+    ENV.fetch("TERMINAL_WALK_RADIUS_MILES", DEFAULT_TERMINAL_WALK_RADIUS_MILES).to_f
   end
 
   def home_coords
     self.class.geocode(ENV.fetch("HOME_LOCATION", nil))
-  end
-
-  def loop_coords
-    self.class.geocode(CHICAGO_LOOP_LOCATION)
   end
 end

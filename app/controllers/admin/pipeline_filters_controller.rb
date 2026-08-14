@@ -9,7 +9,7 @@ class Admin::PipelineFiltersController < Admin::ApplicationController
   # One cohesive read-only assignment of every static filter constant --
   # splitting it into helper methods would fragment a single overview into
   # unreadable pieces for no real simplification.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def index
     @role_families = RoleFamily::FAMILIES
     @big_tech_blocklist = Company::BIG_TECH_NAMES
@@ -18,8 +18,9 @@ class Admin::PipelineFiltersController < Admin::ApplicationController
     @categorizer_categories = JobBoards::Categorizer::CATEGORIES
     @guardrail_patterns = Guardrails::HeuristicScanner::SUSPICIOUS_PATTERNS
     @commute_hyperlocal_radius = ENV.fetch("HYPERLOCAL_RADIUS_MILES", Geo::CommuteZone::DEFAULT_HYPERLOCAL_RADIUS_MILES)
-    @commute_loop_radius = ENV.fetch("CHICAGO_LOOP_RADIUS_MILES", Geo::CommuteZone::DEFAULT_CHICAGO_LOOP_RADIUS_MILES)
+    @commute_station_radius = ENV.fetch("STATION_RADIUS_MILES", Geo::CommuteZone::DEFAULT_STATION_RADIUS_MILES)
+    @commute_terminal_radius = ENV.fetch("TERMINAL_WALK_RADIUS_MILES", Geo::CommuteZone::DEFAULT_TERMINAL_WALK_RADIUS_MILES)
     @adapters = Ingestion::AdapterRegistry.all
   end
-  # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

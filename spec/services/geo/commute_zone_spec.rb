@@ -3,18 +3,23 @@
 require "rails_helper"
 
 RSpec.describe Geo::CommuteZone do
-  # Home: an arbitrary point NW of the terminal. Loop: roughly the Willis
-  # Tower area. Coordinates only need to be self-consistent with the test
-  # distances below, not geographically exact.
+  # Home: an arbitrary point NW of the terminal. Ogilvie: roughly its real
+  # downtown coordinates. Cary: a UP-NW station roughly on-line but a
+  # few towns further from home. Coordinates only
+  # need to be self-consistent with the test distances below, not
+  # geographically exact.
   let(:home_stub) { { "latitude" => 42.30, "longitude" => -88.40 } }
-  let(:loop_stub) { { "latitude" => 41.8789, "longitude" => -87.6359 } }
+  let(:ogilvie_stub) { { "latitude" => 41.8839, "longitude" => -87.6408 } }
+  let(:cary_stub) { { "latitude" => 42.2114, "longitude" => -88.2384 } }
 
   around do |example|
     original_home = ENV.fetch("HOME_LOCATION", nil)
     ENV["HOME_LOCATION"] = "[home location]"
     described_class.instance_variable_set(:@geocode_cache, nil)
+    Geocoder::Lookup::Test.set_default_stub([]) # every other UP-NW station/terminal: "not found"
     Geocoder::Lookup::Test.add_stub("[home location]", [home_stub])
-    Geocoder::Lookup::Test.add_stub(described_class::CHICAGO_LOOP_LOCATION, [loop_stub])
+    Geocoder::Lookup::Test.add_stub("Ogilvie Transportation Center, Chicago, IL", [ogilvie_stub])
+    Geocoder::Lookup::Test.add_stub("Cary, IL", [cary_stub])
 
     example.run
 
@@ -62,21 +67,27 @@ RSpec.describe Geo::CommuteZone do
       expect(described_class.call(posting)).to eq(:allowed)
     end
 
-    it "allows a geocoded posting within the Chicago Loop radius" do
-      posting = job_posting_at(41.88, -87.63) # right by the loop stub
+    it "allows a geocoded posting within walking distance of Ogilvie" do
+      posting = job_posting_at(41.884, -87.641) # right by the Ogilvie stub
 
       expect(described_class.call(posting)).to eq(:allowed)
     end
 
-    it "blocks a geocoded posting far from both home and the Loop" do
+    it "allows a geocoded posting near a UP-NW line station away from home" do
+      posting = job_posting_at(42.211, -88.238) # right by the Cary stub
+
+      expect(described_class.call(posting)).to eq(:allowed)
+    end
+
+    it "blocks a geocoded posting far from home, every UP-NW station, and both terminals" do
       posting = job_posting_at(34.0522, -118.2437) # Los Angeles
 
       expect(described_class.call(posting)).to eq(:blocked)
     end
 
-    it "still allows the Loop zone independently when HOME_LOCATION is unset" do
+    it "still allows an Ogilvie-adjacent posting when HOME_LOCATION is unset" do
       ENV["HOME_LOCATION"] = nil
-      posting = job_posting_at(41.88, -87.63)
+      posting = job_posting_at(41.884, -87.641)
 
       expect(described_class.call(posting)).to eq(:allowed)
     end

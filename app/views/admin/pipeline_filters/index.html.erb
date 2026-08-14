@@ -81,15 +81,24 @@
   <div class="card-neural p-8">
     <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Commute Zone</h3>
     <p class="text-xs text-slate-500 mb-4">Non-remote postings outside these radii are purged once geocoded. Home address stays in <code class="font-mono text-slate-400">.env.local</code>, never shown here.</p>
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-3 gap-4">
       <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
         <div class="text-lg font-black text-white"><%= @commute_hyperlocal_radius %> mi</div>
         <div class="text-xs font-bold text-slate-500 mt-1">Home radius</div>
       </div>
       <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
-        <div class="text-lg font-black text-white"><%= @commute_loop_radius %> mi</div>
-        <div class="text-xs font-bold text-slate-500 mt-1">Chicago Loop radius</div>
+        <div class="text-lg font-black text-white"><%= @commute_station_radius %> mi</div>
+        <div class="text-xs font-bold text-slate-500 mt-1">UP-NW station radius</div>
       </div>
+      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
+        <div class="text-lg font-black text-white"><%= @commute_terminal_radius %> mi</div>
+        <div class="text-xs font-bold text-slate-500 mt-1">Ogilvie/Union walk radius</div>
+      </div>
+    </div>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <% Geo::CommuteZone::UP_NW_STATIONS.each do |station| %>
+        <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= station.split(",").first %></span>
+      <% end %>
     </div>
   </div>
 
