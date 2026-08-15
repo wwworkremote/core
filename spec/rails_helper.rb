@@ -98,10 +98,10 @@ RSpec.configure do |config|
   config.before do
     # Global stub for Vector Intelligence to prevent connection errors in tests
     allow(VectorIntelligence).to receive(:embed)
-      .and_return(Array.new(3584, 0.0))
+      .and_return(Array.new(768, 0.0))
     # Also stub the low-level embedder just in case
     allow(JobBoards::Embedder).to receive(:embed_text)
-      .and_return(Array.new(3584, 0.0))
+      .and_return(Array.new(768, 0.0))
 
     # Stub Geocoder
     Geocoder.configure(lookup: :test, ip_lookup: :test)

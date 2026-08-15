@@ -53,8 +53,11 @@ class Resume::ProfileEmbedder
     false
   end
 
+  # Truncated as a whole -- the embed server's context window (512 tokens on
+  # the current local model) is far smaller than the per-field truncation
+  # here was tuned for, so the sections still overflowed once joined.
   def build_profile_text
-    profile_text_sections.join("\n\n")
+    profile_text_sections.join("\n\n").truncate(1500)
   end
 
   def profile_text_sections

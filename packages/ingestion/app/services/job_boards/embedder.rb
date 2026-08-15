@@ -65,8 +65,12 @@ class JobBoards::Embedder
     false
   end
 
+  # Truncated as a whole, not just the body -- the embed server's context
+  # window (512 tokens on the current local model) is far smaller than the
+  # 3000-char budget this was tuned for, so any per-field truncation still
+  # overflowed once title/company were added on top.
   def embedding_source_text
-    "Title: #{@job_posting.title}\nCompany: #{@job_posting.company}\nDescription: #{@job_posting.body&.truncate(3000)}"
+    "Title: #{@job_posting.title}\nCompany: #{@job_posting.company}\nDescription: #{@job_posting.body}".truncate(1500)
   end
 
   def save_embedding?(response)

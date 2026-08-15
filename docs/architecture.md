@@ -38,7 +38,7 @@ The system implements a production-grade AI stack designed for reliability, safe
 - **Classification Engine**: Risk-based disposition based on instruction density and pattern weights.
 
 ### 3. Vector-Native RAG Architecture
-- **Semantic Identity**: `Resume::ProfileEmbedder` synthesizes work history and career goals into 3584-dimensional embeddings.
+- **Semantic Identity**: `Resume::ProfileEmbedder` synthesizes work history and career goals into 768-dimensional embeddings.
 - **Efficient Retrieval**: Native `pgvector` integration for matching profiles against job postings.
 
 ## 📜 Architectural Decisions (ADR Summary)

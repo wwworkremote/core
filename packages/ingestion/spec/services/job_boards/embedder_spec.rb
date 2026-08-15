@@ -5,10 +5,10 @@ require "rails_helper"
 RSpec.describe JobBoards::Embedder do
   let(:job_posting) { create(:job_posting, title: "Ruby Engineer", body: "We need a Ruby on Rails expert.") }
   let(:embedder) { described_class.new(job_posting) }
-  # Must match the job_postings.embedding column width (vector(3584) --
+  # Must match the job_postings.embedding column width (vector(768) --
   # see db/schema.rb), not necessarily any particular model's real output
   # size.
-  let(:mock_embedding) { Array.new(3584) { rand } }
+  let(:mock_embedding) { Array.new(768) { rand } }
 
   describe "#call" do
     it "fetches and saves the embedding via Faraday" do
@@ -23,7 +23,7 @@ RSpec.describe JobBoards::Embedder do
       expect(result).to be true
 
       job_posting.reload
-      expect(job_posting.embedding.size).to eq(3584)
+      expect(job_posting.embedding.size).to eq(768)
     end
 
     it "handles a 501 (embeddings unsupported on this server) gracefully" do

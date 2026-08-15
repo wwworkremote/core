@@ -6,7 +6,7 @@
 #
 #  id               :bigint           not null, primary key
 #  contact_info     :jsonb
-#  embedding        :vector(3584)
+#  embedding        :vector(768)
 #  experience_level :string
 #  github_context   :jsonb
 #  github_url       :string
@@ -20,7 +20,7 @@
 #
 # Indexes
 #
-#  index_career_profiles_on_embedding_hnsw  (((embedding)::halfvec(3584)) halfvec_cosine_ops) USING hnsw
+#  index_career_profiles_on_embedding_hnsw  (((embedding)::halfvec(768)) halfvec_cosine_ops) USING hnsw
 #  index_career_profiles_on_user_id         (user_id)
 #
 # Foreign Keys

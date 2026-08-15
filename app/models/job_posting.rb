@@ -149,7 +149,7 @@ end
 #  country_code       :string
 #  crawl_status       :string
 #  data               :jsonb            not null
-#  embedding          :vector(3584)
+#  embedding          :vector(768)
 #  enriched_at        :datetime
 #  latitude           :float
 #  location           :string
@@ -177,7 +177,7 @@ end
 #  index_job_postings_on_company_name_and_published_at  (company_name,published_at DESC)
 #  index_job_postings_on_country_code                   (country_code)
 #  index_job_postings_on_data                           (data) USING gin
-#  index_job_postings_on_embedding_hnsw                 (((embedding)::halfvec(3584)) halfvec_cosine_ops) USING hnsw
+#  index_job_postings_on_embedding_hnsw                 (((embedding)::halfvec(768)) halfvec_cosine_ops) USING hnsw
 #  index_job_postings_on_external_id                    (external_id)
 #  index_job_postings_on_location                       (location)
 #  index_job_postings_on_published_at                   (published_at)

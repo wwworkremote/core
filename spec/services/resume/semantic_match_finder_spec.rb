@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Resume::SemanticMatchFinder do
-  let(:embedding) { Array.new(3584) { rand } }
+  let(:embedding) { Array.new(768) { rand } }
   let(:career_profile) { create(:career_profile, embedding: embedding) }
 
   describe ".call" do

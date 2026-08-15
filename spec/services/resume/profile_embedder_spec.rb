@@ -6,7 +6,7 @@ RSpec.describe Resume::ProfileEmbedder do
   let(:user) { create(:user) }
   let(:career_profile) { create(:career_profile, user: user, skills: "Ruby, Rails", experience_level: "Senior") }
   let(:embedder) { described_class.new(career_profile) }
-  let(:mock_embedding) { Array.new(3584) { rand } }
+  let(:mock_embedding) { Array.new(768) { rand } }
 
   before do
     create(:work_experience, career_profile: career_profile, title: "Dev", company_name: "A")
@@ -25,7 +25,7 @@ RSpec.describe Resume::ProfileEmbedder do
       expect(result).to be true
 
       career_profile.reload
-      expect(career_profile.embedding.size).to eq(3584)
+      expect(career_profile.embedding.size).to eq(768)
     end
 
     it "handles API errors gracefully" do

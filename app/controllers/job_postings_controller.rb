@@ -84,10 +84,18 @@ class JobPostingsController < ApplicationController
   end
 
   def apply_query_and_role_family(scope)
-    scope = scope.search(@query) if @query.present?
+    scope = apply_search(scope) if @query.present?
     scope = scope.by_role_family(@role_family.to_sym) if @role_family.present?
     scope = scope.contract_only if @contract
     scope
+  end
+
+  # hybrid_search fuses keyword (pg_search) and vector (pgvector) results via
+  # RRF, but runs unscoped -- reorder(nil) drops the .recent order so match
+  # relevance wins over recency once a query is present.
+  def apply_search(scope)
+    ranked_ids = JobPosting.hybrid_search(@query, limit: 200).pluck(:id)
+    scope.where(id: ranked_ids).reorder(nil).in_order_of(:id, ranked_ids)
   end
 
   def base_job_postings

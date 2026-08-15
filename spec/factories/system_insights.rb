@@ -7,7 +7,7 @@
 #  id          :bigint           not null, primary key
 #  active      :boolean          default(TRUE)
 #  context     :text
-#  embedding   :vector(3584)
+#  embedding   :vector(768)
 #  file_path   :string
 #  line_number :integer
 #  message     :text
@@ -19,7 +19,7 @@
 # Indexes
 #
 #  index_system_insights_on_active          (active)
-#  index_system_insights_on_embedding_hnsw  (((embedding)::halfvec(3584)) halfvec_cosine_ops) USING hnsw
+#  index_system_insights_on_embedding_hnsw  (((embedding)::halfvec(768)) halfvec_cosine_ops) USING hnsw
 #  index_system_insights_on_file_path       (file_path)
 #
 FactoryBot.define do

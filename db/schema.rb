@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_15_023000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -105,7 +105,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
   create_table "career_profiles", force: :cascade do |t|
     t.jsonb "contact_info"
     t.datetime "created_at", null: false
-    t.vector "embedding", limit: 3584
+    t.vector "embedding", limit: 768
     t.string "experience_level"
     t.jsonb "github_context"
     t.string "github_url"
@@ -115,7 +115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
     t.text "skills"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_career_profiles_on_embedding_hnsw", using: :hnsw
+    t.index "((embedding)::halfvec(768)) halfvec_cosine_ops", name: "index_career_profiles_on_embedding_hnsw", using: :hnsw
     t.index ["user_id"], name: "index_career_profiles_on_user_id"
   end
 
@@ -386,7 +386,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
     t.string "crawl_status"
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
-    t.vector "embedding", limit: 3584
+    t.vector "embedding", limit: 768
     t.datetime "enriched_at"
     t.string "external_author_id"
     t.string "external_id"
@@ -402,7 +402,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
     t.string "target_url"
     t.string "title"
     t.datetime "updated_at", null: false
-    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_job_postings_on_embedding_hnsw", using: :hnsw
+    t.index "((embedding)::halfvec(768)) halfvec_cosine_ops", name: "index_job_postings_on_embedding_hnsw", using: :hnsw
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["company", "published_at"], name: "index_job_postings_on_company_and_published_at", order: { published_at: :desc }
     t.index ["company_id"], name: "index_job_postings_on_company_id"
@@ -578,7 +578,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
   create_table "resumes", force: :cascade do |t|
     t.jsonb "content", default: {}, null: false
     t.datetime "created_at", null: false
-    t.vector "embedding", limit: 3584
+    t.vector "embedding", limit: 768
     t.string "imported_from_url"
     t.string "name", null: false
     t.bigint "parent_id"
@@ -586,7 +586,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.integer "version", default: 1, null: false
-    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_resumes_on_embedding_hnsw", using: :hnsw
+    t.index "((embedding)::halfvec(768)) halfvec_cosine_ops", name: "index_resumes_on_embedding_hnsw", using: :hnsw
     t.index ["parent_id"], name: "index_resumes_on_parent_id"
     t.index ["user_id", "name", "version"], name: "index_resumes_on_user_id_and_name_and_version", unique: true
     t.index ["user_id"], name: "index_resumes_on_user_id"
@@ -596,10 +596,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
     t.string "category"
     t.datetime "created_at", null: false
     t.text "description"
-    t.vector "embedding", limit: 3584
+    t.vector "embedding", limit: 768
     t.string "name", null: false
     t.datetime "updated_at", null: false
-    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_skills_on_embedding_hnsw", using: :hnsw
+    t.index "((embedding)::halfvec(768)) halfvec_cosine_ops", name: "index_skills_on_embedding_hnsw", using: :hnsw
     t.index ["name"], name: "index_skills_on_name", unique: true
   end
 
@@ -760,14 +760,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_060000) do
     t.boolean "active", default: true
     t.text "context"
     t.datetime "created_at", null: false
-    t.vector "embedding", limit: 3584
+    t.vector "embedding", limit: 768
     t.string "file_path"
     t.integer "line_number"
     t.text "message"
     t.integer "severity"
     t.integer "tool"
     t.datetime "updated_at", null: false
-    t.index "((embedding)::halfvec(3584)) halfvec_cosine_ops", name: "index_system_insights_on_embedding_hnsw", using: :hnsw
+    t.index "((embedding)::halfvec(768)) halfvec_cosine_ops", name: "index_system_insights_on_embedding_hnsw", using: :hnsw
     t.index ["active"], name: "index_system_insights_on_active"
     t.index ["file_path"], name: "index_system_insights_on_file_path"
   end

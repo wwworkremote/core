@@ -18,8 +18,8 @@ RSpec.describe "Charts::Data::Pipeline" do
   describe "GET /charts/data/pipeline/funnel" do
     it "returns JSON data for pipeline funnel" do
       create(:job_boards_document)
-      # Create an embedding with 3584 dimensions
-      mock_embedding = Array.new(3584) { 0.1 }
+      # Create an embedding with 768 dimensions
+      mock_embedding = Array.new(768) { 0.1 }
       create(:job_posting, embedding: mock_embedding)
 
       get charts_data_pipeline_funnel_path

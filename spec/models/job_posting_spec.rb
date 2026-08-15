@@ -10,7 +10,7 @@
 #  country_code       :string
 #  crawl_status       :string
 #  data               :jsonb            not null
-#  embedding          :vector(3584)
+#  embedding          :vector(768)
 #  enriched_at        :datetime
 #  latitude           :float
 #  location           :string
@@ -38,7 +38,7 @@
 #  index_job_postings_on_company_name_and_published_at  (company_name,published_at DESC)
 #  index_job_postings_on_country_code                   (country_code)
 #  index_job_postings_on_data                           (data) USING gin
-#  index_job_postings_on_embedding_hnsw                 (((embedding)::halfvec(3584)) halfvec_cosine_ops) USING hnsw
+#  index_job_postings_on_embedding_hnsw                 (((embedding)::halfvec(768)) halfvec_cosine_ops) USING hnsw
 #  index_job_postings_on_external_id                    (external_id)
 #  index_job_postings_on_location                       (location)
 #  index_job_postings_on_published_at                   (published_at)
@@ -82,7 +82,7 @@ RSpec.describe JobPosting do
     end
 
     it "nils out the embedding when purged" do
-      job.update!(embedding: Array.new(3584, 0.1))
+      job.update!(embedding: Array.new(768, 0.1))
       job.purge!
       expect(job.reload.embedding).to be_nil
     end
@@ -138,7 +138,7 @@ RSpec.describe JobPosting do
   end
 
   describe ".hybrid_search" do
-    let(:query_embedding) { Array.new(3584) { rand } }
+    let(:query_embedding) { Array.new(768) { rand } }
 
     before do
       # rails_helper stubs VectorIntelligence.embed to an all-zero vector

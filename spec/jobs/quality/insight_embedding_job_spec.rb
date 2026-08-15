@@ -6,7 +6,7 @@ RSpec.describe Quality::InsightEmbeddingJob do
   include ActiveJob::TestHelper
 
   let(:insight) { create(:system_insight, message: "Use double quotes", tool: :rubocop) }
-  let(:mock_embedding) { Array.new(3584) { rand } }
+  let(:mock_embedding) { Array.new(768) { rand } }
 
   before do
     ActiveJob::Base.queue_adapter = :test
@@ -17,7 +17,7 @@ RSpec.describe Quality::InsightEmbeddingJob do
     described_class.perform_now(insight.id)
     insight.reload
     # Use match_array with precision or just check size/presence since float precision varies in DB
-    expect(insight.embedding.size).to eq(3584)
+    expect(insight.embedding.size).to eq(768)
   end
 
   it "constructs descriptive text for embedding" do
