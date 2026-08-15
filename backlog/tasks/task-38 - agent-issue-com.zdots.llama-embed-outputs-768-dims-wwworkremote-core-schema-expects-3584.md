@@ -6,7 +6,7 @@ title: >-
 status: Done
 assignee: []
 created_date: '2026-08-14 01:40'
-updated_date: '2026-08-15 15:05'
+updated_date: '2026-08-15 16:27'
 labels:
   - agent-reported
   - request
@@ -48,4 +48,6 @@ Resolved by migrating the schema to match the currently-running embed model rath
 - Wired the already-built, already-tested JobPosting.hybrid_search (BM25 + vector RRF, TASK-32.1) into the actual job postings search UI, which had only ever used plain keyword search.
 
 603+ specs green, RuboCop clean, all commits through the full pre-commit hook chain.
+
+Follow-up perf fix in the same session: wiring hybrid_search exposed that the job postings search box (both before and after this fix) ran a ~3s full sequential scan per query. Root cause: pg_search computed tsearch live (no matching index) and used a non-indexable similarity() >= threshold predicate for trigram. Fixed with an indexed generated tsv_search column and by scoping trigram fuzzy matching to :title only (body is already covered by tsearch + the vector half). Verified end-to-end via a live HTTP request: 200 OK, ~1s full round trip including the embed call, down from ~3s for the keyword query alone. Commit fffb920.
 <!-- SECTION:FINAL_SUMMARY:END -->

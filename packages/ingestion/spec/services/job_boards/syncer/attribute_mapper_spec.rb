@@ -62,4 +62,22 @@ RSpec.describe JobBoards::Syncer::AttributeMapper do
       expect(job_posting.data["employment_type"]).to be_nil
     end
   end
+
+  describe "adp mapping" do
+    it "maps a direct-hiring-page ADP requisition onto the job posting" do
+      data = {
+        "publishedJobTitle" => "Product Onboarding Specialist", "jobDescription" => "<p>Do the thing</p>",
+        "target_url" => "https://myjobs.adp.com/corpfollettexternal/cx/job-details?reqId=5001218021506",
+        "postingDate" => "2026-08-10", "client_name" => "Follett Corporation", "location" => "Westchester, IL"
+      }
+
+      described_class.call(job_posting, data, "adp")
+
+      expect(job_posting.title).to eq("Product Onboarding Specialist")
+      expect(job_posting.company).to eq("Follett Corporation")
+      expect(job_posting.location).to eq("Westchester, IL")
+      expect(job_posting.target_url).to eq(data["target_url"])
+      expect(job_posting.body).to include("Do the thing")
+    end
+  end
 end
