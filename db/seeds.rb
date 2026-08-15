@@ -17,6 +17,27 @@ puts "== Seeding Data Sources =="
   puts " - #{source_attrs[:name]} (slug: #{source_attrs[:slug]})"
 end
 
+# Direct-hiring-page sources: companies picked for fit with this account's
+# actual target roles (Rails-heavy engineering culture, regulated/complex
+# domains -- fintech, healthtech, insurance -- Staff/Principal-level hiring),
+# each slug/board live-verified against the provider's real public API
+# before being added here. Extend these arrays (or add a new source below)
+# to track more companies -- no code change needed, see each Fetcher class.
+puts "== Seeding Direct-Hiring-Page Sources =="
+[
+  { name: "Greenhouse", slug: "greenhouse", boards: %w[doximity gusto toast] },
+  { name: "Lever", slug: "lever", boards: %w[ro plaid palantir] },
+  { name: "ADP (Direct)", slug: "adp", boards: %w[corpfollettexternal] },
+  { name: "Workday", slug: "workday",
+    boards: [{ "tenant" => "myhrhome", "wd" => "wd1", "site" => "OneMainCareers" }] }
+].each do |source_attrs|
+  source = JobBoards::Source.find_or_create_by!(slug: source_attrs[:slug]) { |s| s.name = source_attrs[:name] }
+  query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+  query.update!(data: query.data.merge("boards" => source_attrs[:boards]))
+
+  puts " - #{source_attrs[:name]} (slug: #{source_attrs[:slug]}, boards: #{source_attrs[:boards]})"
+end
+
 puts "== Seeding LLM Models =="
 LLM::Registry.sync
 puts " - Models synced from config/models.yml"

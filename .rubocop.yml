@@ -61,6 +61,7 @@ Metrics/BlockLength:
     - 'Gemfile'
     - 'config/routes.rb'
     - 'config/environments/*.rb'
+    - 'config/initializers/ingestion_adapters.rb'
     - 'spec/**/*'
     - 'lib/tasks/*.rake'
 

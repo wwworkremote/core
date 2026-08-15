@@ -80,4 +80,24 @@ RSpec.describe JobBoards::Syncer::AttributeMapper do
       expect(job_posting.body).to include("Do the thing")
     end
   end
+
+  describe "workday mapping" do
+    it "maps a direct-hiring-page Workday requisition onto the job posting" do
+      data = {
+        "title" => "Staff Engineer - Software", "jobDescription" => "<p>Lead the platform</p>",
+        "target_url" => "https://myhrhome.wd1.myworkdayjobs.com/OneMainCareers/job/Baltimore-MD/Staff-Engineer_R1",
+        "company" => "OneMain General Services Corporation", "location" => "Baltimore, MD",
+        "employment_type" => "Full time"
+      }
+
+      described_class.call(job_posting, data, "workday")
+
+      expect(job_posting.title).to eq("Staff Engineer - Software")
+      expect(job_posting.company).to eq("OneMain General Services Corporation")
+      expect(job_posting.location).to eq("Baltimore, MD")
+      expect(job_posting.target_url).to eq(data["target_url"])
+      expect(job_posting.body).to include("Lead the platform")
+      expect(job_posting.data["employment_type"]).to eq("Full time")
+    end
+  end
 end

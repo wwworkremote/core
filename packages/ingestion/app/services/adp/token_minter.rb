@@ -15,8 +15,12 @@ class Adp::TokenMinter
 
   def call(board)
     mint(board)
-  rescue Playwright::Error => e
-    Rails.logger.error "[Adp::TokenMinter] Playwright error minting token for #{board}: #{e.message}"
+  rescue StandardError => e
+    # Playwright::DriverCrashedError (e.g. missing/broken Chromium) is a bare
+    # StandardError, not a Playwright::Error -- caught here too so a driver
+    # problem logs and returns nil instead of failing the enclosing job, same
+    # as every other Playwright call site in this codebase.
+    Rails.logger.error "[Adp::TokenMinter] Error minting token for #{board}: #{e.message}"
     nil
   end
 

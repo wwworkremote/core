@@ -1,10 +1,10 @@
 ---
 id: TASK-34
 title: OLLAMA_API_BASE points at the wrong llama-server port for embeddings
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-10 12:23'
-updated_date: '2026-08-10 12:23'
+updated_date: '2026-08-15 18:46'
 labels: []
 dependencies: []
 references:
@@ -40,3 +40,9 @@ This doesn't show up in the RSpec suite because `spec/rails_helper.rb` globally 
 - [ ] #3 A live (non-stubbed) call to JobBoards::Embedder.embed_text returns a real embedding vector in this dev environment
 - [ ] #4 Investigated whether the bin/smoke inference timeout (port 11500, 90s timeout) is related to or independent of this fix, and noted the finding (even if the timeout itself isn't resolved here)
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Superseded by TASK-38's resolution, not fixed as originally scoped. TASK-38 (2026-08-15) migrated the pgvector schema from 3584 to 768 dims to match the actually-running embed model (nomic-embed-text-v2-moe on port 11501) and applied the app-side OLLAMA_EMBED_API_BASE routing fix this task also called for. A live, non-stubbed JobBoards::Embedder.embed_text call now returns a real 768-dim embedding in this dev environment -- verified as part of TASK-38's backfill (job_postings coverage 37.7% -> 98.6%). Closing as resolved via TASK-38 rather than duplicating that work here.
+<!-- SECTION:FINAL_SUMMARY:END -->

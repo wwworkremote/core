@@ -25,6 +25,7 @@ class JobBoards::Syncer::AttributeMapper
     "greenhouse" => :map_greenhouse,
     "lever" => :map_lever,
     "adp" => :map_adp,
+    "workday" => :map_workday,
     "yc" => :map_yc,
     "indeed" => :map_scraped_html,
     "linkedin" => :map_scraped_html,
@@ -170,11 +171,21 @@ class JobBoards::Syncer::AttributeMapper
   end
 
   def map_adp(job_posting, data)
-    job_posting.title        = data["publishedJobTitle"] || data["jobTitle"]
+    title = data["publishedJobTitle"] || data["jobTitle"]
+    job_posting.title        = title if title.present?
     job_posting.body         = data["jobDescription"] if data["jobDescription"].present?
     job_posting.target_url   = data["target_url"] if data["target_url"].present?
     job_posting.published_at = parse_time_or_now(data["postingDate"])
     job_posting.company      = data["client_name"]
+    job_posting.location     = data["location"]
+  end
+
+  def map_workday(job_posting, data)
+    job_posting.title        = data["title"] if data["title"].present?
+    job_posting.body         = data["jobDescription"] if data["jobDescription"].present?
+    job_posting.target_url   = data["target_url"] if data["target_url"].present?
+    job_posting.published_at = Time.zone.now
+    job_posting.company      = data["company"]
     job_posting.location     = data["location"]
   end
 

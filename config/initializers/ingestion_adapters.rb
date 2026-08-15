@@ -12,13 +12,11 @@ Rails.application.config.to_prepare do
   # Feed Fetchers
   Ingestion::AdapterRegistry.register("arbeitnow", Arbeitnow::Fetcher, name: "Arbeitnow", type: "Feed", cooldown: 2.hours)
   Ingestion::AdapterRegistry.register("jobicy", Jobicy::Fetcher, name: "Jobicy", type: "Feed", cooldown: 4.hours)
-
   # Scraper Fetchers (Standard)
   Ingestion::AdapterRegistry.register("greenhouse", Greenhouse::Fetcher, name: "Greenhouse", type: "Scraper", cooldown: 4.hours)
   Ingestion::AdapterRegistry.register("lever", Lever::Fetcher, name: "Lever", type: "Scraper", cooldown: 4.hours)
-  # Direct-hiring-page adapter: add a company by appending its ADP career-site
-  # slug to this source's Query#data["boards"], no code change needed.
   Ingestion::AdapterRegistry.register("adp", Adp::Fetcher, name: "ADP (Direct)", type: "Direct", cooldown: 4.hours)
+  Ingestion::AdapterRegistry.register("workday", Workday::Fetcher, name: "Workday", type: "Direct", cooldown: 4.hours)
   Ingestion::AdapterRegistry.register("wwr", Wwr::Fetcher, name: "Wwr", type: "Scraper", cooldown: 30.minutes)
   Ingestion::AdapterRegistry.register("yc", Yc::Scraper, name: "YC", type: "Scraper", cooldown: 4.hours)
 

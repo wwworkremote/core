@@ -11,6 +11,10 @@ class Adp::Fetcher
 
   CAREER_SITE_URL = "https://myjobs.adp.com"
   CONFIG_URL = "https://myjobs.adp.com/public/staffing/v1/career-site"
+  # "myadp_prefix" only verified against one tenant (Follett) -- the minted
+  # myjobstoken is what actually scopes a request to a company, so this is
+  # believed to be a fixed platform-wide path, not per-tenant. Re-verify
+  # against a second ADP-hosted board before trusting this at scale.
   REQUISITIONS_URL = "https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters"
   SELECT_FIELDS = %w[reqId jobTitle publishedJobTitle jobDescription postingDate
                      clientRequisitionID requisitionLocations].join(",")
