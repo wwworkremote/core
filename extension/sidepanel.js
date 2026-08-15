@@ -448,9 +448,16 @@ function populateForm(state) {
   applyFieldState('fld-salary-range', 'f-salary-min');
 
   // ── Description ───────────────────────────────────────────────────────────
+  // description_text (innerText) already has real paragraph/bullet line
+  // breaks -- collapsing all \s+ (including \n) to one space flattened
+  // every capture into an unreadable wall of text. Only fold horizontal
+  // whitespace and excess blank lines; keep the line breaks.
   const rawDesc  = coalesce(e, 'description_text', 'description_html');
   const cleanDesc = rawDesc
-    ? rawDesc.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+    ? rawDesc.replace(/<\/(p|div|h[1-6])>/gi, '\n\n').replace(/<li[^>]*>|<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' ')
+             .split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim()).join('\n')
+             .replace(/\n{3,}/g, '\n\n')
+             .trim()
     : '';
   setVal('f-description', cleanDesc || null, 'fld-description', 'src-description');
   updateWordCount();
@@ -775,7 +782,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
       // Just update the description field
       const ta      = document.getElementById('f-description');
       const rawDesc = newExtracted.description_text || '';
-      const clean   = rawDesc.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const clean   = rawDesc.replace(/<\/(p|div|h[1-6])>/gi, '\n\n').replace(/<li[^>]*>|<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' ')
+                              .split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim()).join('\n')
+                              .replace(/\n{3,}/g, '\n\n')
+                              .trim();
       ta.value      = clean;
       currentState.extracted.description_text = newExtracted.description_text;
       currentState.extracted.description_html = newExtracted.description_html;

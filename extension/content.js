@@ -868,7 +868,10 @@
               education:         item.educationRequirements  || null,
               description_html:  item.description       || null,
               description_text:  item.description
-                ? item.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+                ? item.description.replace(/<\/(p|div|h[1-6])>/gi, '\n\n').replace(/<li[^>]*>|<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' ')
+                    .split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim()).join('\n')
+                    .replace(/\n{3,}/g, '\n\n')
+                    .trim()
                 : null,
             };
           }
