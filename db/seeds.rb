@@ -23,13 +23,19 @@ end
 # each slug/board live-verified against the provider's real public API
 # before being added here. Extend these arrays (or add a new source below)
 # to track more companies -- no code change needed, see each Fetcher class.
+# Cengage was found by mining this DB's own already-ingested JobPosting rows
+# for myworkdayjobs.com target_urls from prior sessions' work, not guessed --
+# worth re-running that mining pass periodically as more postings land.
 puts "== Seeding Direct-Hiring-Page Sources =="
 [
   { name: "Greenhouse", slug: "greenhouse", boards: %w[doximity gusto toast] },
   { name: "Lever", slug: "lever", boards: %w[ro plaid palantir] },
   { name: "ADP (Direct)", slug: "adp", boards: %w[corpfollettexternal] },
   { name: "Workday", slug: "workday",
-    boards: [{ "tenant" => "myhrhome", "wd" => "wd1", "site" => "OneMainCareers" }] }
+    boards: [
+      { "tenant" => "myhrhome", "wd" => "wd1", "site" => "OneMainCareers" },
+      { "tenant" => "cengage", "wd" => "wd5", "site" => "CengageNorthAmericaCareers" }
+    ] }
 ].each do |source_attrs|
   source = JobBoards::Source.find_or_create_by!(slug: source_attrs[:slug]) { |s| s.name = source_attrs[:name] }
   query = JobBoards::Query.find_or_create_by!(source_id: source.id)
