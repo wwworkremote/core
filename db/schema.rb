@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_15_023000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_15_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -401,6 +401,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_15_023000) do
     t.string "tags", array: true
     t.string "target_url"
     t.string "title"
+    t.virtual "tsv_search", type: :tsvector, as: "(setweight(to_tsvector('english'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, (COALESCE(body, ''::character varying))::text), 'B'::\"char\"))", stored: true
     t.datetime "updated_at", null: false
     t.index "((embedding)::halfvec(768)) halfvec_cosine_ops", name: "index_job_postings_on_embedding_hnsw", using: :hnsw
     t.index ["body"], name: "index_job_postings_on_body", opclass: :gin_trgm_ops, using: :gin
@@ -416,6 +417,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_15_023000) do
     t.index ["signature"], name: "index_job_postings_on_signature", unique: true
     t.index ["source_id", "published_at"], name: "index_job_postings_on_source_id_and_published_at", order: { published_at: :desc }
     t.index ["title"], name: "index_job_postings_on_title", opclass: :gin_trgm_ops, using: :gin
+    t.index ["tsv_search"], name: "index_job_postings_on_tsv_search", using: :gin
   end
 
   create_table "job_searches", force: :cascade do |t|

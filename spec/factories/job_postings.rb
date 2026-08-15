@@ -22,6 +22,7 @@
 #  tags               :string           is an Array
 #  target_url         :string
 #  title              :string
+#  tsv_search         :tsvector
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  company_id         :bigint
@@ -45,6 +46,7 @@
 #  index_job_postings_on_signature                      (signature) UNIQUE
 #  index_job_postings_on_source_id_and_published_at     (source_id,published_at DESC)
 #  index_job_postings_on_title                          (title) USING gin
+#  index_job_postings_on_tsv_search                     (tsv_search) USING gin
 #
 # Foreign Keys
 #

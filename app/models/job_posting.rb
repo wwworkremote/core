@@ -58,11 +58,18 @@ class JobPosting < ApplicationRecord
 
     published_at < 72.hours.ago
   end
+  # tsearch reads the indexed tsv_search column (see migration). Trigram is
+  # scoped to :title only -- fuzzy matching against multi-KB body text is
+  # expensive per row regardless of indexing, and body content is already
+  # covered by tsearch (stemmed) and hybrid_search's vector half. No
+  # :threshold on trigram -- pg_search only emits the indexable `%` operator
+  # when threshold is absent; setting one switches to `similarity() >= x`,
+  # which forces a sequential scan.
   pg_search_scope :search,
                   against: { title: "A", body: "B" },
                   using: {
-                    tsearch: { prefix: true, dictionary: "english" },
-                    trigram: { threshold: 0.1 }
+                    tsearch: { prefix: true, dictionary: "english", tsvector_column: "tsv_search" },
+                    trigram: { only: [:title] }
                   }
 
   def self.semantic_search(query_text, limit: 10)
@@ -161,6 +168,7 @@ end
 #  tags               :string           is an Array
 #  target_url         :string
 #  title              :string
+#  tsv_search         :tsvector
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  company_id         :bigint
@@ -184,6 +192,7 @@ end
 #  index_job_postings_on_signature                      (signature) UNIQUE
 #  index_job_postings_on_source_id_and_published_at     (source_id,published_at DESC)
 #  index_job_postings_on_title                          (title) USING gin
+#  index_job_postings_on_tsv_search                     (tsv_search) USING gin
 #
 # Foreign Keys
 #
