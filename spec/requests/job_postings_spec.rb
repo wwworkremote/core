@@ -55,6 +55,20 @@ RSpec.describe "Job Postings" do
       expect(response.body).not_to include("Python Architect")
     end
 
+    it "combines a search query with another active filter, not just the query alone" do
+      JobPosting.create!(
+        signature: "test-contract-ruby",
+        title: "Contract Ruby Developer",
+        company: "Acme Corp",
+        published_at: Time.current,
+        status: "none",
+        data: { "employment_type" => "Contract" }
+      )
+      get job_postings_path, params: { q: "Ruby", contract: "1" }
+      expect(response.body).to include("Contract Ruby Developer")
+      expect(response.body).not_to include("Senior Ruby Developer")
+    end
+
     it "filters out ignored, purged, and expired jobs by default" do
       create(:job_posting, signature: "ignored-1", title: "Ignored Job", status: "ignored")
       create(:job_posting, signature: "purged-1", title: "Purged Job", status: "purged")
