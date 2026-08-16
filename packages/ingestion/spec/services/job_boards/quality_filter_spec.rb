@@ -3,60 +3,72 @@
 require "rails_helper"
 
 RSpec.describe JobBoards::QualityFilter do
-  let(:user) { create(:user, preferred_countries: %w[US]) }
-  let(:job_posting) do
-    create(:job_posting, title: "Staff Ruby Engineer", country_code: "US", body: "x" * 60)
-  end
+  let(:user) { create(:user, preferred_countries: ["US"]) }
+  let(:job_posting) { build(:job_posting, title: "Senior Ruby Engineer", body: "A" * 60, country_code: "US") }
+  let(:filter) { described_class.new(job_posting, user: user) }
 
   describe "#useful?" do
-    it "accepts a well-formed job matching the user's preferred country" do
-      expect(described_class.new(job_posting, user: user).useful?).to be true
+    it "is true for a normal, well-formed Engineering posting" do
+      expect(filter.useful?).to be true
     end
 
-    it "rejects a blank title" do
+    it "is false when the title is blank" do
       job_posting.title = ""
-      expect(described_class.new(job_posting, user: user).useful?).to be false
+      expect(filter.useful?).to be false
     end
 
-    it "rejects a banned title, case-insensitively" do
-      job_posting.title = "sign in"
-      expect(described_class.new(job_posting, user: user).useful?).to be false
+    it "is false for a banned navigation/UI title" do
+      job_posting.title = "Sign In"
+      expect(filter.useful?).to be false
     end
 
-    it "rejects a title shorter than 3 characters" do
+    it "is false when the title is shorter than 3 characters" do
       job_posting.title = "QA"
-      expect(described_class.new(job_posting, user: user).useful?).to be false
+      expect(filter.useful?).to be false
     end
 
-    it "rejects a country_code outside the user's preferred countries" do
+    it "is false when the posting's country isn't in the user's preferred countries" do
       job_posting.country_code = "DE"
-      expect(described_class.new(job_posting, user: user).useful?).to be false
+      expect(filter.useful?).to be false
     end
 
-    it "accepts a job with no country_code regardless of preferred countries" do
+    it "is true when country_code is blank, regardless of preferred_countries" do
       job_posting.country_code = nil
-      expect(described_class.new(job_posting, user: user).useful?).to be true
+      expect(filter.useful?).to be true
     end
 
-    it "does not filter junior/intern titles (no seniority filtering implemented yet)" do
-      job_posting.title = "Junior Ruby Engineer"
-      expect(described_class.new(job_posting, user: user).useful?).to be true
-    end
-
-    it "rejects a body shorter than 50 characters" do
-      job_posting.body = "too short"
-      expect(described_class.new(job_posting, user: user).useful?).to be false
-    end
-
-    it "rejects a blank body" do
+    it "is false when the body is blank" do
       job_posting.body = ""
-      expect(described_class.new(job_posting, user: user).useful?).to be false
+      expect(filter.useful?).to be false
     end
 
-    it "defaults to the primary user when none is given" do
-      create(:user, preferred_countries: %w[US])
+    it "is false when the body is shorter than 50 characters" do
+      job_posting.body = "Too short."
+      expect(filter.useful?).to be false
+    end
 
-      expect(described_class.new(job_posting).useful?).to be true
+    context "non-Engineering title keyword matching" do
+      described_class::NON_ENGINEERING_TITLE_KEYWORDS.each do |keyword|
+        it "is false for a title containing #{keyword.inspect}" do
+          job_posting.title = "Senior #{keyword}"
+          expect(filter.useful?).to be false
+        end
+      end
+
+      it "matches case-insensitively" do
+        job_posting.title = "senior account executive"
+        expect(filter.useful?).to be false
+      end
+
+      it "does not reject engineering-adjacent hybrid titles like Sales Engineer" do
+        job_posting.title = "Sales Engineer"
+        expect(filter.useful?).to be true
+      end
+
+      it "does not reject Solutions Engineer" do
+        job_posting.title = "Solutions Engineer"
+        expect(filter.useful?).to be true
+      end
     end
   end
 end

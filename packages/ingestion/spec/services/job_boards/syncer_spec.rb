@@ -46,5 +46,35 @@ RSpec.describe JobBoards::Syncer, type: :service do
         service.call
       }.not_to change(JobPosting, :count)
     end
+
+    context "when QualityFilter rejects the posting (e.g. a non-Engineering title)" do
+      let(:job_data) do
+        {
+          id: "456",
+          title: "Account Executive",
+          description: "Cool sales job",
+          url: "https://example.com/job",
+          publication_date: "2024-01-01T12:00:00Z",
+          company_name: "Acme Corp",
+          candidate_required_location: "Worldwide"
+        }
+      end
+      let(:document) do
+        JobBoards::Document.create!(
+          signature: "remotive-456", source_id: source.id, job_boards_query_id: query.id, document: job_data.to_json
+        )
+      end
+
+      before { ActiveJob::Base.queue_adapter = :test }
+
+      it "still ingests the posting as ignored, but never enqueues the expensive AnalysisJob" do
+        document
+        expect {
+          service.call
+        }.to change(JobPosting, :count).by(1).and have_enqueued_job(JobBoards::AnalysisJob).exactly(0).times
+
+        expect(JobPosting.last.status).to eq("ignored")
+      end
+    end
   end
 end
