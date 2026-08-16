@@ -257,6 +257,7 @@ Rails.application.routes.draw do
     resources :sources, only: %i[index show]
     resources :leads, only: %i[index show]
     resources :extraction_rules, only: %i[index show]
+    resources :pipeline_filters, only: [:index]
     resources :queries, only: %i[index show]
     resources :documents, only: %i[index show destroy]
     resources :domains, only: %i[index show destroy]

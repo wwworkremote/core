@@ -2,8 +2,7 @@
 
 class Admin::DocumentsController < Admin::ApplicationController
   def index
-    @documents = JobBoards::Document.order(created_at: :desc).includes(:job_boards_source,
-                                                                       :job_boards_query).page(params[:page]).per(30)
+    @documents = JobBoards::Document.order(created_at: :desc).includes(:job_boards_source).page(params[:page]).per(30)
   end
 
   def show

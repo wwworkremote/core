@@ -1,10 +1,10 @@
 ---
 id: TASK-55
 title: Close the 14 zero-coverage files (test suite audit)
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-16 15:22'
-updated_date: '2026-08-16 15:32'
+updated_date: '2026-08-16 16:59'
 labels: []
 dependencies: []
 priority: medium
@@ -26,7 +26,32 @@ Sequenced after TASK-52/53/54 per explicit user direction (2026-08-16): "I'm ope
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Each of the 14 named files has at least one spec covering its primary behavior (not just a smoke 'renders successfully' test where the action has real branching logic)
-- [ ] #2 Full suite still passes with 0 failures after additions
-- [ ] #3 No new file added to this list in the process (i.e. don't introduce new untested code while writing these specs)
+- [x] #1 Each of the 14 named files has at least one spec covering its primary behavior (not just a smoke 'renders successfully' test where the action has real branching logic)
+- [x] #2 Full suite still passes with 0 failures after additions
+- [x] #3 No new file added to this list in the process (i.e. don't introduce new untested code while writing these specs)
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added at least one behavior-covering spec (not smoke-only) for each of the 14 named files:
+
+- pages_controller.rb -> spec/requests/pages_spec.rb
+- admin/extraction_rules_controller.rb -> spec/requests/admin/extraction_rules_spec.rb
+- api/v0/sources_controller.rb -> spec/requests/api/v0/sources_spec.rb
+- models_controller.rb -> spec/requests/models_spec.rb
+- admin/documents_controller.rb -> spec/requests/admin/documents_spec.rb
+- admin/interview_questions_controller.rb -> spec/requests/admin/interview_questions_spec.rb
+- admin/pipeline_filters_controller.rb -> spec/requests/admin/pipeline_filters_spec.rb (route was missing entirely -- controller+view existed but were unroutable dead code; added `resources :pipeline_filters, only: [:index]`)
+- job_lifecycle/expiry_sweep_job.rb -> spec/jobs/job_lifecycle/expiry_sweep_job_spec.rb
+- admin/interview_sessions_controller.rb -> spec/requests/admin/interview_sessions_spec.rb
+- api/v0/geo_controller.rb -> spec/requests/api/v0/geo_spec.rb
+- solid_queue_maintenance/stale_job_pruner.rb -> spec/services/solid_queue_maintenance/stale_job_pruner_spec.rb
+- admin/pipeline_prompts_controller.rb -> spec/requests/admin/pipeline_prompts_spec.rb
+- job_boards/strategy_agent.rb -> spec/agents/job_boards/strategy_agent_spec.rb
+- admin/skills_controller.rb -> spec/requests/admin/skills_spec.rb
+
+One real bug found and fixed along the way: Admin::DocumentsController#index eager-loaded :job_boards_query via .includes, but no view ever reads it -- Bullet flagged it as unused eager loading the first time a request spec actually hit that action. Dropped the unused include.
+
+Full combined suite (spec + packages/ingestion/spec): 780 examples, 0 failures, 94.31% line coverage (up from 91.28%). Full-repo RuboCop: 684 files, 0 offenses. Brakeman: 0 warnings.
+<!-- SECTION:FINAL_SUMMARY:END -->
