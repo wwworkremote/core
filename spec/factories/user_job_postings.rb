@@ -6,6 +6,8 @@
 #
 #  id             :bigint           not null, primary key
 #  match_analysis :text
+#  match_score    :integer
+#  match_tags     :text             default([]), not null, is an Array
 #  notes          :text
 #  priority_flag  :boolean
 #  status         :string
@@ -20,6 +22,7 @@
 #
 #  index_user_job_postings_on_job_posting_id  (job_posting_id)
 #  index_user_job_postings_on_job_search_id   (job_search_id)
+#  index_user_job_postings_on_match_score     (match_score)
 #  index_user_job_postings_on_user_id         (user_id)
 #
 # Foreign Keys

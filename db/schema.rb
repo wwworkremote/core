@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_15_040000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_16_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -809,6 +809,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_15_040000) do
     t.bigint "job_posting_id", null: false
     t.bigint "job_search_id"
     t.text "match_analysis"
+    t.integer "match_score"
+    t.text "match_tags", default: [], null: false, array: true
     t.text "notes"
     t.boolean "priority_flag"
     t.string "status"
@@ -817,6 +819,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_15_040000) do
     t.bigint "user_id", null: false
     t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
     t.index ["job_search_id"], name: "index_user_job_postings_on_job_search_id"
+    t.index ["match_score"], name: "index_user_job_postings_on_match_score"
     t.index ["user_id"], name: "index_user_job_postings_on_user_id"
   end
 

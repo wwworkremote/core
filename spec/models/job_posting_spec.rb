@@ -156,6 +156,49 @@ RSpec.describe JobPosting do
     end
   end
 
+  describe ".by_match_score" do
+    let(:user) { create(:user) }
+
+    it "orders scored postings highest first" do
+      low = create(:job_posting, title: "Low Match")
+      high = create(:job_posting, title: "High Match")
+      create(:user_job_posting, user: user, job_posting: low, match_score: 10)
+      create(:user_job_posting, user: user, job_posting: high, match_score: 90)
+
+      expect(described_class.by_match_score(user).pluck(:title)).to eq(["High Match", "Low Match"])
+    end
+
+    it "keeps a posting with no UserJobPosting row at all, sorted after scored ones" do
+      scored = create(:job_posting, title: "Scored")
+      create(:job_posting, title: "Unscored")
+      create(:user_job_posting, user: user, job_posting: scored, match_score: 50)
+
+      expect(described_class.by_match_score(user).pluck(:title)).to eq(%w[Scored Unscored])
+    end
+
+    it "does not double-count a posting scored by a different user" do
+      other_user = create(:user)
+      job = create(:job_posting, title: "Shared Job")
+      create(:user_job_posting, user: other_user, job_posting: job, match_score: 99)
+
+      # .length not .count: the scope's raw multi-column .select (needed for
+      # current_match_score/current_match_tags) makes a bare SQL COUNT(...)
+      # wrapping it invalid Postgres syntax -- Kaminari's real pagination
+      # path avoids this internally (verified live), only a naive .count
+      # on the raw relation hits it.
+      expect(described_class.by_match_score(user).where(title: "Shared Job").length).to eq(1)
+    end
+
+    it "exposes the joined score/tags as virtual attributes" do
+      job = create(:job_posting, title: "Tagged")
+      create(:user_job_posting, user: user, job_posting: job, match_score: 77, match_tags: %w[remote-strict])
+
+      result = described_class.by_match_score(user).find_by(title: "Tagged")
+      expect(result.current_match_score).to eq(77)
+      expect(result.current_match_tags).to eq(["remote-strict"])
+    end
+  end
+
   describe ".hybrid_search" do
     let(:query_embedding) { Array.new(768) { rand } }
 

@@ -156,6 +156,55 @@ RSpec.describe "Job Postings" do
     end
   end
 
+  describe "GET /job_postings?sort=match_score" do
+    let(:current_user) {
+      User.find_or_create_by!(email: "mike@just3ws.com") { |u|
+        u.name = "Mike"; u.password = "password"
+      }
+    }
+
+    it "orders postings by the current user's match_score, highest first" do
+      low = create(:job_posting, signature: "low-match", title: "Low Match Job", published_at: Time.current)
+      high = create(:job_posting, signature: "high-match", title: "High Match Job", published_at: Time.current)
+      create(:user_job_posting, user: current_user, job_posting: low, match_score: 20)
+      create(:user_job_posting, user: current_user, job_posting: high, match_score: 90)
+
+      get job_postings_path(sort: "match_score")
+
+      high_index = response.body.index("High Match Job")
+      low_index = response.body.index("Low Match Job")
+      expect(high_index).to be < low_index
+    end
+
+    it "keeps unscored postings in the list, sorted after scored ones" do
+      scored = create(:job_posting, signature: "scored", title: "Scored Job", published_at: Time.current)
+      create(:user_job_posting, user: current_user, job_posting: scored, match_score: 50)
+      # `job` (from the outer let!) has no UserJobPosting at all
+
+      get job_postings_path(sort: "match_score")
+
+      expect(response.body).to include("Scored Job")
+      expect(response.body).to include(job.title)
+    end
+
+    it "displays the score and tags badge on a scored posting's card" do
+      scored = create(:job_posting, signature: "scored-tags", title: "Tagged Job", published_at: Time.current)
+      create(:user_job_posting, user: current_user, job_posting: scored, match_score: 85,
+                                match_tags: %w[remote-strict ruby-heavy])
+
+      get job_postings_path(sort: "match_score")
+
+      expect(response.body).to include("85% match")
+      expect(response.body).to include("remote-strict")
+      expect(response.body).to include("ruby-heavy")
+    end
+
+    it "ignores an invalid sort value rather than erroring" do
+      get job_postings_path(sort: "not-a-real-sort")
+      expect(response).to be_successful
+    end
+  end
+
   describe "GET /job_postings/:id" do
     it "returns a success response" do
       get job_posting_path(job)

@@ -49,6 +49,28 @@ class JobPosting < ApplicationRecord
     where(aliases.map { "title ILIKE ?" }.join(" OR "), *aliases.map { |a| "%#{a}%" })
   end
 
+  # Postings this user hasn't run a ProfileMatcher check on yet have no
+  # user_job_postings row at all -- LEFT JOIN (not INNER) keeps them in the
+  # list, just sorted last (NULLS LAST) rather than dropped. The user_id
+  # check has to live in the JOIN's ON clause, not a WHERE filter applied
+  # after -- filtering in WHERE would drop a posting entirely whenever a
+  # DIFFERENT user has a row for it (LEFT JOIN finds that other row, WHERE
+  # then rejects it since it matches neither user.id nor NULL), instead of
+  # correctly showing it unscored. Selects the joined score/tags as virtual
+  # attributes so the index can display them without an N+1 per card.
+  def self.by_match_score(user)
+    joins(match_score_join_sql(user))
+      .select("job_postings.*, user_job_postings.match_score AS current_match_score, " \
+              "user_job_postings.match_tags AS current_match_tags")
+      .order(Arel.sql("user_job_postings.match_score DESC NULLS LAST"))
+  end
+
+  def self.match_score_join_sql(user)
+    condition = "LEFT JOIN user_job_postings ON user_job_postings.job_posting_id = job_postings.id " \
+                "AND user_job_postings.user_id = ?"
+    sanitize_sql_array([condition, user.id])
+  end
+
   def freshness
     return :unknown if published_at.nil?
     return :stale if stale?

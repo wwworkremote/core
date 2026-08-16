@@ -71,10 +71,11 @@ class LLM::ProfileMatcher::PromptBuilder
 
       [OUTPUT_FORMAT]
       1. **MATCH_CONFIDENCE**: (0-100%)
-      2. **STRENGTHS**: Why this aligns with the user's stated goals.
-      3. **WEAKNESSES**: Why the user might want to SKIP this opportunity.
-      4. **RESUME_DELTA**: The exact technical bullet points to add/tweak if the user decides to apply.
-      5. **INTERVIEW_PREP**: 3 custom technical questions they will likely ask, and the 'STAR' method responses the user should give based on their experience.
+      2. **TAGS**: 2-6 short kebab-case tags summarizing the CRITICAL_EVALUATION_CRITERIA verdict for THIS posting specifically (e.g. remote-strict, hybrid-required, ruby-heavy, mostly-react, senior-fit, underleveled, red-flag-legacy-tech). Comma-separated, one line, no prose.
+      3. **STRENGTHS**: Why this aligns with the user's stated goals.
+      4. **WEAKNESSES**: Why the user might want to SKIP this opportunity.
+      5. **RESUME_DELTA**: The exact technical bullet points to add/tweak if the user decides to apply.
+      6. **INTERVIEW_PREP**: 3 custom technical questions they will likely ask, and the 'STAR' method responses the user should give based on their experience.
     PROMPT
   end
   # rubocop:enable Metrics/AbcSize

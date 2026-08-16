@@ -81,16 +81,27 @@ class LLM::ProfileMatcher
   end
 
   def apply_result(result, user_job)
-    user_job.update!(match_analysis: result[:output])
     score = extract_score(result[:output])
-    user_job.update!(priority_flag: true) if score >= 80
-    { success: true, output: result[:output], score: score }
+    tags = extract_tags(result[:output])
+    user_job.update!(match_analysis: result[:output], match_score: score, match_tags: tags,
+                     priority_flag: score >= 80)
+    { success: true, output: result[:output], score: score, tags: tags }
   end
 
   # Try to extract numerical score (e.g. 85%)
   def extract_score(output)
     match = output.match(/MATCH_CONFIDENCE.*?(\d+)%/i)
     match ? match[1].to_i : 0
+  end
+
+  # TAGS line is comma-separated kebab-case tokens (see PromptBuilder's
+  # OUTPUT_FORMAT) -- strip markdown bold/bullet noise the LLM sometimes
+  # wraps the line in, then split on commas.
+  def extract_tags(output)
+    match = output.match(/TAGS\**:?\**\s*(.+)/i)
+    return [] unless match
+
+    match[1].split(",").map { |tag| tag.strip.gsub(/[*_`]/, "") }.compact_blank
   end
 
   def failure_result(result)

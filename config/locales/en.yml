@@ -157,6 +157,8 @@ en:
       clear_filters: "Clear all"
       mark_source_not_interested: "Mark all %{source} postings not interested"
       not_interested: "Not interested"
+      sort_match_score: "Sort by Match Score"
+      match_score: "%{score}% match"
       network_fallback: "Direct"
       posted_ago: "%{time} ago"
       unknown_company: "Unknown company"

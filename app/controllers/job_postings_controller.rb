@@ -38,7 +38,7 @@ class JobPostingsController < ApplicationController
   def active_filter_params
     {
       q: @query, company: @company, source_id: @source_id, role_family: @role_family,
-      location: @location, remote: (@remote ? "1" : nil), contract: (@contract ? "1" : nil)
+      location: @location, remote: (@remote ? "1" : nil), contract: (@contract ? "1" : nil), sort: @sort
     }
   end
   helper_method :active_filter_params
@@ -65,10 +65,15 @@ class JobPostingsController < ApplicationController
     assign_location_params
   end
 
+  def valid_sort_param
+    params[:sort] if params[:sort] == "match_score"
+  end
+
   def assign_location_params
     @location = params[:location]
     @remote = params[:remote] == "1"
     @contract = params[:contract] == "1"
+    @sort = valid_sort_param
   end
 
   def valid_role_family_param
@@ -117,8 +122,12 @@ class JobPostingsController < ApplicationController
   end
 
   def base_job_postings
-    scope = JobPosting.recent.includes(:company, source: :origin)
+    scope = base_sort_scope.includes(:company, source: :origin)
     scope = scope.where.not(status: %w[ignored purged expired]) if params[:status].blank?
     scope
+  end
+
+  def base_sort_scope
+    @sort == "match_score" ? JobPosting.by_match_score(current_user) : JobPosting.recent
   end
 end
