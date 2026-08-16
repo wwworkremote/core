@@ -9,6 +9,9 @@ Standard roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-huma
 ### Domain docs
 Single-context layout at the root. See `docs/agents/domain.md`.
 
+### bin/ scripts index
+Full list of what every `bin/*` script does and when to use it — check here before writing a new `bin/rails runner` one-liner or a new script for something that might already exist. See `docs/agents/bin-scripts.md`.
+
 ### bin/ script conventions
 Never let a `bin/*` script or rake task write real ActiveRecord rows under `RAILS_ENV=test` outside RSpec's transactional wrapper — it pollutes the shared test DB for every spec after it. See `docs/agents/bin-script-conventions.md`.
 
