@@ -35,14 +35,16 @@ All of these are read-mostly and safe to run against development; none should be
 `RAILS_ENV=test` (see `docs/agents/bin-script-conventions.md` for why) — `bin/verify_board` and
 `bin/verify_ingestion` refuse to on their own, the others don't yet.
 
-- **`bin/smoke`** — orchestrates `verify_llm.rb` + `verify_ingestion`; the "is the stack basically
-  alive" check.
+- **`bin/smoke`** — orchestrates `verify_llm.rb` + `verify_ingestion` + `verify_email_ingestion`;
+  the "is the stack basically alive" check.
 - **`bin/verify_llm.rb`** — pure HTTP health check against the local llama.cpp server (health,
   model alias, inference, embeddings). No Rails, no DB.
 - **`bin/verify_ingestion`** — exercises the HackerNews fetch → `JobBoards::Syncer` path with
   dummy data, wrapped in a rolled-back transaction so nothing persists.
 - **`bin/verify_board`** — see `direct-hiring-board-verify` skill below; checks one real company
   on a board-based adapter (adp/workday/greenhouse/lever) end-to-end.
+- **`bin/verify_email_ingestion`** — runs `EmailIngestion::Scanner` against whatever's actually in
+  `~/.wwworkremote/{source}/*.eml` right now; zero files is a healthy pass, not a failure.
 - **`bin/verify_promote.rb`** — live capture→promote check for one job-board URL, bypassing the
   Chrome extension (extension automation doesn't work in this environment — see
   `docs/extension-workflow.md`). `Usage: bin/verify_promote.rb --provider X --url URL`.
