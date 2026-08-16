@@ -9,6 +9,15 @@ Standard roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-huma
 ### Domain docs
 Single-context layout at the root. See `docs/agents/domain.md`.
 
+### bin/ script conventions
+Never let a `bin/*` script or rake task write real ActiveRecord rows under `RAILS_ENV=test` outside RSpec's transactional wrapper — it pollutes the shared test DB for every spec after it. See `docs/agents/bin-script-conventions.md`.
+
+### Backlog hygiene audits
+Use the `backlog-audit` skill (or the `backlog-audit-agent` subagent for a context-isolated pass) when asked to check whether the backlog is clean — it root-causes bug tasks against git history before assuming they're still open, not just re-reading descriptions.
+
+### Onboarding a new direct-hiring company board
+Use the `direct-hiring-board-verify` skill and `bin/verify_board` to confirm a new ADP/Workday/Greenhouse/Lever tenant slug actually works before adding it to `db/seeds.rb` or a Query's boards list.
+
 ### Chrome extension versioning
 Bump `version` in `extension/manifest.json` whenever any file under `extension/` changes (even a small fix), unless doing so would break something. Nothing in the codebase reads or depends on this value — it's for tracking which build is loaded in `chrome://extensions`. Full semver, `major.minor.patch`:
 - **patch** — copy/wording fixes, color/theme tweaks, selector adjustments, bug fixes that don't change behavior a user would notice as a new capability.
