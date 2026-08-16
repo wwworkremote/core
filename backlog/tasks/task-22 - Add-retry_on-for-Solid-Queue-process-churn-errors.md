@@ -1,10 +1,10 @@
 ---
 id: TASK-22
 title: Add retry_on for Solid Queue process-churn errors
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-27 21:57'
-updated_date: '2026-07-28 00:13'
+updated_date: '2026-08-16 17:11'
 labels: []
 dependencies: []
 priority: high
@@ -22,3 +22,9 @@ ordinal: 21000
 <!-- SECTION:NOTES:BEGIN -->
 Added retry_on SolidQueue::Processes::ProcessPrunedError, SolidQueue::Processes::ProcessMissingError, wait: 30.seconds, attempts: 3 to ApplicationJob. Verified both classes are real StandardError subclasses and the handler registered correctly via a runner check. rubocop clean.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Already implemented in commit 178f13a9 (2026-07-27, same day as this task) -- app/jobs/application_job.rb:11-13 has `retry_on SolidQueue::Processes::ProcessPrunedError, SolidQueue::Processes::ProcessMissingError, wait: 30.seconds, attempts: 3`, matching this task's Implementation Notes exactly. Never marked Done at the time. Closing now; no new code changes needed.
+<!-- SECTION:FINAL_SUMMARY:END -->
