@@ -6,8 +6,8 @@ class EmailIngestion::Scanner
   BASE_DIR = File.expand_path("~/.wwworkremote")
   SOURCES = %w[indeed linkedin adzuna].freeze
 
-  def call
-    SOURCES.each { |source| scan_source(source) }
+  def call(source: nil)
+    (source ? [source] : SOURCES).each { |src| scan_source(src) }
   end
 
   private

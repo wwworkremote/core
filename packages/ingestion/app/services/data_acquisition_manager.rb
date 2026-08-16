@@ -67,14 +67,7 @@ class DataAcquisitionManager
 
   def self.dispatch(slug, config, force)
     return CrawlRunner.call(slug, config) if config[:class] == Scraper::CrawlDiscoveryJob
-    return run_job(slug, config, force) if config[:class].respond_to?(:perform_later)
 
     ServiceRunner.call(slug, config, force)
-  end
-
-  def self.run_job(slug, config, _force)
-    args = config[:class] == EmailImportJob ? [slug.split("_").last] : []
-    config[:class].perform_later(*args)
-    { success: true }
   end
 end

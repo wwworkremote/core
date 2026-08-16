@@ -34,8 +34,9 @@ Rails.application.config.to_prepare do
   Ingestion::AdapterRegistry.register("echojobs", Scraper::CrawlDiscoveryJob, name: "EchoJobs", type: "Scraper", cooldown: 4.hours)
   Ingestion::AdapterRegistry.register("roberthalf", Scraper::CrawlDiscoveryJob, name: "Robert Half", type: "Scraper", cooldown: 4.hours)
 
-  # Email Fetchers
-  Ingestion::AdapterRegistry.register("email_indeed", EmailImportJob, name: "Email (Indeed)", type: "Email", cooldown: 1.hour)
-  Ingestion::AdapterRegistry.register("email_adzuna", EmailImportJob, name: "Email (Adzuna)", type: "Email", cooldown: 1.hour)
-  Ingestion::AdapterRegistry.register("email_linkedin", EmailImportJob, name: "Email (LinkedIn)", type: "Email", cooldown: 1.hour)
+  # Email Fetchers -- scan ~/.wwworkremote/{source}/*.eml, claim+enqueue
+  # EmailImportJob per file found. See TASK-19.
+  Ingestion::AdapterRegistry.register("email_indeed", EmailIngestion::Scanner, name: "Email (Indeed)", type: "Email", cooldown: 1.hour)
+  Ingestion::AdapterRegistry.register("email_adzuna", EmailIngestion::Scanner, name: "Email (Adzuna)", type: "Email", cooldown: 1.hour)
+  Ingestion::AdapterRegistry.register("email_linkedin", EmailIngestion::Scanner, name: "Email (LinkedIn)", type: "Email", cooldown: 1.hour)
 end

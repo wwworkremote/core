@@ -12,6 +12,7 @@ class JobFetchers::CanonicalJobExtractor
   INTERSTITIAL_TITLE_PATTERNS = [
     /signing you in/i,
     /additional verification required/i,
+    /performing additional .*verification/i,
     /verify you'?re? a human/i,
     /checking your browser/i,
     /just a moment/i,

@@ -78,6 +78,22 @@ RSpec.describe DataAcquisitionManager do
       end
     end
 
+    context "with an email source (email_indeed)" do
+      let(:email_slug) { "email_indeed" }
+      let(:scanner_double) { instance_double(EmailIngestion::Scanner, call: true) }
+
+      before do
+        create(:job_boards_source, slug: email_slug)
+        allow(EmailIngestion::Scanner).to receive(:new).and_return(scanner_double)
+      end
+
+      it "scans only the matching source, not every configured source" do
+        described_class.run(email_slug)
+
+        expect(scanner_double).to have_received(:call).with(source: "indeed")
+      end
+    end
+
     context "with a generic Scraper (Cord)" do
       let(:scraper_slug) { "cord" }
 

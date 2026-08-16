@@ -149,4 +149,32 @@ RSpec.describe JobFetchers::CanonicalJobExtractor do
       </html>
     HTML
   end
+
+  describe "interstitial/bot-check detection" do
+    # Real title observed live (TASK-19 verification session) sourced from an
+    # Indeed email link -- not covered by the denylist until this title was
+    # added, so a bot-check page was saved as a real JobPosting.
+    it "rejects a page whose title is a bot-check challenge, returning nil instead of data" do
+      html = "<html><body><h1>Performing additional browser verification...</h1></body></html>"
+
+      result = described_class.new(html, url, "indeed").call
+
+      expect(result).to be_nil
+    end
+
+    it "still extracts a real job posting whose title happens to mention 'verification'" do
+      html = <<~HTML
+        <html>
+          <body>
+            <h1 class="jobsearch-JobInfoHeader-title">Identity Verification Engineer</h1>
+            <div id="jobDescriptionText">Build KYC verification pipelines.</div>
+          </body>
+        </html>
+      HTML
+
+      result = described_class.new(html, url, "indeed").call
+
+      expect(result[:title]).to eq("Identity Verification Engineer")
+    end
+  end
 end
