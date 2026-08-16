@@ -113,6 +113,15 @@ group :development, :test do
   gem "strong_migrations"
   gem "vcr"
   gem "webmock"
+  # traceroute's rake task only exists when the gem is actually required --
+  # unlike every other tool in lib/tasks/quality.rake (invoked as a plain
+  # CLI binary via `bundle exec <tool>`, group-independent), it's driven
+  # through Rails' own rake task system, which only loads gems
+  # Bundler.require pulled in for the current Rails env. Needs to live in
+  # this development+test group (not the development-only one below) so
+  # `bundle exec rake quality` -- which always runs under RAILS_ENV=test,
+  # including in CI -- can actually find it.
+  gem "traceroute"
 end
 
 group :development do
@@ -125,7 +134,6 @@ group :development do
   gem "listen", "~> 3.10"
   gem "rack-mini-profiler"
   gem "reek", require: false
-  gem "traceroute"
 end
 
 group :test do
