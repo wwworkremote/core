@@ -115,19 +115,31 @@
       },
     },
 
+    // Verified live against two real postings (different companies/templates
+    // on the same www.adzuna.com/details/* page shape). The old guessed
+    // selectors were wrong on every field except location/salary, and those
+    // two only worked by accident: Adzuna's real classes are .ui-company,
+    // .ui-location, .ui-salary, and .adp-body (description) -- the old
+    // `[class*="location"]`/`[class*="salary"]` wildcards happen to match
+    // "ui-location"/"ui-salary" as a substring, but `.company`/
+    // `[class*="company-name"]` never matches "ui-company", and
+    // `.job-description`/`[class*="JobDescription"]` never matches
+    // "adp-body" at all -- both silently returned null. JSON-LD (checked
+    // first in the extraction chain) happened to cover company/description
+    // as a fallback, which is why this went unnoticed.
     adzuna: {
       label: 'Adzuna',
       match: h => h.includes('adzuna.com'),
-      readySelector: '.job-description, [class*="JobDescription"]',
+      readySelector: '.adp-body, .ui-company',
       readyTimeout: 5000,
       extract(doc) {
         return {
           title:            pickText(doc, 'h1'),
-          company:          pickText(doc, '.company, [class*="company-name"]'),
-          location:         pickText(doc, '.location, [class*="location"]'),
-          salary:           pickText(doc, '.salary, [class*="salary"]'),
-          description_html: pickHtml(doc, '.job-description, [class*="JobDescription"]'),
-          description_text: pickInnerText(doc, '.job-description, [class*="JobDescription"]'),
+          company:          pickText(doc, '.ui-company'),
+          location:         pickText(doc, '.ui-location'),
+          salary:           pickText(doc, '.ui-salary'),
+          description_html: pickHtml(doc, '.adp-body'),
+          description_text: pickInnerText(doc, '.adp-body'),
         };
       },
     },
@@ -364,19 +376,36 @@
       },
     },
 
+    // Verified live against two real postings (different companies).
+    // The old selectors were all camelCase-guess CSS-module class names
+    // (jobDescription, StartupName, ...) -- Wellfound's actual markup is
+    // Tailwind utility classes with no such names anywhere, so every field
+    // but title silently returned null. company/location instead use the
+    // only stable hooks on the page: the /company/<slug> and /location/
+    // <slug> href structure (the company link needs :not(.content-center)
+    // since the logo image is wrapped in an identical-shaped, but text-
+    // empty, sibling anchor). salary/employment_type have no href or
+    // data-* hook at all -- positional (h1's sibling <ul>'s 1st/last <li>)
+    // is the only option; confirmed stable (empty <li> preserved, not
+    // omitted, on a listing with no disclosed salary) rather than the list
+    // reshuffling. description has no data-* hook either; targeted via its
+    // two Tailwind utility classes together (.rounded-xl.border-gray-400),
+    // which only ever match the one description card, not the header card
+    // (.border-neutral-200).
     wellfound: {
       label: 'Wellfound',
       match: h => h.includes('wellfound.com'),
-      readySelector: '[class*="jobDescription"], [class*="JobDescription"], [class*="description"]',
+      readySelector: 'h1, .rounded-xl.border-gray-400',
       readyTimeout: 6000,
       extract(doc) {
+        const descSel = '.rounded-xl.border-gray-400';
         return {
-          title:            pickText(doc, 'h1, [class*="JobTitle"], [class*="jobTitle"]'),
-          company:          pickText(doc, '[class*="StartupName"], [class*="startupName"], [class*="companyName"]'),
-          location:         pickText(doc, '[class*="JobLocation"], [class*="jobLocation"], [class*="location"]'),
-          salary:           pickText(doc, '[class*="Salary"], [class*="salary"], [class*="compensation"]'),
-          description_html: pickHtml(doc, '[class*="jobDescription"], [class*="JobDescription"]'),
-          description_text: pickInnerText(doc, '[class*="jobDescription"], [class*="JobDescription"]'),
+          title:            pickText(doc, 'h1'),
+          company:          pickText(doc, '[data-testid="startup-header"] a[href^="/company/"]:not(.content-center)'),
+          location:         pickText(doc, 'h1 + ul a[href^="/location/"], h1 + ul li:nth-child(2)'),
+          salary:           pickText(doc, 'h1 + ul li:first-child'),
+          description_html: pickHtml(doc, descSel),
+          description_text: pickInnerText(doc, descSel),
         };
       },
     },
