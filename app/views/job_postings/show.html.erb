@@ -43,18 +43,8 @@
     </header>
 
     <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
-      <h2 class="text-xs font-bold text-base-content/50 mb-10 pb-4 border-b border-white/5"><%= t('.description_heading') %></h2>
-
-      <div class="prose-invert max-w-none text-sm font-medium leading-relaxed text-base-content/80">
-        <% if @job_posting.body.present? %>
-          <%= markdown(@job_posting.body) %>
-        <% else %>
-          <div class="bg-white/5 border border-dashed border-white/10 rounded-xl p-8 text-center">
-            <div class="text-sm font-bold text-slate-400 mb-2"><%= t('.no_description_title') %></div>
-            <p class="text-xs text-slate-500"><%= t('.no_description_body') %></p>
-          </div>
-        <% end %>
-      </div>
+      <%= turbo_stream_from @job_posting %>
+      <%= render "description", job_posting: @job_posting %>
 
       <% if @job_posting.target_url.present? %>
         <div class="mt-16 pt-10 border-t border-white/5 flex flex-wrap gap-4">

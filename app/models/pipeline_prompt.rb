@@ -32,9 +32,11 @@ class PipelinePrompt < ApplicationRecord
   # app/agents/job_boards/strategy_agent.rb,
   # app/services/LLM/profile_matcher/prompt_builder.rb,
   # app/services/LLM/company_auditor.rb,
-  # app/agents/job_boards/selector_learner_agent.rb).
+  # app/agents/job_boards/selector_learner_agent.rb,
+  # app/agents/job_boards/reformatter_agent.rb).
   KNOWN_KEYS = {
     "job_boards_categorizer" => "No locals -- template can reference JobBoards::Categorizer::CATEGORIES directly.",
+    "job_boards_reformatter" => "No locals -- the raw job posting body is passed as untrusted_text, not a local.",
     "job_boards_strategy" => "No locals -- job posting/fit analysis/company research are inlined into the prompt.",
     "profile_matcher_deep_scan" => "profile, job_posting, experiences_context, github_synthesis, extra_documents",
     "company_auditor" => "company_name, raw_feedback",

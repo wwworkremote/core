@@ -27,6 +27,10 @@ class JobPosting < ApplicationRecord
   has_many :interview_tasks, dependent: :destroy
   has_many :leads, dependent: :nullify
 
+  def reformatting?
+    data["reformatting"] == true
+  end
+
   private
 
   def add_pipeline_note(note, link: nil)

@@ -163,5 +163,45 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Senior Ruby Developer")
       expect(response.body).to include("Acme Corp")
     end
+
+    it "shows the reformat button when the posting has a body and isn't already reformatting" do
+      job.update!(body: "raw description text")
+      get job_posting_path(job)
+      expect(response.body).to include("Reformat with AI")
+    end
+
+    it "shows a pending indicator instead of the button while reformatting" do
+      job.update!(body: "raw description text", data: { "reformatting" => true })
+      get job_posting_path(job)
+      expect(response.body).to include("Reformatting...")
+      expect(response.body).not_to include("Reformat with AI")
+    end
+
+    it "prefers the AI-reformatted body over the raw body when present" do
+      job.update!(body: "raw <b>text</b>", data: { "formatted_body" => "## Clean Heading" })
+      get job_posting_path(job)
+      expect(response.body).to include("Clean Heading")
+    end
+  end
+
+  describe "POST /job_postings/:id/reformat" do
+    before { ActiveJob::Base.queue_adapter = :test }
+
+    it "marks the posting as reformatting and enqueues the background job" do
+      job.update!(body: "raw description text")
+
+      expect {
+        post reformat_job_posting_path(job), as: :turbo_stream
+      }.to have_enqueued_job(JobPostingReformatJob).with(job.id)
+
+      expect(job.reload.data["reformatting"]).to be true
+    end
+
+    it "responds with a turbo stream replacing the description block" do
+      job.update!(body: "raw description text")
+      post reformat_job_posting_path(job), as: :turbo_stream
+      expect(response.media_type).to eq(Mime[:turbo_stream].to_s)
+      expect(response.body).to include("Reformatting...")
+    end
   end
 end

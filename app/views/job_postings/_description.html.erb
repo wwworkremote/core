@@ -1,0 +1,27 @@
+<div id="<%= dom_id(job_posting, :description) %>">
+  <div class="flex items-center justify-between mb-10 pb-4 border-b border-white/5">
+    <h2 class="text-xs font-bold text-base-content/50"><%= t('job_postings.show.description_heading') %></h2>
+
+    <% if job_posting.body.present? %>
+      <% if job_posting.reformatting? %>
+        <span class="text-xs font-bold text-base-content/40 flex items-center gap-2">
+          <i class="bi bi-arrow-repeat animate-spin"></i> <%= t('job_postings.show.reformatting') %>
+        </span>
+      <% else %>
+        <%= button_to t('job_postings.show.reformat_button'), reformat_job_posting_path(job_posting),
+              method: :post, class: "text-xs font-bold text-primary hover:underline bg-transparent border-0 p-0 cursor-pointer" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="prose-invert max-w-none text-sm font-medium leading-relaxed text-base-content/80">
+    <% if job_posting.body.present? %>
+      <%= markdown(job_posting.data["formatted_body"].presence || job_posting.body) %>
+    <% else %>
+      <div class="bg-white/5 border border-dashed border-white/10 rounded-xl p-8 text-center">
+        <div class="text-sm font-bold text-slate-400 mb-2"><%= t('job_postings.show.no_description_title') %></div>
+        <p class="text-xs text-slate-500"><%= t('job_postings.show.no_description_body') %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

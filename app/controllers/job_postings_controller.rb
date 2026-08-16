@@ -20,6 +20,12 @@ class JobPostingsController < ApplicationController
     ahoy.track "Viewed Job Posting", job_posting_id: @job_posting.id, title: @job_posting.title
   end
 
+  def reformat
+    job_posting = mark_reformatting!(JobPosting.find(params.expect(:id)))
+    JobPostingReformatJob.perform_later(job_posting.id)
+    render turbo_stream: description_replace_stream(job_posting)
+  end
+
   def role_family_labels
     ROLE_FAMILY_LABELS
   end
@@ -38,6 +44,18 @@ class JobPostingsController < ApplicationController
   helper_method :active_filter_params
 
   private
+
+  def mark_reformatting!(job_posting)
+    job_posting.update!(data: job_posting.data.merge("reformatting" => true))
+    job_posting
+  end
+
+  def description_replace_stream(job_posting)
+    turbo_stream.replace(
+      ActionView::RecordIdentifier.dom_id(job_posting, :description),
+      partial: "job_postings/description", locals: { job_posting: job_posting }
+    )
+  end
 
   def assign_filter_params
     @query = params[:q]

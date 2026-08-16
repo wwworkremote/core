@@ -117,6 +117,23 @@ RSpec.describe JobPosting do
     end
   end
 
+  describe "#reformatting?" do
+    it "is true when data[\"reformatting\"] is true" do
+      job = build(:job_posting, data: { "reformatting" => true })
+      expect(job.reformatting?).to be true
+    end
+
+    it "is false when data[\"reformatting\"] is absent" do
+      job = build(:job_posting, data: {})
+      expect(job.reformatting?).to be false
+    end
+
+    it "is false when data[\"reformatting\"] is false" do
+      job = build(:job_posting, data: { "reformatting" => false })
+      expect(job.reformatting?).to be false
+    end
+  end
+
   describe ".by_role_family" do
     it "matches titles in the given family" do
       manager = create(:job_posting, title: "Engineering Manager, Payments")

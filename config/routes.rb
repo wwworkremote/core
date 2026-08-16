@@ -273,7 +273,11 @@ Rails.application.routes.draw do
   get "home/index"
 
   resources :outbound_links, only: [:show]
-  resources :job_postings, only: %i[index show]
+  resources :job_postings, only: %i[index show] do
+    member do
+      post :reformat
+    end
+  end
 
   resources :data_fetchers, only: [:index] do
     collection do
