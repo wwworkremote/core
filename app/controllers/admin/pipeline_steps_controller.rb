@@ -17,10 +17,25 @@ class Admin::PipelineStepsController < Admin::ApplicationController
   def create
     @job_posting = JobPosting.find(params.expect(:job_posting_id))
     log_activity
-    redirect_to admin_job_posting_path(@job_posting), notice: "Activity logged."
+    respond_after_logging
   end
 
   private
+
+  # Explicit param, not respond_to/format negotiation -- Turbo Drive sends
+  # `Accept: text/vnd.turbo-stream.html` on every form submission by
+  # default, not just ones with a data-turbo-stream flag, so format.turbo_stream
+  # would silently hijack every OTHER status button sharing this action
+  # (Favorite, Apply, ...) across every view, not just the one caller that
+  # actually wants a card removed. remove_card is only sent by
+  # job_postings/index.html.erb's "ignore" button.
+  def respond_after_logging
+    if params[:remove_card] == "true"
+      render turbo_stream: turbo_stream.remove(@job_posting)
+    else
+      redirect_to admin_job_posting_path(@job_posting), notice: "Activity logged."
+    end
+  end
 
   # Handle status transitions or manual notes
   def log_activity

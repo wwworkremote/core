@@ -102,7 +102,7 @@
       <% @job_postings.each do |job| %>
         <article id="<%= dom_id(job) %>" class="card bg-base-200 border border-white/5 hover:border-primary/30 hover:shadow-2xl transition-all group overflow-hidden relative">
           <% if job.may_ignore? %>
-            <%= button_to admin_job_posting_pipeline_steps_path(job), params: { status: 'ignore' },
+            <%= button_to admin_job_posting_pipeline_steps_path(job), params: { status: 'ignore', remove_card: true },
                 form: { data: { turbo_stream: true }, class: "absolute top-3 right-3 z-10" },
                 title: t('.not_interested'),
                 class: "btn btn-ghost btn-xs btn-circle text-base-content/40 hover:text-error hover:bg-error/10" do %>
