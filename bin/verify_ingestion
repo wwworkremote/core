@@ -5,7 +5,12 @@ require_relative '../config/environment'
 
 puts "--- Running Operational Ingestion Verification ---"
 
-begin
+# Wrapped in a transaction that's always rolled back so this verification
+# script never leaves persistent Source/Document rows behind -- in any
+# environment, including the shared test DB bin/smoke runs it against
+# (TASK-35: those leftover rows broke unrelated specs asserting exact counts).
+error = nil
+ActiveRecord::Base.transaction do
   source = Source.find_or_create_by!(signature: 'smoke_test_source') do |s|
     s.event = { 'name' => 'Smoke Test Source' }
     s.payload = { 'url' => 'https://example.com' }
@@ -27,10 +32,16 @@ begin
   # Use nil for query_id or a generic one if possible
   HackerNews::FetchJobstoryJob.new.perform(test_jobstory_id, hn_source.id, nil)
   JobBoards::Syncer.new.call
+rescue => e
+  error = e
+ensure
+  raise ActiveRecord::Rollback
+end
 
+if error
+  puts "\e[31m✗ Ingestion failure: #{error.message}\e[0m"
+  exit 1
+else
   puts "\e[32m✓ Ingestion operational\e[0m"
   exit 0
-rescue => e
-  puts "\e[31m✗ Ingestion failure: #{e.message}\e[0m"
-  exit 1
 end

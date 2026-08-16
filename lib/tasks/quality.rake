@@ -5,12 +5,17 @@ namespace :quality do
   desc "Run all static analysis tools (RuboCop, Brakeman, Reek, Flay, Flog, RailsBestPractices, Bundle-Audit)"
   task all: :environment do
     errors = []
+    # rake quality runs under RAILS_ENV=test in CI, immediately before `rspec`
+    # against the same DB -- SystemInsight writes here are real, non-transactional,
+    # and would leak into the shared test DB that specs depend on (TASK-35).
+    ingest = !Rails.env.test?
+    puts "\nℹ️  RAILS_ENV=test: skipping SystemInsight writes (see TASK-35)" unless ingest
 
     puts "\n🔍 Running RuboCop..."
     rubocop_report = `bundle exec rubocop -f json`
     if $CHILD_STATUS.success? || !rubocop_report.empty?
-      Quality::InsightIngester.ingest_rubocop(rubocop_report)
-      puts "✅ RuboCop findings ingested."
+      Quality::InsightIngester.ingest_rubocop(rubocop_report) if ingest
+      puts "✅ RuboCop findings#{ingest ? ' ingested' : ' collected'}."
     else
       errors << "RuboCop failed to run"
     end
@@ -18,8 +23,8 @@ namespace :quality do
     puts "\n🛡️ Running Brakeman..."
     brakeman_report = `bundle exec brakeman -q -w2 --no-pager -f json`
     if $CHILD_STATUS.success? || !brakeman_report.empty?
-      Quality::InsightIngester.ingest_brakeman(brakeman_report)
-      puts "✅ Brakeman findings ingested."
+      Quality::InsightIngester.ingest_brakeman(brakeman_report) if ingest
+      puts "✅ Brakeman findings#{ingest ? ' ingested' : ' collected'}."
     else
       errors << "Brakeman failed to run"
     end
@@ -27,8 +32,8 @@ namespace :quality do
     puts "\n👃 Running Reek..."
     reek_report = `bundle exec reek -f json`
     if $CHILD_STATUS.success? || !reek_report.empty?
-      Quality::InsightIngester.ingest_reek(reek_report)
-      puts "✅ Reek findings ingested."
+      Quality::InsightIngester.ingest_reek(reek_report) if ingest
+      puts "✅ Reek findings#{ingest ? ' ingested' : ' collected'}."
     else
       errors << "Reek failed to run"
     end
