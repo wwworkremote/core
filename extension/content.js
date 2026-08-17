@@ -1079,21 +1079,32 @@
 
   // ─── Content readiness (SPA guard) ────────────────────────────────────────
 
-  function waitForContent(selector, timeoutMs) {
+  // staleText: the readySelector element's textContent as of the *previous*
+  // extraction on this page load, if any. On SPA boards (LinkedIn especially)
+  // React reuses the same description container across job selections and
+  // just swaps its text -- so "the element exists" is true instantly on
+  // every navigation, well before React has actually re-rendered the new
+  // job's content into it. Without this check, a capture that fires in that
+  // window silently re-scrapes the previous job's text even though the
+  // extension's own cache was correctly reset (live-verified: this was the
+  // remaining hole after TASK-60's cache-reset fix). Waiting for the text to
+  // actually differ from what was last seen closes it.
+  function waitForContent(selector, timeoutMs, staleText) {
     LOG('Waiting for:', selector, `(${timeoutMs}ms max)`);
+    const isFresh = el => el && (staleText == null || el.textContent !== staleText);
     return new Promise(resolve => {
       const found = document.querySelector(selector);
-      if (found) { LOG_OK('Content already present'); return resolve(found); }
+      if (isFresh(found)) { LOG_OK('Content already present'); return resolve(found); }
 
       const observer = new MutationObserver(() => {
         const el = document.querySelector(selector);
-        if (el) { observer.disconnect(); LOG_OK('Content appeared (MutationObserver)'); resolve(el); }
+        if (isFresh(el)) { observer.disconnect(); LOG_OK('Content appeared (MutationObserver)'); resolve(el); }
       });
-      observer.observe(document.documentElement, { childList: true, subtree: true });
+      observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
       setTimeout(() => {
         observer.disconnect();
         LOG_WARN('Readiness timeout — proceeding with current DOM state');
-        resolve(null);
+        resolve(document.querySelector(selector));
       }, timeoutMs);
     });
   }
@@ -1342,6 +1353,10 @@
     }
   }
 
+  // Content seen by the readySelector's element as of the last successful
+  // extraction on this page load -- see waitForContent's comment.
+  let lastExtractedSnapshot = null;
+
   async function previewExtraction() {
     // Step 1: Auto-expand any truncated content
     await expandContent(provider);
@@ -1350,8 +1365,10 @@
     // mean "not a job page" -- LinkedIn in particular is slow/inconsistent
     // about this selector appearing even on genuine job-detail pages -- so
     // we proceed with whatever the DOM has and let extraction itself decide.
+    // staleText guards against the element already existing from the
+    // previous job (see waitForContent's comment).
     if (provider?.readySelector) {
-      await waitForContent(provider.readySelector, provider.readyTimeout);
+      await waitForContent(provider.readySelector, provider.readyTimeout, lastExtractedSnapshot);
     }
 
     // Step 3: Run extraction chain, apply any taught field overrides, show preview
@@ -1365,6 +1382,10 @@
     if (captureMode === 'capture' && !extracted.title && wordCount(extracted.description_text) < 20) {
       LOG_WARN('No title or description found — not a job detail page.');
       return null;
+    }
+
+    if (provider?.readySelector) {
+      lastExtractedSnapshot = document.querySelector(provider.readySelector)?.textContent ?? null;
     }
 
     setBadge(extracted._method, countFields(extracted));
