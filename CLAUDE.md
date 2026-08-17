@@ -21,6 +21,9 @@ Use the `backlog-audit` skill (or the `backlog-audit-agent` subagent for a conte
 ### Onboarding a new direct-hiring company board
 Use the `direct-hiring-board-verify` skill and `bin/verify_board` to confirm a new ADP/Workday/Greenhouse/Lever tenant slug actually works before adding it to `db/seeds.rb` or a Query's boards list.
 
+### Local interop with other on-box tools/agents
+Other local tools (e.g. the just3ws CLI) that need job-fit scoring should call `bin/wwwr match <job_posting_id> --source=<name> [--escalate]` rather than re-implementing scoring against a separate resume copy — reads are unrestricted, `--escalate` gates the one write path (an LLM call). See `docs/agents/interop.md`.
+
 ### Chrome extension versioning
 Bump `version` in `extension/manifest.json` whenever any file under `extension/` changes (even a small fix), unless doing so would break something. Nothing in the codebase reads or depends on this value — it's for tracking which build is loaded in `chrome://extensions`. Full semver, `major.minor.patch`:
 - **patch** — copy/wording fixes, color/theme tweaks, selector adjustments, bug fixes that don't change behavior a user would notice as a new capability.

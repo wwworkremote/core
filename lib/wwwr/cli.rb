@@ -16,7 +16,8 @@ class Wwwr::CLI
   COMMANDS = {
     "status" => :print_status,
     "postings" => :print_postings,
-    "transition" => :run_transition
+    "transition" => :run_transition,
+    "match" => :run_match
   }.freeze
 
   def run(argv)
@@ -123,6 +124,8 @@ class Wwwr::CLI
     scope = scope.contract_only if filters[:contract]
     scope
   end
+
+  def run_match(args) = args.first ? puts(Wwwr::Interop.call(args.first, parse_filters(args.drop(1)))) : print_usage
 
   def format_posting(posting)
     title = posting.title.to_s.truncate(45)

@@ -2,6 +2,7 @@
 
 require "rails_helper"
 require Rails.root.join("lib/wwwr")
+require Rails.root.join("lib/wwwr/interop")
 require Rails.root.join("lib/wwwr/cli")
 
 RSpec.describe Wwwr::CLI do
@@ -46,6 +47,43 @@ RSpec.describe Wwwr::CLI do
 
     it "reports an unknown posting id instead of raising" do
       expect { cli.run(%w[transition 999999 favorite]) }.to output(/not found/).to_stdout
+    end
+  end
+
+  describe "match" do
+    it "requires --source for attribution" do
+      posting = create(:job_posting)
+
+      expect { cli.run(["match", posting.id.to_s]) }.to output(/Missing --source/).to_stdout
+    end
+
+    it "reports an unknown posting id instead of raising" do
+      expect { cli.run(%w[match 999999 --source=spec]) }.to output(/not found/).to_stdout
+    end
+
+    it "reads an existing analysis without calling the LLM" do
+      user = create(:user)
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, match_analysis: "Solid fit.", match_score: 90)
+      allow(LLM::ProfileMatcher).to receive(:call)
+
+      expect { cli.run(["match", posting.id.to_s, "--source=spec"]) }.to output(/Solid fit\./).to_stdout
+      expect(LLM::ProfileMatcher).not_to have_received(:call)
+    end
+
+    it "tells the caller to --escalate when there is no analysis on file" do
+      create(:user)
+      posting = create(:job_posting)
+
+      expect { cli.run(["match", posting.id.to_s, "--source=spec"]) }.to output(/Pass --escalate/).to_stdout
+    end
+
+    it "runs the profile matcher and prints its output when escalated" do
+      user = create(:user)
+      posting = create(:job_posting)
+      allow(LLM::ProfileMatcher).to receive(:call).with(user, posting).and_return(success: true, output: "Fresh scan.")
+
+      expect { cli.run(["match", posting.id.to_s, "--source=spec", "--escalate"]) }.to output(/Fresh scan\./).to_stdout
     end
   end
 end

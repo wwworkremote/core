@@ -4,8 +4,14 @@
 # bin/wwwr -- pipeline status, browsing postings, and pipeline actions from
 # outside the browser. See lib/wwwr/cli.rb for the actual logic.
 
+# One-shot CLI, not a long-lived process -- skip OTel boot (also keeps its
+# instrumentation-install log lines off stdout, which `match`'s output needs
+# clean for other local tools to consume).
+ENV["SKIP_OTEL"] ||= "1"
+
 require_relative "../config/environment"
 require_relative "../lib/wwwr"
+require_relative "../lib/wwwr/interop"
 require_relative "../lib/wwwr/cli"
 
 Wwwr::CLI.new.run(ARGV)
