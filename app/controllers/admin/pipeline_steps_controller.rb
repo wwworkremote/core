@@ -69,13 +69,18 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     log_status_change_step
   end
 
+  # One cohesive create! call plus its tracking event -- splitting it
+  # further would obscure it, not simplify it.
+  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def log_status_change_step
+    ahoy.track "Pipeline Status Changed", status: params[:status], job_posting_id: @job_posting.id
     @job_posting.pipeline_steps.create!(
       status: params[:status],
       note: "Status changed to #{params[:status]}",
       user: current_user
     )
   end
+  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   # One cohesive create! call -- splitting it further would obscure it,
   # not simplify it.

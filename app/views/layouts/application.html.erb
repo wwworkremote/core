@@ -13,6 +13,9 @@
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
     <%= javascript_importmap_tags %>
+    <% unless Rails.env.test? %>
+      <script>window.ahoyTrackInteractions = true</script>
+    <% end %>
     <% if Rails.env.development? %>
       <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     <% end %>
