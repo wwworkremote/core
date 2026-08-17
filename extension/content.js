@@ -74,22 +74,32 @@
 
     // ── Job boards ──────────────────────────────────────────────────────────
 
+    // Verified live against a real posting on the split-view search
+    // results layout (the far more common entry point than a standalone
+    // job page). LinkedIn has since renamed its top-card classes to a
+    // `job-details-jobs-unified-top-card__*` scheme -- company/location/
+    // pills all silently returned null under the old
+    // `.jobs-unified-top-card__*`/`.topcard__*` names, leaving only
+    // title+description (title's own `h1` bare fallback happened to still
+    // work). Pills no longer live in a `__job-insight` wrapper at all --
+    // they're bare `<strong>` tags inside the top-card container, mixed in
+    // with unrelated strongs ("Actively reviewing applicants"), so still
+    // classified by content (classifyInsightPills), not assumed shape.
     linkedin: {
       label: 'LinkedIn',
       match: h => h.includes('linkedin.com'),
       readySelector: '.show-more-less-html__markup, .jobs-description__content, .description__text',
       readyTimeout: 8000,
       extract(doc) {
-        // LinkedIn renders salary/workplace-type/employment-type as sibling
-        // "insight pill" elements matched by the same selector -- classify
-        // each by content rather than assuming positional order.
         const pills = pickAllText(
-          doc, '.jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight span'
+          doc,
+          '.job-details-jobs-unified-top-card__container--two-pane strong, ' +
+          '.jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight span'
         );
         return {
           title:            pickText(doc, 'h1.top-card-layout__title, h1.jobs-unified-top-card__job-title, h1'),
-          company:          pickText(doc, '.topcard__org-name-link, .jobs-unified-top-card__company-name a, .top-card-layout__first-subline a'),
-          location:         pickText(doc, '.topcard__flavor--bullet, .jobs-unified-top-card__bullet'),
+          company:          pickText(doc, '.job-details-jobs-unified-top-card__company-name, .topcard__org-name-link, .jobs-unified-top-card__company-name a, .top-card-layout__first-subline a'),
+          location:         pickText(doc, '.job-details-jobs-unified-top-card__tertiary-description-container .tvm__text, .topcard__flavor--bullet, .jobs-unified-top-card__bullet'),
           posted_at:        pickText(doc, '.posted-time-ago__text, .jobs-unified-top-card__posted-date'),
           ...classifyInsightPills(pills),
           description_html: pickHtml(doc, '.show-more-less-html__markup, .description__text--rich, .jobs-description__content'),
@@ -98,17 +108,38 @@
       },
     },
 
+    // Verified live against 3 real postings, both page shapes Indeed
+    // serves (the full /viewjob?jk= page, and the split-view detail pane
+    // shown inline on /jobs?q=...&vjk= search results -- the far more
+    // common entry point when clicking a card without opening a new tab).
+    // Three real bugs found: (1) the old `h1.jobsearch-JobInfoHeader-title`
+    // compound selector required the title to BE an h1 -- true on the full
+    // page, but the split-view pane renders the identically-classed title
+    // as an h2, so the bare `h1` fallback silently grabbed the search
+    // page's own h1 ("software engineer jobs") instead -- same root-cause
+    // class as TASK-47 (a different file: the server-side email/API
+    // extractor). Fixed by matching the class alone, tag-agnostic. (2) The
+    // split-view title also has a UI-only " - job post" suffix nested in a
+    // hashed-class child span -- stripped like Greenhouse's logo-alt
+    // cleanup. (3) `.jobsearch-JobInfoHeader-subtitle` (location) and
+    // `.attribute_snippet` (salary) no longer exist anywhere in the
+    // current markup -- salary/job-type now share one `#salaryInfoAndJobType`
+    // container as two hashed-class sibling spans with no way to tell them
+    // apart by selector, so classified by content (SALARY_PILL) like
+    // LinkedIn's insight pills instead of by position.
     indeed: {
       label: 'Indeed',
       match: h => h.includes('indeed.com'),
-      readySelector: '#jobDescriptionText, .jobsearch-JobComponent-description',
+      readySelector: '.jobsearch-JobInfoHeader-title, #jobDescriptionText, .jobsearch-JobComponent-description',
       readyTimeout: 6000,
       extract(doc) {
+        const title = pickText(doc, '.jobsearch-JobInfoHeader-title, h1')?.replace(/\s*-\s*job post\s*$/i, '');
+        const salaryText = pickAllText(doc, '#salaryInfoAndJobType span').find(t => SALARY_PILL.test(t));
         return {
-          title:            pickText(doc, 'h1.jobsearch-JobInfoHeader-title, h1'),
+          title,
           company:          pickText(doc, '[data-company-name="true"], .jobsearch-InlineCompanyRating div'),
-          location:         pickText(doc, '.jobsearch-JobInfoHeader-subtitle div:last-child'),
-          salary:           pickText(doc, '#salaryInfoAndJobType .attribute_snippet'),
+          location:         pickText(doc, '[data-testid="job-location"], .jobsearch-JobInfoHeader-subtitle div:last-child'),
+          ...(salaryText ? parseSalaryPill(salaryText) : {}),
           description_html: pickHtml(doc, '#jobDescriptionText, .jobsearch-JobComponent-description'),
           description_text: pickInnerText(doc, '#jobDescriptionText, .jobsearch-JobComponent-description'),
         };
