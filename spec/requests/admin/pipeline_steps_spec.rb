@@ -36,6 +36,25 @@ RSpec.describe "Admin::PipelineSteps" do
       end
     end
 
+    context "when marking a posting expired" do
+      it "expires the posting, distinct from ignore/not-interested" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "expire" }
+
+        expect(job.reload.status).to eq("expired")
+        expect(response).to redirect_to(admin_job_posting_path(job))
+      end
+
+      it "no-ops instead of raising when the transition isn't legal from the current status" do
+        job.update_column(:status, "purged") # rubocop:disable Rails/SkipsModelValidations
+
+        expect {
+          post admin_job_posting_pipeline_steps_path(job), params: { status: "expire" }
+        }.not_to change(PipelineStep, :count)
+
+        expect(job.reload.status).to eq("purged")
+      end
+    end
+
     context "when the request accepts turbo_stream but remove_card is not set (every other status button)" do
       # Turbo Drive sends `Accept: text/vnd.turbo-stream.html` on every form
       # submission by default -- this is the regression case: a naive

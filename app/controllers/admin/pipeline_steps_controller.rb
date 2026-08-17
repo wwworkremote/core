@@ -11,7 +11,8 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     "interview" => %i[interview! may_interview?],
     "offer" => %i[offer! may_offer?],
     "archive" => %i[archive! may_archive?],
-    "ignore" => %i[ignore! may_ignore?]
+    "ignore" => %i[ignore! may_ignore?],
+    "expire" => %i[expire! may_expire?]
   }.freeze
 
   def create

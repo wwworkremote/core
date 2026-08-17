@@ -157,6 +157,7 @@ en:
       clear_filters: "Clear all"
       mark_source_not_interested: "Mark all %{source} postings not interested"
       not_interested: "Not interested"
+      expired: "Expired"
       sort_match_score: "Sort by Match Score"
       match_score: "%{score}% match"
       network_fallback: "Direct"
@@ -213,6 +214,7 @@ en:
       pipeline:
         heading: "Application Status"
         not_interested: "Not Interested"
+        expired: "Expired"
         note_placeholder: "Add a note..."
         link_placeholder: "https://..."
         add_update: "Add Update"
