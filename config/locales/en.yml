@@ -215,6 +215,10 @@ en:
         heading: "Application Status"
         not_interested: "Not Interested"
         expired: "Expired"
+        enrich_data: "Enrich Data"
+        purge: "Purge"
+        purge_confirm: "Purge this posting? It can be restored later."
+        restore: "Restore"
         note_placeholder: "Add a note..."
         link_placeholder: "https://..."
         add_update: "Add Update"
@@ -236,6 +240,14 @@ en:
         history_label: "History"
         history_entry: "%{event} by %{who} at %{time}"
         system: "System"
+        signature_label: "Signature"
+        external_id_label: "External ID"
+        coordinates_label: "Coordinates"
+        published_label: "Published"
+        unknown: "Unknown"
+        none: "None"
+      similar:
+        heading: "Similar Postings"
   job_searches:
     form:
       breadcrumb_home: "Home"

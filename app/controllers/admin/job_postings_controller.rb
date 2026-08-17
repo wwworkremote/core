@@ -30,7 +30,7 @@ class Admin::JobPostingsController < Admin::ApplicationController
 
   def show
     @job_posting = JobPosting.find(params.expect(:id))
-    return unless params[:frame] == "semantic_matches"
+    return redirect_to job_posting_path(@job_posting) unless params[:frame] == "semantic_matches"
 
     @similar_jobs = semantic_matches(@job_posting)
     render partial: "semantic_matches", locals: { similar_jobs: @similar_jobs }
@@ -39,7 +39,7 @@ class Admin::JobPostingsController < Admin::ApplicationController
   def update
     @job_posting = JobPosting.find(params.expect(:id))
     perform_action(params[:action_type])
-    redirect_back_or_to(admin_job_posting_path(@job_posting))
+    redirect_back_or_to(job_posting_path(@job_posting))
   end
 
   def purge

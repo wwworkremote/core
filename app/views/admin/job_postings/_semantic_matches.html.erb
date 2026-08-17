@@ -4,7 +4,7 @@
       <% similar_jobs.each do |job| %>
         <% match_score = ((1.0 - job.neighbor_distance) * 100).round(1) %>
         <div class="border-l-2 border-l-violet-500/30 pl-4 py-1 group">
-          <%= link_to admin_job_posting_path(job), class: "text-sm font-bold text-white hover:text-violet-400 block mb-1 truncate transition-colors", data: { turbo: false } do %>
+          <%= link_to job_posting_path(job), class: "text-sm font-bold text-white hover:text-violet-400 block mb-1 truncate transition-colors", data: { turbo: false } do %>
             <%= job.title %>
           <% end %>
           <div class="flex items-center justify-between">
@@ -13,12 +13,6 @@
           </div>
         </div>
       <% end %>
-
-      <div class="mt-4 pt-4 border-t border-white/5">
-        <%= link_to admin_job_posting_path(@job_posting), class: "btn btn-ghost btn-xs w-full text-xs font-bold text-slate-500", data: { turbo: false } do %>
-          Full view <%= heroicon "arrow-right", options: { class: "w-3 h-3 ml-1" } %>
-        <% end %>
-      </div>
     <% else %>
       <div class="text-center py-4 text-sm font-bold text-slate-500 italic">No matches found</div>
     <% end %>

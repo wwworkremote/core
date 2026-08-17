@@ -11,7 +11,7 @@ RSpec.describe "Admin::PipelineSteps" do
         post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite" }
       }.to change(PipelineStep, :count).by(1)
 
-      expect(response).to redirect_to(admin_job_posting_path(job))
+      expect(response).to redirect_to(job_posting_path(job))
       expect(job.reload.status).to eq("favorited")
     end
 
@@ -41,7 +41,7 @@ RSpec.describe "Admin::PipelineSteps" do
         post admin_job_posting_pipeline_steps_path(job), params: { status: "expire" }
 
         expect(job.reload.status).to eq("expired")
-        expect(response).to redirect_to(admin_job_posting_path(job))
+        expect(response).to redirect_to(job_posting_path(job))
       end
 
       it "no-ops instead of raising when the transition isn't legal from the current status" do
@@ -72,13 +72,13 @@ RSpec.describe "Admin::PipelineSteps" do
       it "ignores return_to for other status events, keeping the existing show-page redirect" do
         post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite", return_to: "/job_postings" }
 
-        expect(response).to redirect_to(admin_job_posting_path(job))
+        expect(response).to redirect_to(job_posting_path(job))
       end
 
       it "falls back to the posting's own page when return_to isn't a safe local path" do
         post admin_job_posting_pipeline_steps_path(job), params: { status: "ignore", return_to: "//evil.com/phish" }
 
-        expect(response).to redirect_to(admin_job_posting_path(job))
+        expect(response).to redirect_to(job_posting_path(job))
       end
     end
 
@@ -90,12 +90,14 @@ RSpec.describe "Admin::PipelineSteps" do
       # dedicated ignore button. Every other caller (job_postings/show,
       # admin/job_postings/show, admin/companies/show) still expects the
       # plain redirect + flash notice regardless of what the browser's Accept
-      # header offers.
+      # header offers. (job_postings/show and admin/companies/show are the
+      # remaining callers -- admin/job_postings/show was retired in favor of
+      # a redirect to the unified job_postings page.)
       it "still redirects with a flash notice for a plain status change" do
         post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite" }, as: :turbo_stream
 
         expect(job.reload.status).to eq("favorited")
-        expect(response).to redirect_to(admin_job_posting_path(job))
+        expect(response).to redirect_to(job_posting_path(job))
         follow_redirect!
         expect(response.body).to include("Activity logged")
       end

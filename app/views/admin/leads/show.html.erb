@@ -48,7 +48,7 @@
           <dd>
             <% if @lead.job_posting %>
               <%= link_to "##{@lead.job_posting.id} — #{@lead.job_posting.title}",
-                          admin_job_posting_path(@lead.job_posting),
+                          job_posting_path(@lead.job_posting),
                           class: "text-blue-400 hover:text-blue-300 font-bold" %>
             <% else %>
               <span class="text-slate-600">Not yet promoted</span>

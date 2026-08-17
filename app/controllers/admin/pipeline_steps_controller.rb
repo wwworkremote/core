@@ -45,7 +45,7 @@ class Admin::PipelineStepsController < Admin::ApplicationController
   # tampered form value (e.g. a protocol-relative "//evil.com" open redirect).
   def redirect_target
     return_to = safe_local_path(params[:return_to]) if %w[ignore expire].include?(params[:status])
-    return_to || admin_job_posting_path(@job_posting)
+    return_to || job_posting_path(@job_posting)
   end
 
   # Handle status transitions or manual notes

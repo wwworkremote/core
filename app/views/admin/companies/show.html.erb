@@ -22,7 +22,7 @@
           <tbody>
             <% @company.job_postings.each do |posting| %>
               <tr class="border-b border-white/5">
-                <td class="py-4 font-bold text-white"><%= link_to posting.title, admin_job_posting_path(posting), class: "hover:text-primary" %></td>
+                <td class="py-4 font-bold text-white"><%= link_to posting.title, job_posting_path(posting), class: "hover:text-primary" %></td>
                 <td class="py-4 text-slate-400"><%= posting.published_at&.to_date %></td>
               </tr>
             <% end %>

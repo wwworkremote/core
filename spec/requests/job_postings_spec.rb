@@ -246,6 +246,42 @@ RSpec.describe "Job Postings" do
       get job_posting_path(job), headers: { "HTTP_REFERER" => "http://evil.example/steal" }
       expect(response.body).not_to include("return_to=")
     end
+
+    it "shows the Enrich Data action" do
+      get job_posting_path(job)
+      expect(response.body).to include("Enrich Data")
+    end
+
+    it "shows Purge instead of Restore for a non-purged posting" do
+      get job_posting_path(job)
+      expect(response.body).to include("Purge")
+      expect(response.body).not_to include("Restore")
+    end
+
+    it "shows Restore instead of Purge for a purged posting" do
+      job.purge!
+      get job_posting_path(job)
+      expect(response.body).to include("Restore")
+      expect(response.body).not_to include(">Purge<")
+    end
+
+    it "shows a Lead badge linking to the admin lead when the posting was captured via the extension" do
+      lead = create(:lead, job_posting: job, provider: "linkedin")
+      get job_posting_path(job)
+      expect(response.body).to include("Linkedin")
+      expect(response.body).to include(admin_lead_path(lead))
+    end
+
+    it "omits the Lead badge when the posting has no lead" do
+      get job_posting_path(job)
+      expect(response.body).not_to include("Captured via the extension")
+    end
+
+    it "renders a lazily-loaded similar-postings frame pointing at the admin frame endpoint" do
+      get job_posting_path(job)
+      expect(response.body).to include('id="semantic_matches"')
+      expect(response.body).to include(admin_job_posting_path(job, frame: "semantic_matches"))
+    end
   end
 
   describe "POST /job_postings/:id/reformat" do

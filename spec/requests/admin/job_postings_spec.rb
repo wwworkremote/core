@@ -27,9 +27,9 @@ RSpec.describe "Admin::JobPostings" do
   end
 
   describe "GET /admin/job_postings/:id" do
-    it "shows the job posting" do
+    it "redirects to the unified job posting page" do
       get admin_job_posting_path(job_posting)
-      expect(response).to be_successful
+      expect(response).to redirect_to(job_posting_path(job_posting))
     end
 
     it "renders the semantic matches partial when framed" do
@@ -45,7 +45,7 @@ RSpec.describe "Admin::JobPostings" do
       patch admin_job_posting_path(job_posting), params: { action_type: "enrich" }
 
       expect(Scraper::Enricher).to have_received(:call).with(job_posting)
-      expect(response).to redirect_to(admin_job_posting_path(job_posting))
+      expect(response).to redirect_to(job_posting_path(job_posting))
       expect(flash[:notice]).to eq("Enrichment complete.")
     end
 
@@ -62,7 +62,7 @@ RSpec.describe "Admin::JobPostings" do
     it "redirects without a notice for an unknown action_type" do
       patch admin_job_posting_path(job_posting), params: { action_type: "bogus" }
 
-      expect(response).to redirect_to(admin_job_posting_path(job_posting))
+      expect(response).to redirect_to(job_posting_path(job_posting))
       expect(flash[:notice]).to be_nil
     end
   end

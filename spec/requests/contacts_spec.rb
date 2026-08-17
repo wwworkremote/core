@@ -20,7 +20,7 @@ RSpec.describe "Contacts" do
         post admin_job_posting_contacts_path(job), params: contact_params
       }.to change(Contact, :count).by(1)
 
-      expect(response).to redirect_to(admin_job_posting_path(job))
+      expect(response).to redirect_to(job_posting_path(job))
       follow_redirect!
       expect(response.body).to include("Contact added.")
     end
@@ -34,7 +34,7 @@ RSpec.describe "Contacts" do
         delete admin_job_posting_contact_path(job, contact)
       }.to change(Contact, :count).by(-1)
 
-      expect(response).to redirect_to(admin_job_posting_path(job))
+      expect(response).to redirect_to(job_posting_path(job))
       follow_redirect!
       expect(response.body).to include("Contact removed.")
     end
