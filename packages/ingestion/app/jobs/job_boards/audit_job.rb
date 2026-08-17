@@ -5,7 +5,7 @@ class JobBoards::AuditJob < ApplicationJob
   mediumweight!
 
   def perform(limit: 100)
-    stats = Auditor.new(fix: true, limit: limit).call
+    stats = JobBoards::Auditor.new(fix: true, limit: limit).call
     Rails.logger.info "[AuditJob] Completed: #{stats.inspect}"
   end
 end
