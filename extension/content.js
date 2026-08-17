@@ -1645,7 +1645,33 @@
   };
   window.addEventListener('popstate', markPanelStale);
 
+  // Clears the capture-button's memoized extraction/lead so the next click
+  // does a fresh capture of whatever posting is on screen now, instead of
+  // silently re-submitting the previous posting (the button click handler
+  // below short-circuits to cachedExtraction when it's already set).
+  function resetForNewPage() {
+    cachedExtraction = null;
+    leadId = null;
+    leadCapturePromise = null;
+
+    const preview = document.getElementById('wwr-preview');
+    if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
+
+    const badgeEl = document.getElementById('wwr-badge');
+    if (badgeEl) {
+      badgeEl.textContent = captureMode === 'capture' ? 'ready' : 'scanning…';
+      badgeEl.style.background = '#454158';
+      badgeEl.style.color = '#9590c5';
+    }
+    const fc = document.getElementById('wwr-field-count');
+    if (fc) fc.textContent = '';
+
+    updateLeadStatus('Not yet captured', '#9590c5');
+  }
+
   function markPanelStale() {
+    resetForNewPage();
+
     const SESSION_KEY = 'wwr_panel_state';
     chrome.storage.session.get(SESSION_KEY, data => {
       const state = data?.[SESSION_KEY];
