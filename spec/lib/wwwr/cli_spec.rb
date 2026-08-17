@@ -15,7 +15,6 @@ RSpec.describe Wwwr::CLI do
     end
 
     it "surfaces an unclaimed job's queue depth and age (regression: 2026-08-17 dead-worker incident)" do
-      ActiveJob::Base.queue_adapter = :solid_queue
       job_posting = create(:job_posting)
       JobPostingReformatJob.perform_later(job_posting.id)
 

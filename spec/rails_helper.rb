@@ -95,6 +95,13 @@ RSpec.configure do |config|
     Rails.cache.clear
   end
 
+  # Several specs set ActiveJob::Base.queue_adapter = :test with no teardown,
+  # which leaks into every later spec in the same process. Restore the app
+  # default after each example so run order can't poison other specs.
+  config.after do
+    ActiveJob::Base.queue_adapter = :solid_queue
+  end
+
   config.before do
     # Global stub for Vector Intelligence to prevent connection errors in tests
     allow(VectorIntelligence).to receive(:embed)
