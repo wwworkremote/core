@@ -1635,15 +1635,20 @@
   });
 
   // ─── SPA navigation staleness detection ───────────────────────────────────
-  // On SPAs (LinkedIn, Indeed), navigating to a new job does not reload the
-  // page. Intercept history.pushState so the panel can show a staleness banner.
-
-  const _originalPushState = history.pushState.bind(history);
-  history.pushState = function (...args) {
-    _originalPushState(...args);
-    markPanelStale();
-  };
-  window.addEventListener('popstate', markPanelStale);
+  // On SPAs (LinkedIn, Indeed), selecting a new job updates the URL without
+  // reloading the page. Live-tested: intercepting history.pushState never
+  // fired here -- LinkedIn's router bundle already held its own reference to
+  // the original pushState before this content script (document_end) ran, so
+  // patching it after the fact is a no-op. Polling location.href sidesteps
+  // that entirely since it doesn't depend on which function reference the
+  // host page happens to call.
+  let _lastHref = window.location.href;
+  setInterval(() => {
+    if (window.location.href !== _lastHref) {
+      _lastHref = window.location.href;
+      markPanelStale();
+    }
+  }, 750);
 
   // Clears the capture-button's memoized extraction/lead so the next click
   // does a fresh capture of whatever posting is on screen now, instead of

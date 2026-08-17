@@ -4,7 +4,7 @@ title: 'Extension: capture button re-ingests stale posting after SPA navigation'
 status: Done
 assignee: []
 created_date: '2026-08-17 01:37'
-updated_date: '2026-08-17 01:37'
+updated_date: '2026-08-17 01:47'
 labels: []
 dependencies: []
 modified_files:
@@ -33,5 +33,7 @@ The existing `markPanelStale()` SPA-navigation hook (already wired to `pushState
 ## Final Summary
 
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
-Added resetForNewPage() (clears cachedExtraction/leadId/leadCapturePromise, resets overlay preview/badge/lead-status DOM) and call it from markPanelStale(), which was already correctly hooked to pushState/popstate for SPA boards. Root-caused via the capture-btn click handler's `if (captureMode === 'enrich' || cachedExtraction)` short-circuit in extension/content.js. manifest.json bumped 1.10.4 -> 1.10.5. node --check and npm run lint:extension both clean.
+Fix landed in two passes -- the first attempt (resetForNewPage() wired to markPanelStale) was correct but markPanelStale never fired: it was hooked to intercepting history.pushState, and live testing on LinkedIn showed that never triggers -- LinkedIn's router bundle holds its own reference to the original pushState from before this content script (document_end) runs, so patching it after the fact is a no-op. Replaced the pushState/popstate interception with polling window.location.href every 750ms, which doesn't depend on which function reference the host page calls.
+
+Live-verified end-to-end via browser automation against real LinkedIn postings: captured job A (Lead #62, Watchtower Labs), navigated to job B via the in-page job list (SPA nav, no reload), overlay correctly reset to "ready"/"Not yet captured", captured job B (Lead #63, AdviNOW Medical) -- both leads distinct and correct in the database. manifest.json bumped 1.10.5 -> 1.10.6.
 <!-- SECTION:FINAL_SUMMARY:END -->
