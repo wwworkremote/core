@@ -34,11 +34,13 @@ class Wwwr::CLI
   end
 
   def print_status(_args = [])
-    puts "Job postings:      #{JobPosting.count}"
-    puts "Sources:           #{JobBoards::Source.count}"
-    puts "Pending documents: #{pending_documents_count}"
-    puts "Pipelines paused:  #{SystemSetting.paused?}"
-    puts "Queue error rate:  #{solid_queue_error_rate}%"
+    puts status_lines.join("\n")
+  end
+
+  def status_lines
+    ["Job postings:      #{JobPosting.count}", "Sources:           #{JobBoards::Source.count}",
+     "Pending documents: #{pending_documents_count}", "Pipelines paused:  #{SystemSetting.paused?}",
+     "Queue error rate:  #{solid_queue_error_rate}%", Wwwr::QueueStatus.call]
   end
 
   def pending_documents_count

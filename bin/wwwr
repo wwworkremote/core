@@ -12,6 +12,7 @@ ENV["SKIP_OTEL"] ||= "1"
 require_relative "../config/environment"
 require_relative "../lib/wwwr"
 require_relative "../lib/wwwr/interop"
+require_relative "../lib/wwwr/queue_status"
 require_relative "../lib/wwwr/cli"
 
 Wwwr::CLI.new.run(ARGV)

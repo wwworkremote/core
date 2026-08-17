@@ -3,6 +3,7 @@
 require "rails_helper"
 require Rails.root.join("lib/wwwr")
 require Rails.root.join("lib/wwwr/interop")
+require Rails.root.join("lib/wwwr/queue_status")
 require Rails.root.join("lib/wwwr/cli")
 
 RSpec.describe Wwwr::CLI do
@@ -11,6 +12,15 @@ RSpec.describe Wwwr::CLI do
   describe "status" do
     it "prints a pipeline health summary" do
       expect { cli.run(["status"]) }.to output(/Job postings:/).to_stdout
+    end
+
+    it "surfaces an unclaimed job's queue depth and age (regression: 2026-08-17 dead-worker incident)" do
+      ActiveJob::Base.queue_adapter = :solid_queue
+      job_posting = create(:job_posting)
+      JobPostingReformatJob.perform_later(job_posting.id)
+
+      expect { cli.run(["status"]) }.to output(/Unclaimed pending jobs: [1-9]/).to_stdout
+      expect { cli.run(["status"]) }.to output(/Oldest unclaimed:.*JobPostingReformatJob/).to_stdout
     end
   end
 
