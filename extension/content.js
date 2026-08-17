@@ -1388,6 +1388,9 @@
   // and the panel all wait for the manual click below. Free browsing means
   // this content script fires on every matching-hostname page, including
   // search/listing pages, so a silent auto-run was too unreliable in practice.
+  // Browsing to a new posting (SPA nav or full reload) always resets the
+  // cache first (see resetForNewPage/markPanelStale below), so each click
+  // here captures whatever posting is on screen right now, never a stale one.
 
   const EXTRACTING_PLACEHOLDER = { title: 'Extracting…', description_text: '', _method: 'pending', _confidence: 'low' };
   const NOT_FOUND_PLACEHOLDER = {
