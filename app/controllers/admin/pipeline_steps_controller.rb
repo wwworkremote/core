@@ -34,8 +34,18 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     if params[:remove_card] == "true"
       render turbo_stream: turbo_stream.remove(@job_posting)
     else
-      redirect_to admin_job_posting_path(@job_posting), notice: "Activity logged."
+      redirect_to redirect_target, notice: "Activity logged."
     end
+  end
+
+  # Not interested/Expired redirect back to wherever triage started (see
+  # JobPostingsController#show) instead of this now-dismissed posting's own
+  # page. safe_local_path re-validates the submitted value even though it
+  # originated from our own hidden field -- defense in depth against a
+  # tampered form value (e.g. a protocol-relative "//evil.com" open redirect).
+  def redirect_target
+    return_to = safe_local_path(params[:return_to]) if %w[ignore expire].include?(params[:status])
+    return_to || admin_job_posting_path(@job_posting)
   end
 
   # Handle status transitions or manual notes

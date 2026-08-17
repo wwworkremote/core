@@ -15,6 +15,28 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Only ever a same-app relative path is returned -- never the full referer
+  # -- so a later redirect_to built from it can't be steered off this host
+  # regardless of what a crafted Referer header contains.
+  def safe_return_path(referer)
+    return nil if referer.blank?
+
+    uri = URI.parse(referer)
+    uri.host == request.host ? uri.request_uri : nil
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  # Validates a value that's already supposed to be a same-app relative path
+  # (e.g. round-tripped through a hidden form field) -- rejects anything that
+  # isn't root-relative, including a protocol-relative "//evil.com/x" (which
+  # browsers resolve as https://evil.com/x, a classic open-redirect vector).
+  def safe_local_path(path)
+    return nil if path.blank?
+
+    path.start_with?("/") && !path.start_with?("//") ? path : nil
+  end
+
   def skip_admin_auth?
     # Skip authentication in test environment for simplicity in request specs
     return true if Rails.env.test?

@@ -10,6 +10,9 @@ class JobPostingsController < ApplicationController
   }.freeze
   helper_method :role_family_labels
 
+  # Lets "Not Interested"/"Expired" redirect back to wherever triage started.
+  before_action(only: :show) { @return_to = safe_return_path(request.referer) }
+
   def index
     assign_filter_params
     @job_postings = filtered_job_postings.page(params[:page]).per(20)
@@ -30,11 +33,10 @@ class JobPostingsController < ApplicationController
     ROLE_FAMILY_LABELS
   end
 
-  # Single source of truth for "every active filter, as URL params" -- the
-  # view builds every filter-badge/remove link off this hash (via #except /
-  # #merge) instead of hand-threading each param through every link_to, which
-  # silently drops filters whenever a new one is added and someone forgets a
-  # spot.
+  # Single source of truth for "every active filter, as URL params" -- every
+  # filter-badge/remove link builds off this hash instead of hand-threading
+  # each param through every link_to, which silently drops filters whenever
+  # a new one is added and someone forgets a spot.
   def active_filter_params
     {
       q: @query, company: @company, source_id: @source_id, role_family: @role_family,

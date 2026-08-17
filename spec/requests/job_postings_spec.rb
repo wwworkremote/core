@@ -231,6 +231,21 @@ RSpec.describe "Job Postings" do
       get job_posting_path(job)
       expect(response.body).to include("Clean Heading")
     end
+
+    it "carries the same-host referer through to the Not Interested/Expired buttons as return_to" do
+      get job_posting_path(job), headers: { "HTTP_REFERER" => "http://www.example.com/job_postings?q=ruby" }
+      expect(response.body).to include('name="return_to" value="/job_postings?q=ruby"')
+    end
+
+    it "omits return_to when there's no referer" do
+      get job_posting_path(job)
+      expect(response.body).not_to include("return_to=")
+    end
+
+    it "omits return_to when the referer is a different host" do
+      get job_posting_path(job), headers: { "HTTP_REFERER" => "http://evil.example/steal" }
+      expect(response.body).not_to include("return_to=")
+    end
   end
 
   describe "POST /job_postings/:id/reformat" do

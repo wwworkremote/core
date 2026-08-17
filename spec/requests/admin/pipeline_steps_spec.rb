@@ -55,6 +55,33 @@ RSpec.describe "Admin::PipelineSteps" do
       end
     end
 
+    context "with a return_to param (TASK-61)" do
+      it "redirects to return_to after ignore instead of the posting's own page" do
+        post admin_job_posting_pipeline_steps_path(job),
+             params: { status: "ignore", return_to: "/job_postings?q=rails" }
+
+        expect(response).to redirect_to("/job_postings?q=rails")
+      end
+
+      it "redirects to return_to after expire instead of the posting's own page" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "expire", return_to: "/job_postings" }
+
+        expect(response).to redirect_to("/job_postings")
+      end
+
+      it "ignores return_to for other status events, keeping the existing show-page redirect" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite", return_to: "/job_postings" }
+
+        expect(response).to redirect_to(admin_job_posting_path(job))
+      end
+
+      it "falls back to the posting's own page when return_to isn't a safe local path" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "ignore", return_to: "//evil.com/phish" }
+
+        expect(response).to redirect_to(admin_job_posting_path(job))
+      end
+    end
+
     context "when the request accepts turbo_stream but remove_card is not set (every other status button)" do
       # Turbo Drive sends `Accept: text/vnd.turbo-stream.html` on every form
       # submission by default -- this is the regression case: a naive

@@ -253,10 +253,10 @@
 
         <div class="flex flex-wrap gap-2">
           <% if @job_posting.may_expire? %>
-            <%= button_to t('.pipeline.expired'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'expire' }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-warning/20 text-warning hover:bg-warning hover:text-white transition-all" %>
+            <%= button_to t('.pipeline.expired'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'expire', return_to: @return_to }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-warning/20 text-warning hover:bg-warning hover:text-white transition-all" %>
           <% end %>
           <% if @job_posting.may_ignore? %>
-            <%= button_to t('.pipeline.not_interested'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'ignore' }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
+            <%= button_to t('.pipeline.not_interested'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'ignore', return_to: @return_to }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
           <% end %>
         </div>
       </div>
