@@ -318,3 +318,64 @@ when a payload shape changes).
   salary from the body text, and the real values get wiped back to `nil`.
   Fixed by `.compact`-ing the LLM's optional fields before merging, so an
   absent key never overwrites a value that's already there.
+
+## 9. Candidate provider research (TASK-37.4)
+
+Live-checked 2026-08-18 against real postings (never reputation-only) for
+the 6 candidates named in TASK-37.4 plus jobs.rubyonrails.org (added mid-
+session). Recommendation for TASK-37.5, priority order:
+
+1. **jobs.rubyonrails.org** — clean `JobPosting` JSON-LD, `title`/
+   `hiringOrganization` match the page exactly, single-tenant (one Rails
+   app, no per-company theme variance). 100% Rails/Ruby-relevant postings.
+   Near-zero maintenance, highest role-family fit of any candidate here.
+2. **Workable** (`apply.workable.com/{tenant}/j/{id}`) — clean JSON-LD
+   confirmed on 2 real tenants (Rokt, GOVX), title/org match the page both
+   times. Plenty of Staff/Senior Software Engineer postings observed.
+3. **Himalayas** (`himalayas.app/companies/{slug}/jobs/{slug}`) — clean
+   JSON-LD confirmed on 2 tenants (Linxon, lemon.io), matches the page both
+   times. Role mix is broad (design/legal/marketing alongside engineering),
+   so expect lower engineering-role yield per posting than Workable/Rails.
+4. **iCIMS** (`careers-{tenant}.icims.com/jobs/{id}/{slug}/job`) — JSON-LD
+   confirmed present and matching (Cotiviti tenant), and role mix skews
+   senior/enterprise. **Implementation catch**: the entire posting — DOM
+   and JSON-LD both — renders inside a same-origin `<iframe
+   id="icims_content_iframe" src=".../job?in_iframe=1">`, not the top-level
+   document. A content script matching only the top-level host won't see
+   any of it; needs `all_frames: true` (manifest) plus walking into
+   `iframe.contentDocument` the way this research did, or matching the
+   iframe's own URL pattern directly. No other current provider has this
+   shape — worth a deliberate design decision in TASK-37.5, not a
+   copy-paste of the existing single-document extraction pattern. Plainly-
+   named `iCIMS_*`/`icims_*` classes exist throughout as a CSS fallback if
+   JSON-LD is ever thin on a given tenant.
+5. **Work at a Startup** (`workatastartup.com/jobs/{id}`) — **no JSON-LD at
+   all**, no `data-*` hooks; only generic Tailwind utility classes
+   (`text-xl font-medium`, not hashed but not semantically stable either).
+   The one usable structural hook: `<h1>Title at <a href="/companies/
+   {slug}">Company</a></h1>` — same "title-suffix" shape as WeWorkRemotely/
+   Greenhouse's logo-alt fallback, parseable but selector-fragile, would
+   need `pickInnerText`-style prose parsing for salary/location/type
+   (observed as plain sibling text, not discrete nodes). Role fit is
+   excellent (Staff/Senior YC-backed roles, e.g. "$200K-$300K Staff Full
+   Stack Engineer" observed) — worth the CSS maintenance cost specifically
+   because of that fit, but budget it as a WeWorkRemotely-tier effort, not
+   a JSON-LD tier one.
+6. **BambooHR** (`{tenant}.bamboohr.com/careers/{id}`) — JSON-LD confirmed
+   present and matching on 2 tenants (A-Line D.D.S., Practicing the Way).
+   Technically viable, but **not recommended**: both live tenants found
+   were a dental practice and a nonprofit — BambooHR's customer base skews
+   small/mid-business across all industries, not tech employers. Observed
+   postings were "Business Development Specialist" and "Interest Form", no
+   engineering roles found in casual searching. Low expected yield against
+   the `RoleFamily` taxonomy (staff+/senior IC, eng management) doesn't
+   justify a new provider's maintenance surface. Skip unless a specific
+   BambooHR-hosted tech employer is identified later.
+
+**Drop from the candidate list: Otta.** `otta.com` now redirects to
+`uk.welcometothejungle.com` — Otta Technology Ltd rebranded/consolidated
+into Welcome to the Jungle (confirmed via the site's own footer). Otta as
+originally named no longer exists as a distinct board to extract from. If
+Welcome to the Jungle itself is worth evaluating, that's a fresh candidate
+for a future spike, not implied by this research (not checked here — out
+of TASK-37.4's named scope).
