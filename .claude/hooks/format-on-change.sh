@@ -27,7 +27,14 @@ esac
 
 case "$file_path" in
   *.rb|*.rake)
-    bundle exec rubocop -A --force-exclusion --no-color --format simple "$file_path" >/dev/null 2>&1
+    # -a (safe-only), not -A -- rubocop-rails marks some autocorrects
+    # SafeAutoCorrect: false (e.g. Rails/StrongParametersExpect rewriting
+    # params[:x].permit(...) to params.expect(:x).permit(...), which raises
+    # ActionController::ParameterMissing when :x is a Hash, not a scalar --
+    # -A applies those anyway, silently changing behavior instead of just
+    # style. -a leaves them as reported offenses for a human/Claude to
+    # judge, matching the erb_lint tag-count guard below in spirit.
+    bundle exec rubocop -a --force-exclusion --no-color --format simple "$file_path" >/dev/null 2>&1
     remaining="$(bundle exec rubocop --force-exclusion --no-color --format simple "$file_path" 2>&1)"
     if ! echo "$remaining" | grep -q "no offenses detected"; then
       echo "RuboCop offenses remain in $file_path after autocorrect:" >&2
