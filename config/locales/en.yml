@@ -208,6 +208,8 @@ en:
         generate_pack: "Generate Application Pack"
         no_match_yet: "No match analysis yet"
         match_helper: "Run a check to see how your profile aligns with this posting."
+        cover_letter_heading: "Cover Letter"
+        copy: "Copy"
         notes_heading: "Notes"
         note_placeholder: "Add a personal note..."
         save_note: "Save Note"

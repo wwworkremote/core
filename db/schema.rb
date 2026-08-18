@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_16_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_234000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -805,6 +805,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_160000) do
   end
 
   create_table "user_job_postings", force: :cascade do |t|
+    t.text "cover_letter"
     t.datetime "created_at", null: false
     t.bigint "job_posting_id", null: false
     t.bigint "job_search_id"

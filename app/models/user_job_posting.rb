@@ -5,6 +5,7 @@
 # Table name: user_job_postings
 #
 #  id             :bigint           not null, primary key
+#  cover_letter   :text
 #  match_analysis :text
 #  match_score    :integer
 #  match_tags     :text             default([]), not null, is an Array

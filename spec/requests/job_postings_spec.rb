@@ -282,6 +282,31 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include('id="semantic_matches"')
       expect(response.body).to include(admin_job_posting_path(job, frame: "semantic_matches"))
     end
+
+    context "cover letter panel" do
+      let(:current_user) {
+        User.find_or_create_by!(email: "mike@just3ws.com") { |u|
+          u.name = "Mike"; u.password = "password"
+        }
+      }
+
+      it "renders the generated cover letter as its own panel, distinct from notes, with a copy action" do
+        create(:user_job_posting, user: current_user, job_posting: job, cover_letter: "Dear Hiring Manager...",
+                                  notes: "my own private notes")
+
+        get job_posting_path(job)
+
+        expect(response.body).to include("Dear Hiring Manager")
+        expect(response.body).to include("Cover Letter")
+        expect(response.body).to include('data-action="clipboard#copy"')
+        expect(response.body).to include("my own private notes")
+      end
+
+      it "omits the cover letter panel when none has been generated yet" do
+        get job_posting_path(job)
+        expect(response.body).not_to include('data-controller="clipboard"')
+      end
+    end
   end
 
   describe "POST /job_postings/:id/reformat" do

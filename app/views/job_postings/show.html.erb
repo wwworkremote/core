@@ -234,6 +234,22 @@
         </div>
       </div>
 
+      <!-- Cover Letter -->
+      <% if user_job&.cover_letter.present? %>
+        <div class="space-y-4 mb-10" data-controller="clipboard">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-bold text-base-content/40"><%= t('.activity.cover_letter_heading') %></div>
+            <button type="button" data-action="clipboard#copy" class="text-xs font-bold text-primary hover:text-white underline">
+              <span data-clipboard-target="label"><%= t('.activity.copy') %></span>
+            </button>
+          </div>
+          <div class="p-4 rounded-xl bg-white/5 border border-white/5 prose-invert text-xs leading-relaxed">
+            <%= markdown(user_job.cover_letter) %>
+          </div>
+          <textarea data-clipboard-target="source" class="hidden" readonly><%= user_job.cover_letter %></textarea>
+        </div>
+      <% end %>
+
       <!-- Personal Notes -->
       <div class="space-y-4">
         <div class="text-xs font-bold text-base-content/40"><%= t('.activity.notes_heading') %></div>

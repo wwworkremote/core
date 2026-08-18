@@ -32,6 +32,18 @@ RSpec.describe LLM::ArtifactGenerator do
       expect(result[:success]).to be true
       expect(captured_args[:untrusted_text]).to include("Lead at Tech Corp") # Most recent first
       expect(captured_args[:untrusted_text]).to include("Dev at Tech Corp")
+      expect(user.user_job_postings.find_by(job_posting: job).cover_letter).to eq("Dear Hiring Manager...")
+    end
+
+    it "stores the cover letter in its own column, not mixed into personal notes" do
+      create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
+      user_job = create(:user_job_posting, user: user, job_posting: job, notes: "my own notes")
+      allow(LLM::Orchestrator).to receive(:call).and_return(success: true, output: "Draft letter")
+
+      described_class.call(user, job)
+
+      expect(user_job.reload.cover_letter).to eq("Draft letter")
+      expect(user_job.notes).to eq("my own notes")
     end
 
     it "handles missing skills and goals in profile gracefully" do

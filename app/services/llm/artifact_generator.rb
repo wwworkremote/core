@@ -52,7 +52,7 @@ class LLM::ArtifactGenerator
 
   def attach_artifact(result)
     user_job = @user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
-    user_job.update!(notes: "#{user_job.notes}\n\n### [GENERATED_COVER_LETTER]\n#{result[:output]}")
+    user_job.update!(cover_letter: result[:output])
     { success: true, output: result[:output] }
   end
 end
