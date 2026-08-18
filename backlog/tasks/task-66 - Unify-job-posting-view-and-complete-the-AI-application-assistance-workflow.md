@@ -1,9 +1,10 @@
 ---
 id: TASK-66
 title: Unify job posting view and complete the AI application-assistance workflow
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-17 23:13'
+updated_date: '2026-08-18 15:52'
 labels:
   - ux
   - job-postings
@@ -27,3 +28,20 @@ While auditing this page, three other gaps were found where backend capability a
 
 This parent task tracks the initiative; each piece is broken into a subtask since they touch different subsystems and can land somewhat independently, but the UI-facing ones (cover letter display, history, Q&A) should target the unified page produced by the view-merge subtask rather than the soon-to-be-retired admin-only page.
 <!-- SECTION:DESCRIPTION:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+All four subtasks complete:
+
+- **TASK-66.1** merged the admin and non-admin job posting views into one canonical page at job_postings/:id, retiring the split (which turned out to have no real permission boundary behind it -- authenticate_admin gated the whole app equally). Added a lazily-loaded similar-postings panel while at it, per user request during review.
+- **TASK-66.2** gave generated cover letters their own storage column and a rendered, copyable panel, instead of being string-concatenated into the free-text personal notes field.
+- **TASK-66.3** made the existing change-history panel actually show what changed (found and fixed a real infrastructure bug along the way: PaperTrail's object_changes tracking was silently broken app-wide since it was first added, due to a missing column and an unpermitted YAML class).
+- **TASK-66.4** added the net-new bespoke Q&A feature: per-question canned-vs-AI answer generation, reusing the cover letter's profile-priming approach.
+
+Along the way, also fixed the originally-reported "Enrich Data does nothing" bug (a `params[:action]` vs `params[:action_type]` mismatch -- `action` is a reserved Rails param, so it was silently swallowed).
+
+Every piece was verified with full RSpec suite runs (final: 604 examples, 0 failures), rubocop, erb_lint, and live manual browser verification against real dev data -- not just spec coverage. Four commits total: ff99c7f3 predecessor work aside, this initiative's commits are f6ae5b4 (66.1), 5b404d6 (66.2), 9cca9b8 (66.3), 02cd9d1 (66.4), all on main, none yet pushed to origin.
+
+See each subtask's own Final Summary for full implementation detail.
+<!-- SECTION:FINAL_SUMMARY:END -->
