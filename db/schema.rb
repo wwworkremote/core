@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_235500) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_18_090500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -90,6 +90,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_235500) do
     t.string "visitor_token"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "application_questions", force: :cascade do |t|
+    t.string "answer_source"
+    t.text "answer_text"
+    t.datetime "created_at", null: false
+    t.bigint "job_posting_id", null: false
+    t.text "question_text"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["job_posting_id"], name: "index_application_questions_on_job_posting_id"
+    t.index ["user_id"], name: "index_application_questions_on_user_id"
   end
 
   create_table "board_queries", force: :cascade do |t|
@@ -870,6 +882,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_235500) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "application_questions", "job_postings"
+  add_foreign_key "application_questions", "users"
   add_foreign_key "career_profiles", "users"
   add_foreign_key "company_pipeline_steps", "companies"
   add_foreign_key "company_pipeline_steps", "users"

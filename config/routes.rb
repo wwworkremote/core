@@ -247,6 +247,7 @@ Rails.application.routes.draw do
       resources :contacts, only: %i[create destroy]
       resources :interview_sessions, only: [:create]
       resources :interview_tasks, only: [:create]
+      resources :application_questions, only: %i[create destroy]
     end
     resources :interview_sessions, only: [] do
       resources :interview_questions, only: [:create]

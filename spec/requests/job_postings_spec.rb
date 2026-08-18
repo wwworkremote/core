@@ -315,6 +315,44 @@ RSpec.describe "Job Postings" do
         expect(response.body).not_to include('data-controller="clipboard"')
       end
     end
+
+    context "application Q&A panel" do
+      let(:current_user) {
+        User.find_or_create_by!(email: "mike@just3ws.com") { |u|
+          u.name = "Mike"; u.password = "password"
+        }
+      }
+
+      it "lists existing questions with their answer and source badge" do
+        create(:application_question, user: current_user, job_posting: job, question_text: "Why this role?",
+                                      answer_text: "Because it's a great fit.", answer_source: "ai")
+
+        get job_posting_path(job)
+
+        expect(response.body).to include("Why this role?")
+        expect(response.body).to include("Because it&#39;s a great fit.")
+        expect(response.body).to include("AI Generated")
+      end
+
+      it "shows a From Profile badge for canned answers" do
+        create(:application_question, user: current_user, job_posting: job, question_text: "Years of experience?",
+                                      answer_text: "10 years", answer_source: "canned")
+
+        get job_posting_path(job)
+
+        expect(response.body).to include("From Profile")
+      end
+
+      it "shows a fallback message when a question has no answer yet" do
+        create(:application_question, user: current_user, job_posting: job, question_text: "Unanswered question",
+                                      answer_text: nil)
+
+        get job_posting_path(job)
+
+        expect(response.body).to include("Unanswered question")
+        expect(response.body).to include("Answer generation failed")
+      end
+    end
   end
 
   describe "POST /job_postings/:id/reformat" do

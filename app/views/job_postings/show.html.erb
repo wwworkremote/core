@@ -261,6 +261,35 @@
       </div>
     </div>
 
+    <!-- Application Q&A -->
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.qa.heading') %></h3>
+
+      <%= form_with url: admin_job_posting_application_questions_path(@job_posting), class: "space-y-2 mb-8" do |f| %>
+        <%= f.text_area :question_text, placeholder: t('.qa.question_placeholder'), class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-sm font-mono", rows: 2 %>
+        <%= f.submit t('.qa.ask'), class: "w-full py-2 rounded-xl bg-primary/20 text-primary border border-primary/20 text-xs font-bold hover:bg-primary hover:text-white transition-all" %>
+      <% end %>
+
+      <div class="space-y-6">
+        <% @job_posting.application_questions.order(created_at: :desc).each do |question| %>
+          <div class="p-4 rounded-xl bg-white/5 border border-white/5">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <p class="text-sm font-bold text-white flex-1">"<%= question.question_text %>"</p>
+              <%= button_to "×", admin_job_posting_application_question_path(@job_posting, question), method: :delete, class: "text-rose-500 font-bold text-xs hover:text-white shrink-0" %>
+            </div>
+            <% if question.answer_text.present? %>
+              <span class="badge badge-outline text-xs font-bold mb-2 <%= question.answer_source == 'canned' ? 'border-success/40 text-success' : 'border-accent/40 text-accent' %>">
+                <%= question.answer_source == 'canned' ? t('.qa.canned_badge') : t('.qa.ai_badge') %>
+              </span>
+              <p class="text-xs text-base-content/70 leading-relaxed"><%= question.answer_text %></p>
+            <% else %>
+              <p class="text-xs text-warning italic"><%= t('.qa.no_answer') %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <!-- Application status -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.pipeline.heading') %></h3>

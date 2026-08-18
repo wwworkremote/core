@@ -20,27 +20,19 @@ class JobPosting < ApplicationRecord
 
   has_many :user_job_postings, dependent: :destroy
   has_many :users, through: :user_job_postings
-
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
   has_many :interview_sessions, dependent: :destroy
   has_many :interview_tasks, dependent: :destroy
+  has_many :application_questions, dependent: :destroy
   has_many :leads, dependent: :nullify
 
   def reformatting?
     data["reformatting"] == true
   end
 
-  private
-
-  def add_pipeline_note(note, link: nil)
-    pipeline_steps.create!(status: "noted", note: note, link: link)
-  end
-
   scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
   scope :contract_only, -> { where("data->>'employment_type' ILIKE ANY (ARRAY[?, ?])", "%contract%", "%temp%") }
-
-  public
 
   def self.by_role_family(family)
     aliases = RoleFamily.aliases_for(family)
@@ -150,26 +142,6 @@ class JobPosting < ApplicationRecord
     broadcast_prepend_to "admin_live_feed", target: "live_ingestion", partial: "admin/dashboard/live_feed/job_posting",
                                             locals: { job_posting: self }
   end
-
-  # has_many :job_postings, -> { readonly }, dependent: :restrict_with_error, inverse_of: :source
-
-  # rails_admin do
-  #   label 'Job Posting'
-  #   label_plural 'Job Postings'
-
-  #   list do
-  #     field :title do
-  #       column_width 600
-  #     end
-
-  #     field :published_at, :datetime do
-  #       label 'Published At'
-  #       date_format :long
-  #     end
-
-  #     sort_by :published_at
-  #   end
-  # end
 end
 
 # == Schema Information

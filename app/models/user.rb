@@ -29,6 +29,7 @@ class User < ApplicationRecord
   has_many :pipeline_steps, dependent: :destroy
   has_many :contacts, dependent: :destroy
   has_many :company_pipeline_steps, dependent: :destroy
+  has_many :application_questions, dependent: :destroy
 
   validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :name, presence: true
