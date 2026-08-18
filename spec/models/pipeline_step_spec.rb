@@ -8,6 +8,7 @@
 #  link           :string
 #  note           :text
 #  notes          :text
+#  reason_tags    :jsonb            not null
 #  status         :string
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null

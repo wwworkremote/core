@@ -275,6 +275,7 @@ Rails.application.routes.draw do
   get "home/index"
 
   resources :outbound_links, only: [:show]
+  get "job_postings/triage", to: "job_posting_triage#show", as: :job_posting_triage
   resources :job_postings, only: %i[index show] do
     member do
       post :reformat

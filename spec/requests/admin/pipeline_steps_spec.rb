@@ -82,6 +82,31 @@ RSpec.describe "Admin::PipelineSteps" do
       end
     end
 
+    context "with reason_tags and a custom note (TASK-62 triage)" do
+      it "stores the whitelisted reason_tags and overrides the default note" do
+        post admin_job_posting_pipeline_steps_path(job),
+             params: { status: "favorite", note: "great fit", reason_tags: { industry: "good", evil_key: "x" } }
+
+        step = PipelineStep.last
+        expect(step.note).to eq("great fit")
+        expect(step.reason_tags).to eq("industry" => "good")
+      end
+
+      it "defaults to an empty hash when reason_tags is absent" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite" }
+
+        expect(PipelineStep.last.reason_tags).to eq({})
+      end
+    end
+
+    context "with from_triage set" do
+      it "redirects back to the triage queue instead of the posting's own page" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite", from_triage: "true" }
+
+        expect(response).to redirect_to(job_posting_triage_path)
+      end
+    end
+
     context "when the request accepts turbo_stream but remove_card is not set (every other status button)" do
       # Turbo Drive sends `Accept: text/vnd.turbo-stream.html` on every form
       # submission by default -- this is the regression case: a naive

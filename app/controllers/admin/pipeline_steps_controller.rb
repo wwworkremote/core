@@ -15,6 +15,12 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     "expire" => %i[expire! may_expire?]
   }.freeze
 
+  # Whitelisted by key, not passed through raw -- these are jsonb-column
+  # values, not model attributes, so strong params' usual guard against
+  # mass-assigning unrelated columns doesn't apply, but an attacker-supplied
+  # key set could still bloat the column with arbitrary junk.
+  REASON_TAG_KEYS = %w[industry skills_seniority compensation location_remote].freeze
+
   def create
     @job_posting = JobPosting.find(params.expect(:job_posting_id))
     log_activity
@@ -31,11 +37,9 @@ class Admin::PipelineStepsController < Admin::ApplicationController
   # actually wants a card removed. remove_card is only sent by
   # job_postings/index.html.erb's "ignore" button.
   def respond_after_logging
-    if params[:remove_card] == "true"
-      render turbo_stream: turbo_stream.remove(@job_posting)
-    else
-      redirect_to redirect_target, notice: "Activity logged."
-    end
+    return render turbo_stream: turbo_stream.remove(@job_posting) if params[:remove_card] == "true"
+
+    redirect_to redirect_target, notice: "Activity logged."
   end
 
   # Not interested/Expired redirect back to wherever triage started (see
@@ -44,8 +48,15 @@ class Admin::PipelineStepsController < Admin::ApplicationController
   # originated from our own hidden field -- defense in depth against a
   # tampered form value (e.g. a protocol-relative "//evil.com" open redirect).
   def redirect_target
-    return_to = safe_local_path(params[:return_to]) if %w[ignore expire].include?(params[:status])
-    return_to || job_posting_path(@job_posting)
+    return job_posting_triage_path if params[:from_triage] == "true"
+
+    dismissal_return_to || job_posting_path(@job_posting)
+  end
+
+  def dismissal_return_to
+    return unless %w[ignore expire].include?(params[:status])
+
+    safe_local_path(params[:return_to])
   end
 
   # Handle status transitions or manual notes
@@ -76,11 +87,25 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     ahoy.track "Pipeline Status Changed", status: params[:status], job_posting_id: @job_posting.id
     @job_posting.pipeline_steps.create!(
       status: params[:status],
-      note: "Status changed to #{params[:status]}",
+      note: params[:note].presence || "Status changed to #{params[:status]}",
+      reason_tags: triage_reason_tags,
       user: current_user
     )
   end
   # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
+
+  # params.expect(:reason_tags) (the rubocop-suggested rewrite) is wrong
+  # here: expect on a bare key treats it as a required *scalar*, so it
+  # raises ActionController::ParameterMissing given the Hash reason_tags
+  # actually is. Permit + to_h is the correct shape for an optional,
+  # arbitrarily-keyed nested hash.
+  # rubocop:disable Rails/StrongParametersExpect
+  def triage_reason_tags
+    return {} if params[:reason_tags].blank?
+
+    params[:reason_tags].permit(*REASON_TAG_KEYS).to_h.compact_blank
+  end
+  # rubocop:enable Rails/StrongParametersExpect
 
   # One cohesive create! call -- splitting it further would obscure it,
   # not simplify it.

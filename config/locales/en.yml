@@ -137,6 +137,28 @@ en:
       older_30d: "Older than 30d"
       new_postings: "New Postings"
       stale_postings: "Stale Postings"
+  job_posting_triage:
+    show:
+      title: "Triage"
+      subtitle: "One at a time -- F favorite, N not interested, E expired, S skip."
+      back_to_list: "Back to list"
+      favorite: "Favorite"
+      not_interested: "Not interested"
+      expired: "Expired"
+      skip: "Skip"
+      note_placeholder: "Optional note..."
+      reason_industry: "Industry"
+      reason_skills_seniority: "Skills/Seniority"
+      reason_compensation: "Compensation"
+      reason_location_remote: "Location/Remote"
+      good: "Good"
+      bad: "Bad"
+      unknown_company: "Unknown company"
+      posted_ago: "%{time} ago"
+      empty:
+        title: "Nothing left to triage"
+        body: "Every untriaged posting has been reviewed or skipped this session."
+        reset_skips: "Clear skipped postings"
   job_postings:
     index:
       title: "Job Postings"
@@ -159,6 +181,7 @@ en:
       not_interested: "Not interested"
       expired: "Expired"
       sort_match_score: "Sort by Match Score"
+      sort_company: "Sort by Company"
       match_score: "%{score}% match"
       network_fallback: "Direct"
       posted_ago: "%{time} ago"
@@ -306,6 +329,10 @@ en:
       track: "Track"
       no_matches_title: "No matches yet"
       no_matches_body: "Matches appear once postings are ingested and scored against this resume."
+  layouts:
+    application:
+      nav:
+        triage: "Triage"
   llm_chats:
     form:
       model_label: "Model"
