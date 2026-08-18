@@ -424,9 +424,16 @@
         <div>
           <div class="text-xs font-bold text-base-content/40 mb-3"><%= t('.details.history_label') %></div>
           <div class="space-y-2">
-            <% @job_posting.versions.reverse.first(5).each do |version| %>
+            <% @job_posting.versions.includes(:item).reverse.first(5).each do |version| %>
               <div class="text-xs font-mono text-base-content/50">
-                <%= t('.details.history_entry', event: version.event.humanize, who: version.whodunnit || t('.details.system'), time: version.created_at.strftime("%b %-d, %H:%M")) %>
+                <div><%= t('.details.history_entry', event: version.event.humanize, who: version.whodunnit || t('.details.system'), time: version.created_at.strftime("%b %-d, %H:%M")) %></div>
+                <% if (changes = version_changes_summary(version)) %>
+                  <ul class="pl-4 list-disc text-base-content/40">
+                    <% changes.each do |change| %>
+                      <li><%= change %></li>
+                    <% end %>
+                  </ul>
+                <% end %>
               </div>
             <% end %>
           </div>

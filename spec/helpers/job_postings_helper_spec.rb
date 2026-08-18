@@ -22,4 +22,40 @@ RSpec.describe JobPostingsHelper do
       expect(helper.safe_job_url("not a url")).to eq("#")
     end
   end
+
+  describe "#version_changes_summary" do
+    let(:job) { create(:job_posting, title: "Original Title", status: "none") }
+
+    it "summarizes what changed, in human-readable form, excluding timestamps" do
+      job.update!(title: "Updated Title")
+      version = job.versions.last
+
+      summary = helper.version_changes_summary(version)
+
+      expect(summary).to eq(["Title: Original Title → Updated Title"])
+    end
+
+    it "returns nil when the version has an empty changeset" do
+      version = job.versions.last
+      allow(version).to receive(:changeset).and_return({})
+
+      expect(helper.version_changes_summary(version)).to be_nil
+    end
+
+    it "returns nil rather than raising when changeset itself is nil (real historical versions predate tracking)" do
+      version = job.versions.last
+      allow(version).to receive(:changeset).and_return(nil)
+
+      expect(helper.version_changes_summary(version)).to be_nil
+    end
+
+    it "summarizes non-scalar values without dumping raw content" do
+      job.update!(data: job.data.merge("marker" => "x"))
+      version = job.versions.last
+
+      summary = helper.version_changes_summary(version)
+
+      expect(summary).to include("Data: changed → changed")
+    end
+  end
 end

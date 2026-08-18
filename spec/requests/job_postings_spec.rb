@@ -283,6 +283,14 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include(admin_job_posting_path(job, frame: "semantic_matches"))
     end
 
+    it "shows what changed for a version, not just the bare event/time" do
+      job.update!(title: "A New Title")
+
+      get job_posting_path(job)
+
+      expect(response.body).to include("Title: Senior Ruby Developer → A New Title")
+    end
+
     context "cover letter panel" do
       let(:current_user) {
         User.find_or_create_by!(email: "mike@just3ws.com") { |u|
