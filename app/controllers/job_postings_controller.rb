@@ -68,7 +68,7 @@ class JobPostingsController < ApplicationController
   end
 
   def valid_sort_param
-    params[:sort] if params[:sort] == "match_score"
+    params[:sort] if %w[match_score company].include?(params[:sort])
   end
 
   def assign_location_params
@@ -130,6 +130,8 @@ class JobPostingsController < ApplicationController
   end
 
   def base_sort_scope
-    @sort == "match_score" ? JobPosting.by_match_score(current_user) : JobPosting.recent
+    return JobPosting.by_match_score(current_user) if @sort == "match_score"
+
+    @sort == "company" ? JobPosting.by_company : JobPosting.recent
   end
 end

@@ -32,6 +32,7 @@ class JobPosting < ApplicationRecord
   end
 
   scope :recent, -> { order(Arel.sql("published_at DESC NULLS LAST")) }
+  scope :by_company, -> { order(Arel.sql("company_name ASC NULLS LAST")) }
   scope :contract_only, -> { where("data->>'employment_type' ILIKE ANY (ARRAY[?, ?])", "%contract%", "%temp%") }
 
   def self.by_role_family(family)
