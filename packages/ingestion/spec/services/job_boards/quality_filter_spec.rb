@@ -47,6 +47,36 @@ RSpec.describe JobBoards::QualityFilter do
       expect(filter.useful?).to be false
     end
 
+    context "results-excluded source (TASK-69.2)" do
+      # Origin <-> JobBoards::Source have no FK -- only a shared name,
+      # established by JobBoards::Syncer#resolve_dashboard_source.
+      it "is false when the source's Origin name matches an excluded JobBoards::Source" do
+        create(:job_boards_source, name: "Arbeitnow", excluded_from_results: true)
+        job_posting.source = create(:source, origin: Origin.create!(name: "Arbeitnow"))
+
+        expect(filter.useful?).to be false
+      end
+
+      it "is true when the matching JobBoards::Source is not excluded" do
+        create(:job_boards_source, name: "Arbeitnow", excluded_from_results: false)
+        job_posting.source = create(:source, origin: Origin.create!(name: "Arbeitnow"))
+
+        expect(filter.useful?).to be true
+      end
+
+      it "is true when no JobBoards::Source matches the origin name" do
+        job_posting.source = create(:source, origin: Origin.create!(name: "Unregistered Board"))
+
+        expect(filter.useful?).to be true
+      end
+
+      it "is true when the posting has no source at all" do
+        job_posting.source = nil
+
+        expect(filter.useful?).to be true
+      end
+    end
+
     context "non-Engineering title keyword matching" do
       described_class::NON_ENGINEERING_TITLE_KEYWORDS.each do |keyword|
         it "is false for a title containing #{keyword.inspect}" do

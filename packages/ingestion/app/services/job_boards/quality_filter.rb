@@ -46,7 +46,7 @@ class JobBoards::QualityFilter
 
   def useful?
     return false unless valid_title?
-    return false if country_mismatch?
+    return false if country_mismatch? || excluded_source?
     return false if body_too_short?
     return false if non_engineering_title?
 
@@ -89,5 +89,20 @@ class JobBoards::QualityFilter
 
   def body_too_short?
     @job_posting.body.blank? || @job_posting.body.length < 50
+  end
+
+  # source (raw ingestion-event record) -> origin (Origin, a plain name
+  # holder) -> matched by name to JobBoards::Source (the "board", e.g.
+  # Arbeitnow -- flagged via /admin/sources/:id). There's no direct FK
+  # between Origin and JobBoards::Source; name is the only link the syncer
+  # establishes (JobBoards::Syncer#resolve_dashboard_source). Flagging keeps
+  # the board ingesting for future analysis while its postings stay out of
+  # every result list, the same auto-ignore path CompanyResolver uses for
+  # Company#ingestion_enabled.
+  def excluded_source?
+    origin_name = @job_posting.source&.origin&.name
+    return false if origin_name.blank?
+
+    JobBoards::Source.find_by(name: origin_name)&.excluded_from_results? || false
   end
 end

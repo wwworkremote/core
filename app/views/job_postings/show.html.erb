@@ -322,6 +322,7 @@
           <% end %>
           <% if @job_posting.may_restore? %>
             <%= button_to t('.pipeline.restore'), restore_admin_job_posting_path(@job_posting), method: :post, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-success/30 text-success hover:bg-success hover:text-white transition-all" %>
+            <%= button_to t('.pipeline.delete_permanently'), admin_job_posting_path(@job_posting), method: :delete, data: { turbo_confirm: t('.pipeline.delete_confirm') }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/40 bg-error/10 text-error hover:bg-error hover:text-white transition-all" %>
           <% elsif @job_posting.may_purge? %>
             <%= button_to t('.pipeline.purge'), purge_admin_job_posting_path(@job_posting), method: :post, data: { turbo_confirm: t('.pipeline.purge_confirm') }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
           <% end %>

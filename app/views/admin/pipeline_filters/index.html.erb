@@ -102,6 +102,21 @@
     </div>
   </div>
 
+  <!-- Country Filter -->
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Country Filter</h3>
+    <p class="text-xs text-slate-500 mb-4">A posting with a <code class="font-mono text-slate-400">country_code</code> outside this list is dropped during ingestion, remote or not (TASK-69.3) -- same auto-ignore path as Quality Filter above. A blank <code class="font-mono text-slate-400">country_code</code> is never filtered on. Edit via <code class="font-mono text-slate-400">User#preferred_countries</code>.</p>
+    <div class="flex flex-wrap gap-2">
+      <% if @preferred_countries.empty? %>
+        <span class="px-2 py-1 rounded bg-warning/10 border border-warning/20 text-xs font-mono text-warning">none set -- filter is inert</span>
+      <% else %>
+        <% @preferred_countries.each do |code| %>
+          <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= code %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
   <!-- AI Category Taxonomy -->
   <div class="card-neural p-8">
     <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">AI Category Taxonomy</h3>

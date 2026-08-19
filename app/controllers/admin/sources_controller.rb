@@ -17,7 +17,17 @@ class Admin::SourcesController < Admin::ApplicationController
 
   def toggle_exclusion
     source = JobBoards::Source.find(params.expect(:id))
-    source.update!(excluded_from_results: !source.excluded_from_results)
+    flip_exclusion(source)
     redirect_to admin_source_path(source)
+  end
+
+  private
+
+  # New postings self-exclude via JobBoards::QualityFilter#excluded_source?
+  # going forward; sweep existing untouched/low-quality postings from this
+  # source the same way "Run Audit" already does for everything else.
+  def flip_exclusion(source)
+    source.update!(excluded_from_results: !source.excluded_from_results)
+    JobBoards::AuditJob.perform_later if source.excluded_from_results?
   end
 end

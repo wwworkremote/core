@@ -21,6 +21,7 @@ class Admin::PipelineFiltersController < Admin::ApplicationController
     @commute_station_radius = ENV.fetch("STATION_RADIUS_MILES", Geo::CommuteZone::DEFAULT_STATION_RADIUS_MILES)
     @commute_terminal_radius = ENV.fetch("TERMINAL_WALK_RADIUS_MILES", Geo::CommuteZone::DEFAULT_TERMINAL_WALK_RADIUS_MILES)
     @adapters = Ingestion::AdapterRegistry.all
+    @preferred_countries = User.first&.preferred_countries || []
   end
   # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

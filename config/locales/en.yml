@@ -255,6 +255,8 @@ en:
         purge: "Purge"
         purge_confirm: "Purge this posting? It can be restored later."
         restore: "Restore"
+        delete_permanently: "Delete Permanently"
+        delete_confirm: "Permanently delete this posting? This cannot be undone."
         note_placeholder: "Add a note..."
         link_placeholder: "https://..."
         add_update: "Add Update"

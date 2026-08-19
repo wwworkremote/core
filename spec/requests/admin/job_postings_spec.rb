@@ -86,6 +86,17 @@ RSpec.describe "Admin::JobPostings" do
     end
   end
 
+  describe "DELETE /admin/job_postings/:id (TASK-69.4)" do
+    it "permanently deletes the job posting and redirects to the admin index" do
+      expect {
+        delete admin_job_posting_path(job_posting)
+      }.to change(JobPosting, :count).by(-1)
+
+      expect(response).to redirect_to(admin_job_postings_path)
+      expect(flash[:notice]).to eq("Job posting was permanently deleted.")
+    end
+  end
+
   describe "POST /admin/job_postings/bulk_action" do
     it "purges the selected records" do
       post bulk_action_admin_job_postings_path, params: { job_ids: [job_posting.id], bulk_operation: "purge" }

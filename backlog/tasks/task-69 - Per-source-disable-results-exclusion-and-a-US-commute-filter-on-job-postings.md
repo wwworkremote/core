@@ -3,9 +3,10 @@ id: TASK-69
 title: >-
   Per-source disable + results-exclusion, and a US/commute filter on job
   postings
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-19 01:58'
+updated_date: '2026-08-19 12:00'
 labels: []
 dependencies: []
 references:
@@ -45,3 +46,19 @@ Does "US-only" also exclude non-US *remote* postings, or only non-US *physical/n
 ## Bug noticed in passing
 `app/views/admin/sources/show.html.erb:33` renders `@source.payload`, which doesn't exist on `JobBoards::Source` (that attribute belongs to the unrelated `Source` model) — always renders `{}`. Fix while touching this view for the disable toggle.
 <!-- SECTION:DESCRIPTION:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+All four subtasks shipped (TASK-69.1 through 69.4). Summary of the real design that emerged, since it differs from the original plan:
+
+- Per-source ingestion-disable (`/data_fetchers`, `/admin/sources/:id`) and results-exclusion are two independent booleans on `JobBoards::Source` (69.1).
+- Results-exclusion for sources, and the US-only country filter (69.3), both turned out to need zero new query-time scopes anywhere -- both route through `JobBoards::QualityFilter#useful?`, the same auto-ignore mechanism the codebase already used for `Company#ingestion_enabled`. Every job-posting list already excludes ignored/purged/expired, so gating at the ingestion/audit layer means index, company pages, and source-scoped views all get it for free.
+- Company-side exclusion needed no new code at all -- already fully built (`mark_not_interested_admin_company_path`, already on the company show page).
+- US-only decision: excludes non-US postings even when tagged remote (confirmed with the user).
+- Delete button (69.4) wires up a destroy action that already existed server-side but had no UI caller anywhere.
+
+Real modeling gotcha hit and documented along the way: `JobPosting#source.origin` is an `Origin` record, NOT `JobBoards::Source` -- no FK between them, only a shared `name`. Anyone touching source-exclusion logic again should read the comment on `QualityFilter#excluded_source?` first.
+
+Pending real cleanup opportunity (not part of this task): the shared-budget `JobBoards::Auditor` can't reliably reach `audit_low_quality` when `missing_postings`/`missing_category` backlogs are large -- worth a follow-up task if the sweep needs to be reliable rather than best-effort.
+<!-- SECTION:FINAL_SUMMARY:END -->

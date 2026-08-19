@@ -299,6 +299,16 @@ RSpec.describe "Job Postings" do
       expect(response.body).not_to include(">Purge<")
     end
 
+    it "offers Delete Permanently only once a posting is purged (TASK-69.4)" do
+      get job_posting_path(job)
+      expect(response.body).not_to include("Delete Permanently")
+
+      job.purge!
+      get job_posting_path(job)
+      expect(response.body).to include("Delete Permanently")
+      expect(response.body).to include(admin_job_posting_path(job))
+    end
+
     it "shows a Lead badge linking to the admin lead when the posting was captured via the extension" do
       lead = create(:lead, job_posting: job, provider: "linkedin")
       get job_posting_path(job)
