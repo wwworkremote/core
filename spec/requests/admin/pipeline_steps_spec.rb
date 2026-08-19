@@ -105,6 +105,18 @@ RSpec.describe "Admin::PipelineSteps" do
 
         expect(response).to redirect_to(job_posting_triage_path)
       end
+
+      it "records the posting in the session's triage history" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite", from_triage: "true" }
+
+        expect(session[:triage_history]).to eq([job.id])
+      end
+
+      it "does not touch triage history for a decision made outside the triage flow" do
+        post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite" }
+
+        expect(session[:triage_history]).to be_nil
+      end
     end
 
     context "when the request accepts turbo_stream but remove_card is not set (every other status button)" do

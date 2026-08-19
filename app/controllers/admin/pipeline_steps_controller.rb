@@ -78,7 +78,22 @@ class Admin::PipelineStepsController < Admin::ApplicationController
 
     @job_posting.public_send(bang)
     log_status_change_step
+    record_triage_history
   end
+
+  # Lets the triage queue offer a "Back" link to the previous decision so a
+  # misclick can be corrected on that posting's own show page (which already
+  # has the full set of status-transition buttons, including restore).
+  # Capped at 20 so the session cookie doesn't grow unbounded across a long
+  # triage streak.
+  # rubocop:disable Metrics/AbcSize
+  def record_triage_history
+    return unless params[:from_triage] == "true"
+
+    history = session[:triage_history].presence || []
+    session[:triage_history] = (history << @job_posting.id).last(20)
+  end
+  # rubocop:enable Metrics/AbcSize
 
   # One cohesive create! call plus its tracking event -- splitting it
   # further would obscure it, not simplify it.

@@ -6,6 +6,7 @@ class JobPostingTriageController < ApplicationController
   def show
     apply_queue_params
     @job_posting = next_candidate
+    @last_triaged = JobPosting.find_by(id: session[:triage_history]&.last)
   end
 
   private

@@ -4,7 +4,16 @@
       <h1 class="text-4xl font-black tracking-tight text-white mb-2"><%= t('.title') %></h1>
       <p class="text-base-content/60 font-bold text-sm"><%= t('.subtitle') %></p>
     </div>
-    <%= link_to t('.back_to_list'), job_postings_path, class: "btn btn-ghost btn-sm rounded-lg font-bold" %>
+    <div class="flex items-center gap-3">
+      <% if @last_triaged %>
+        <%= link_to job_posting_path(@last_triaged), data: { triage_target: "back" },
+            title: t('.back_to_last', title: @last_triaged.title),
+            class: "btn btn-outline btn-sm rounded-lg font-bold" do %>
+          <%= t('.back') %> <span class="opacity-50 text-xs">B</span>
+        <% end %>
+      <% end %>
+      <%= link_to t('.back_to_list'), job_postings_path, class: "btn btn-ghost btn-sm rounded-lg font-bold" %>
+    </div>
   </div>
 
   <% if @job_posting.nil? %>

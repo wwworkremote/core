@@ -26,7 +26,11 @@
           <% end %>
         </h1>
         <p class="text-xl font-bold text-secondary mb-8">
-          <%= link_to @job_posting.company_name, job_postings_path(company: @job_posting.company_name), class: "hover:underline" %>
+          <% if @job_posting.company_record %>
+            <%= link_to @job_posting.company_name, company_path(@job_posting.company_record), class: "hover:underline" %>
+          <% else %>
+            <%= link_to @job_posting.company_name, job_postings_path(company: @job_posting.company_name), class: "hover:underline" %>
+          <% end %>
         </p>
 
         <div class="flex flex-wrap gap-6 text-xs font-bold text-base-content/60">
@@ -45,6 +49,10 @@
           <div class="flex items-center gap-2">
             <%= heroicon "eye", options: { class: "w-4 h-4 text-success" } %>
             <span class="text-white"><%= t('.views_count', count: @job_posting.seen_count) %></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <%= heroicon "globe-alt", options: { class: "w-4 h-4 text-secondary" } %>
+            <span class="text-white"><%= t('.source_prefix') %> <%= @job_posting.source&.origin&.name || @job_posting.source&.name || t('.source_unknown') %></span>
           </div>
         </div>
       </div>
@@ -434,6 +442,10 @@
           <div>
             <div class="mb-1"><%= t('.details.published_label') %></div>
             <div class="text-white"><%= @job_posting.published_at&.strftime("%Y-%m-%d") || t('.details.unknown') %></div>
+          </div>
+          <div>
+            <div class="mb-1"><%= t('.details.employment_type_label') %></div>
+            <div class="text-white"><%= @job_posting.data&.[]('employment_type') || t('.details.none') %></div>
           </div>
         </div>
 

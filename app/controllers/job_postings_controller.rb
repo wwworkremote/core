@@ -19,7 +19,7 @@ class JobPostingsController < ApplicationController
   end
 
   def show
-    @job_posting = JobPosting.includes(:contacts).find(params.expect(:id))
+    @job_posting = JobPosting.includes(:contacts, source: :origin).find(params.expect(:id))
     ahoy.track "Viewed Job Posting", job_posting_id: @job_posting.id, title: @job_posting.title
   end
 

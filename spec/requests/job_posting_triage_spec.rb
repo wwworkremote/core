@@ -53,5 +53,23 @@ RSpec.describe "JobPostingTriage" do
         expect(response.body).to include(skipped.title)
       end
     end
+
+    context "after a decision was recorded via the triage flow" do
+      it "offers a Back link to the just-triaged posting so a wrong disposition can be fixed" do
+        decided = create(:job_posting, status: "none", title: "Just Decided Engineer")
+        post admin_job_posting_pipeline_steps_path(decided), params: { status: "favorite", from_triage: "true" }
+
+        get job_posting_triage_path
+
+        expect(response.body).to include(job_posting_path(decided))
+        expect(response.body).to include(decided.title)
+      end
+    end
+
+    it "has no Back link when nothing has been triaged yet this session" do
+      get job_posting_triage_path
+
+      expect(response.body).not_to include('data-triage-target="back"')
+    end
   end
 end

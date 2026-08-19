@@ -23,6 +23,18 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Senior Ruby Developer")
     end
 
+    # The results grid lives inside a turbo_frame_tag (see TASK-67) so live
+    # filtering doesn't need a full page reload -- any link inside that
+    # frame that points somewhere else (the show page) must explicitly
+    # escape it with data-turbo-frame="_top", or Turbo captures the click
+    # as a frame-scoped navigation and shows "Content missing" on the show
+    # page, which has no matching frame. Caught live in-browser once
+    # already; this pins it so it can't silently regress.
+    it "escapes the results frame on the job title link so it navigates to the show page" do
+      get job_postings_path
+      expect(response.body).to match(%r{<a data-turbo-frame="_top"[^>]*href="/job_postings/\d+"})
+    end
+
     it "shows the linked Company's name when company_name is blank" do
       company = create(:company, name: "Sparta Commodities")
       JobPosting.create!(signature: "test-company-id-only", title: "Staff Backend Engineer",
@@ -245,6 +257,28 @@ RSpec.describe "Job Postings" do
     it "omits return_to when the referer is a different host" do
       get job_posting_path(job), headers: { "HTTP_REFERER" => "http://evil.example/steal" }
       expect(response.body).not_to include("return_to=")
+    end
+
+    it "shows the source's origin name" do
+      get job_posting_path(job)
+      expect(response.body).to include("Test Origin")
+    end
+
+    it "shows the employment type from data when present" do
+      job.update!(data: { "employment_type" => "Contract" })
+      get job_posting_path(job)
+      expect(response.body).to include("Contract")
+    end
+
+    it "links the company name to its profile page when a matching Company exists" do
+      company = create(:company, name: "Acme Corp")
+      get job_posting_path(job)
+      expect(response.body).to include(company_path(company))
+    end
+
+    it "falls back to the filtered index link when no matching Company exists" do
+      get job_posting_path(job)
+      expect(response.body).to include(job_postings_path(company: "Acme Corp"))
     end
 
     it "shows the Enrich Data action" do
