@@ -15,6 +15,7 @@ Welcome to the WWWorkRemote documentation nodes.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.
 
 ### Special Interest
+- **[Changelog](changelog.md)**: Narrative project history by era, from git log + Backlog.md.
 - **[ADR Registry](adr/001-audit-strategy.md)**: Architecture Decision Records.
 - **[Agent Protocol](agents/domain.md)**: Context and guides for AI Agents.
 - **[Extension Guide](../extension/README.md)**: Ingestion Assistant Chrome Extension.
