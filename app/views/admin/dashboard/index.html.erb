@@ -6,7 +6,7 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
-  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
+  <div class="stats w-full bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
       <div class="stat-title text-xs font-bold text-slate-500 mb-2">Job Postings</div>
       <div class="stat-value text-primary text-5xl font-black tracking-tighter"><%= @job_postings_count %></div>
@@ -18,7 +18,7 @@
     </div>
   </div>
 
-  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
+  <div class="stats w-full bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
       <div class="stat-title text-xs font-bold text-slate-500 mb-2">Companies</div>
       <div class="stat-value text-kanagawa-accent text-5xl font-black tracking-tighter"><%= Company.count %></div>
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
+  <div class="stats w-full bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
       <div class="stat-title text-xs font-bold text-slate-500 mb-2">Sources</div>
       <div class="stat-value text-kanagawa-green text-5xl font-black tracking-tighter"><%= @sources_count %></div>
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <div class="stats bg-base-200 border border-white/10 shadow-2xl">
+  <div class="stats w-full bg-base-200 border border-white/10 shadow-2xl">
     <div class="stat p-8">
       <div class="stat-title text-xs font-bold text-slate-500 mb-2">Active Sources</div>
       <div class="stat-value text-kanagawa-yellow text-5xl font-black tracking-tighter"><%= @active_fetchers_count %></div>
