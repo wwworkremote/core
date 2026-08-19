@@ -33,14 +33,21 @@
         <% fetchers.each do |slug, config| %>
           <% status = @fetcher_statuses[slug] %>
           <% next unless status %>
-          <div class="bg-base-300 p-4 rounded-lg flex items-center justify-between group">
+          <div class="bg-base-300 p-4 rounded-lg flex items-center justify-between group <%= 'opacity-50' if status[:ingestion_paused] %>">
             <div>
-              <div class="font-bold text-white text-xs"><%= config[:name] %></div>
+              <div class="font-bold text-white text-xs">
+                <%= config[:name] %>
+                <% if status[:ingestion_paused] %>
+                  <span class="badge badge-xs bg-rose-900/40 text-rose-400 border-none ml-1">Disabled</span>
+                <% end %>
+              </div>
               <div class="text-xs text-slate-500 font-mono">Last fetched: <%= status[:last_fetched_at]&.strftime("%b %d, %H:%M") || "Never" %></div>
               <div class="text-xs text-slate-500 font-mono">Last ingested: <%= status[:last_ingested_at]&.strftime("%b %d, %H:%M") || "Never" %></div>
             </div>
             <div class="flex items-center gap-2">
-              <% if status[:can_fetch] %>
+              <% if status[:ingestion_paused] %>
+                <button class="btn-admin bg-base-200 text-slate-500 cursor-not-allowed" disabled>Run</button>
+              <% elsif status[:can_fetch] %>
                 <%= button_to "Run", run_data_fetchers_path, params: { slug: slug }, class: "btn-admin bg-white/5 hover:bg-white/10" %>
               <% else %>
                 <button class="btn-admin bg-base-200 text-slate-500 cursor-not-allowed" disabled>
@@ -52,6 +59,8 @@
                 </button>
               <% end %>
               <%= button_to "Force", run_data_fetchers_path, params: { slug: slug, force: true }, class: "btn-admin bg-rose-900/20 text-rose-500 hover:bg-rose-900/40 border-none" %>
+              <%= button_to (status[:ingestion_paused] ? "Enable" : "Disable"), toggle_pause_data_fetchers_path, params: { slug: slug },
+                  class: "btn-admin bg-white/5 hover:bg-white/10" %>
             </div>
           </div>
         <% end %>

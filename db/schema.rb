@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_171058) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_020154) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -358,6 +358,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_171058) do
     t.string "aasm_state"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.jsonb "data", default: {}, null: false
+    t.boolean "excluded_from_results", default: false, null: false
+    t.boolean "ingestion_paused", default: false, null: false
     t.integer "job_boards_documents_count", default: 0, null: false
     t.datetime "last_ingested_at"
     t.datetime "last_synced_at"

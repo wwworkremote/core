@@ -4,15 +4,17 @@
 #
 # Table name: job_boards_sources
 #
-#  id               :bigint           not null, primary key
-#  aasm_state       :string
-#  data             :jsonb            not null
-#  last_ingested_at :datetime
-#  last_synced_at   :datetime
-#  name             :string           not null
-#  slug             :string
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
+#  id                     :bigint           not null, primary key
+#  aasm_state             :string
+#  data                   :jsonb            not null
+#  excluded_from_results  :boolean          default(false), not null
+#  ingestion_paused       :boolean          default(false), not null
+#  last_ingested_at       :datetime
+#  last_synced_at         :datetime
+#  name                   :string           not null
+#  slug                   :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
 #
 # Indexes
 #
@@ -26,6 +28,6 @@ class JobBoards::Source < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
 
   def self.ransackable_attributes(_auth_object = nil)
-    %w[id name slug created_at updated_at]
+    %w[id name slug created_at updated_at ingestion_paused excluded_from_results]
   end
 end

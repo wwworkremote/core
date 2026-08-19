@@ -27,7 +27,8 @@ class DataAcquisitionManager
 
   def self.guard_status_fields(slug, config, guard, source)
     fetch_fields = { last_fetched_at: guard.last_fetched_at(slug) || source&.last_synced_at,
-                     last_ingested_at: source&.last_ingested_at }
+                     last_ingested_at: source&.last_ingested_at,
+                     ingestion_paused: source&.ingestion_paused || false }
     fetch_fields.merge(guard_availability_fields(slug, config, guard))
   end
 
@@ -51,9 +52,26 @@ class DataAcquisitionManager
   def self.run(slug, force: false)
     config = Ingestion::AdapterRegistry.get(slug)
     return { error: "Fetcher not found" } unless config
-    return { success: false, error: "Pipelines are globally paused." } if SystemSetting.paused? && !force
 
-    source_for(slug, config).update!(last_synced_at: Time.current)
+    source = source_for(slug, config)
+    block(source, config, force) || run!(slug, config, source, force)
+  end
+
+  def self.block(source, config, force)
+    reason = blocked_reason(source, config, force)
+    { success: false, error: reason } if reason
+  end
+
+  def self.blocked_reason(source, config, force)
+    return nil if force
+    return "Pipelines are globally paused." if SystemSetting.paused?
+    return "#{config[:name]} is disabled." if source.ingestion_paused?
+
+    nil
+  end
+
+  def self.run!(slug, config, source, force)
+    source.update!(last_synced_at: Time.current)
     dispatch(slug, config, force)
   end
 

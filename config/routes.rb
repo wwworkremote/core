@@ -255,7 +255,12 @@ Rails.application.routes.draw do
 
     resources :tasks, only: %i[index create update destroy]
 
-    resources :sources, only: %i[index show]
+    resources :sources, only: %i[index show] do
+      member do
+        post :toggle_ingestion
+        post :toggle_exclusion
+      end
+    end
     resources :leads, only: %i[index show]
     resources :extraction_rules, only: %i[index show]
     resources :pipeline_filters, only: [:index]
@@ -288,6 +293,7 @@ Rails.application.routes.draw do
       post :run_all_by_type
       post :audit
       post :enrich
+      post :toggle_pause
     end
   end
 

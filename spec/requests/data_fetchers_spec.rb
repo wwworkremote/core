@@ -68,6 +68,34 @@ RSpec.describe "DataFetchers" do
     end
   end
 
+  describe "POST /data_fetchers/toggle_pause (TASK-69.1)" do
+    it "creates the source paused when none exists yet, then unpauses on a second toggle" do
+      expect {
+        post toggle_pause_data_fetchers_path, params: { slug: "adzuna" }
+      }.to change { JobBoards::Source.find_by(slug: "adzuna")&.ingestion_paused }.from(nil).to(true)
+
+      expect(response).to redirect_to(data_fetchers_path)
+
+      expect {
+        post toggle_pause_data_fetchers_path, params: { slug: "adzuna" }
+      }.to change { JobBoards::Source.find_by(slug: "adzuna").ingestion_paused }.from(true).to(false)
+    end
+  end
+
+  describe "DataAcquisitionManager.run respecting ingestion_paused (TASK-69.1)" do
+    it "blocks a normal run when the source is disabled, but force still goes through" do
+      JobBoards::Source.find_or_create_by!(slug: "adzuna") { |s| s.name = "Adzuna" }
+                       .update!(ingestion_paused: true)
+      allow(DataAcquisitionManager).to receive(:dispatch).and_return(success: true)
+
+      post run_data_fetchers_path, params: { slug: "adzuna" }
+      expect(flash[:alert]).to include("Adzuna is disabled")
+
+      post run_data_fetchers_path, params: { slug: "adzuna", force: true }
+      expect(flash[:notice]).to include("started successfully")
+    end
+  end
+
   describe "POST /data_fetchers/audit" do
     it "enqueues the audit job and redirects" do
       expect { post audit_data_fetchers_path }.to have_enqueued_job(JobBoards::AuditJob)

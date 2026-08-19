@@ -19,6 +19,12 @@ class DataFetchersController < ApplicationController
     redirect_to data_fetchers_path
   end
 
+  def toggle_pause
+    source = source_for(params[:slug])
+    source.update!(ingestion_paused: !source.ingestion_paused)
+    redirect_to data_fetchers_path
+  end
+
   def audit
     JobBoards::AuditJob.perform_later
     flash[:notice] = "Audit and repair job has been enqueued."
@@ -32,6 +38,11 @@ class DataFetchersController < ApplicationController
   end
 
   private
+
+  def source_for(slug)
+    config = Ingestion::AdapterRegistry.get(slug)
+    JobBoards::Source.find_or_create_by!(slug: slug) { |s| s.name = config[:name] }
+  end
 
   def run_fetcher(slug, force:)
     result = DataAcquisitionManager.run(slug, force: force)
