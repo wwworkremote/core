@@ -17,11 +17,19 @@
       <script>window.ahoyTrackInteractions = true</script>
     <% end %>
     <% if Rails.env.development? %>
-      <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+      <script>
+        var wwrLivereload = document.createElement("script");
+        wwrLivereload.src = "http://" + (location.host || "localhost").split(":")[0] + ":35729/livereload.js?snipver=1";
+        document.head.appendChild(wwrLivereload);
+      </script>
     <% end %>
   </head>
 
   <body class="min-h-screen">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:btn focus:btn-primary focus:btn-sm">
+      Skip to content
+    </a>
+
     <header class="navbar bg-base-200 border-b border-white/5 px-6 py-4 sticky top-0 z-50">
       <div class="flex-1">
         <a href="/" class="text-xl font-black tracking-tighter uppercase">
@@ -29,16 +37,26 @@
         </a>
       </div>
 
-      <div class="flex-none">
+      <nav aria-label="Primary" class="flex-none">
         <ul class="menu menu-horizontal px-1 gap-2 font-bold text-sm">
-          <li><%= link_to t('.nav.dashboard'), root_path %></li>
-          <li><%= link_to t('.nav.companies'), companies_path %></li>
-          <li><%= link_to t('.nav.job_postings'), job_postings_path %></li>
-          <li><%= link_to t('.nav.triage'), job_posting_triage_path %></li>
-          <li><%= link_to t('.nav.saved_jobs'), user_job_postings_path %></li>
+          <% nav_links = {
+               dashboard: [t('.nav.dashboard'), root_path],
+               companies: [t('.nav.companies'), companies_path],
+               job_postings: [t('.nav.job_postings'), job_postings_path],
+               triage: [t('.nav.triage'), job_posting_triage_path],
+               saved_jobs: [t('.nav.saved_jobs'), user_job_postings_path]
+             } %>
+          <% nav_links.each_value do |label, path| %>
+            <% active = current_page?(path) %>
+            <li>
+              <%= link_to label, path,
+                  class: active ? "text-primary" : nil,
+                  "aria-current": (active ? "page" : nil) %>
+            </li>
+          <% end %>
 
           <li class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded text-primary"><%= t('.nav.profile_menu') %></div>
+            <div tabindex="0" role="button" aria-haspopup="menu" class="btn btn-ghost btn-xs rounded text-primary"><%= t('.nav.profile_menu') %></div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
               <li><%= link_to t('.nav.career_profile'), career_profile_path %></li>
               <li><%= link_to t('.nav.resume_versions'), resumes_path %></li>
@@ -49,7 +67,7 @@
           </li>
 
           <li class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-xs rounded"><%= t('.nav.admin_menu') %></div>
+            <div tabindex="0" role="button" aria-haspopup="menu" class="btn btn-ghost btn-xs rounded"><%= t('.nav.admin_menu') %></div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-64 mt-4 border border-white/5">
               <li class="menu-title text-xs opacity-60"><%= t('.nav.admin_section_label') %></li>
               <li><%= link_to t('.nav.admin_dashboard'), admin_root_path %></li>
@@ -64,10 +82,10 @@
             </ul>
           </li>
         </ul>
-      </div>
+      </nav>
     </header>
 
-    <main class="container mx-auto max-w-[1400px] px-6 py-12">
+    <main id="main-content" class="container mx-auto max-w-[1400px] px-6 py-12">
       <% if notice.present? %>
         <div class="alert alert-success rounded-xl mb-10 shadow-lg font-bold text-xs uppercase tracking-widest">
           <%= heroicon "check-circle", variant: :solid, options: { class: "w-4 h-4" } %>
@@ -79,13 +97,13 @@
     </main>
 
     <footer class="footer p-10 bg-base-200 text-base-content border-t border-white/5">
-      <nav>
+      <nav aria-label="<%= t('.footer.links_heading') %>">
         <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.links_heading') %></h6>
         <%= link_to t('.footer.about'), about_path, class: "link link-hover text-xs font-bold text-slate-400" %>
         <%= link_to t('.footer.source_code'), 'https://github.com/wwworkremote/core', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
         <%= link_to 'just3ws.com', 'https://www.just3ws.com', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
       </nav>
-      <nav>
+      <nav aria-label="<%= t('.footer.also_built_heading') %>">
         <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.also_built_heading') %></h6>
         <%= link_to 'Phalanx Duel', 'https://phalanxduel.com', class: "link link-hover text-xs font-bold text-primary", target: "_blank" %>
       </nav>

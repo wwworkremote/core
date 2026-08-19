@@ -339,7 +339,33 @@ en:
   layouts:
     application:
       nav:
+        dashboard: "Dashboard"
+        companies: "Companies"
+        job_postings: "Job Postings"
         triage: "Triage"
+        saved_jobs: "Saved Jobs"
+        profile_menu: "Profile Menu"
+        career_profile: "Career Profile"
+        resume_versions: "Resume Versions"
+        saved_searches: "Saved Searches"
+        ai_chats: "AI Chats"
+        ai_models: "AI Models"
+        admin_menu: "Admin Menu"
+        admin_section_label: "Admin"
+        admin_dashboard: "Admin Dashboard"
+        system_health: "System Health"
+        background_jobs: "Background Jobs"
+        data_sources: "Data Sources"
+        tools_section_label: "Tools"
+        pghero: "PgHero"
+        job_queue: "Job Queue"
+        analytics: "Analytics"
+      footer:
+        links_heading: "Links"
+        about: "About"
+        source_code: "Source Code"
+        also_built_heading: "Also Built"
+        tagline: "Own your search."
   llm_chats:
     form:
       model_label: "Model"
