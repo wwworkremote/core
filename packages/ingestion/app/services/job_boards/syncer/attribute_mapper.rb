@@ -22,6 +22,7 @@ class JobBoards::Syncer::AttributeMapper
     "wwr" => :map_wwr,
     "remoteok" => :map_remoteok,
     "jobicy" => :map_jobicy,
+    "rubyonrails" => :map_rubyonrails,
     "greenhouse" => :map_greenhouse,
     "lever" => :map_lever,
     "adp" => :map_adp,
@@ -151,6 +152,20 @@ class JobBoards::Syncer::AttributeMapper
     job_posting.location     = data["jobGeo"]
   end
 
+  # jobs.rubyonrails.org's RSS titles are "{Role}[, remote] at {Company}" --
+  # no separate structured company field exists (confirmed live 2026-08-19),
+  # same "title-suffix" shape as WeWorkRemotely/Greenhouse's logo-alt
+  # fallback in the extension. No location field either -- left unset rather
+  # than guessed from free text.
+  def map_rubyonrails(job_posting, data)
+    title = data["title"]
+    job_posting.title        = rails_job_title(title) if title.present?
+    job_posting.body         = data["description"] if data["description"].present?
+    job_posting.target_url   = data["link"] if data["link"].present?
+    job_posting.published_at = parse_time_or_now(data["pub_date"])
+    job_posting.company      = rails_job_company(title) if title.present?
+  end
+
   def map_greenhouse(job_posting, data)
     job_posting.title        = data["title"] if data["title"].present?
     job_posting.body         = data["content"] if data["content"].present?
@@ -246,6 +261,14 @@ class JobBoards::Syncer::AttributeMapper
   def parse_wwr_company(title)
     # WWR titles are often "Company Name: Job Title"
     title.split(":").first.strip
+  end
+
+  def rails_job_title(title)
+    title.sub(/\s+at\s+[^,]+\z/, "").strip
+  end
+
+  def rails_job_company(title)
+    title.split(/\s+at\s+/).last&.strip
   end
 end
 # rubocop:enable Metrics/ClassLength

@@ -6,7 +6,8 @@ puts "== Seeding Data Sources =="
   { name: "Arbeitnow", slug: "arbeitnow" },
   { name: "HackerNews", slug: "hackernews" },
   { name: "Remotive", slug: "remotive" },
-  { name: "Wwr", slug: "wwr" }
+  { name: "Wwr", slug: "wwr" },
+  { name: "Rails Job Board", slug: "rubyonrails" }
 ].each do |source_attrs|
   source = JobBoards::Source.find_or_create_by!(slug: source_attrs[:slug]) do |s|
     s.name = source_attrs[:name]

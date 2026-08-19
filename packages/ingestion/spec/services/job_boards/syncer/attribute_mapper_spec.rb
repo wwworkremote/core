@@ -100,4 +100,31 @@ RSpec.describe JobBoards::Syncer::AttributeMapper do
       expect(job_posting.data["employment_type"]).to eq("Full time")
     end
   end
+
+  describe "rubyonrails mapping" do
+    it "splits company out of the 'Title at Company' RSS title" do
+      data = {
+        "title" => "Senior Backend Engineer, remote at Acme Corp",
+        "description" => "<p>Build things.</p>",
+        "link" => "https://jobs.rubyonrails.org/jobs/1-senior-backend-engineer-acme-corp",
+        "pub_date" => "Mon, 17 Aug 2026 19:06:59 +0000"
+      }
+
+      described_class.call(job_posting, data, "rubyonrails")
+
+      expect(job_posting.title).to eq("Senior Backend Engineer, remote")
+      expect(job_posting.company).to eq("Acme Corp")
+      expect(job_posting.target_url).to eq(data["link"])
+      expect(job_posting.body).to include("Build things")
+    end
+
+    it "still extracts a usable company from a garbled duplicate-suffix title" do
+      data = { "title" => "Rails Developer at Podomatic at Podomatic" }
+
+      described_class.call(job_posting, data, "rubyonrails")
+
+      expect(job_posting.title).to eq("Rails Developer")
+      expect(job_posting.company).to eq("Podomatic")
+    end
+  end
 end

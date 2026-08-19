@@ -12,6 +12,8 @@ Rails.application.config.to_prepare do
   # Feed Fetchers
   Ingestion::AdapterRegistry.register("arbeitnow", Arbeitnow::Fetcher, name: "Arbeitnow", type: "Feed", cooldown: 2.hours)
   Ingestion::AdapterRegistry.register("jobicy", Jobicy::Fetcher, name: "Jobicy", type: "Feed", cooldown: 4.hours)
+  Ingestion::AdapterRegistry.register("rubyonrails", RailsJobBoard::Fetcher, name: "Rails Job Board", type: "Feed",
+                                                                             cooldown: 4.hours)
   # Scraper Fetchers (Standard)
   Ingestion::AdapterRegistry.register("greenhouse", Greenhouse::Fetcher, name: "Greenhouse", type: "Scraper", cooldown: 4.hours)
   Ingestion::AdapterRegistry.register("lever", Lever::Fetcher, name: "Lever", type: "Scraper", cooldown: 4.hours)
