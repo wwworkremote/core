@@ -1,9 +1,10 @@
 ---
 id: TASK-37.5
 title: Implement and live-verify extraction for approved new providers
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-13 17:41'
+updated_date: '2026-08-19 14:33'
 labels: []
 milestone: m-1
 dependencies:
