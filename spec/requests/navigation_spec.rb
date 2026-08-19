@@ -24,6 +24,13 @@ RSpec.describe "Navigation" do
       get root_path
       expect(response.body).to match(%r{<a[^>]*aria-current="page"[^>]*href="/">Dashboard})
     end
+
+    it "mounts the command palette dialog with a populated route index (TASK-76)" do
+      get root_path
+      expect(response.body).to include('data-command-palette-target="dialog"')
+      expect(response.body).to include('data-controller="command-palette"')
+      expect(response.body).to include("&quot;label&quot;:&quot;Companies&quot;")
+    end
   end
 
   describe "GET /companies" do

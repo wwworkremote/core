@@ -5,8 +5,12 @@ require "rails_helper"
 RSpec.describe "Admin::Documents" do
   describe "GET /admin/documents" do
     it "lists documents newest first" do
-      older = create(:job_boards_document, signature: "older", created_at: 1.day.ago)
-      newer = create(:job_boards_document, signature: "newer")
+      # Longer, collision-resistant signatures -- "older"/"newer" are
+      # substrings of common page text (e.g. the command palette's
+      # `placeholder=` attribute contains "older"), which broke this
+      # exact assertion once (TASK-77).
+      older = create(:job_boards_document, signature: "older-doc-sig", created_at: 1.day.ago)
+      newer = create(:job_boards_document, signature: "newer-doc-sig")
 
       get admin_documents_path
 

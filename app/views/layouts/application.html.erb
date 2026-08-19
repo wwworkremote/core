@@ -25,10 +25,24 @@
     <% end %>
   </head>
 
-  <body class="min-h-screen">
+  <body class="min-h-screen"
+      data-controller="command-palette"
+      data-command-palette-index-value="<%= CommandIndex.entries.to_json %>"
+      data-action="keydown@window->command-palette#globalKeydown">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:btn focus:btn-primary focus:btn-sm">
       Skip to content
     </a>
+
+    <dialog data-command-palette-target="dialog" data-action="click->command-palette#backdropClick"
+        class="backdrop:bg-black/60 bg-transparent p-0 m-auto w-full max-w-xl" aria-label="Command palette">
+      <div class="bg-base-200 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        <input type="text" data-command-palette-target="input" autocomplete="off"
+            data-action="input->command-palette#filter keydown->command-palette#onKeydown"
+            placeholder="Jump to a page..."
+            class="w-full bg-transparent px-6 py-5 text-lg font-bold text-white placeholder:text-slate-500 border-b border-white/10 focus:outline-none">
+        <ul data-command-palette-target="results" class="max-h-96 overflow-y-auto p-2"></ul>
+      </div>
+    </dialog>
 
     <header class="navbar bg-base-200 border-b border-white/5 px-6 py-4 sticky top-0 z-50">
       <div class="flex-1">
@@ -36,6 +50,11 @@
           WWWork<span class="text-primary">Remote</span>
         </a>
       </div>
+
+      <button type="button" data-action="click->command-palette#open"
+          class="btn btn-ghost btn-xs rounded text-slate-400 font-mono mr-2" aria-label="Open command palette">
+        &#8984;K
+      </button>
 
       <nav aria-label="Primary" class="flex-none">
         <ul class="menu menu-horizontal px-1 gap-2 font-bold text-sm">

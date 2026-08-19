@@ -286,6 +286,18 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Enrich Data")
     end
 
+    it "shows a Favorited badge once favorited" do
+      job.favorite!
+      get job_posting_path(job)
+      expect(response.body).to include("Favorited")
+    end
+
+    it "shows a Not Interested badge once ignored" do
+      job.ignore!
+      get job_posting_path(job)
+      expect(response.body).to include("Not Interested")
+    end
+
     it "shows Purge instead of Restore for a non-purged posting" do
       get job_posting_path(job)
       expect(response.body).to include("Purge")

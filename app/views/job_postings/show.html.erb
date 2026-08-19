@@ -18,6 +18,21 @@
       <div class="relative z-10">
         <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none">
           <%= @job_posting.title %>
+          <% status_badges = {
+               "favorited" => ["Favorited", "border-primary/40 text-primary"],
+               "applied" => ["Applied", "border-info/40 text-info"],
+               "interview" => ["Interviewing", "border-accent/40 text-accent"],
+               "offered" => ["Offered", "border-success/40 text-success"],
+               "archived" => ["Archived", "border-white/20 text-slate-400"],
+               "ignored" => ["Not Interested", "border-error/40 text-error"],
+               "expired" => ["Expired", "border-warning/40 text-warning"],
+               "purged" => ["Purged", "border-error/60 text-error"]
+             } %>
+          <% if (badge = status_badges[@job_posting.status]) %>
+            <span class="badge badge-outline <%= badge[1] %> text-xs font-bold align-middle ml-1">
+              <%= badge[0] %>
+            </span>
+          <% end %>
           <% if @job_posting.leads.any? %>
             <%= link_to admin_lead_path(@job_posting.leads.first), title: "Captured via the extension -- click to view the Lead",
                         class: "badge badge-outline border-accent/40 text-accent text-xs font-bold align-middle ml-1" do %>
