@@ -23,6 +23,16 @@
   --color-slate-900: #17161d;
   --color-slate-800: #22212c;
 
+  /* Tailwind's default slate-500/600 fail WCAG AA (4.5:1) as body/label
+     text against this theme's dark backgrounds -- measured 3.34:1 and
+     2.10:1 against base-100 respectively, the two most-used "muted text"
+     colors across the app (~300 uses of slate-500 alone). Lightened just
+     enough to clear 4.5:1 against base-100 (the stricter of the two card
+     backgrounds) with a small margin, keeping the same relative ordering
+     (600 still reads as more muted than 500). */
+  --color-slate-600: #7c8ca5; /* was #475569 -- 2.10:1 -> 4.65:1 vs base-100 */
+  --color-slate-500: #8b96ad; /* was #64748b -- 3.34:1 -> 5.34:1 vs base-100 */
+
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
