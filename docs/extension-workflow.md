@@ -399,3 +399,18 @@ covered by TASK-37.1-37.3.
   one (fully-remote board), not a selector bug. End-to-end capture+promote
   verified via `bin/verify_promote.rb` (JobPosting 6166, all fields
   confirmed against the source page).
+- **Workable** -- verified against 2 real tenants (Rokt `/rokt/j/DF568C9752/`,
+  GOVX `/govx/j/AE0737F1CF/`). JSON-LD confirmed clean and matching in the
+  live browser both times, but `bin/verify_promote.rb`'s plain `fetch()`
+  can't see it -- Workable is a client-side-rendered SPA that injects the
+  `<script type="application/ld+json">` tag (and the `data-ui="job-*"`
+  content nodes content.js's CSS tier relies on) after initial load, so a
+  no-JS fetch of the raw HTML gets an empty shell. Verified instead by
+  reading the real values via live browser JS execution and passing them to
+  `verify_promote.rb --title/--company/--location/... --body-file` directly
+  (the script's own documented fallback for "providers whose pages don't
+  render JSON-LD" -- same category, different reason). CSS fallback uses
+  Workable's own `data-ui="job-*"` attributes (plainly-named, not hashed);
+  company has no such hook, so `companyFromWorkablePath()` reads it from the
+  URL (`apply.workable.com/{tenant}/j/{id}/`). JobPosting 6168 (Rokt),
+  6169 (GOVX).

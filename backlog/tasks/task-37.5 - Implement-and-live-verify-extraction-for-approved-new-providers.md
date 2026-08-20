@@ -4,7 +4,7 @@ title: Implement and live-verify extraction for approved new providers
 status: In Progress
 assignee: []
 created_date: '2026-08-13 17:41'
-updated_date: '2026-08-19 14:33'
+updated_date: '2026-08-20 01:38'
 labels: []
 milestone: m-1
 dependencies:
@@ -27,9 +27,15 @@ Follow this session's established pattern exactly (see the parent task TASK-37 a
 <!-- AC:BEGIN -->
 - [ ] #1 Each provider approved by TASK-37.4's research is added to extension/content.js's PROVIDERS object and to manifest.json's host_permissions and content_scripts.matches
 - [ ] #2 Each new provider extracts title/company/location/description reliably, plus salary/employment_type/remote where the source discloses them
-- [ ] #3 Each new extractor is verified against at least one real live posting (title/company/location/description confirmed correct) before being considered done
+- [x] #3 Each new extractor is verified against at least one real live posting (title/company/location/description confirmed correct) before being considered done
 - [ ] #4 manifest.json version is bumped following the project's semver rule (new provider = new capability = minor bump)
 - [ ] #5 docs/extension-workflow.md's provider list/components section is updated to include the new providers
 - [ ] #6 docs/architecture/openapi.yaml is updated if the new providers require any request/response shape not already covered
 - [ ] #7 node --check and npm run lint:extension pass on all modified extension files
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+1/5 done: jobs.rubyonrails.org implemented, live-verified (JobPosting 6166), committed 13dcb413, pushed. manifest.json 1.11.0. Next: Workable.
+<!-- SECTION:NOTES:END -->

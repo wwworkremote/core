@@ -467,6 +467,35 @@
       },
     },
 
+    // Verified live against 2 real tenants (Rokt, GOVX). Clean JSON-LD both
+    // times -- title matches h1 exactly, hiringOrganization.name correct
+    // (JSON-LD also separately covers qualifications/responsibilities/
+    // jobBenefits as their own fields, so CSS only needs one description
+    // fallback, not a concatenation of Workable's three content blocks).
+    // CSS tier uses Workable's own `data-ui="job-*"` attribute system (a
+    // real, plainly-named hook, not hashed): job-title/job-location/
+    // job-type/job-description all present and consistent across both
+    // tenants. No `data-ui` hook for company name (the logo has no alt
+    // text either) -- reads it from the URL path instead
+    // (apply.workable.com/{tenant}/j/{id}/), same pattern as
+    // companyFromWorkdayHostname/companyFromSmartRecruitersPath.
+    workable: {
+      label: 'Workable',
+      match: h => h.includes('workable.com'),
+      readySelector: '[data-ui="job-description"], [data-ui="job-title"]',
+      readyTimeout: 6000,
+      extract(doc) {
+        return {
+          title:            pickText(doc, '[data-ui="job-title"], h1'),
+          company:          companyFromWorkablePath(),
+          location:         pickText(doc, '[data-ui="job-location"]'),
+          employment_type:  pickText(doc, '[data-ui="job-type"]'),
+          description_html: pickHtml(doc, '[data-ui="job-description"]'),
+          description_text: pickInnerText(doc, '[data-ui="job-description"]'),
+        };
+      },
+    },
+
   };
 
   // ─── Null-safe object merge ────────────────────────────────────────────────
@@ -574,6 +603,16 @@
   // unlike the Workday hostname this needs no title-casing pass.
   function companyFromSmartRecruitersPath() {
     return window.location.pathname.split('/')[1] || null;
+  }
+
+  // Workable URLs are apply.workable.com/{tenant}/j/{id}/ -- the tenant
+  // segment is a lowercase-dashed slug (e.g. "rokt", "govx"), not real
+  // casing like SmartRecruiters', so this needs the same title-casing pass
+  // as companyFromWorkdayHostname(). JSON-LD's hiringOrganization.name is
+  // reliable here (confirmed on 2 tenants) so this is a fallback only.
+  function companyFromWorkablePath() {
+    const slug = window.location.pathname.split('/')[1];
+    return slug ? slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : null;
   }
 
   // Reads schema.org Microdata (itemprop attributes), the sibling format to
