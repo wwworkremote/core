@@ -33,6 +33,15 @@ development:
     class: JobBoards::ContentEnrichmentJob
     schedule: every 30 minutes
 
+  # Drains DiscoveryLink rows (status: pending) created by CrawlDiscoveryJob
+  # into JobPostings via Scraper::Enricher. Was defined but never scheduled
+  # (TASK-74) -- the crawl-based sources (cord, builtin, remoteok, etc) kept
+  # discovering links that just piled up unprocessed, so last_ingested_at
+  # froze even though last_synced_at kept refreshing.
+  discovery_link_consumption:
+    class: Scraper::DiscoveryConsumerJob
+    schedule: every 30 minutes
+
   nightly_database_backup:
     class: DatabaseBackupJob
     schedule: every day at 3am
@@ -82,6 +91,10 @@ production:
 
   content_enrichment:
     class: JobBoards::ContentEnrichmentJob
+    schedule: every 30 minutes
+
+  discovery_link_consumption:
+    class: Scraper::DiscoveryConsumerJob
     schedule: every 30 minutes
 
   nightly_database_backup:

@@ -17,7 +17,7 @@ class Scraper::DiscoveryConsumerJob < ApplicationJob
     link.update!(status: "processing")
 
     begin
-      Enricher.call_for_link(link)
+      Scraper::Enricher.call_for_link(link)
     rescue StandardError => e
       link.update!(status: "error", error_message: e.message)
     end
