@@ -441,6 +441,32 @@
       },
     },
 
+    // Verified live against a real posting (jobs.rubyonrails.org/jobs/39438,
+    // Edfinity). Clean schema.org JobPosting JSON-LD -- title/
+    // hiringOrganization.name both match the page exactly, so this is
+    // effectively JSON-LD-only; CSS here just needs to not return null so
+    // Extractor.css() doesn't drop out. Single-tenant board (one Rails app),
+    // no per-company template variance to worry about. Description lives in
+    // a plain, plainly-named `.prose` (Tailwind Typography) container --
+    // company isn't a discrete DOM node, so companyFromTitleSuffix() reads
+    // it off `<title>` ("X at Company"), same pattern as WeWorkRemotely/
+    // Greenhouse's logo-alt fallback.
+    rubyonrails: {
+      label: 'Rails Job Board',
+      match: h => h.includes('jobs.rubyonrails.org'),
+      readySelector: 'h1, .prose',
+      readyTimeout: 5000,
+      extract(doc) {
+        const descSel = '.prose';
+        return {
+          title:            pickText(doc, 'h1'),
+          company:          companyFromTitleSuffix(doc),
+          description_html: pickHtml(doc, descSel),
+          description_text: pickInnerText(doc, descSel),
+        };
+      },
+    },
+
   };
 
   // ─── Null-safe object merge ────────────────────────────────────────────────

@@ -379,3 +379,23 @@ originally named no longer exists as a distinct board to extract from. If
 Welcome to the Jungle itself is worth evaluating, that's a fresh candidate
 for a future spike, not implied by this research (not checked here — out
 of TASK-37.4's named scope).
+
+## 10. Implemented providers (TASK-37.5)
+
+Live-verified as each lands, in the priority order section 9 recommended.
+`extension/content.js`'s `PROVIDERS` object is the source of truth for the
+full current provider list (13 as of this section's last update); this is
+just the changelog for what TASK-37.5 added on top of the 12 already
+covered by TASK-37.1-37.3.
+
+- **jobs.rubyonrails.org** — verified against a real posting
+  (`/jobs/39438-senior-software-engineer-remote-edfinity`, Edfinity).
+  JSON-LD confirmed clean as TASK-37.4 predicted: title/company/
+  employment_type/salary_currency/salary_unit all captured correctly.
+  `company` (no discrete DOM node) reads off `<title>`'s "X at Company"
+  suffix via the existing `companyFromTitleSuffix()` helper. Description
+  lives in a plain `.prose` (Tailwind Typography) container. `location`
+  came through null on this posting — the JSON-LD simply doesn't disclose
+  one (fully-remote board), not a selector bug. End-to-end capture+promote
+  verified via `bin/verify_promote.rb` (JobPosting 6166, all fields
+  confirmed against the source page).
