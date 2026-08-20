@@ -72,6 +72,17 @@ RSpec.describe JobBoards::Categorizer do
       expect(job_posting.data["ai_category"]).to be_nil
     end
 
+    it "extracts JSON surrounded by chatter before and after it" do
+      llm_json = { category: "Software Engineering", tags: %w[ruby rails] }.to_json
+      chatter = "Sure, here you go:\n#{llm_json}\nLet me know if you need anything else!"
+      stub_llm_response(sse_body(chatter))
+
+      categorizer.call
+
+      job_posting.reload
+      expect(job_posting.data["ai_category"]).to eq("Software Engineering")
+    end
+
     it "handles LLM failures gracefully" do
       stub_request(:post, "http://localhost:11500/v1/chat/completions")
         .to_return(status: 500, body: "Internal Server Error")

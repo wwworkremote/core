@@ -69,8 +69,15 @@ class JobBoards::Categorizer
     nil
   end
 
-  # Basic JSON extraction in case the LLM adds chatter
+  # Basic JSON extraction in case the LLM adds chatter. Plain index/rindex
+  # instead of a greedy regex -- /\{.*\}/m on long LLM output was hitting
+  # Regexp::TimeoutError (catastrophic backtracking), silently dropping
+  # categorization (TASK-71).
   def extract_json(response)
-    response.match(/\{.*\}/m)&.to_s
+    start = response.index("{")
+    finish = response.rindex("}")
+    return nil unless start && finish && finish > start
+
+    response[start..finish]
   end
 end
