@@ -45,6 +45,10 @@ development:
     class: JobPostingTrendRollupJob
     schedule: every day at 5am
 
+  job_boards_audit:
+    class: JobBoards::AuditJob
+    schedule: every day at 5:30am
+
 
 production:
   fetch_all_jobs:
@@ -91,3 +95,7 @@ production:
   job_posting_trend_rollup:
     class: JobPostingTrendRollupJob
     schedule: every day at 5am
+
+  job_boards_audit:
+    class: JobBoards::AuditJob
+    schedule: every day at 5:30am

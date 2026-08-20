@@ -92,5 +92,29 @@ RSpec.describe JobBoards::Auditor do
       expect(stats[:missing_postings]).to eq(3)
       expect(stats[:fixed]).to eq(2)
     end
+
+    it "still fixes low-quality postings when the other audits' shared budget is exhausted" do
+      create_list(:job_boards_document, 5)
+      jp = create(:job_posting)
+      filter = instance_double(JobBoards::QualityFilter, useful?: false)
+      allow(JobBoards::QualityFilter).to receive(:new).with(jp).and_return(filter)
+
+      stats = described_class.new(fix: true, limit: 2).call
+
+      expect(stats[:missing_postings]).to eq(5)
+      expect(stats[:low_quality_fixed]).to eq(1)
+      expect(jp.reload.status).to eq("ignored")
+    end
+
+    it "caps low-quality fixes at the limit independently of the other audits" do
+      jps = create_list(:job_posting, 3)
+      filter = instance_double(JobBoards::QualityFilter, useful?: false)
+      jps.each { |jp| allow(JobBoards::QualityFilter).to receive(:new).with(jp).and_return(filter) }
+
+      stats = described_class.new(fix: true, limit: 2).call
+
+      expect(stats[:low_quality_fixed]).to eq(2)
+      expect(jps.count { |jp| jp.reload.status == "ignored" }).to eq(2)
+    end
   end
 end

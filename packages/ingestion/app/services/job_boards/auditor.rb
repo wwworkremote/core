@@ -4,7 +4,8 @@ class JobBoards::Auditor
   def initialize(options = {})
     @fix = options.fetch(:fix, true)
     @limit = options.fetch(:limit, 100)
-    @stats = { missing_postings: 0, missing_category: 0, missing_embedding: 0, missing_geocoding: 0, fixed: 0 }
+    @stats = { missing_postings: 0, missing_category: 0, missing_embedding: 0, missing_geocoding: 0, fixed: 0,
+               low_quality_fixed: 0 }
   end
 
   AUDITS = %i[audit_missing_postings audit_missing_category audit_missing_embedding audit_missing_geocoding
@@ -54,7 +55,7 @@ class JobBoards::Auditor
       next if JobBoards::QualityFilter.new(jp).useful?
 
       @stats[:missing_category] += 1
-      apply_fix { jp.ignore! } if jp.may_ignore?
+      apply_low_quality_fix { jp.ignore! } if jp.may_ignore?
     end
   end
 
@@ -62,6 +63,17 @@ class JobBoards::Auditor
     return unless @fix && @stats[:fixed] < @limit
 
     yield
+    @stats[:fixed] += 1
+  end
+
+  # Own budget, separate from the other four audits' shared @stats[:fixed]
+  # counter -- otherwise a large missing_postings/missing_category backlog
+  # starves this correctness-enforcing sweep every run (see TASK-73).
+  def apply_low_quality_fix
+    return unless @fix && @stats[:low_quality_fixed] < @limit
+
+    yield
+    @stats[:low_quality_fixed] += 1
     @stats[:fixed] += 1
   end
 end
