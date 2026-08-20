@@ -524,6 +524,36 @@
       },
     },
 
+    // Verified live against a real Cotiviti tenant. Real design difference
+    // from every other provider: the entire posting -- DOM and JSON-LD both
+    // -- renders inside a same-origin <iframe id="icims_content_iframe">,
+    // not this top-level document. `previewExtraction()` special-cases
+    // `provider.key === 'icims'` to resolve the iframe's own contentDocument
+    // (via waitForIcimsFrame(), see its comment for why polling instead of
+    // a MutationObserver) and thread THAT through the whole extraction
+    // chain instead of the top document -- no manifest `all_frames`, no
+    // dual content-script injection, this `extract(doc)` and the JSON-LD
+    // tier both just receive the iframe's document like any other page.
+    // JSON-LD is clean and matching (title/hiringOrganization/
+    // employmentType/jobLocation all correct), so CSS here only needs a
+    // title/description fallback -- `.iCIMS_JobContent` is real,
+    // plainly-named markup (confirmed live, not a print-only template like
+    // SmartRecruiters' old selectors turned out to be).
+    icims: {
+      label: 'iCIMS',
+      match: h => h.includes('icims.com'),
+      readySelector: '.iCIMS_JobContent, h1',
+      readyTimeout: 10000,
+      extract(doc) {
+        const descSel = '.iCIMS_JobContent';
+        return {
+          title:            pickText(doc, 'h1'),
+          description_html: pickHtml(doc, descSel),
+          description_text: pickInnerText(doc, descSel),
+        };
+      },
+    },
+
   };
 
   // ─── Null-safe object merge ────────────────────────────────────────────────
@@ -1182,6 +1212,40 @@
   // extension's own cache was correctly reset (live-verified: this was the
   // remaining hole after TASK-60's cache-reset fix). Waiting for the text to
   // actually differ from what was last seen closes it.
+  // iCIMS renders the entire posting -- DOM and JSON-LD both -- inside a
+  // same-origin <iframe id="icims_content_iframe">, not the top-level
+  // document (no other current provider has this shape). The iframe may
+  // not exist yet when content.js first runs, and iCIMS's own JS navigates
+  // it to the job-detail URL *after* initial load -- a MutationObserver
+  // attached to an early contentDocument snapshot would be silently
+  // orphaned by that internal navigation, so this polls instead, re-
+  // resolving the iframe fresh every tick rather than observing one.
+  function icimsFrameDocument() {
+    const frame = document.getElementById('icims_content_iframe');
+    try {
+      return frame?.contentDocument || null;
+    } catch {
+      return null; // cross-origin frame (shouldn't happen, same host) -- fail safe
+    }
+  }
+
+  function waitForIcimsFrame(selector, timeoutMs) {
+    LOG('Waiting for iCIMS iframe content:', selector, `(${timeoutMs}ms max)`);
+    return new Promise(resolve => {
+      const deadline = Date.now() + timeoutMs;
+      const tick = () => {
+        const doc = icimsFrameDocument();
+        if (doc?.querySelector(selector) || Date.now() >= deadline) {
+          if (!doc) LOG_WARN('iCIMS iframe readiness timeout — proceeding without it');
+          resolve(doc);
+          return;
+        }
+        setTimeout(tick, 200);
+      };
+      tick();
+    });
+  }
+
   function waitForContent(selector, timeoutMs, staleText) {
     LOG('Waiting for:', selector, `(${timeoutMs}ms max)`);
     const isFresh = el => el && (staleText == null || el.textContent !== staleText);
@@ -1460,12 +1524,16 @@
     // we proceed with whatever the DOM has and let extraction itself decide.
     // staleText guards against the element already existing from the
     // previous job (see waitForContent's comment).
-    if (provider?.readySelector) {
+    const isIcims = provider?.key === 'icims';
+    let extractDoc = document;
+    if (isIcims) {
+      extractDoc = (await waitForIcimsFrame(provider.readySelector, provider.readyTimeout)) || document;
+    } else if (provider?.readySelector) {
       await waitForContent(provider.readySelector, provider.readyTimeout, lastExtractedSnapshot);
     }
 
     // Step 3: Run extraction chain, apply any taught field overrides, show preview
-    const extracted = Extractor.run(document, provider);
+    const extracted = Extractor.run(extractDoc, provider);
     await applyLearnedRules(extracted);
 
     // Step 3b: In capture mode, bail out only if extraction found essentially
@@ -1478,7 +1546,7 @@
     }
 
     if (provider?.readySelector) {
-      lastExtractedSnapshot = document.querySelector(provider.readySelector)?.textContent ?? null;
+      lastExtractedSnapshot = extractDoc.querySelector(provider.readySelector)?.textContent ?? null;
     }
 
     setBadge(extracted._method, countFields(extracted));

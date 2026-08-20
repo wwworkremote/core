@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WWWorkRemote Ingestion Assistant",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
   "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
   "host_permissions": [
@@ -24,7 +24,8 @@
     "https://www.dice.com/*",
     "https://jobs.rubyonrails.org/*",
     "https://apply.workable.com/*",
-    "https://himalayas.app/*"
+    "https://himalayas.app/*",
+    "https://*.icims.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -55,7 +56,8 @@
         "https://www.dice.com/*",
         "https://jobs.rubyonrails.org/*",
         "https://apply.workable.com/*",
-        "https://himalayas.app/*"
+        "https://himalayas.app/*",
+        "https://*.icims.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_end"
