@@ -4,7 +4,7 @@ title: Implement and live-verify extraction for approved new providers
 status: In Progress
 assignee: []
 created_date: '2026-08-13 17:41'
-updated_date: '2026-08-20 02:25'
+updated_date: '2026-08-20 12:19'
 labels: []
 milestone: m-1
 dependencies:
@@ -42,4 +42,8 @@ Follow this session's established pattern exactly (see the parent task TASK-37 a
 2/5 done: Workable implemented, verified against 2 tenants (Rokt/GOVX, JobPosting 6168/6169). Committed 9727b309, pushed. manifest.json 1.12.0. Note: Workable is client-side-rendered SPA, verify_promote.rb's plain fetch can't see its JSON-LD -- used field-override fallback instead. Next: Himalayas.
 
 3/5 done: Himalayas implemented, verified against 2 tenants (Linxon/lemon.io, JobPosting 6170/6171). Committed e3a3dde4, pushed. manifest.json 1.13.0. Added bin/verify_promote.rb --html-file flag (reusable fix for Cloudflare-gated boards). Next: iCIMS (iframe-based, real design decision -- see TASK-37.4's research note).
+
+4/5 providers done and live-verified: jobs.rubyonrails.org (13dcb413), Workable (9727b309), Himalayas (e3a3dde4, verified against 2 tenants), iCIMS (4cd6d2a6, verified live against a real Cotiviti tenant, iframe-based extraction -- real design decision). All committed and pushed to origin/main. manifest.json now 1.14.0.
+
+Work at a Startup (last one, lowest priority) deferred: its job listing page is a JS-only SPA (Algolia-driven client search, no server-rendered links or JSON-LD), so a real posting URL can't be found without a working browser -- tried the sanctioned direct-fetch fallback (curl with browser headers, attempted the exposed Algolia search API directly) and it's a dead end without JS execution. TASK-37.4's docs/extension-workflow.md section 9 already has the real structural pattern from an earlier live-verified session (`<h1>Title at <a href="/companies/{slug}">Company</a></h1>`, prose-parsed salary/location) -- user chose to wait for Chrome reconnection rather than implement blind or use a stale/unverified URL. Resume this once claude-in-chrome is connected again.
 <!-- SECTION:NOTES:END -->

@@ -1,9 +1,10 @@
 ---
 id: TASK-64
 title: Promote pipeline triage actions higher on the job posting show page
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-17 23:02'
+updated_date: '2026-08-20 12:32'
 labels:
   - ux
 dependencies: []
@@ -23,7 +24,13 @@ Given the observed behavior is "come back to decide," having the decision contro
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Favorite/Apply/Interview/Offer/Archive/Not Interested/Expired controls are visible without scrolling past unrelated content (notes, activity log) on the job posting show page
-- [ ] #2 Existing pipeline_steps_controller behavior and AASM guard logic (may_favorite? etc.) is unchanged -- this is a layout/placement change only
+- [x] #1 Favorite/Apply/Interview/Offer/Archive/Not Interested/Expired controls are visible without scrolling past unrelated content (notes, activity log) on the job posting show page
+- [x] #2 Existing pipeline_steps_controller behavior and AASM guard logic (may_favorite? etc.) is unchanged -- this is a layout/placement change only
 - [ ] #3 Change is verified in a real browser (not just specs) per project convention for UI changes
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Moved the Application Status card to be the first sidebar card (was 4th of 8, below company reputation/activity/Q&A). Layout-only change, AASM guard logic untouched -- verified via a new ordering spec (spec/requests/job_postings_spec.rb, asserts 'Application Status' index < 'Notes' placeholder index and < 'Application Q&A' index). Committed 6ab9f3aa, pushed. AC #3 (real-browser verification) still pending -- claude-in-chrome is disconnected this session; resume once it's back.
+<!-- SECTION:NOTES:END -->
