@@ -33,4 +33,22 @@ RSpec.describe Scraper::DiscoveryConsumerJob do
 
     expect(pending_link.reload).to have_attributes(status: "error", error_message: "boom")
   end
+
+  it "touches the source's last_ingested_at when Enricher actually creates a posting" do
+    source = create(:job_boards_source, slug: pending_link.board_name)
+    allow(Scraper::Enricher).to receive(:call_for_link) { pending_link.update!(status: "processed") }
+
+    described_class.perform_now
+
+    expect(source.reload.last_ingested_at).to be_present
+  end
+
+  it "does not touch last_ingested_at when Enricher finds nothing new" do
+    source = create(:job_boards_source, slug: pending_link.board_name)
+    allow(Scraper::Enricher).to receive(:call_for_link)
+
+    described_class.perform_now
+
+    expect(source.reload.last_ingested_at).to be_nil
+  end
 end
