@@ -286,6 +286,17 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Enrich Data")
     end
 
+    it "renders the pipeline/triage controls before the notes and Q&A sections (TASK-64)" do
+      get job_posting_path(job)
+
+      pipeline_index = response.body.index("Application Status")
+      notes_index = response.body.index("Add a personal note...")
+      qa_index = response.body.index("Application Q&amp;A")
+
+      expect(pipeline_index).to be < notes_index
+      expect(pipeline_index).to be < qa_index
+    end
+
     it "shows a Favorited badge once favorited" do
       job.favorite!
       get job_posting_path(job)

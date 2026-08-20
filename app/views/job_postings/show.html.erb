@@ -159,6 +159,79 @@
   </article>
 
   <aside class="space-y-8">
+    <!-- Application status -->
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.pipeline.heading') %></h3>
+
+      <!-- Status Transitions -->
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-8">
+        <div class="flex flex-wrap gap-2">
+          <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
+            <% if @job_posting.send("may_#{event}?") %>
+              <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all" %>
+            <% end %>
+          <% end %>
+          <%= button_to t('.pipeline.enrich_data'), admin_job_posting_path(@job_posting), params: { action_type: 'enrich' }, method: :patch, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-violet-500/30 text-violet-400 hover:bg-violet-500 hover:text-white transition-all" %>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <% if @job_posting.may_expire? %>
+            <%= button_to t('.pipeline.expired'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'expire', return_to: @return_to }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-warning/20 text-warning hover:bg-warning hover:text-white transition-all" %>
+          <% end %>
+          <% if @job_posting.may_ignore? %>
+            <%= button_to t('.pipeline.not_interested'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'ignore', return_to: @return_to }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
+          <% end %>
+          <% if @job_posting.may_restore? %>
+            <%= button_to t('.pipeline.restore'), restore_admin_job_posting_path(@job_posting), method: :post, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-success/30 text-success hover:bg-success hover:text-white transition-all" %>
+            <%= button_to t('.pipeline.delete_permanently'), admin_job_posting_path(@job_posting), method: :delete, data: { turbo_confirm: t('.pipeline.delete_confirm') }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/40 bg-error/10 text-error hover:bg-error hover:text-white transition-all" %>
+          <% elsif @job_posting.may_purge? %>
+            <%= button_to t('.pipeline.purge'), purge_admin_job_posting_path(@job_posting), method: :post, data: { turbo_confirm: t('.pipeline.purge_confirm') }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Activity Logger -->
+      <%= form_with url: admin_job_posting_pipeline_steps_path(@job_posting), multipart: true, class: "space-y-3 mb-10" do |f| %>
+        <%= f.text_area :note, placeholder: t('.pipeline.note_placeholder'), class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-sm font-mono", rows: 2 %>
+        <div class="grid grid-cols-1 gap-2">
+          <%= f.text_field :link, placeholder: t('.pipeline.link_placeholder'), class: "input input-bordered bg-base-300 w-full rounded-xl text-sm font-mono" %>
+          <%= f.file_field :artifacts, multiple: true, class: "file-input file-input-bordered bg-base-300 w-full rounded-xl text-sm font-mono" %>
+        </div>
+        <%= f.submit t('.pipeline.add_update'), class: "w-full py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all" %>
+      <% end %>
+
+      <!-- Timeline -->
+      <div class="space-y-6">
+        <% @job_posting.pipeline_steps.order(created_at: :desc).each do |step| %>
+          <div class="relative pl-6 border-l border-white/5">
+            <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-primary/30"></div>
+            <div class="text-xs font-bold text-base-content/40 mb-1"><%= step.created_at.strftime("%b %-d, %Y · %H:%M") %></div>
+            <div class="text-sm font-bold text-white"><%= step.status.humanize %></div>
+            <% if step.note.present? %><p class="text-xs text-base-content/60 mt-1 leading-tight"><%= step.note %></p><% end %>
+
+            <% if step.artifacts.attached? %>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <% step.artifacts.each do |artifact| %>
+                  <div class="group relative">
+                    <% if artifact.variable? %>
+                      <%= image_tag artifact.variant(resize_to_limit: [100, 100]), class: "rounded-lg border border-white/10 hover:border-primary/50 transition-all cursor-zoom-in" %>
+                    <% else %>
+                      <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                        <i class="bi bi-file-earmark-zip text-slate-500"></i>
+                      </div>
+                    <% end %>
+                    <%= link_to url_for(artifact), target: "_blank", class: "absolute inset-0 z-10" do %><% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if step.link.present? %><%= link_to t('.pipeline.view_source'), step.link, class: "text-xs text-primary hover:underline mt-2 inline-block font-bold" %><% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <% if @job_posting.company_record %>
       <div class="card-neural p-8 border-l-4 <%= @job_posting.company_record.toxic_culture_flag ? 'border-l-rose-500 bg-rose-500/5' : 'border-l-emerald-500 bg-emerald-500/5' %> shadow-2xl">
         <h3 class="text-xs font-bold mb-6 flex justify-between items-center text-white/60">
@@ -308,79 +381,6 @@
             <% else %>
               <p class="text-xs text-warning italic"><%= t('.qa.no_answer') %></p>
             <% end %>
-          </div>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Application status -->
-    <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
-      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.pipeline.heading') %></h3>
-
-      <!-- Status Transitions -->
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-8">
-        <div class="flex flex-wrap gap-2">
-          <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
-            <% if @job_posting.send("may_#{event}?") %>
-              <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all" %>
-            <% end %>
-          <% end %>
-          <%= button_to t('.pipeline.enrich_data'), admin_job_posting_path(@job_posting), params: { action_type: 'enrich' }, method: :patch, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-violet-500/30 text-violet-400 hover:bg-violet-500 hover:text-white transition-all" %>
-        </div>
-
-        <div class="flex flex-wrap gap-2">
-          <% if @job_posting.may_expire? %>
-            <%= button_to t('.pipeline.expired'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'expire', return_to: @return_to }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-warning/20 text-warning hover:bg-warning hover:text-white transition-all" %>
-          <% end %>
-          <% if @job_posting.may_ignore? %>
-            <%= button_to t('.pipeline.not_interested'), admin_job_posting_pipeline_steps_path(@job_posting), params: { status: 'ignore', return_to: @return_to }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
-          <% end %>
-          <% if @job_posting.may_restore? %>
-            <%= button_to t('.pipeline.restore'), restore_admin_job_posting_path(@job_posting), method: :post, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-success/30 text-success hover:bg-success hover:text-white transition-all" %>
-            <%= button_to t('.pipeline.delete_permanently'), admin_job_posting_path(@job_posting), method: :delete, data: { turbo_confirm: t('.pipeline.delete_confirm') }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/40 bg-error/10 text-error hover:bg-error hover:text-white transition-all" %>
-          <% elsif @job_posting.may_purge? %>
-            <%= button_to t('.pipeline.purge'), purge_admin_job_posting_path(@job_posting), method: :post, data: { turbo_confirm: t('.pipeline.purge_confirm') }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-error/20 text-error hover:bg-error hover:text-white transition-all" %>
-          <% end %>
-        </div>
-      </div>
-
-      <!-- Activity Logger -->
-      <%= form_with url: admin_job_posting_pipeline_steps_path(@job_posting), multipart: true, class: "space-y-3 mb-10" do |f| %>
-        <%= f.text_area :note, placeholder: t('.pipeline.note_placeholder'), class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-sm font-mono", rows: 2 %>
-        <div class="grid grid-cols-1 gap-2">
-          <%= f.text_field :link, placeholder: t('.pipeline.link_placeholder'), class: "input input-bordered bg-base-300 w-full rounded-xl text-sm font-mono" %>
-          <%= f.file_field :artifacts, multiple: true, class: "file-input file-input-bordered bg-base-300 w-full rounded-xl text-sm font-mono" %>
-        </div>
-        <%= f.submit t('.pipeline.add_update'), class: "w-full py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all" %>
-      <% end %>
-
-      <!-- Timeline -->
-      <div class="space-y-6">
-        <% @job_posting.pipeline_steps.order(created_at: :desc).each do |step| %>
-          <div class="relative pl-6 border-l border-white/5">
-            <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-primary/30"></div>
-            <div class="text-xs font-bold text-base-content/40 mb-1"><%= step.created_at.strftime("%b %-d, %Y · %H:%M") %></div>
-            <div class="text-sm font-bold text-white"><%= step.status.humanize %></div>
-            <% if step.note.present? %><p class="text-xs text-base-content/60 mt-1 leading-tight"><%= step.note %></p><% end %>
-
-            <% if step.artifacts.attached? %>
-              <div class="flex flex-wrap gap-2 mt-3">
-                <% step.artifacts.each do |artifact| %>
-                  <div class="group relative">
-                    <% if artifact.variable? %>
-                      <%= image_tag artifact.variant(resize_to_limit: [100, 100]), class: "rounded-lg border border-white/10 hover:border-primary/50 transition-all cursor-zoom-in" %>
-                    <% else %>
-                      <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                        <i class="bi bi-file-earmark-zip text-slate-500"></i>
-                      </div>
-                    <% end %>
-                    <%= link_to url_for(artifact), target: "_blank", class: "absolute inset-0 z-10" do %><% end %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-
-            <% if step.link.present? %><%= link_to t('.pipeline.view_source'), step.link, class: "text-xs text-primary hover:underline mt-2 inline-block font-bold" %><% end %>
           </div>
         <% end %>
       </div>
