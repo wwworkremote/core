@@ -122,7 +122,20 @@ class Workday::Fetcher
     response = JobBoards::Client.new("workday").get(detail_url(board, external_path))
     return nil if response.nil? || response.status != 200
 
-    enrich(Oj.load(response.body), board, external_path)
+    payload = parse_detail_body(response.body, board, external_path)
+    payload && enrich(payload, board, external_path)
+  end
+
+  # Some tenants occasionally return a blank/HTML body instead of JSON
+  # (TASK-72) -- skip just that posting rather than raising, which would
+  # abort the whole board fetch via #call's top-level rescue.
+  def parse_detail_body(body, board, external_path)
+    return nil if body.blank?
+
+    Oj.load(body)
+  rescue Oj::ParseError => e
+    Rails.logger.warn "Workday: bad detail body for #{board['tenant']}/#{external_path}: #{e.message}"
+    nil
   end
 
   def enrich(payload, board, external_path)
