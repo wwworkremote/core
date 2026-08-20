@@ -305,6 +305,7 @@ Rails.application.routes.draw do
         member do
           post :enrich
         end
+        resources :application_questions, only: %i[index create]
       end
     end
   end
