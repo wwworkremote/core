@@ -4,7 +4,7 @@ title: Implement and live-verify extraction for approved new providers
 status: In Progress
 assignee: []
 created_date: '2026-08-13 17:41'
-updated_date: '2026-08-20 01:38'
+updated_date: '2026-08-20 01:56'
 labels: []
 milestone: m-1
 dependencies:
@@ -38,4 +38,6 @@ Follow this session's established pattern exactly (see the parent task TASK-37 a
 
 <!-- SECTION:NOTES:BEGIN -->
 1/5 done: jobs.rubyonrails.org implemented, live-verified (JobPosting 6166), committed 13dcb413, pushed. manifest.json 1.11.0. Next: Workable.
+
+2/5 done: Workable implemented, verified against 2 tenants (Rokt/GOVX, JobPosting 6168/6169). Committed 9727b309, pushed. manifest.json 1.12.0. Note: Workable is client-side-rendered SPA, verify_promote.rb's plain fetch can't see its JSON-LD -- used field-override fallback instead. Next: Himalayas.
 <!-- SECTION:NOTES:END -->

@@ -496,6 +496,34 @@
       },
     },
 
+    // Verified live against 2 real tenants (Linxon, lemon.io). Clean JSON-LD
+    // both times -- title matches h1, hiringOrganization.name correct. Site
+    // sits behind a Cloudflare challenge ("Just a moment...") on first hit,
+    // which clears on its own in a real browser but means
+    // bin/verify_promote.rb's plain fetch() gets a 403 -- same field-
+    // override verification path as Workable, not a Himalayas-specific
+    // issue. Company has a stable semantic hook (`a[href^="/companies/"]`,
+    // same URL-structure pattern as Wellfound's company link) so CSS
+    // doesn't need a path/hostname fallback like Workday/Workable. No
+    // salary/jobLocation observed in JSON-LD on either tenant checked --
+    // per TASK-37.4's research this board has a broad, non-engineering-
+    // heavy role mix, expect lower structured-data completeness than
+    // Workable/Rails on average.
+    himalayas: {
+      label: 'Himalayas',
+      match: h => h.includes('himalayas.app'),
+      readySelector: 'article, h1',
+      readyTimeout: 8000,
+      extract(doc) {
+        return {
+          title:            pickText(doc, 'h1'),
+          company:          pickText(doc, 'a[href^="/companies/"]'),
+          description_html: pickHtml(doc, 'article'),
+          description_text: pickInnerText(doc, 'article'),
+        };
+      },
+    },
+
   };
 
   // ─── Null-safe object merge ────────────────────────────────────────────────

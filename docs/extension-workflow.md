@@ -414,3 +414,23 @@ covered by TASK-37.1-37.3.
   company has no such hook, so `companyFromWorkablePath()` reads it from the
   URL (`apply.workable.com/{tenant}/j/{id}/`). JobPosting 6168 (Rokt),
   6169 (GOVX).
+- **Himalayas** -- verified against 2 real tenants (Linxon
+  `/companies/linxon/jobs/rostering-assistant`, lemon.io
+  `/companies/lemon-io/jobs/product-manager`). JSON-LD confirmed clean and
+  matching both times. The whole site sits behind a Cloudflare "Just a
+  moment..." challenge on first hit -- clears on its own in a real browser
+  (a few seconds), but `bin/verify_promote.rb`'s plain `fetch()` got a
+  403, harder-blocked than Workable's empty-shell case. Added
+  `--html-file FILE` to `verify_promote.rb` to read HTML from disk instead
+  of live-fetching `--url` -- a small, reusable fix for this whole class of
+  Cloudflare-gated board, not a one-off. Company has a stable semantic hook
+  (`a[href^="/companies/"]`, same URL-structure pattern as Wellfound's
+  company link). Minor unrelated finding while verifying: promoting by
+  `--company` name (not `--company-id`) 422'd with "Slug has already been
+  taken" when a Company with different casing already existed
+  ("lemon.io" vs "Lemon.io") -- worked fine once passed the existing
+  company's id instead; a `Leads::CaptureService`/promote-path quirk (name-
+  based company resolution not being idempotent against a casing-variant
+  match), not a Himalayas extraction bug, and not investigated further
+  here (out of TASK-37.5's scope). JobPosting 6170 (Linxon), 6171
+  (lemon.io).

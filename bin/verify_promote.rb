@@ -17,6 +17,10 @@
 #      raw_html snapshot) 500s at the nginx layer before Rails ever sees it.
 #      This script talks to Puma directly on --puma-port (see config/puma.rb),
 #      skipping nginx.
+#   3. Some boards (confirmed: Himalayas) sit behind a Cloudflare challenge
+#      that blocks this script's plain Net::HTTP fetch with a 403, even
+#      though a real browser clears it fine. --html-file lets you supply
+#      HTML captured from a live browser session instead of fetching --url.
 #
 # Usage:
 #   bin/verify_promote.rb --provider lever --url "https://jobs.lever.co/ro/xxx"
@@ -54,6 +58,7 @@ OptionParser.new do |o|
   o.on("--salary-max N") { |v| opts[:data]["salary_max"] = v }
   o.on("--salary-currency CUR") { |v| opts[:data]["salary_currency"] = v }
   o.on("--salary-unit UNIT") { |v| opts[:data]["salary_unit"] = v }
+  o.on("--html-file FILE", "use this HTML instead of fetching --url (for Cloudflare-gated pages like Himalayas)") { |v| opts[:html] = File.read(v) }
   o.on("--puma-port PORT", Integer, "default 31000") { |v| opts[:port] = v }
   o.on("--extract-only", "fetch + print extracted fields, don't capture/promote") { opts[:extract_only] = true }
 end.parse!
@@ -117,7 +122,7 @@ def post(port, path, payload)
 end
 
 port = opts[:port] || 31_000
-html = fetch(opts[:url])
+html = opts[:html] || fetch(opts[:url])
 extracted = extract_json_ld(html)
 
 # Explicit --flags win over JSON-LD.
