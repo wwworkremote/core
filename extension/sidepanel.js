@@ -414,10 +414,14 @@ function renderApplicationQA(qa) {
 // ── Profile fields (TASK-78) ────────────────────────────────────────────────
 // Copy-paste suggestions for the personal-info fields every ATS application
 // asks for (name/email/phone/links/location), sourced from CareerProfile.
+// Ordered the way a form asks for them -- identity, contact, address, links
+// -- so copying down a form is a walk down this list. City/State/Country are
+// separate rows because plenty of ATS forms split the address instead of
+// taking `location`'s combined string.
 const PROFILE_FIELD_LABELS = [
   ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'],
-  ['linkedin_url', 'LinkedIn'], ['github_url', 'GitHub'],
-  ['website_url', 'Website'], ['location', 'Location'],
+  ['location', 'Location'], ['city', 'City'], ['state', 'State'], ['country', 'Country'],
+  ['linkedin_url', 'LinkedIn'], ['github_url', 'GitHub'], ['website_url', 'Website'],
 ];
 
 function renderProfileFields(profile) {

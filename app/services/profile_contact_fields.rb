@@ -15,7 +15,7 @@ class ProfileContactFields
   end
 
   def call
-    basic_fields.merge(url_fields).merge(location: @profile&.location_info&.dig("display"))
+    basic_fields.merge(url_fields).merge(location_fields)
   end
 
   private
@@ -30,5 +30,16 @@ class ProfileContactFields
       linkedin_url: @contact.dig("linkedin", "url"),
       website_url: @contact.dig("website", "url")
     }
+  end
+
+  # Plenty of ATS forms split the address into City / State / Country rather
+  # than taking one combined string, and location_info already stores those
+  # parts -- only `display` was being surfaced, so the split fields had to be
+  # retyped from memory every time.
+  def location_fields
+    location = @profile&.location_info || {}
+
+    { location: location["display"], city: location["locality"],
+      state: location["region"], country: location["country"] }
   end
 end
