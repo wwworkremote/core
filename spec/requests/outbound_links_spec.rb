@@ -6,10 +6,10 @@ RSpec.describe "Outbound Links" do
   let!(:job) { create(:job_posting, target_url: "https://trusted-site.com/apply") }
 
   describe "GET /outbound_link" do
-    it "redirects to the job's target URL and tracks the event" do
+    it "redirects to the job's target URL with wwr_id appended, and tracks the event" do
       get outbound_link_path(id: "tracking", job_posting_id: job.id)
 
-      expect(response).to redirect_to("https://trusted-site.com/apply")
+      expect(response).to redirect_to("https://trusted-site.com/apply?wwr_id=#{job.id}")
     end
 
     it "permits redirect if the URL exists in the database even without an ID" do

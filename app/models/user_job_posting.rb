@@ -47,8 +47,11 @@ class UserJobPosting < ApplicationRecord
       transitions from: %i[none archived], to: :favorited
     end
 
+    # `none` is a valid origin: applying directly from a board (or from the
+    # Chrome extension while sitting on the application page) is the common
+    # path, and requiring a favorite first made `applied` unreachable.
     event :apply do
-      transitions from: %i[favorited interview], to: :applied
+      transitions from: %i[none favorited interview], to: :applied
     end
 
     event :interview do
@@ -62,5 +65,24 @@ class UserJobPosting < ApplicationRecord
     event :archive do
       transitions from: %i[favorited applied interview offered], to: :archived
     end
+  end
+
+  STATUS_EVENTS = %w[favorite apply interview offer archive].freeze
+
+  # The transitions legal from the current state. An unsaved record answers
+  # for a posting the user hasn't tracked yet, so callers need no nil branch.
+  def available_status_events
+    STATUS_EVENTS.select { |event| send("may_#{event}?") }
+  end
+
+  # Applies an AASM event and logs it to the pipeline timeline, so a status
+  # change made from the web UI and one made from the extension leave the same
+  # trail. Returns the logged PipelineStep, or nil when the transition isn't
+  # legal -- callers get a no-op instead of an AASM::InvalidTransition.
+  def record_status_event!(event)
+    return unless STATUS_EVENTS.include?(event.to_s) && send("may_#{event}?")
+
+    send("#{event}!")
+    user.pipeline_steps.create!(job_posting: job_posting, status: event.to_s, note: "User marked as #{event}")
   end
 end

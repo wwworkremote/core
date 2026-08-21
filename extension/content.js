@@ -819,6 +819,148 @@
     return str ? Math.round(new Blob([str]).size / 1024) : 0;
   }
 
+  // ─── Application Q&A (TASK-78) ─────────────────────────────────────────────
+  // Read-only: extracts Greenhouse's embedded application-form screening
+  // questions and matches them against this job's existing ApplicationQuestion
+  // answers, surfaced in the panel as copy-paste suggestions. Never writes
+  // into the page's form. Verified live against job-boards.greenhouse.io:
+  // custom questions are <input>/<textarea> with id="question_<n>", while the
+  // "Voluntary Self-Identification" (EEO) section uses plain numeric ids, so
+  // filtering by the "question_" prefix already excludes it without needing
+  // to special-case #demographic-section (kept as a belt-and-suspenders check
+  // below in case a future Greenhouse template changes that convention).
+  // Multi-select checkbox questions (id contains "[") aren't free-text
+  // answerable, so they're skipped -- ApplicationQuestion only stores text.
+  function extractApplicationQuestions(doc) {
+    const form = doc.querySelector('#application-form');
+    if (!form) return [];
+    const demoSection = doc.getElementById('demographic-section');
+
+    const out = [];
+    for (const el of form.querySelectorAll('input[id^="question_"], textarea[id^="question_"]')) {
+      if (el.id.includes('[')) continue;
+      if (demoSection && demoSection.contains(el)) continue;
+      const label = doc.getElementById(`${el.id}-label`) || form.querySelector(`label[for="${el.id}"]`);
+      const text = label ? label.textContent.replace(/\*\s*$/, '').trim() : null;
+      if (text) out.push({ id: el.id, text });
+    }
+    return out;
+  }
+
+  function normalizeWords(str) {
+    return new Set(String(str || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean));
+  }
+
+  // Overlap coefficient (intersection / smaller set's size), not Jaccard --
+  // live-tested against a real Greenhouse page and found Jaccard scores a
+  // stored question far too low whenever it's a shorter paraphrase/prefix of
+  // the page's full question text (union grows with the longer string,
+  // burying a genuine containment match). Overlap coefficient scores that
+  // case ~1.0 since it only asks "does the shorter text's vocabulary appear
+  // in the longer one," which is what actually indicates "same question."
+  function questionSimilarity(a, b) {
+    const wa = normalizeWords(a), wb = normalizeWords(b);
+    if (!wa.size || !wb.size) return 0;
+    let intersection = 0;
+    for (const w of wa) if (wb.has(w)) intersection++;
+    return intersection / Math.min(wa.size, wb.size);
+  }
+
+  const QA_MATCH_THRESHOLD = 0.7;
+
+  // Returns { matches, unmatched } rather than just matches -- unmatched
+  // questions still surface in the panel with a "Generate answer" action
+  // (round-trips to LLM::AnswerGenerator via the same create endpoint) so a
+  // brand-new screening question isn't a dead end.
+  function matchApplicationQuestions(extracted, stored) {
+    const matches = [];
+    const unmatched = [];
+    for (const q of extracted) {
+      let best = null;
+      let bestScore = 0;
+      for (const s of stored) {
+        if (!s.answer_text) continue;
+        const score = questionSimilarity(q.text, s.question_text);
+        if (score > bestScore) { bestScore = score; best = s; }
+      }
+      if (best && bestScore >= QA_MATCH_THRESHOLD) {
+        matches.push({ question: q.text, answer: best.answer_text, source: best.answer_source });
+      } else {
+        unmatched.push(q.text);
+      }
+    }
+    return { matches, unmatched };
+  }
+
+  async function fetchStoredApplicationQuestions(jobPostingId) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = authHeader ? { Authorization: authHeader } : {};
+    const res = await apiFetch(`${apiBase}/api/v0/job_postings/${jobPostingId}/application_questions`, { headers });
+    return res.ok && Array.isArray(res.data) ? res.data : [];
+  }
+
+  // Sidepanel's "Generate answer" button on an unmatched question. Creates
+  // the ApplicationQuestion and runs LLM::AnswerGenerator (job-posting- and
+  // profile-aware) server-side in one round-trip.
+  async function generateApplicationAnswer(questionText) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    const res = await apiFetch(`${apiBase}/api/v0/job_postings/${wwrId}/application_questions`, {
+      method: 'POST', headers, body: JSON.stringify({ question_text: questionText }),
+    });
+    if (!res.ok || !res.data?.success) return { ok: false, error: res.data?.error || `HTTP ${res.status}` };
+    return { ok: true, answer: res.data.question.answer_text, source: res.data.question.answer_source };
+  }
+
+  // ─── Application lifecycle status (TASK-78) ────────────────────────────────
+  async function fetchApplicationStatus(jobPostingId) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = authHeader ? { Authorization: authHeader } : {};
+    const res = await apiFetch(`${apiBase}/api/v0/job_postings/${jobPostingId}/application_status`, { headers });
+    return res.ok ? res.data : null;
+  }
+
+  async function setApplicationStatus(event) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    const res = await apiFetch(`${apiBase}/api/v0/job_postings/${wwrId}/application_status`, {
+      method: 'POST', headers, body: JSON.stringify({ event }),
+    });
+    if (!res.ok || !res.data?.success) return { ok: false, error: res.data?.error || `HTTP ${res.status}` };
+    return { ok: true, status: res.data.status, availableEvents: res.data.available_events };
+  }
+
+  async function fetchProfileFields() {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = authHeader ? { Authorization: authHeader } : {};
+    const res = await apiFetch(`${apiBase}/api/v0/profile`, { headers });
+    return res.ok ? res.data : null;
+  }
+
+  // Only runs for Greenhouse (the only board this has been live-verified
+  // against) and only once we know which JobPosting to match against (wwrId
+  // -- set when the app links here via "Source & Enrich"), and only once the
+  // application form is actually visible (user clicked "Apply").
+  async function computeApplicationAssist() {
+    const empty = { qa: { matches: [], unmatched: [] }, profile: null, status: null };
+    if (!wwrId || provider?.key !== 'greenhouse') return empty;
+    const extracted = extractApplicationQuestions(document);
+    if (!document.querySelector('#application-form')) return empty;
+    try {
+      const [stored, profile, status] = await Promise.all([
+        extracted.length ? fetchStoredApplicationQuestions(wwrId) : Promise.resolve([]),
+        fetchProfileFields(),
+        fetchApplicationStatus(wwrId),
+      ]);
+      const qa = extracted.length ? matchApplicationQuestions(extracted, stored) : { matches: [], unmatched: [] };
+      LOG_OK(`Application assist — ${qa.matches.length} matched, ${qa.unmatched.length} new, profile: ${profile ? 'yes' : 'no'}, status: ${status?.status || 'unknown'}`);
+      return { qa, profile, status };
+    } catch (err) {
+      LOG_WARN('Application assist fetch failed:', err.message);
+      return empty;
+    }
+  }
+
   function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
   }
@@ -1551,6 +1693,7 @@
 
     setBadge(extracted._method, countFields(extracted));
     renderPreview(extracted);
+    extracted._applicationAssist = await computeApplicationAssist();
     return extracted;
   }
 
@@ -1620,6 +1763,9 @@
       wwrId,
       leadId,
       extracted,
+      applicationQA: extracted._applicationAssist?.qa || { matches: [], unmatched: [] },
+      profileFields: extracted._applicationAssist?.profile || null,
+      applicationStatus: extracted._applicationAssist?.status || null,
       provider:   provider ? provider.key : 'generic',
       pageUrl:    window.location.href,
       pageTitle:  document.title,
@@ -1815,6 +1961,26 @@
         }
         sendResponse({ ok: true });
       }).catch(err => sendResponse({ ok: false, error: err.message }));
+      return true;
+    }
+
+    // GENERATE_ANSWER: user clicked "Generate answer" on an unmatched
+    // application question in the panel (TASK-78)
+    if (msg.type === 'GENERATE_ANSWER') {
+      generateApplicationAnswer(msg.questionText)
+        .then(result => sendResponse(result))
+        .catch(err   => sendResponse({ ok: false, error: err.message }));
+      return true;
+    }
+
+    // SET_APPLICATION_STATUS: user clicked a lifecycle button in the panel.
+    // Recording it here -- on the ATS page, at the moment of applying -- is
+    // the whole point; going back to the app to do it is the step that got
+    // skipped, which is why nothing ever reached "applied".
+    if (msg.type === 'SET_APPLICATION_STATUS') {
+      setApplicationStatus(msg.event)
+        .then(result => sendResponse(result))
+        .catch(err   => sendResponse({ ok: false, error: err.message }));
       return true;
     }
   });

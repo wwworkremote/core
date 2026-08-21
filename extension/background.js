@@ -5,6 +5,8 @@
 //   UPDATE_PANEL_DATA  content.js → background → storage only (panel already open)
 //   SUBMIT_JOB         sidepanel.js → background → content.js (PANEL_SUBMIT)
 //   REEXTRACT          sidepanel.js → background → content.js
+//   GENERATE_ANSWER    sidepanel.js → background → content.js (TASK-78)
+//   SET_APPLICATION_STATUS sidepanel.js → background → content.js (TASK-78)
 //   UPDATE_DESCRIPTION content.js → background → storage (desc-only patch)
 //   API_FETCH          content.js → background → fetch (bypasses page CSP)
 //   PICKER_START       sidepanel.js → background → content.js (element picker)
@@ -30,6 +32,9 @@ function buildPanelState(msg, tabId) {
     wwrId:     msg.wwrId,
     leadId:    msg.leadId,
     extracted: msg.extracted,
+    applicationQA: msg.applicationQA || { matches: [], unmatched: [] },
+    profileFields: msg.profileFields || null,
+    applicationStatus: msg.applicationStatus || null,
     provider:  msg.provider,
     pageUrl:   msg.pageUrl,
     pageTitle: msg.pageTitle,
@@ -118,6 +123,50 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       chrome.tabs.sendMessage(
         state.tabId,
         { type: 'REEXTRACT', descOnly: !!msg.descOnly },
+        (response) => {
+          if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+          else sendResponse(response);
+        }
+      );
+    });
+    return true;
+  }
+
+  // ── GENERATE_ANSWER (TASK-78) ───────────────────────────────────────────────
+  // Sent by sidepanel.js for an unmatched application question; relayed to the
+  // content script on the originating tab, which POSTs it to the Rails API.
+  if (msg.type === 'GENERATE_ANSWER') {
+    chrome.storage.session.get(SESSION_KEY, (data) => {
+      const state = data[SESSION_KEY];
+      if (!state?.tabId) {
+        sendResponse({ ok: false, error: 'No active job session' });
+        return;
+      }
+      chrome.tabs.sendMessage(
+        state.tabId,
+        { type: 'GENERATE_ANSWER', questionText: msg.questionText },
+        (response) => {
+          if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+          else sendResponse(response);
+        }
+      );
+    });
+    return true;
+  }
+
+  // ── SET_APPLICATION_STATUS (TASK-78) ───────────────────────────────────────
+  // Sent by sidepanel.js when the user advances the lifecycle from the panel;
+  // same relay shape as GENERATE_ANSWER.
+  if (msg.type === 'SET_APPLICATION_STATUS') {
+    chrome.storage.session.get(SESSION_KEY, (data) => {
+      const state = data[SESSION_KEY];
+      if (!state?.tabId) {
+        sendResponse({ ok: false, error: 'No active job session' });
+        return;
+      }
+      chrome.tabs.sendMessage(
+        state.tabId,
+        { type: 'SET_APPLICATION_STATUS', event: msg.event },
         (response) => {
           if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
           else sendResponse(response);

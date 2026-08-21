@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class UserJobPostingsController < ApplicationController
-  ALLOWED_STATUS_EVENTS = %w[favorite apply interview offer archive].freeze
-
   before_action :set_job_posting, only: %i[create analyze_match generate_artifacts]
 
   def index
@@ -13,7 +11,7 @@ class UserJobPostingsController < ApplicationController
 
   def create
     build_user_job_posting
-    apply_status_event(params[:status]) if params[:status].present?
+    @user_job_posting.record_status_event!(params[:status]) if params[:status].present?
 
     redirect_back_or_to(job_posting_path(@job_posting), notice: "Job status updated.")
   end
@@ -60,15 +58,6 @@ class UserJobPostingsController < ApplicationController
     @user_job_posting.job_search_id = params[:job_search_id] if params[:job_search_id].present?
   end
 
-  # Log to pipeline as well as applying the AASM event, so the pipeline
-  # timeline reflects user-initiated status changes.
-  def apply_status_event(status)
-    return unless ALLOWED_STATUS_EVENTS.include?(status)
-
-    @user_job_posting.send("#{status}!")
-    current_user.pipeline_steps.create!(job_posting: @job_posting, status: status, note: "User marked as #{status}")
-  end
-
   def forced?
     params[:force] == "true"
   end
@@ -81,7 +70,9 @@ class UserJobPostingsController < ApplicationController
     end
   end
 
+  # Deliberately excludes :status -- writing that column directly would skip
+  # the AASM guards entirely. Status changes go through record_status_event!.
   def user_job_posting_params
-    params.expect(user_job_posting: %i[status notes])
+    params.expect(user_job_posting: %i[notes])
   end
 end

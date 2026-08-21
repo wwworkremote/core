@@ -170,6 +170,36 @@
     .company-match-create { color: var(--purple); }
     .company-match-loading { font-size: 13px; color: var(--comment); }
 
+    /* ── Application Q&A / Profile fields (TASK-78) ──────────────────────────── */
+    #application-qa-section, #profile-fields-section, #application-status-section {
+      margin-bottom: 14px; padding: 8px; background: var(--bg-dark);
+      border: 1px solid var(--green); border-radius: var(--radius);
+    }
+    .status-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .status-btn {
+      background: none; border: 1px solid var(--cyan); border-radius: 4px; color: var(--cyan);
+      font-family: var(--font); font-size: 12px; padding: 3px 9px; cursor: pointer;
+    }
+    .status-btn:hover:not(:disabled) { background: var(--bg-mid); }
+    .status-btn:disabled { opacity: 0.6; cursor: default; }
+    .qa-header {
+      font-size: 11px; color: var(--green); text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 6px;
+    }
+    .qa-item { padding: 6px 0; border-top: 1px solid var(--bg-mid); }
+    .qa-item:first-of-type { border-top: none; }
+    .qa-question { font-size: 13px; color: var(--fg); margin-bottom: 3px; }
+    .qa-answer { font-size: 13px; color: var(--comment); white-space: pre-wrap; }
+    .qa-answer.qa-unanswered { font-style: italic; }
+    .qa-copy-btn, .qa-generate-btn {
+      margin-top: 4px; background: none; border: 1px solid var(--bg-mid); border-radius: 4px;
+      color: var(--cyan); font-family: var(--font); font-size: 12px; padding: 2px 8px; cursor: pointer;
+    }
+    .qa-generate-btn { color: var(--purple); border-color: var(--purple); }
+    .qa-copy-btn:hover, .qa-generate-btn:hover:not(:disabled) { background: var(--bg-mid); }
+    .qa-copy-btn.copied { color: var(--green); border-color: var(--green); }
+    .qa-generate-btn:disabled { opacity: 0.6; cursor: default; }
+
     #desc-meta { font-size: 12px; color: var(--comment); margin-top: 3px; text-align: right; }
 
     #apply-link {
@@ -329,6 +359,10 @@
 
   <!-- Form body -->
   <div id="form-body" style="display:none">
+
+    <div id="application-status-section" style="display:none;"></div>
+    <div id="application-qa-section" style="display:none;"></div>
+    <div id="profile-fields-section" style="display:none;"></div>
 
     <div class="section-header">Core</div>
 

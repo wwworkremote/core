@@ -227,8 +227,13 @@ en:
         cons: "Cons"
       activity:
         heading: "Your Activity"
-        favorited: "Favorited"
-        mark_favorite: "Mark Favorite"
+        status_label: "Status"
+        events:
+          favorite: "Mark Favorite"
+          apply: "Mark Applied"
+          interview: "Mark Interviewing"
+          offer: "Mark Offered"
+          archive: "Archive"
         match_heading: "Match Analysis"
         check_match: "Check Match"
         setup_profile: "Set Up Profile"

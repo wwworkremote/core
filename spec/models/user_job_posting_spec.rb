@@ -52,5 +52,28 @@ RSpec.describe UserJobPosting do
       expect(user_job_posting.favorite).to be true
       expect(user_job_posting.status).to eq("favorited")
     end
+
+    it "can apply directly from none without favoriting first" do
+      expect(user_job_posting.may_apply?).to be true
+    end
+  end
+
+  describe "#record_status_event!" do
+    let(:user_job_posting) { create(:user_job_posting, status: "none") }
+
+    it "transitions and logs a pipeline step" do
+      expect { user_job_posting.record_status_event!("apply") }.to change(PipelineStep, :count).by(1)
+      expect(user_job_posting.reload.status).to eq("applied")
+    end
+
+    it "returns nil without raising when the transition is illegal" do
+      user_job_posting.update!(status: "archived")
+
+      expect(user_job_posting.record_status_event!("apply")).to be_nil
+    end
+
+    it "returns nil for an event outside the known transitions" do
+      expect(user_job_posting.record_status_event!("delete_everything")).to be_nil
+    end
   end
 end

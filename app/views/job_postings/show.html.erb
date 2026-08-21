@@ -291,15 +291,17 @@
       <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
         <h3 class="text-xs font-bold text-base-content/50"><%= t('.activity.heading') %></h3>
         <% user_job = current_user.user_job_postings.find_by(job_posting: @job_posting) %>
-        <div class="flex items-center gap-4">
-          <% if user_job&.status == 'favorited' %>
-            <div class="text-xs font-bold text-primary flex items-center gap-2">
-              <%= heroicon "heart", variant: :solid, options: { class: "w-3 h-3" } %> <%= t('.activity.favorited') %>
-            </div>
-          <% else %>
-            <%= button_to user_job_postings_path(job_posting_id: @job_posting.id, status: 'favorite'), class: "group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary transition-colors" do %>
-              <%= heroicon "heart", options: { class: "w-3 h-3 group-hover:scale-125 transition-transform" } %> <%= t('.activity.mark_favorite') %>
-            <% end %>
+        <div class="flex items-center gap-4 flex-wrap justify-end">
+          <div class="text-xs font-bold text-primary flex items-center gap-2">
+            <%= heroicon "heart", variant: :solid, options: { class: "w-3 h-3" } %>
+            <%= t('.activity.status_label') %>: <%= (user_job&.status || 'none').humanize %>
+          </div>
+          <%# Every legal next transition, not just favorite -- `applied` and beyond
+              previously had no control at all, so the pipeline could never advance. %>
+          <% (user_job || UserJobPosting.new).available_status_events.each do |event| %>
+            <%= button_to t(".activity.events.#{event}"),
+                          user_job_postings_path(job_posting_id: @job_posting.id, status: event),
+                          class: "text-xs font-bold text-slate-400 hover:text-primary transition-colors" %>
           <% end %>
         </div>
       </div>

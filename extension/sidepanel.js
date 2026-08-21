@@ -331,6 +331,164 @@ function renderCompanyMatches(matches, query) {
   }
 }
 
+// ── Application Q&A (TASK-78) ───────────────────────────────────────────────
+// Read-only: matches screening questions found on a Greenhouse application
+// page against this job's existing ApplicationQuestion answers. Copy-paste
+// only -- never writes into the page's form fields. Unmatched questions get
+// a "Generate answer" action that round-trips to the AI-answer endpoint.
+function copyButtonHtml(idx) {
+  return `<button type="button" class="qa-copy-btn" data-idx="${idx}">Copy answer</button>`;
+}
+
+function attachCopyHandlers(container, getAnswer) {
+  container.querySelectorAll('.qa-copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(getAnswer(Number(btn.dataset.idx))).then(() => {
+        btn.textContent = 'Copied ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy answer'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+}
+
+function renderApplicationQA(qa) {
+  const container = document.getElementById('application-qa-section');
+  if (!container) return;
+
+  const matches = qa?.matches || [];
+  const unmatched = qa?.unmatched || [];
+  if (!matches.length && !unmatched.length) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  const matchItems = matches.map((m, i) => `
+    <div class="qa-item">
+      <div class="qa-question">${escapeHtml(m.question)}</div>
+      <div class="qa-answer">${escapeHtml(m.answer)}</div>
+      ${copyButtonHtml(i)}
+    </div>
+  `).join('');
+
+  const unmatchedItems = unmatched.map((q, i) => `
+    <div class="qa-item">
+      <div class="qa-question">${escapeHtml(q)}</div>
+      <div class="qa-answer qa-unanswered">No saved answer yet</div>
+      <button type="button" class="qa-generate-btn" data-idx="${i}">✨ Generate answer</button>
+    </div>
+  `).join('');
+
+  const headerParts = [];
+  if (matches.length) headerParts.push(`${matches.length} match${matches.length === 1 ? '' : 'es'}`);
+  if (unmatched.length) headerParts.push(`${unmatched.length} new`);
+
+  container.innerHTML =
+    `<div class="qa-header">Application Q&amp;A — ${headerParts.join(', ')}</div>${matchItems}${unmatchedItems}`;
+  container.style.display = 'block';
+
+  attachCopyHandlers(container, i => matches[i].answer);
+
+  container.querySelectorAll('.qa-generate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const questionText = unmatched[Number(btn.dataset.idx)];
+      btn.disabled = true;
+      btn.textContent = 'Generating…';
+      chrome.runtime.sendMessage({ type: 'GENERATE_ANSWER', questionText }, (response) => {
+        if (!response?.ok) {
+          btn.disabled = false;
+          btn.textContent = `⚠ ${response?.error || 'Failed'} — retry`;
+          return;
+        }
+        const item = btn.closest('.qa-item');
+        item.querySelector('.qa-answer').textContent = response.answer;
+        item.querySelector('.qa-answer').classList.remove('qa-unanswered');
+        btn.outerHTML = copyButtonHtml(`gen-${btn.dataset.idx}`);
+        attachCopyHandlers(item, () => response.answer);
+      });
+    });
+  });
+}
+
+// ── Profile fields (TASK-78) ────────────────────────────────────────────────
+// Copy-paste suggestions for the personal-info fields every ATS application
+// asks for (name/email/phone/links/location), sourced from CareerProfile.
+const PROFILE_FIELD_LABELS = [
+  ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'],
+  ['linkedin_url', 'LinkedIn'], ['github_url', 'GitHub'],
+  ['website_url', 'Website'], ['location', 'Location'],
+];
+
+function renderProfileFields(profile) {
+  const container = document.getElementById('profile-fields-section');
+  if (!container) return;
+
+  const present = PROFILE_FIELD_LABELS.filter(([key]) => profile?.[key]);
+  if (!present.length) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  const items = present.map(([key, label], i) => `
+    <div class="qa-item">
+      <div class="qa-question">${escapeHtml(label)}</div>
+      <div class="qa-answer">${escapeHtml(profile[key])}</div>
+      ${copyButtonHtml(i)}
+    </div>
+  `).join('');
+
+  container.innerHTML = `<div class="qa-header">Your Info — copy into the form</div>${items}`;
+  container.style.display = 'block';
+  attachCopyHandlers(container, i => profile[present[i][0]]);
+}
+
+// ── Application lifecycle (TASK-78) ─────────────────────────────────────────
+// The panel is open on the ATS page at the exact moment the user applies, so
+// this is where the status transition belongs -- previously the only control
+// lived in the web app and `applied` was effectively never recorded.
+const STATUS_EVENT_LABELS = {
+  favorite: '♥ Favorite', apply: '✓ Mark Applied', interview: '◎ Interviewing',
+  offer: '★ Offered', archive: '⨯ Archive',
+};
+
+function renderApplicationStatus(status) {
+  const container = document.getElementById('application-status-section');
+  if (!container) return;
+
+  if (!status) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  const buttons = (status.available_events || [])
+    .map(ev => `<button type="button" class="status-btn" data-event="${escapeHtml(ev)}">${STATUS_EVENT_LABELS[ev] || ev}</button>`)
+    .join('');
+
+  container.innerHTML =
+    `<div class="qa-header">Application Status — ${escapeHtml(status.status || 'none')}</div>
+     <div class="status-actions">${buttons}</div>`;
+  container.style.display = 'block';
+
+  container.querySelectorAll('.status-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const event = btn.dataset.event;
+      container.querySelectorAll('.status-btn').forEach(b => { b.disabled = true; });
+      btn.textContent = 'Saving…';
+      chrome.runtime.sendMessage({ type: 'SET_APPLICATION_STATUS', event }, (response) => {
+        if (!response?.ok) {
+          container.querySelectorAll('.status-btn').forEach(b => { b.disabled = false; });
+          btn.textContent = `⚠ ${response?.error || 'Failed'} — retry`;
+          return;
+        }
+        renderApplicationStatus({ status: response.status, available_events: response.availableEvents });
+      });
+    });
+  });
+}
+
 function highlightSelectedCompany(selectedEl) {
   document.querySelectorAll('.company-match-option, .company-match-create')
     .forEach(el => el.classList.remove('selected'));
@@ -368,6 +526,9 @@ function populateForm(state) {
     mode === 'capture' ? (state.leadId ? `#${state.leadId}` : '…') : (state.wwrId || '—');
   document.getElementById('hdr-board').textContent = BOARD_LABELS[state.provider] || state.provider || '—';
   updateConfidenceBadge(e._method);
+  renderApplicationStatus(state.applicationStatus);
+  renderApplicationQA(state.applicationQA);
+  renderProfileFields(state.profileFields);
 
   // Company match picker only applies in capture mode -- enrich mode keeps
   // the plain text field (the JobPosting's Company link is set elsewhere).
