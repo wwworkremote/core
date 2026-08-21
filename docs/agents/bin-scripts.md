@@ -82,6 +82,11 @@ All of these are read-mostly and safe to run against development; none should be
   pushing.
 - **`bin/lint_extension`** — lints `extension/**/*.js`; also runs automatically as a pre-commit
   hook.
+- **`bin/rspec-precommit`** — the suite runner Overcommit's `PreCommit::RSpec` hook invokes. Not
+  for manual use; run `bundle exec rspec` directly instead. It exists because configuring
+  `include:` on that hook (so extension-JS/docs-only commits skip the suite) also makes Overcommit
+  append the matched staged files as rspec arguments — this ignores them and runs the fixed
+  `spec packages/ingestion/spec` set. Don't add file arguments to it.
 
 ## Related skills (`.claude/skills/`)
 
