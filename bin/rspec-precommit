@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Suite runner for Overcommit's PreCommit::RSpec hook.
+#
+# Why this exists: Overcommit's RSpec hook switches behavior based on whether
+# `include` is configured. Without it, it runs `command` verbatim but fires on
+# every commit. With it, it fires only when a staged file matches -- but it
+# also appends those matched files to `command` as arguments, so rspec tries
+# to load Gemfile, app/models/*.rb and friends as spec files and dies with
+# "error occurred outside of examples."
+#
+# We want the trigger-filtering half, not the argument-appending half, so this
+# ignores "$@" on purpose and always runs the full fixed suite. A change
+# anywhere in app/ can break a spec anywhere, so narrowing WHAT runs based on
+# WHAT changed would be unsound -- `include` only decides WHETHER to run.
+#
+# Explicit dirs, not a bare `rspec`: packages/*/spec sits outside RSpec's
+# default_path ("spec"), so a bare invocation silently never discovers it.
+set -euo pipefail
+
+exec bundle exec rspec --fail-fast spec packages/ingestion/spec

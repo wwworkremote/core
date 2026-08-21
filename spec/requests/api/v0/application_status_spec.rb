@@ -3,8 +3,14 @@
 require "rails_helper"
 
 RSpec.describe "Api::V0::ApplicationStatus" do
-  let!(:user) { create(:user) }
+  let(:user) { create(:user) }
   let(:job_posting) { create(:job_posting) }
+
+  # The controller resolves the actor as User.first (this is a single-user
+  # system, same as Api::V0::ProfileController). Stub it rather than assuming
+  # the factory user sorts first -- any stray row in the shared test DB would
+  # otherwise silently point the request at a different user.
+  before { allow(User).to receive(:first).and_return(user) }
 
   describe "GET show" do
     it "reports none with the events available to an untracked posting" do
