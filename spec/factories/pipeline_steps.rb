@@ -26,9 +26,10 @@
 #  fk_rails_...  (user_id => users.id)
 #
 FactoryBot.define do
+  # Was untouched scaffold output (`job_posting { nil }`, "MyString"), so it
+  # could never build a valid record -- nothing used it until now.
   factory :pipeline_step do
-    job_posting { nil }
-    status { "MyString" }
-    notes { "MyText" }
+    job_posting
+    status { "applied" }
   end
 end

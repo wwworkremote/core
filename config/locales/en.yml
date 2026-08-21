@@ -249,8 +249,10 @@ en:
         heading: "Application Q&A"
         question_placeholder: "Add a screening question from the application..."
         ask: "Get Answer"
-        canned_badge: "From Profile"
-        ai_badge: "AI Generated"
+        badges:
+          canned: "From Profile"
+          ai: "AI Generated"
+          submitted: "You Submitted"
         no_answer: "Answer generation failed -- see the flash message above."
       pipeline:
         heading: "Application Status"

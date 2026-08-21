@@ -376,9 +376,8 @@
               <%= button_to "×", admin_job_posting_application_question_path(@job_posting, question), method: :delete, class: "text-rose-500 font-bold text-xs hover:text-white shrink-0" %>
             </div>
             <% if question.answer_text.present? %>
-              <span class="badge badge-outline text-xs font-bold mb-2 <%= question.answer_source == 'canned' ? 'border-success/40 text-success' : 'border-accent/40 text-accent' %>">
-                <%= question.answer_source == 'canned' ? t('.qa.canned_badge') : t('.qa.ai_badge') %>
-              </span>
+              <% badge_class, badge_label = answer_source_badge(question.answer_source) %>
+              <span class="badge badge-outline text-xs font-bold mb-2 <%= badge_class %>"><%= badge_label %></span>
               <p class="text-xs text-base-content/70 leading-relaxed"><%= question.answer_text %></p>
             <% else %>
               <p class="text-xs text-warning italic"><%= t('.qa.no_answer') %></p>

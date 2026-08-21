@@ -6,7 +6,7 @@ title: >-
 status: In Progress
 assignee: []
 created_date: '2026-08-19 21:26'
-updated_date: '2026-08-21 18:54'
+updated_date: '2026-08-21 19:59'
 labels: []
 dependencies: []
 references:
@@ -49,6 +49,9 @@ Actually writing prebaked answers into the form fields (true autofill), and expa
 - [x] #6 Application lifecycle status is visible and advanceable from the panel while on the ATS page
 - [x] #7 Panel-driven status changes leave the same pipeline trail as web-UI ones
 - [ ] #8 Verified live against a real Greenhouse posting, not just unit-tested
+- [x] #9 The questions on the form and the answers the user actually typed are persisted when the application is marked applied
+- [x] #10 Captured answers are tagged `submitted` and do not overwrite or relabel an unchanged canned/AI answer
+- [x] #11 The ATS application URL is recorded on the pipeline step for the transition
 <!-- AC:END -->
 
 ## Implementation Notes
@@ -67,6 +70,28 @@ Actually writing prebaked answers into the form fields (true autofill), and expa
 **Fixed en route**: `OutboundLinksController` was dropping `wwr_id` on redirect, so the extension never knew which JobPosting it was on. Open-redirect guard untouched.
 
 **Not yet verified**: the panel's rendered Application Status section (needs an extension reload; the Chrome side panel isn't capturable by automation). Data layer confirmed via console + live API.
+
+**Still v2**: true autofill, non-Greenhouse ATS, resume upload, multi-page forms.
+
+2026-08-21 (later) — lifecycle closed through submission (extension v1.18.0).
+
+**The gap this closed**: the panel could record *that* an application went out but never what it asked or what was said in reply. Unless the user pressed "Generate answer", a screening question was extracted, matched, rendered — and then died with the page. Every application re-answered the same questions from scratch.
+
+**Shipped**
+- `extractApplicationQuestions` now also reads `el.value` (still read-only against the page; nothing is written into the form).
+- Capture rides along with the existing `✓ Mark Applied` button rather than adding a second control — "I applied" and "here's what I answered" are one moment, and one round-trip means they can't half-land. No new endpoint, route, or controller.
+- `POST .../application_status` accepts `answers` + `link`. Answers upsert by `question_text` (`answer_source: "submitted"`), blanks skipped, unchanged answers left alone so copying a canned answer verbatim doesn't relabel it as the user's own words.
+- `PipelineStep#link` records the ATS URL — the one piece of context that's unrecoverable once a posting is taken down.
+- Passive capture-phase `submit` listener snapshots the form, because Greenhouse replaces it with a confirmation view once accepted. Live-verified `#application-form` is a real `HTMLFormElement`, so the event actually fires.
+- `answer_source_badge` helper: `submitted` renders "You Submitted", not "AI Generated". Provenance is the whole point of that badge.
+
+**Security fix found en route**: `PipelineStep#link` is rendered with `link_to` and every writer feeds it outside-the-app input (admin note form, now the extension). No scheme check meant a `javascript:` value was a clickable payload in the user's own UI. Now validated http(s)-only at the model, which covers all three writers.
+
+**Infra fix found en route**: `ops/nginx/servers/wwworkremote.conf` returned **301** for http→https. A 301 makes clients drop the request body (most also downgrade POST to GET), so an API POST to `http://wwworkremote.localhost` arrived with empty params and silently no-opped — 200 with `success:false`, nothing written. Changed to **308** (same permanent redirect, method and body preserved). The extension defaults to `http://localhost:31000` and so was never affected; anyone who pointed it at the nginx hostname over http would have been. Deployed copy at `/opt/homebrew/etc/nginx/servers/` still needs the user to sync + `nginx -s reload`.
+
+**Live-verified** (over https, on a throwaway posting, cleaned up after; posting 6068 untouched): apply → `captured_answers: 2` with the blank third skipped, second transition → `captured_answers: 0` with no duplicate row and no relabel, `PipelineStep.link` set, and the web UI rendering both answers with the "You Submitted" badge.
+
+**Still not visually confirmed**: the rendered side panel (Chrome side panels aren't capturable by automation). Data layer confirmed end-to-end.
 
 **Still v2**: true autofill, non-Greenhouse ATS, resume upload, multi-page forms.
 <!-- SECTION:NOTES:END -->

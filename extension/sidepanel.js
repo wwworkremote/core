@@ -467,8 +467,15 @@ function renderApplicationStatus(status) {
     .map(ev => `<button type="button" class="status-btn" data-event="${escapeHtml(ev)}">${STATUS_EVENT_LABELS[ev] || ev}</button>`)
     .join('');
 
+  // The captured count is the only feedback that the answers on the page went
+  // with the transition -- without it the user can't tell a status-only click
+  // from one that also banked the Q&A for next time.
+  const captured = Number(status.captured) > 0
+    ? ` · captured ${status.captured} answer${status.captured === 1 ? '' : 's'}`
+    : '';
+
   container.innerHTML =
-    `<div class="qa-header">Application Status — ${escapeHtml(status.status || 'none')}</div>
+    `<div class="qa-header">Application Status — ${escapeHtml(status.status || 'none')}${captured}</div>
      <div class="status-actions">${buttons}</div>`;
   container.style.display = 'block';
 
@@ -483,7 +490,11 @@ function renderApplicationStatus(status) {
           btn.textContent = `⚠ ${response?.error || 'Failed'} — retry`;
           return;
         }
-        renderApplicationStatus({ status: response.status, available_events: response.availableEvents });
+        renderApplicationStatus({
+          status: response.status,
+          available_events: response.availableEvents,
+          captured: response.captured,
+        });
       });
     });
   });

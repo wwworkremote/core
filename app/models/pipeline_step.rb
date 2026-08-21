@@ -35,4 +35,10 @@ class PipelineStep < ApplicationRecord
   # Status: favorited, applied, interview, offered, archived, noted
 
   validates :status, presence: true
+
+  # `link` is rendered with link_to on the posting timeline, and every writer
+  # feeds it outside-the-app input -- the admin note form, and now the Chrome
+  # extension posting the ATS page URL. Without a scheme check a `javascript:`
+  # value becomes a clickable payload in the user's own UI.
+  validates :link, format: { with: %r{\Ahttps?://}i, message: "must be an http(s) URL" }, allow_blank: true
 end

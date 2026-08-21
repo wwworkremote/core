@@ -842,7 +842,9 @@
       if (demoSection && demoSection.contains(el)) continue;
       const label = doc.getElementById(`${el.id}-label`) || form.querySelector(`label[for="${el.id}"]`);
       const text = label ? label.textContent.replace(/\*\s*$/, '').trim() : null;
-      if (text) out.push({ id: el.id, text });
+      // `value` is what the user has typed so far. Reading it keeps this
+      // read-only against the page -- nothing is written back into the form.
+      if (text) out.push({ id: el.id, text, value: el.value });
     }
     return out;
   }
@@ -913,6 +915,28 @@
   }
 
   // ─── Application lifecycle status (TASK-78) ────────────────────────────────
+
+  // The question text plus whatever the user has actually typed into it. This
+  // is the half of the lifecycle that used to evaporate: the panel could
+  // record *that* an application went out, never the questions it asked or
+  // the answers that went with them.
+  function currentAnswers() {
+    return extractApplicationQuestions(document)
+      .filter(q => q.value && q.value.trim())
+      .map(q => ({ question: q.text, answer: q.value.trim() }));
+  }
+
+  // Greenhouse replaces the form with a confirmation view once it accepts a
+  // submission, so by the time the user marks the application applied there
+  // may be nothing left to read. Snapshot on the way out. Passive listener in
+  // the capture phase: it reads values and never touches the form or the
+  // event, so a failure here can't block a submit. Inert on every other page
+  // -- nothing else carries id="application-form".
+  let submittedAnswers = null;
+  document.addEventListener('submit', (e) => {
+    if (e.target && e.target.id === 'application-form') submittedAnswers = currentAnswers();
+  }, true);
+
   async function fetchApplicationStatus(jobPostingId) {
     const { base: apiBase, authHeader } = await getApiConfig();
     const headers = authHeader ? { Authorization: authHeader } : {};
@@ -920,14 +944,26 @@
     return res.ok ? res.data : null;
   }
 
+  // Ships the captured Q&A with the transition rather than as its own action:
+  // "I applied" and "here's what I answered" are the same moment, and one
+  // round-trip means they can't half-land. Live form first, submit snapshot
+  // as the fallback for when the page has already moved on.
   async function setApplicationStatus(event) {
     const { base: apiBase, authHeader } = await getApiConfig();
     const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    const live = currentAnswers();
+    const answers = live.length ? live : (submittedAnswers || []);
     const res = await apiFetch(`${apiBase}/api/v0/job_postings/${wwrId}/application_status`, {
-      method: 'POST', headers, body: JSON.stringify({ event }),
+      method: 'POST', headers, body: JSON.stringify({ event, answers, link: window.location.href }),
     });
     if (!res.ok || !res.data?.success) return { ok: false, error: res.data?.error || `HTTP ${res.status}` };
-    return { ok: true, status: res.data.status, availableEvents: res.data.available_events };
+    LOG_OK(`Status → ${res.data.status}, captured ${res.data.captured_answers} answer(s)`);
+    return {
+      ok: true,
+      status: res.data.status,
+      availableEvents: res.data.available_events,
+      captured: res.data.captured_answers,
+    };
   }
 
   async function fetchProfileFields() {

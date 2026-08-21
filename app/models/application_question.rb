@@ -29,5 +29,9 @@ class ApplicationQuestion < ApplicationRecord
 
   validates :question_text, presence: true
 
-  SOURCES = %w[canned ai].freeze
+  # `submitted` is what the user actually typed into the ATS form, captured by
+  # the extension when they mark the application applied. It outranks the
+  # other two as future reference material: it's the answer that really went
+  # out, not the one that was offered.
+  SOURCES = %w[canned ai submitted].freeze
 end

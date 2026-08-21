@@ -37,7 +37,7 @@ RSpec.describe ApplicationQuestion do
 
   describe "constants" do
     it "defines SOURCES" do
-      expect(described_class::SOURCES).to eq(%w[canned ai])
+      expect(described_class::SOURCES).to eq(%w[canned ai submitted])
     end
   end
 end

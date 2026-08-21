@@ -5,6 +5,21 @@ module JobPostingsHelper
   # they're not "what changed," just when.
   HISTORY_IGNORED_ATTRS = %w[updated_at created_at].freeze
 
+  ANSWER_SOURCE_BADGE_CLASSES = {
+    "canned" => "border-success/40 text-success",
+    "submitted" => "border-info/40 text-info",
+    "ai" => "border-accent/40 text-accent"
+  }.freeze
+
+  # Provenance is the entire point of this badge, so `submitted` -- the answer
+  # the user actually sent to the employer -- must not render as "AI
+  # Generated". Unknown/legacy sources fall back to `ai`, which is what the
+  # two-way ternary this replaced already did.
+  def answer_source_badge(source)
+    key = ANSWER_SOURCE_BADGE_CLASSES.key?(source) ? source : "ai"
+    [ANSWER_SOURCE_BADGE_CLASSES.fetch(key), t("job_postings.show.qa.badges.#{key}")]
+  end
+
   def safe_job_url(url)
     return "#" if url.blank?
 

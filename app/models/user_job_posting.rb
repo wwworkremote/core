@@ -77,12 +77,16 @@ class UserJobPosting < ApplicationRecord
 
   # Applies an AASM event and logs it to the pipeline timeline, so a status
   # change made from the web UI and one made from the extension leave the same
-  # trail. Returns the logged PipelineStep, or nil when the transition isn't
-  # legal -- callers get a no-op instead of an AASM::InvalidTransition.
-  def record_status_event!(event)
+  # trail. `link` records where it happened -- the extension passes the ATS
+  # application URL, which is the one piece of context you can't reconstruct
+  # later once the posting is taken down. Returns the logged PipelineStep, or
+  # nil when the transition isn't legal -- callers get a no-op instead of an
+  # AASM::InvalidTransition.
+  def record_status_event!(event, link: nil)
     return unless STATUS_EVENTS.include?(event.to_s) && send("may_#{event}?")
 
     send("#{event}!")
-    user.pipeline_steps.create!(job_posting: job_posting, status: event.to_s, note: "User marked as #{event}")
+    user.pipeline_steps.create!(job_posting: job_posting, status: event.to_s, link: link,
+                                note: "User marked as #{event}")
   end
 end
