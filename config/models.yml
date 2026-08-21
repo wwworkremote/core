@@ -11,7 +11,10 @@ defaults:
   # the one path where quality outranks keeping the call on-box. The
   # primary is a 7B *code* model, which is a tool mismatch for first-person
   # career prose regardless of its size. Point this at a stronger model to
-  # switch just this path:
+  # switch just this path -- uncomment once ANTHROPIC_API_KEY is valid. The
+  # key currently in the environment is rejected, and nothing reads
+  # defaults.fallback below, so a hosted model that can't authenticate takes
+  # answer generation down rather than degrading to local:
   #
   #   answer_generation: "claude-3-5-sonnet-20241022"
   #

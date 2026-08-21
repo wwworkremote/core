@@ -39,7 +39,8 @@ class LLM::Orchestrator::Streamer
   end
 
   def stream_args
-    { tools: [], temperature: 0.7, model: LLM::Orchestrator::ModelRef.new(@model.model_id) }
+    { tools: [], temperature: 0.7,
+      model: LLM::Orchestrator::ModelRef.new(@model.model_id, @model.max_output_tokens) }
   end
 
   def stream_chunk(chunk)
