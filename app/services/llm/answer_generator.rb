@@ -51,7 +51,19 @@ class LLM::AnswerGenerator
 
   def call_orchestrator
     prompt = PromptBuilder.call(@profile, @job_posting, @question.question_text)
-    LLM::Orchestrator.call(untrusted_text: prompt, system_rules: SYSTEM_RULES, task_instructions: TASK_INSTRUCTIONS)
+    LLM::Orchestrator.call(untrusted_text: prompt, system_rules: SYSTEM_RULES,
+                           task_instructions: TASK_INSTRUCTIONS, model: answer_model)
+  end
+
+  # Screening answers are the opposite profile to ingestion: low volume, no
+  # untrusted third-party text, no PHI exposure, and the output goes to an
+  # employer -- so quality matters more than keeping the call on-box, which
+  # is the reverse of the trade that makes local-first right everywhere else.
+  # Set `defaults.answer_generation` in config/models.yml to opt this one
+  # path onto a stronger model; unset, it uses the primary like everything
+  # else and nothing changes.
+  def answer_model
+    LLM::Registry.model_for(:answer_generation)
   end
 
   def handle_result(result)

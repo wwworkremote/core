@@ -44,4 +44,28 @@ RSpec.describe LLM::Registry do
       expect(model.model_id).to eq("llama3.2:latest")
     end
   end
+
+  describe ".model_for" do
+    before { described_class.sync }
+
+    it "returns the model named by a per-purpose default" do
+      expect(described_class.model_for(:primary).model_id).to eq("llama3.2:latest")
+    end
+
+    # nil rather than raising: an unconfigured purpose has to fall through to
+    # the primary, or pointing one call site at a different model would mean
+    # configuring every other one.
+    it "returns nil for a purpose with no configured default" do
+      expect(described_class.model_for(:answer_generation)).to be_nil
+    end
+
+    # Same reason a typo shouldn't be fatal -- the caller falls back rather
+    # than every LLM path failing on a bad config key.
+    it "returns nil when the configured model has not been synced" do
+      allow(YAML).to receive(:load_file).with(described_class::CONFIG_PATH)
+                                        .and_return({ "defaults" => { "answer_generation" => "nope" } })
+
+      expect(described_class.model_for(:answer_generation)).to be_nil
+    end
+  end
 end

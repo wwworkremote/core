@@ -37,4 +37,16 @@ class LLM::Registry
   def self.default_model
     Model.find_by(model_id: default_model_id)
   end
+
+  # A named default for one call site, e.g. `defaults.answer_generation`.
+  # Returns nil when the key is unset or names a model that hasn't been
+  # synced, so an unconfigured purpose falls through to the primary --
+  # pointing one path at a different model shouldn't mean configuring every
+  # other path, or breaking them all on a typo.
+  def self.model_for(purpose)
+    model_id = YAML.load_file(CONFIG_PATH).dig("defaults", purpose.to_s)
+    return if model_id.blank?
+
+    Model.find_by(model_id: model_id)
+  end
 end

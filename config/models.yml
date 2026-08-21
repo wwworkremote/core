@@ -2,6 +2,23 @@ defaults:
   primary: "local"
   fallback: "claude-3-5-sonnet-20241022"
 
+  # Per-purpose overrides. Any key here is readable as
+  # LLM::Registry.model_for(:key); unset means "use primary".
+  #
+  # answer_generation: screening answers written for an employer. Unlike
+  # ingestion there's no untrusted third-party text and no PHI, and the
+  # output is read by a human deciding whether to interview -- so this is
+  # the one path where quality outranks keeping the call on-box. The
+  # primary is a 7B *code* model, which is a tool mismatch for first-person
+  # career prose regardless of its size. Point this at a stronger model to
+  # switch just this path:
+  #
+  #   answer_generation: "claude-3-5-sonnet-20241022"
+  #
+  # Add a gemini entry under `models:` below to use that instead --
+  # RubyLLM::Providers::Gemini is already wired in ProviderMap, so it needs
+  # a model entry and an API key, no code.
+
 models:
   local:
     name: "Qwen 2.5 Coder 7B (Local)"
