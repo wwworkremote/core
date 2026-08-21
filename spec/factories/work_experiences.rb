@@ -9,6 +9,7 @@
 #  company_name      :string
 #  context           :text
 #  description       :text
+#  embedding         :vector(768)
 #  employment_type   :string
 #  end_date          :date
 #  impact            :text

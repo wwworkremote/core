@@ -48,7 +48,9 @@ RSpec.describe LLM::AnswerGenerator do
       expect(result[:success]).to be true
       expect(result[:source]).to eq("ai")
       expect(captured_args[:untrusted_text]).to include("Why do you want to work here?")
-      expect(captured_args[:untrusted_text]).to include("Dev at Tech Corp")
+      # Prompt renders the same text the ranking searches over, so title and
+      # company arrive joined by ". " rather than the old "X at Y" phrasing.
+      expect(captured_args[:untrusted_text]).to include("Dev. Tech Corp")
       expect(question.reload.answer_text).to eq("I'm excited about this role because...")
       expect(question.answer_source).to eq("ai")
     end
