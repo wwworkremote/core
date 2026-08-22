@@ -55,8 +55,11 @@ class WorkExperience < ApplicationRecord
   # question about C# or pgvector had no retrievable evidence behind it, and
   # every entry looked alike to cosine distance, which is exactly what the
   # flat 0.56-0.63 spread over 24 experiences was showing.
+  # squish because highlights come from YAML folded scalars and keep their
+  # trailing newlines, which joined into "\n. " and put a line break mid-
+  # sentence in both the embedded text and the rendered prompt.
   def embeddable_text
-    embeddable_parts.compact_blank.join(". ")
+    embeddable_parts.map { |part| part.to_s.squish }.compact_blank.join(". ")
   end
 
   private
