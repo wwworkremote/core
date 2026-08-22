@@ -35,7 +35,12 @@ RSpec.describe Resume::YamlImporter do
       "end_date" => "December 2018",
       "summary" => "Improved testability.",
       "highlights" => [{ "label" => "Quality", "text" => "Hardened test suite." }],
-      "skills" => ["MySQL", "JavaScript", "Automated Testing"]
+      "skills" => ["MySQL", "JavaScript", "Automated Testing"],
+      "case_study" => {
+        "challenge" => "Suite took 40 minutes.",
+        "cartography_approach" => [{ "dimension" => "Test Topology", "detail" => "Mapped fixture coupling." }],
+        "outcomes" => ["Cut MTTR by 60%."]
+      }
     }.to_yaml)
 
     # Mock a position exercising the year-only and "present" date fallbacks.
@@ -59,7 +64,7 @@ RSpec.describe Resume::YamlImporter do
       expect {
         described_class.call(user, base_path: base_path.to_s)
       }.to change(WorkExperience, :count).by(2)
-       .and change(ExperienceHighlight, :count).by(1)
+       .and change(ExperienceHighlight, :count).by(4) # 1 highlight + challenge + dimension + outcome
 
       user.reload
       expect(user.name).to eq("Mike Hall")
@@ -82,6 +87,17 @@ RSpec.describe Resume::YamlImporter do
 
       expect(user.career_profile.reload.skills)
         .to eq("LLM Orchestration, Bounded Agent Workflows, Ruby on Rails")
+    end
+
+    # The quantified outcomes live in the case_study block, not in highlights,
+    # so dropping it meant the only numbers in the file were unretrievable.
+    it "imports the case_study block as highlights" do
+      described_class.call(user, base_path: base_path.to_s)
+
+      exp = WorkExperience.find_by(company_name: "ActiveCampaign")
+      expect(exp.experience_highlights.pluck(:label, :text))
+        .to include(["Outcome", "Cut MTTR by 60%."], ["Test Topology", "Mapped fixture coupling."])
+      expect(exp.embeddable_text).to include("Cut MTTR by 60%.")
     end
 
     it "stores each position's skills list" do

@@ -115,7 +115,29 @@ class Resume::YamlImporter
   end
 
   def highlight_rows(data)
-    Array(data["highlights"]).map { |h| { label: h["label"], text: h["text"] } }
+    Array(data["highlights"]).map { |h| { label: h["label"], text: h["text"] } } + case_study_rows(data)
+  end
+
+  # A position file may carry a `case_study` block -- challenge, a set of
+  # approach dimensions, and outcomes. It's the most specific evidence in the
+  # file (the outcomes are the quantified ones) and none of it was read: the
+  # importer only ever looked at `highlights`. Folded in as highlights rather
+  # than written to a narrative column, because those columns are populated
+  # from elsewhere and overwriting them would lose hand-written text.
+  def case_study_rows(data)
+    study = data["case_study"]
+    return [] unless study.is_a?(Hash)
+
+    [{ label: "Challenge", text: study["challenge"] }] +
+      approach_rows(study) + outcome_rows(study)
+  end
+
+  def approach_rows(study)
+    Array(study["cartography_approach"]).map { |d| { label: d["dimension"], text: d["detail"] } }
+  end
+
+  def outcome_rows(study)
+    Array(study["outcomes"]).map { |o| { label: "Outcome", text: o } }
   end
 
   # to_s before anything else: a bare `start_date: 2025` in the YAML is an
