@@ -15,6 +15,7 @@
 #  impact            :text
 #  location          :string
 #  scope             :jsonb
+#  skills            :text
 #  start_date        :date
 #  summary           :text
 #  title             :string
@@ -34,7 +35,7 @@
 #
 FactoryBot.define do
   factory :work_experience do
-    career_profile { nil }
+    career_profile
     company_name { "MyString" }
     location { "MyString" }
     title { "MyString" }

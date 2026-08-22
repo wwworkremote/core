@@ -19,11 +19,20 @@ class JobBoards::Embedder
     false
   end
 
+  # Same 512-token ceiling embedding_source_text works around, applied at the
+  # shared entry point. Overflowing it doesn't raise -- the server returns a
+  # response with no embedding in it, so this method quietly returns nil and
+  # every caller treats that as "embeddings are off". WorkExperienceEmbeddingJob
+  # returns early on blank, meaning an experience that grew past the limit would
+  # keep a stale vector indefinitely with nothing logged. Truncating here fixes
+  # it for every caller instead of at each call site.
+  MAX_EMBED_CHARS = 1500
+
   # Utility to embed a query string for semantic search
   def self.embed_text(text)
     return nil unless new(nil).send(:enabled?)
 
-    response = post_embedding(text)
+    response = post_embedding(text.to_s.truncate(MAX_EMBED_CHARS))
     return nil unless response.success?
 
     parse_embedding(response)

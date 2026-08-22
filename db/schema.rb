@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_21_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -876,6 +876,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_21_210000) do
     t.text "impact"
     t.string "location"
     t.jsonb "scope"
+    t.text "skills"
     t.date "start_date"
     t.text "summary"
     t.string "title"
