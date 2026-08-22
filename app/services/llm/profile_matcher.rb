@@ -3,8 +3,23 @@
 # Service to match a User's career profile against a specific JobPosting.
 # It leverages multi-document resume analysis and structured work experience.
 class LLM::ProfileMatcher
-  SYSTEM_RULES = "You are a ruthless technical career advocate, expert Ruby negotiator, and elite interview coach."
-  TASK_INSTRUCTIONS = "Return a structured markdown analysis. Be honest, critical, and preparation-oriented."
+  # "expert Ruby negotiator" used to sit in this string, and it biased every
+  # scan regardless of the posting's actual stack. Scoring a Go/TypeScript role
+  # that mentions Ruby zero times, it reported "the role emphasizes Ruby and
+  # Rails" as the top strength and tagged the posting ruby-heavy -- inflating
+  # the score on a stack the candidate does not match. The persona must not
+  # name a language.
+  SYSTEM_RULES = "You are a rigorous technical career advisor and interview coach."
+
+  # The anti-fabrication clause mirrors LLM::AnswerGenerator, which always had
+  # one. Without it the STAR prep invented credentials to fit the posting --
+  # claiming Go backend services and a Principal title at an employer where
+  # neither is true. Prep the candidate cannot honestly say in a room is worse
+  # than no prep.
+  TASK_INSTRUCTIONS = "Return a structured markdown analysis. Be honest, critical, and " \
+                      "preparation-oriented. Assess against the posting's actual stack and " \
+                      "requirements, not a preferred one. Never claim experience, titles, or " \
+                      "technologies the candidate profile does not contain; name gaps as gaps."
 
   # Executes the deep alignment scan and preparation.
   # @param user [User] The candidate being evaluated.
