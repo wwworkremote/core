@@ -3,6 +3,9 @@
 require "yaml"
 
 class Resume::YamlImporter
+  # The only thing binding this app to the just3ws checkout. Overridable via
+  # JUST3WS_RESUME_PATH so a moved peer repo is config, not a code change. Should
+  # stop being a filesystem path at all -- see docs/just3ws-interop-protocol.md.
   DEFAULT_BASE_PATH = "/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume"
   attr_reader :base_path
 
@@ -13,7 +16,7 @@ class Resume::YamlImporter
   def initialize(user, base_path: nil)
     @user = user
     @profile = user.career_profile || user.create_career_profile!
-    @base_path = base_path || DEFAULT_BASE_PATH
+    @base_path = base_path || ENV.fetch("JUST3WS_RESUME_PATH", DEFAULT_BASE_PATH)
   end
 
   def call
@@ -37,7 +40,6 @@ class Resume::YamlImporter
     @profile.update!(contact_info: data["contact"], location_info: data["location"])
   end
 
-  # skills.yml is the resume's real skills inventory, grouped into categories.
   # CareerProfile#skills was a hand-typed list that had drifted out of date --
   # it still read "Solid Queue, Sidekiq, RSpec, OpenTelemetry" with no AI
   # category at all, which is why a screening question about AI tooling came
