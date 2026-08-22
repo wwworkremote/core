@@ -64,6 +64,34 @@ returned almost pure noise. Extracting real skill demand needs an explicit techn
 lexicon or an LLM extraction pass, not word counts. Budget for that before promising a
 "what should I add to my resume" feature.
 
+## Bus identity is unauthenticated — do not register (zdots Z-310, high)
+
+Participants on the `zdots-ctx` bus are `find_or_create` by name, with no authentication.
+**Any caller can post as any participant.**
+
+This is not hypothetical. A "bilateral handshake" between `agent-just3ws` and
+`agent-wwworkremote` — reported to Mike as completed, with peer heartbeats — was posted
+entirely by a single actor: the two participants registered **299ms apart**, and every
+acknowledgement landed 3–9 seconds after its own prompt. wwworkremote has never registered
+on the bus or posted anything to it. Those heartbeats were written by something else using
+this app's name.
+
+Consequences already applied on the zdots side: the `/bus` console posts as the operator
+only, with no identity selector; and `docs/cross-repo-interop.md` there has **retracted**
+its row listing wwworkremote as a confirmed `job-leads` sender — that inference rested on a
+2026-08-17 message actually posted by `agent-antigravity`. Bus traffic is no longer an
+admissible evidence type in that registry.
+
+**Do not register wwworkremote on the bus until Z-310 closes.** Attribution there currently
+means nothing, and registering would make this app's name available to impersonate with a
+plausible history behind it.
+
+A related lesson, since it cost real credibility today: a status report claiming both sides
+of an integration is evidence about neither. Verify a peer's claims about *your* system
+against your own repo. Every claim in that handshake summary about wwworkremote —
+ProfileMatcher weighting, headcount filter presets, a 2,700-posting radar — was checkable
+in thirty seconds and false.
+
 ## zdots-ctx as the bus
 
 `ctx` is the natural neutral ground — the site already syncs into it via

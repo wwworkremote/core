@@ -1,11 +1,10 @@
 ---
 id: TASK-81
-title: >-
-  Surface a stalled application funnel — ingestion outruns applications by
-  ~1500:1
+title: Surface a stalled application funnel — and fix the numbers it reports
 status: To Do
 assignee: []
 created_date: '2026-08-22 15:22'
+updated_date: '2026-08-22 15:39'
 labels: []
 dependencies: []
 priority: high
@@ -43,3 +42,13 @@ Related: `docs/agents/peer-contract-just3ws.md` records the same finding from th
 - [ ] #3 The signal is visible where Mike already looks, not on a new page he must remember to visit
 - [ ] #4 No new scraping or ingestion capability is added by this task
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+2026-08-22 — **correcting this task's own premise.** It was filed reading only `UserJobPosting.status`, which gave "2 applied, 1 pipeline event dated 2026-04-22, 143 untriaged." That is one of two disagreeing sources. Reading `JobPosting.status` instead: **4 applied** (Edfinity, BNSF Railway, Omada Health, Follett), 452 ignored, 469 purged, 4,739 expired, 407 none. Substantially more triage has happened than this task claimed.
+
+The funnel is narrow but not as dead as filed. The application step is still the bottleneck — 4 applications against 6,136 ingested — but "no application in four months" was wrong.
+
+**Blocked on TASK-82.** Any staleness metric built now would inherit the same ambiguity, since which model you query changes the answer. Fix the dual state machine first, then build the signal on the reconciled number.
+<!-- SECTION:NOTES:END -->
