@@ -69,8 +69,8 @@ lexicon or an LLM extraction pass, not word counts. Budget for that before promi
 `ctx` is the natural neutral ground — the site already syncs into it via
 `bin/sync_zdots_ctx.rb`, and both repos' agents can read it through `ctx-mcp`.
 
-**Blocked as of 2026-08-22 — tracked as zdots Z-309.** Do not use ctx as a read or write
-bus until it is fixed. Do not work around it by sanitizing content at the call site.
+**Resolved 2026-08-22** in zdots `5840de41`. Z-297 and Z-309 both closed. Recorded here
+because the shape of the miss is worth keeping, not because it still blocks anything.
 
 Root cause (diagnosed by the zdots kernel session, confirmed independently here): the
 POSIX single-quote escape is applied as a Ruby `gsub` **string** replacement, where `\'` is
@@ -105,12 +105,26 @@ against the isolated escaping logic in a scratch dir (not through the live ctx p
 "it's a $(touch MARKER) day"     -> rc=0, MARKER CREATED   (executed)
 ```
 
-Z-309 escalated to high with a threat model covering content originating from scraped
-pages, transcripts, and peer messages. Note this was previously filed as **Z-297**
-(2026-08-07) at *low/friction* — the reporter hit the same syntax errors, read them as a
-contraction papercut, and it sat for 15 days. The cosmetic reading is what kept it parked.
+**Blast radius was narrower than I claimed.** I asserted here that
+`bin/sync_zdots_ctx.rb` — which pipes 207 interview transcripts and every markdown article
+through `add-lesson` — had therefore been corrupting the knowledge base on every run, and
+that transcribed speech made it the untrusted-input vector. **That was wrong.** The defect
+was in `bin/ctx-mcp` and `bin/o2-mcp`, the *agent-facing MCP servers*, not the
+`zdots-ctx` CLI. That script shells out to the CLI, which passes argv correctly. Only
+content routed through an MCP tool call was ever exposed.
 
-**Live exposure:** `bin/sync_zdots_ctx.rb` in the just3ws repo pipes 207 interview
-transcripts plus every markdown article through `ctx add-lesson`. Transcribed speech is
-dense with contractions, so that path has been silently corrupting content on every run,
-and is the untrusted-input vector for the execution case.
+Measured rather than argued, by the kernel session: of 325 decrypted lessons, **198
+contain an apostrophe and only 2 carry the repeated-phrase signature** (one of those reads
+as genuine repeated speech). Had the sync run through the broken escape, all 198 would be
+mangled. No re-sync was needed.
+
+Three things worth keeping from this:
+
+- **Filed twice, parked once.** Z-297 (2026-08-07) hit the identical syntax errors, read
+  them as a contraction papercut, and sat at low for 15 days. The cosmetic reading is what
+  kept it parked; pushing on severity is what moved it.
+- **The audit found a third instance neither ticket named** — the same idiom at
+  `o2-mcp:112`.
+- **Reason about blast radius from the call path, not from the symptom.** I inferred
+  exposure from "this script writes lessons" without checking *which* interface it writes
+  through. The measurement took one query and would have saved the wrong claim.
