@@ -75,9 +75,24 @@ class Wwwr::CLI
     puts "Cannot transition ##{posting.id} (#{posting.status}) via #{event}."
   end
 
+  # JobPosting#status and UserJobPosting#status are two AASM machines with
+  # overlapping state names. This CLI and the admin UI drove the first; the
+  # Chrome extension drives the second. Nothing reconciled them, so 25 rows
+  # disagreed and one posting read as both "applied" and "ignored" -- which
+  # makes every funnel number depend on which model you happen to query.
+  #
+  # record_status_event! is the extension's path and already does the guard,
+  # the transition and the PipelineStep, so routing through it replaces the
+  # hand-rolled step below rather than adding to it. Behaviour change worth
+  # naming: ignore/expire aren't pipeline events on UserJobPosting, so they no
+  # longer create a PipelineStep. They're properties of the posting, not of a
+  # relationship to it, and 452 ignored postings would be noise in a pipeline.
+  #
+  # ponytail: keeps the two machines in step so recording an application today
+  # is trustworthy either way. One owner for pipeline state is TASK-82.
   def perform_transition(posting, bang, event)
     posting.public_send(bang)
-    posting.pipeline_steps.create!(status: event, note: "Status changed to #{event} via bin/wwwr")
+    User.sole.user_job_postings.find_or_create_by!(job_posting: posting).record_status_event!(event)
     puts "##{posting.id} #{posting.title.to_s.truncate(50)} -> #{event}"
   end
 

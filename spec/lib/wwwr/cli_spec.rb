@@ -38,6 +38,11 @@ RSpec.describe Wwwr::CLI do
   end
 
   describe "transition" do
+    # The CLI now records against the one local User's UserJobPosting as well
+    # as the posting, same as the extension does -- so the single-user
+    # assumption Wwwr::Interop already makes has to hold here too.
+    let!(:user) { create(:user) }
+
     it "applies a legal event and logs a pipeline step" do
       posting = create(:job_posting, status: "none")
 
@@ -45,6 +50,18 @@ RSpec.describe Wwwr::CLI do
 
       expect(posting.reload.status).to eq("favorited")
       expect(posting.pipeline_steps.last.status).to eq("favorite")
+    end
+
+    # The bug this closes: the CLI moved JobPosting.status and wrote a
+    # PipelineStep while UserJobPosting.status stayed put, so the audit trail
+    # claimed a pipeline advance that the user's own record never saw.
+    it "keeps the user's tracked status in step with the posting" do
+      posting = create(:job_posting, status: "none")
+
+      cli.run(["transition", posting.id.to_s, "favorite"])
+
+      tracked = user.user_job_postings.find_by(job_posting: posting)
+      expect(tracked.status).to eq("favorited")
     end
 
     it "refuses an illegal transition without raising" do
