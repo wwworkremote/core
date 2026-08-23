@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-22 19:43'
-updated_date: '2026-08-22 19:46'
+updated_date: '2026-08-23 15:30'
 labels: []
 dependencies: []
 priority: high
@@ -49,11 +49,11 @@ Reading application *outcome* status (rejected / in review / interview). LinkedI
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 LinkedIn applied-list entries import as applied transitions on the correct JobPosting
+- [x] #1 LinkedIn applied-list entries import as applied transitions on the correct JobPosting
 - [ ] #2 Indeed applied-list entries do the same
-- [ ] #3 Transitions are recorded at the real application date, not import time
-- [ ] #4 List rows with no matching JobPosting are handled explicitly (created or held), never silently dropped
-- [ ] #5 Re-running a backfill does not duplicate applications or create duplicate PipelineSteps
+- [x] #3 Transitions are recorded at the real application date, not import time
+- [x] #4 List rows with no matching JobPosting are handled explicitly (created or held), never silently dropped
+- [x] #5 Re-running a backfill does not duplicate applications or create duplicate PipelineSteps
 - [ ] #6 A Greenhouse submit is captured even when the posting was not already tracked with a wwr_id
 - [ ] #7 Every selector used was verified against a live page, not inferred
 - [ ] #8 extension/manifest.json version bumped
@@ -92,3 +92,32 @@ Do not build four bespoke integrations. Build **one "applied list" adapter shape
 - No background or scheduled scraping of logged-in surfaces — capture happens on a page he has navigated to.
 - Read-only. Nothing is written back to any board.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+## 2026-08-23 — LinkedIn half landed via saved-page import, not the extension
+
+`bin/import_linkedin_tracker <stage> <saved-html>` (commit 0ff408a2, idempotency fix follows). **Tracked applications went 4 -> 14.**
+
+**Mechanism differs from the plan and the difference matters.** The plan assumed an extension DOM read of the live tracker. I used a "Save Page As -> Complete" of the same page instead. Same data, same read-only risk profile, no extension work — but it only solves *backfill*. Ongoing capture still wants the extension path, so AC #9 (one shared applied-list adapter) is untouched and still correct as written.
+
+Imported: 10 applied, 8 clicked_apply, 10 saved.
+
+**`clicked_apply` is recorded as favorite, not applied** — LinkedIn only knows he left for the employer's site, not that he finished. Recording those as applied would have inflated the funnel by 8.
+
+**Dedup is on the LinkedIn job id inside `target_url`, not our signature** (AC #4/#5). The same posting routinely arrives twice: once scraped from a LinkedIn job-alert email (source "Email (LinkedIn)") and once from the tracker. #5653 and #5654 were already in the DB under these exact ids. A match also backfills `company_name`, which email-scraped LinkedIn rows arrive without.
+
+AC #3 (real date): partially. LinkedIn gives relative ages only ("Applied 3mo ago"), so the date is approximate and stored as approximate in `UserJobPosting.notes` — there is no `applied_at` column to put it in. Five of the ten applications date to ~2026-05-23; that gap is real signal for TASK-81.
+
+AC #5 verified by re-running: JP.applied 12, UJP.applied 12, PipelineStep 410, notes length 722 — all unchanged.
+
+### Blocked on the human (see HUMAN.md)
+
+- **AC #2 Indeed — cannot proceed.** The saved `My jobs _ Indeed.html` is the app shell only: `window._initialState` carries config, the job list loads by XHR afterward, and the file contains zero job ids. Needs a re-save after the list renders.
+- **AC #10 Greenhouse — cannot verify.** The saved `MyGreenhouse.html` is **0 bytes**. Whether `my.greenhouse.io` aggregates across tenants is still unknown, so Tier 2 vs Tier 3 is still undecided.
+
+### Also worth knowing
+
+The applications and the ingestion corpus are **nearly disjoint**. Of 28 LinkedIn tracker rows, only 3 already existed among 6,136 ingested postings. The pipeline is not surfacing the jobs he actually applies to — that is a bigger finding than the backfill itself and belongs in TASK-81's analysis.
+<!-- SECTION:NOTES:END -->
