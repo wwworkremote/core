@@ -44,3 +44,9 @@ data/maxmind/
 
 doc/
 coverage/
+
+# Human-answer handoffs. Questions are fine in the repo; the answers routinely
+# carry career narrative that must not reach a public mirror. Same pattern the
+# just3ws.github.io repo settled on. Filled-in copies live in ~/my.
+HUMAN.md
+HUMAN.local.md

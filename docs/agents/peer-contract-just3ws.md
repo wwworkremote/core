@@ -92,6 +92,9 @@ against your own repo. Every claim in that handshake summary about wwworkremote 
 ProfileMatcher weighting, headcount filter presets, a 2,700-posting radar — was checkable
 in thirty seconds and false.
 
+Queued work for that repo, held rather than applied, is in
+[`just3ws-pending-changes.md`](just3ws-pending-changes.md).
+
 ## Rule: never assert state in a repo you cannot read
 
 Both directions, and it binds this repo's agents first.
