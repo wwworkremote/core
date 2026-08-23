@@ -106,7 +106,18 @@ def advance(posting, user, event, note)
   tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
   tracked.record_status_event!("favorite") if tracked.status == "none"
   tracked.record_status_event!("apply") if event == :apply && tracked.status != "applied"
-  tracked.update!(notes: [tracked.notes, note].compact_blank.join("\n")) if note
+  append_note(tracked, note)
+end
+
+# Statuses and PipelineSteps are already idempotent via the may_* guards, but
+# the note is a plain append and re-running a backfill stacked a second copy.
+# Match on the age string ("Applied 3mo ago") rather than the whole line: the
+# trailing "imported <date>" changes every run, so a full-string compare would
+# never see the duplicate.
+def append_note(tracked, note)
+  return if note.blank? || tracked.notes.to_s.include?(note[/^[^(]+/].to_s.strip)
+
+  tracked.update!(notes: [tracked.notes, note].compact_blank.join("\n"))
 end
 
 # source_id rather than the association: JobPosting's belongs_to resolves to a
