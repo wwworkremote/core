@@ -29,6 +29,18 @@ guidance needed.
   (code bug vs. worker/infra), recurring-job schedule cross-check. Use when something's actually
   wrong, not for a routine check.
 
+## Application-history backfill
+
+- **`bin/import_linkedin_tracker <stage> <saved-html> [--dry-run]`** — reads a "Save Page As →
+  Complete" of `linkedin.com/jobs-tracker/?stage=<applied|clicked_apply|saved>` and records the
+  applications in it. LinkedIn has no export and no tracker API, and the list is client-rendered,
+  so the saved DOM is genuinely the only source. Dedups on the LinkedIn job id inside
+  `target_url` (the same posting also arrives via LinkedIn job-alert emails), writes both
+  `JobPosting` and `UserJobPosting`, and records `clicked_apply` as *favorite* rather than
+  applied — LinkedIn only knows he left for the employer's site, not that he finished.
+  Always `--dry-run` first; it prints create/backfill per row without writing.
+  Caps at whatever the page had loaded, ~10 rows per stage, so scroll before saving.
+
 ## Verification / smoke scripts
 
 All of these are read-mostly and safe to run against development; none should be run under
