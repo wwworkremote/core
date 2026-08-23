@@ -1,0 +1,132 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Backfill application history from a saved LinkedIn job-tracker page.
+#
+# LinkedIn has no export and no API for the tracker, so the input is a
+# "Save Page As -> Complete" of https://www.linkedin.com/jobs-tracker/?stage=<stage>.
+# The list is client-rendered, so the saved DOM is the only place the data
+# exists -- there is no embedded JSON payload to read instead.
+#
+# Usage:
+#   bin/import_linkedin_tracker applied "~/Desktop/inbox/Job tracker _ LinkedIn - stage=applied.html"
+#   bin/import_linkedin_tracker saved   <file>   # also: clicked_apply
+#   bin/import_linkedin_tracker applied <file> --dry-run
+#
+# ponytail: one page per invocation, no pagination. LinkedIn renders 10 rows
+# per stage before "show more", so a heavy month needs scrolling before the
+# save. If that becomes the norm, drive it with the Chrome extension instead
+# of hand-saving.
+require_relative "../config/environment"
+require "nokogiri"
+
+STAGES = {
+  # LinkedIn's own vocabulary -> our event. "clicked_apply" means he left for
+  # the employer's site; LinkedIn cannot see whether he finished, so it is
+  # deliberately NOT recorded as applied.
+  "applied" => :apply,
+  "clicked_apply" => :favorite,
+  "saved" => :favorite
+}.freeze
+
+def usage
+  warn "Usage: bin/import_linkedin_tracker <#{STAGES.keys.join('|')}> <saved-html> [--dry-run]"
+  exit 1
+end
+
+stage, path, *flags = ARGV
+usage unless STAGES.key?(stage) && path
+dry_run = flags.include?("--dry-run")
+path = File.expand_path(path)
+abort "No such file: #{path}" unless File.exist?(path)
+abort "Empty file (the save produced 0 bytes): #{path}" if File.size(path).zero?
+
+# Relative ages are all LinkedIn gives ("Applied 3mo ago"). Approximate is
+# enough for a staleness signal and is recorded as approximate, not as a date
+# we can defend.
+def approximate_date(note)
+  n, unit = note.to_s.match(/(\d+)\s*(d|w|mo|yr)\b/)&.captures
+  return nil unless n
+
+  { "d" => n.to_i.days, "w" => n.to_i.weeks, "mo" => n.to_i.months, "yr" => n.to_i.years }[unit]&.ago&.to_date
+end
+
+def rows_from(doc)
+  doc.css('a[href*="/jobs/view/"]').filter_map do |a|
+    id = a["href"][%r{/jobs/view/(\d{8,12})}, 1]
+    next unless id
+
+    # Each field is its own <p> inside the anchor. a.text runs them together
+    # ("Software Engineer | RemoteCrossing Hurdles"), so read the elements.
+    lines = a.css("p").map { |p| p.text.strip }.reject(&:empty?)
+    next if lines.empty?
+
+    company, location = (lines[1..].find { |l| l.include?("·") } || "").split("·", 2).map(&:strip)
+    { id: id, title: lines.first, company: company, location: location,
+      note: lines[1..].find { |l| l.match?(/\b(Applied|Saved|Viewed)\b.*ago/) } }
+  end.uniq { |r| r[:id] }
+end
+
+# Dedup on the LinkedIn job id inside target_url, not just our own signature.
+# The same posting routinely arrives twice -- once scraped from a LinkedIn job
+# alert email (source "Email (LinkedIn)") and once here -- and matching only on
+# signature would double-count it in every funnel number. Confirmed against
+# #5653/#5654, which were already in the DB under these exact ids.
+def existing_posting(row)
+  JobPosting.find_by(signature: Digest::SHA256.hexdigest("linkedin-tracker-#{row[:id]}")) ||
+    JobPosting.where("target_url LIKE ?", "%/jobs/view/#{row[:id]}%").first
+end
+
+def upsert(row, dry_run)
+  posting = existing_posting(row)
+  return ["exists", posting] if posting && dry_run
+  return [:backfill, backfill(posting, row)] if posting
+  return ["create", nil] if dry_run
+
+  ["create", JobPosting.create!(
+    signature: Digest::SHA256.hexdigest("linkedin-tracker-#{row[:id]}"), title: row[:title],
+    company_name: row[:company], location: row[:location], source_id: linkedin_source_id,
+    target_url: "https://www.linkedin.com/jobs/view/#{row[:id]}/", status: "none", crawl_status: "pending"
+  )]
+end
+
+# Email-scraped LinkedIn postings arrive with company_name nil, so a match here
+# is a chance to fill it in rather than just skip.
+def backfill(posting, row)
+  posting.update!(company_name: row[:company]) if posting.company_name.blank? && row[:company].present?
+  posting
+end
+
+# apply requires favorited, so a brand-new posting takes two steps. Same two
+# writes bin/wwwr transition makes -- JobPosting and UserJobPosting -- because
+# they are separate state machines that drift when only one is moved (TASK-82).
+def advance(posting, user, event, note)
+  posting.favorite! if posting.may_favorite?
+  posting.apply! if event == :apply && posting.may_apply?
+  tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
+  tracked.record_status_event!("favorite") if tracked.status == "none"
+  tracked.record_status_event!("apply") if event == :apply && tracked.status != "applied"
+  tracked.update!(notes: [tracked.notes, note].compact_blank.join("\n")) if note
+end
+
+# source_id rather than the association: JobPosting's belongs_to resolves to a
+# differently-loaded copy of the Source class than JobBoards::Source here, and
+# assigning the record raises AssociationTypeMismatch. The id sidesteps it.
+def linkedin_source_id
+  @linkedin_source_id ||= JobBoards::Source.find_or_create_by!(slug: "linkedin") { |s| s.name = "LinkedIn" }.id
+end
+
+user = User.sole
+event = STAGES.fetch(stage)
+rows = rows_from(Nokogiri::HTML(File.read(path)))
+abort "Parsed 0 rows -- was the page fully loaded before saving?" if rows.empty?
+
+puts "#{rows.size} rows in #{File.basename(path)} (stage=#{stage} -> #{event})#{' [DRY RUN]' if dry_run}"
+
+rows.each do |row|
+  action, posting = upsert(row, dry_run)
+  date = approximate_date(row[:note])
+  note = date && "LinkedIn tracker: #{row[:note]} (~#{date}), imported #{Date.current}"
+  advance(posting, user, event, note) unless dry_run
+  puts format("  %-8s %-44s %-24s %s", action, row[:title].to_s[0, 42], row[:company].to_s[0, 22], date || "")
+end
