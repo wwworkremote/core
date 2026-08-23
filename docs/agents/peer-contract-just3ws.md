@@ -92,6 +92,25 @@ against your own repo. Every claim in that handshake summary about wwworkremote 
 ProfileMatcher weighting, headcount filter presets, a 2,700-posting radar — was checkable
 in thirty seconds and false.
 
+## Rule: never assert state in a repo you cannot read
+
+Both directions, and it binds this repo's agents first.
+
+**Writing.** A claim about a repo outside this session's working directories is written as
+intent, never as achievement. "Proposed adding X to just3ws" — not "added X". If you cannot
+open the file and see the change, you do not get the past tense. This holds at every effort
+level; a low-token run is exactly when the distinction gets dropped, which is how it went
+wrong on 2026-08-22.
+
+**Reading.** A peer's claim about *this* repo is a lead, not a fact. Check it against the
+working tree before it informs a decision or gets repeated to Mike. Bus traffic and handoff
+files are both unauthenticated (Z-310), so neither is evidence of its own contents.
+
+Filed upstream as zdots **Z-313** — the handoff format and bus have no verified-vs-intended
+marker, so this rule currently lives in prose in each repo instead of in the substrate.
+The operator's read on the original incident: the peer's own-repo work was real; the failure
+was reporting intended state as achieved across a boundary it could not see.
+
 ## zdots-ctx as the bus
 
 `ctx` is the natural neutral ground — the site already syncs into it via
