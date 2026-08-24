@@ -104,19 +104,23 @@ the mandate answers it before the question forms.
 the acquirer — must **not** appear in the YAML. It is interview-prep material and
 already lives in the vault copy.
 
-## 4. Selected Current Work is still four entries — partially unblocked
+## 4. Selected Current Work — **APPLIED 2026-08-24** (just3ws `620f5f84`)
 
-`_data/resume/ats.yml:25-31` lists `agent-tooling`, `wwworkremote`, `phalanx-duel`,
-`technical-conversation-archive`. `resume.html` is ~1,856 words, roughly 3.7 pages.
+`wwworkremote` removed from `_data/resume/ats.yml`. Three entries remain: `agent-tooling`,
+`phalanx-duel`, `technical-conversation-archive`. `bin/validate_data.rb` passes.
 
-**Settled 2026-08-23** (`HUMAN.answered.md` #2): the wwworkremote repo **stays private**.
-Extracting a public slice is off the table — guardrails and application data live in one
-repo, so exposing any of it exposes all of it.
+**Settled 2026-08-23** (`HUMAN.answered.md` #2): the repo **stays private**. Extracting a
+public slice is off the table — guardrails and application data live in one repo, so exposing
+any of it exposes all of it.
 
-**Still open** as `HUMAN.md` #8: his answer was "don't put it on the resume publicly yet but
-don't delete the references", which points both ways for this file. Proposed reading — keep
-the `wwworkremote` entry, drop any repo URL, describe it plainly — pending one-word
-confirmation. Do not edit `ats.yml` until that lands.
+**Decided 2026-08-24** (`HUMAN.answered.md` #8): remove it from the resume. This **overrules
+the proposed reading** in an earlier revision of this file, which was "keep the entry, drop the
+URL". He chose removal, and it is the more consistent call — a private repo described in detail
+is an unverifiable claim regardless of whether a URL is attached.
+
+**`positions/wwworkremote.yml` is deliberately retained.** "Don't delete the references" means
+the position file stays, so the work is recoverable if he later opens the repo. Only the
+`ats.yml` listing went. Do not garbage-collect it as an orphan.
 
 ## 5. SCNA / Obtiva / SCMC chronology — **ACTED ON 2026-08-24** (`6ea30b5e`)
 
@@ -190,9 +194,10 @@ Approved 2026-08-23 (`HUMAN.answered.md` #4) as one line in the position summary
 
 ## Recommendation
 
-**Updated 2026-08-24.** Items 1, 2, 5, 6 are applied, and item 3 is applied in part — its
-`case_study` half was withdrawn by a later answer, so do not resurrect it. **Only item 4
-still waits**, on `HUMAN.md` #8.
+**Queue closed 2026-08-24.** Items 1, 2, 4, 5, 6 are applied; item 3 is applied in part — its
+`case_study` half was withdrawn by a later answer, so do not resurrect it. **Nothing here is
+blocked on Mike any more.** Keep this file as the record of what was decided and why; new peer-
+repo work should start a fresh queue rather than reopening these.
 
 One thing this queue did not anticipate: `Resume::YamlImporter` no longer reads that repo's
 working tree at all. It fetches `http://just3ws.localhost/resume.json`, so changes there
