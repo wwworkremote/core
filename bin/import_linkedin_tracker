@@ -63,7 +63,13 @@ def rows_from(doc)
 
     company, location = (lines[1..].find { |l| l.include?("·") } || "").split("·", 2).map(&:strip)
     { id: id, title: lines.first, company: company, location: location,
-      note: lines[1..].find { |l| l.match?(/\b(Applied|Saved|Viewed)\b.*ago/) } }
+      note: lines[1..].find { |l| l.match?(/\b(Applied|Saved|Viewed)\b.*ago/) },
+      # LinkedIn's own outcome signal: this line is already inside the anchor's
+      # <p> children (every row has it, or doesn't) -- previously parsed and
+      # discarded. It's the same fact Greenhouse expresses as `inactive` and
+      # Indeed as employerJobStatus CLOSED: the listing closed, not a
+      # rejection, but real signal that beats silence.
+      closed: lines.any? { |l| l.include?("No longer accepting applications") } }
   end.uniq { |r| r[:id] }
 end
 
@@ -100,13 +106,17 @@ end
 # apply requires favorited, so a brand-new posting takes two steps. Same two
 # writes bin/wwwr transition makes -- JobPosting and UserJobPosting -- because
 # they are separate state machines that drift when only one is moved (TASK-82).
-def advance(posting, user, event, note)
+def advance(posting, user, event, note, row)
   posting.favorite! if posting.may_favorite?
   posting.apply! if event == :apply && posting.may_apply?
   tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
   tracked.record_status_event!("favorite") if tracked.status == "none"
   tracked.record_status_event!("apply") if event == :apply && tracked.status != "applied"
   append_note(tracked, note)
+  # Only when closed and only when nothing stronger is already recorded --
+  # Indeed's REJECTED (import_indeed_applications) is a stronger fact than
+  # LinkedIn's "listing closed" and should not be overwritten by it.
+  tracked.update!(outcome: "closed", outcome_at: Time.current, outcome_source: "self_reported") if row[:closed] && tracked.outcome.blank?
 end
 
 # Statuses and PipelineSteps are already idempotent via the may_* guards, but
@@ -138,6 +148,7 @@ rows.each do |row|
   action, posting = upsert(row, dry_run)
   date = approximate_date(row[:note])
   note = date && "LinkedIn tracker: #{row[:note]} (~#{date}), imported #{Date.current}"
-  advance(posting, user, event, note) unless dry_run
-  puts format("  %-8s %-44s %-24s %s", action, row[:title].to_s[0, 42], row[:company].to_s[0, 22], date || "")
+  advance(posting, user, event, note, row) unless dry_run
+  puts format("  %-8s %-44s %-24s %-12s %s", action, row[:title].to_s[0, 42], row[:company].to_s[0, 22],
+              date || "", row[:closed] ? "[closed]" : "")
 end
