@@ -143,21 +143,25 @@ RSpec.describe Resume::YamlImporter do
     # The whole point of the move off disk: with no source injected it must go
     # to the documented endpoint, not to another checkout's working tree.
     it "fetches the published endpoint when no source is injected" do
-      stub = instance_double(Faraday::Response, success?: true, body: source.to_json)
-      allow(Faraday).to receive(:get).with("http://just3ws.localhost/resume.json").and_return(stub)
+      conn = stub_connection(instance_double(Faraday::Response, success?: true, body: source.to_json))
 
       described_class.call(user)
 
-      expect(Faraday).to have_received(:get).once
+      expect(conn).to have_received(:get).with(Resume::Source::DEFAULT_URL).once
       expect(WorkExperience.find_by(company_name: "ActiveCampaign")).to be_present
     end
 
     it "raises rather than importing a partial profile when the endpoint fails" do
-      stub = instance_double(Faraday::Response, success?: false, status: 503)
-      allow(Faraday).to receive(:get).and_return(stub)
+      stub_connection(instance_double(Faraday::Response, success?: false, status: 503))
 
       expect { described_class.call(user) }.to raise_error(/returned 503/)
       expect(WorkExperience.count).to eq(0)
+    end
+
+    def stub_connection(response)
+      conn = instance_double(Faraday::Connection, get: response)
+      allow(Faraday).to receive(:new).and_return(conn)
+      conn
     end
   end
 end

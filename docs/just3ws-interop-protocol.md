@@ -27,7 +27,7 @@ AI agents working in `wwworkremote` should post lead evaluations, job match upda
 
 `just3ws.localhost` exposes machine-readable APIs derived from canonical data (`_data/resume/`):
 
-* **Structured Resume API (JSON)**: `GET http://just3ws.localhost/resume.json`
+* **Structured Resume API (JSON)**: `GET https://just3ws.localhost/resume.json` (http 301s to https; Faraday does not follow redirects)
   - Full candidate `profile`, `summary`, `positions` array, `skills` breakdown, `leadership` records, and `timeline`.
 
 * **Markdown Resume Export**: `GET http://just3ws.localhost/exports/resume.md`
