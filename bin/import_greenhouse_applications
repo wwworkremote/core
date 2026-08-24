@@ -84,8 +84,17 @@ def backfill(posting, app)
   posting
 end
 
+# JobPosting#source resolves to plain ::Source (an ingestion-event row
+# belonging to an Origin), NOT JobBoards::Source -- a same-named, unrelated
+# model with its own table. Using JobBoards::Source's id satisfied the FK by
+# coincidence in dev (both tables happened to have overlapping id ranges) but
+# pointed every posting at a random unrelated Source row. Mirrors
+# Leads::CaptureService#resolve_source, the extension's own real capture path.
 def greenhouse_source_id
-  @greenhouse_source_id ||= JobBoards::Source.find_or_create_by!(slug: "greenhouse") { |s| s.name = "Greenhouse" }.id
+  @greenhouse_source_id ||= begin
+    origin = Origin.find_or_create_by!(name: "Greenhouse")
+    Source.find_or_create_by!(signature: "greenhouse-app-import") { |s| s.origin = origin; s.name = "Greenhouse" }.id
+  end
 end
 
 # Same two-machine write as bin/wwwr transition and the LinkedIn importer --

@@ -301,6 +301,9 @@ Rails.application.routes.draw do
     namespace :v0 do
       get "geo" => "geo#index"
       get "profile" => "profile#show"
+      resource :outcomes, only: [], controller: "outcomes" do
+        post :indeed
+      end
       resources :sources, only: %i[index show]
       resources :job_postings, only: %i[index show create] do
         member do

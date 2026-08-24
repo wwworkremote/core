@@ -130,11 +130,17 @@ def append_note(tracked, note)
   tracked.update!(notes: [tracked.notes, note].compact_blank.join("\n"))
 end
 
-# source_id rather than the association: JobPosting's belongs_to resolves to a
-# differently-loaded copy of the Source class than JobBoards::Source here, and
-# assigning the record raises AssociationTypeMismatch. The id sidesteps it.
+# JobPosting#source resolves to plain ::Source (an ingestion-event row
+# belonging to an Origin), NOT JobBoards::Source -- a same-named, unrelated
+# model with its own table. Using JobBoards::Source's id satisfied the FK by
+# coincidence in dev (both tables happened to have overlapping id ranges) but
+# pointed every posting at a random unrelated Source row. Mirrors
+# Leads::CaptureService#resolve_source, the extension's own real capture path.
 def linkedin_source_id
-  @linkedin_source_id ||= JobBoards::Source.find_or_create_by!(slug: "linkedin") { |s| s.name = "LinkedIn" }.id
+  @linkedin_source_id ||= begin
+    origin = Origin.find_or_create_by!(name: "LinkedIn")
+    Source.find_or_create_by!(signature: "linkedin-tracker-import") { |s| s.origin = origin; s.name = "LinkedIn" }.id
+  end
 end
 
 user = User.sole

@@ -62,76 +62,16 @@ def rows_from(har)
   payloads.max_by { |p| p.is_a?(Array) ? p.size : 0 } || []
 end
 
-def signature_for(row)
-  Digest::SHA256.hexdigest("indeed-app-#{row['jobKey']}")
-end
-
-def find_posting(row)
-  Applications::PostingMatcher.call(
-    signature: signature_for(row),
-    native_id_fragment: "jk=#{row['jobKey']}",
-    target_url: row["jobUrl"],
-    company: row.dig("company", "name"),
-    title: row["jobTitle"]
+# Upsert + outcome logic lives in Applications::IndeedRowImporter, shared
+# with Api::V0::OutcomesController so the extension's live capture and this
+# HAR-replay backfill write through one code path.
+def dry_run_line(row)
+  posting = Applications::PostingMatcher.call(
+    signature: Digest::SHA256.hexdigest("indeed-app-#{row['jobKey']}"),
+    native_id_fragment: "jk=#{row['jobKey']}", target_url: row["jobUrl"],
+    company: row.dig("company", "name"), title: row["jobTitle"]
   )
-end
-
-def upsert(row, dry_run)
-  posting = find_posting(row)
-  return ["exists", posting] if posting && dry_run
-  return ["backfill", backfill(posting, row)] if posting
-  return ["create", nil] if dry_run
-
-  ["create", JobPosting.create!(
-    signature: signature_for(row), title: row["jobTitle"].to_s.strip,
-    company_name: row.dig("company", "name").to_s.strip, location: row["location"],
-    source_id: indeed_source_id, target_url: row["jobUrl"],
-    status: "none", crawl_status: "pending"
-  )]
-end
-
-def backfill(posting, row)
-  company = row.dig("company", "name").to_s.strip
-  posting.update!(company_name: company) if posting.company_name.blank? && company.present?
-  posting
-end
-
-def indeed_source_id
-  @indeed_source_id ||= JobBoards::Source.find_or_create_by!(slug: "indeed") { |s| s.name = "Indeed" }.id
-end
-
-# Employer signal beats his own self-report, and REJECTED beats REVIEWED --
-# once an employer has said no, a later "reviewed" from a different field
-# would otherwise look like progress. jobExpired is the weakest signal (the
-# posting could just be full), so it only fires when nothing stronger applies.
-OUTCOME_RANK = { "REJECTED" => 3, "REVIEWED" => 2, "CLOSED" => 1 }.freeze
-
-def outcome_for(row)
-  candidates = {
-    row.dig("statuses", "candidateStatus", "status") => "employer",
-    row.dig("statuses", "selfReportedStatus", "status") => "self_reported",
-    row.dig("statuses", "employerJobStatus", "status") => "employer"
-  }.compact
-  best = candidates.keys.max_by { |s| OUTCOME_RANK[s] || 0 }
-  return [nil, nil] unless best && OUTCOME_RANK.key?(best)
-
-  [best.downcase, candidates[best]]
-end
-
-# Same two-machine write as the other importers -- JobPosting and
-# UserJobPosting drift when only one is moved (TASK-82).
-def advance(posting, user, applied_at, row)
-  posting.favorite! if posting.may_favorite?
-  posting.apply! if posting.may_apply?
-  tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
-  tracked.record_status_event!("apply") if tracked.status != "applied"
-  # Only fill a blank date. Indeed's applyTime is exact, but so is
-  # Greenhouse's, and when both describe one application the first writer is as
-  # good as the second -- overwriting would just churn the column.
-  tracked.update!(applied_at: applied_at) if applied_at && tracked.applied_at.blank?
-
-  outcome, source = outcome_for(row)
-  tracked.update!(outcome: outcome, outcome_at: Time.current, outcome_source: source) if outcome
+  posting ? "exists" : "create"
 end
 
 user = User.sole
@@ -141,10 +81,15 @@ abort "Parsed 0 applications -- does the HAR contain myjobs.indeed.com/api/v1/ap
 puts "#{rows.size} applications in #{File.basename(path)}#{' [DRY RUN]' if dry_run}"
 
 rows.sort_by { |r| r["applyTime"].to_i }.each do |row|
-  action, posting = upsert(row, dry_run)
-  applied_at = row["applyTime"] && Time.zone.at(row["applyTime"].to_i / 1000)
-  advance(posting, user, applied_at, row) unless dry_run
-  outcome, = outcome_for(row)
-  puts format("  %-8s %-10s %-26s %-42s %s", action, applied_at&.to_date, row.dig("company", "name").to_s[0, 24],
-              row["jobTitle"].to_s[0, 42], outcome ? "[#{outcome}]" : "")
+  if dry_run
+    action = dry_run_line(row)
+    applied_at = row["applyTime"] && Time.zone.at(row["applyTime"].to_i / 1000)
+    puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, row.dig("company", "name").to_s[0, 24],
+                row["jobTitle"].to_s[0, 42])
+  else
+    result = Applications::IndeedRowImporter.call(row, user: user)
+    puts format("  %-8s %-10s %-26s %-42s %s", "ok", result[:applied_at]&.to_date,
+                row.dig("company", "name").to_s[0, 24], row["jobTitle"].to_s[0, 42],
+                result[:outcome] ? "[#{result[:outcome]}]" : "")
+  end
 end
