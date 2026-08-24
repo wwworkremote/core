@@ -168,7 +168,7 @@ Also captured, useful for the community history rather than the resume: SCMC fir
 Mike interviewed); **Jim Breen** worked with him at Obtiva on the Sears Commercial engagement.
 Meetup is `software-craftsmanship-mchenry-county`.
 
-Local copies in `~/Desktop/inbox/SCNA History/`.
+Local copies in `~/ai/inbox/SCNA History/`.
 
 **This is a research task, not a blocked one.** Work the sources and propose a corrected
 timeline. If a fact turns out genuinely undecidable from them, ask it as a new numbered

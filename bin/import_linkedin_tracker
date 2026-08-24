@@ -9,7 +9,7 @@
 # exists -- there is no embedded JSON payload to read instead.
 #
 # Usage:
-#   bin/import_linkedin_tracker applied "~/Desktop/inbox/Job tracker _ LinkedIn - stage=applied.html"
+#   bin/import_linkedin_tracker applied "~/ai/inbox/Job tracker _ LinkedIn - stage=applied.html"
 #   bin/import_linkedin_tracker saved   <file>   # also: clicked_apply
 #   bin/import_linkedin_tracker applied <file> --dry-run
 #

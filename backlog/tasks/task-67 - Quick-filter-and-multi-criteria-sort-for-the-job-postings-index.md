@@ -11,7 +11,7 @@ labels:
 dependencies: []
 documentation:
   - >-
-    /Users/mike/Desktop/inbox/inspiration/agentic-platform-lessons-2026-08-12/31-global-command-palette-and-keyboard-navigation/lesson.md
+    /Users/mike/ai/inbox/inspiration/agentic-platform-lessons-2026-08-12/31-global-command-palette-and-keyboard-navigation/lesson.md
 modified_files:
   - app/controllers/job_postings_controller.rb
   - app/models/job_posting.rb
@@ -29,7 +29,7 @@ The job_postings index (JobPostingsController#index / app/views/job_postings/ind
 
 User framing to keep in mind for this and future UI work on this app: WWWorkRemote is deliberately the intersection of an admin/data-management tool and a browsing/product interface, built for one local power user -- not a simplified consumer product. Favor dense, fast, keyboard-friendly affordances over hiding complexity.
 
-Design inspiration flagged by the user: a global Cmd+K-style command palette pattern, documented at /Users/mike/Desktop/inbox/inspiration/agentic-platform-lessons-2026-08-12/31-global-command-palette-and-keyboard-navigation/lesson.md -- keyboard shortcut opens an instant modal search/filter overlay backed by a fast index, supporting direct-jump navigation. Whether this task adopts that exact pattern (a global palette) versus a more conventional inline quick-filter bar with additional sort options is a design decision to make before implementation, not a foregone conclusion -- evaluate both against this specific index page's needs (large result sets, existing filter params, existing sort infrastructure) rather than assuming the palette pattern is the right fit wholesale.
+Design inspiration flagged by the user: a global Cmd+K-style command palette pattern, documented at /Users/mike/ai/inbox/inspiration/agentic-platform-lessons-2026-08-12/31-global-command-palette-and-keyboard-navigation/lesson.md -- keyboard shortcut opens an instant modal search/filter overlay backed by a fast index, supporting direct-jump navigation. Whether this task adopts that exact pattern (a global palette) versus a more conventional inline quick-filter bar with additional sort options is a design decision to make before implementation, not a foregone conclusion -- evaluate both against this specific index page's needs (large result sets, existing filter params, existing sort infrastructure) rather than assuming the palette pattern is the right fit wholesale.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
