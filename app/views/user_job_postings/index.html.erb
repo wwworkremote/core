@@ -7,9 +7,18 @@
     </div>
   </div>
 
-  <header class="mb-12">
-    <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none">My Jobs</h1>
-    <p class="text-slate-500 font-bold text-sm">Jobs you've favorited or applied to.</p>
+  <header class="mb-12 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none">My Jobs</h1>
+      <p class="text-slate-500 font-bold text-sm">Jobs you've favorited or applied to.</p>
+    </div>
+    <div class="flex items-center gap-1 text-xs font-bold">
+      <span class="text-slate-500 mr-2">Sort</span>
+      <% { "newest" => "Newest", "oldest" => "Oldest" }.each do |key, label| %>
+        <%= link_to label, user_job_postings_path(sort: key),
+              class: "px-3 py-1.5 rounded-lg transition-all #{@sort == key ? 'bg-primary/20 text-primary border border-primary/20' : 'text-slate-500 hover:text-white border border-transparent'}" %>
+      <% end %>
+    </div>
   </header>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -26,6 +35,9 @@
                   <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors"><%= link_to job.title, job_posting_path(job) %></h4>
 
                   <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                    <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
+                      <i class="bi bi-bookmark"></i> saved <%= user_job.created_at.strftime("%b %-d, %Y") %>
+                    </span>
                     <% if job.data['is_remote'] %>
                       <span class="text-xs font-bold text-emerald-500 flex items-center gap-1">
                         <i class="bi bi-broadcast"></i> Remote
@@ -63,8 +75,19 @@
             <div class="card-neural p-6 border-accent/20">
               <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
               <h4 class="text-lg font-black text-white"><%= link_to job.title, job_posting_path(job) %></h4>
-              <div class="mt-4 flex gap-2">
+              <div class="mt-4 flex flex-wrap items-center gap-2">
                 <span class="px-2 py-1 rounded bg-accent/20 text-accent text-xs font-bold border border-accent/10">Applied</span>
+                <%# A missing applied_at is called out rather than quietly showing import time as if it were the application date. %>
+                <% if user_job.applied_at %>
+                  <span class="text-xs font-bold text-slate-400" title="<%= user_job.applied_at.strftime('%B %-d, %Y at %-l:%M %p') %>">
+                    <%= user_job.applied_at.strftime("%b %-d, %Y") %>
+                    <span class="text-slate-600">· <%= time_ago_in_words(user_job.applied_at) %> ago</span>
+                  </span>
+                <% else %>
+                  <span class="text-xs font-bold text-slate-600" title="No application date was captured; showing when it was tracked.">
+                    tracked <%= user_job.created_at.strftime("%b %-d, %Y") %>
+                  </span>
+                <% end %>
               </div>
             </div>
           <% end %>

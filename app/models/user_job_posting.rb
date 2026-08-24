@@ -5,6 +5,7 @@
 # Table name: user_job_postings
 #
 #  id             :bigint           not null, primary key
+#  applied_at     :datetime
 #  cover_letter   :text
 #  match_analysis :text
 #  match_score    :integer
@@ -21,6 +22,7 @@
 #
 # Indexes
 #
+#  index_user_job_postings_on_applied_at      (applied_at)
 #  index_user_job_postings_on_job_posting_id  (job_posting_id)
 #  index_user_job_postings_on_job_search_id   (job_search_id)
 #  index_user_job_postings_on_match_score     (match_score)

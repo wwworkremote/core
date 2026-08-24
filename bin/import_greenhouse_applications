@@ -1,0 +1,116 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Backfill application history from my.greenhouse.io.
+#
+# Unlike LinkedIn, Greenhouse has a real aggregating endpoint --
+# GET my.greenhouse.io/applications.json?page=N&active_only=true -- that spans
+# every Greenhouse-powered company he applied to, not one tenant at a time.
+# That answers TASK-83 AC #10: my.greenhouse.io is Tier 1, not Tier 3.
+#
+# It is behind a login, so the input is a HAR capture of the page rather than
+# a fetch we can make ourselves. Save the network log while paging through
+# my.greenhouse.io, and every page's response is in it.
+#
+# Usage:
+#   bin/import_greenhouse_applications ~/ai/inbox/my.greenhouse.io.har --dry-run
+#   bin/import_greenhouse_applications ~/ai/inbox/my.greenhouse.io.har
+#
+# Why this beats the saved DOM: applied_at is a real ISO timestamp. LinkedIn
+# only exposes relative ages ("Applied 3mo ago"), so its dates are approximate
+# by construction; these are exact and go straight into applied_at.
+require_relative "../config/environment"
+require "json"
+require "base64"
+
+def usage
+  warn "Usage: bin/import_greenhouse_applications <har-file> [--dry-run]"
+  exit 1
+end
+
+path, *flags = ARGV
+usage unless path
+dry_run = flags.include?("--dry-run")
+path = File.expand_path(path)
+abort "No such file: #{path}" unless File.exist?(path)
+
+# HAR bodies arrive either as plain text or base64, and Chrome mixes both
+# within a single capture -- pages 3 and 4 of this file were base64 while the
+# rest were not. Reading only .text silently drops them.
+def body_of(entry)
+  content = entry.dig("response", "content") || {}
+  text = content["text"].to_s
+  return nil if text.empty?
+
+  content["encoding"] == "base64" ? Base64.decode64(text) : text
+end
+
+def applications_from(har)
+  har.fetch("log", {}).fetch("entries", []).filter_map do |entry|
+    next unless entry.dig("request", "url").to_s.include?("applications.json")
+
+    body = body_of(entry) or next
+    JSON.parse(body).dig("active", "applications")
+  rescue JSON::ParserError
+    nil
+  end.flatten.uniq { |a| a["id"] }
+end
+
+# Greenhouse's own job_post_id is the stable key. Dedup against it inside
+# target_url first, the same way the LinkedIn importer matches on its job id,
+# so a posting already ingested from a board feed is not counted twice.
+def existing_posting(app)
+  JobPosting.find_by(signature: Digest::SHA256.hexdigest("greenhouse-app-#{app['id']}")) ||
+    JobPosting.where("target_url LIKE ?", "%/jobs/#{app['job_post_id']}%").first ||
+    JobPosting.find_by(target_url: app["job_post_url"])
+end
+
+def upsert(app, dry_run)
+  posting = existing_posting(app)
+  return ["exists", posting] if posting && dry_run
+  return ["backfill", backfill(posting, app)] if posting
+  return ["create", nil] if dry_run
+
+  ["create", JobPosting.create!(
+    signature: Digest::SHA256.hexdigest("greenhouse-app-#{app['id']}"),
+    title: app["job_title"].to_s.strip, company_name: app["company_name"].to_s.strip,
+    location: app["locations"], source_id: greenhouse_source_id,
+    target_url: app["job_post_url"], status: "none", crawl_status: "pending"
+  )]
+end
+
+def backfill(posting, app)
+  posting.update!(company_name: app["company_name"].to_s.strip) if posting.company_name.blank?
+  posting
+end
+
+def greenhouse_source_id
+  @greenhouse_source_id ||= JobBoards::Source.find_or_create_by!(slug: "greenhouse") { |s| s.name = "Greenhouse" }.id
+end
+
+# Same two-machine write as bin/wwwr transition and the LinkedIn importer --
+# JobPosting and UserJobPosting drift when only one is moved (TASK-82).
+def advance(posting, user, applied_at)
+  posting.favorite! if posting.may_favorite?
+  posting.apply! if posting.may_apply?
+  tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
+  tracked.record_status_event!("apply") if tracked.status != "applied"
+  # Always set applied_at, even on a re-run: this is the authoritative date for
+  # these rows, and a LinkedIn approximation may have written a worse one first.
+  tracked.update!(applied_at: applied_at) if applied_at
+end
+
+user = User.sole
+har = JSON.parse(File.read(path))
+apps = applications_from(har)
+abort "Parsed 0 applications -- does the HAR contain my.greenhouse.io/applications.json?" if apps.empty?
+
+puts "#{apps.size} applications in #{File.basename(path)}#{' [DRY RUN]' if dry_run}"
+
+apps.sort_by { |a| a["applied_at"].to_s }.each do |app|
+  action, posting = upsert(app, dry_run)
+  applied_at = Time.zone.parse(app["applied_at"].to_s)
+  advance(posting, user, applied_at) unless dry_run
+  puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, app["company_name"].to_s[0, 24],
+              app["job_title"].to_s[0, 44])
+end

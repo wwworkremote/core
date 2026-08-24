@@ -3,10 +3,19 @@
 class UserJobPostingsController < ApplicationController
   before_action :set_job_posting, only: %i[create analyze_match generate_artifacts]
 
+  # COALESCE rather than plain applied_at: rows tracked before that column
+  # existed have no date, and ordering on a bare NULL drops them all to one end
+  # regardless of direction. Falling back to created_at sorts them by when we
+  # learned of them, which is the honest approximation.
+  SORTS = {
+    "newest" => Arel.sql("COALESCE(applied_at, created_at) DESC"),
+    "oldest" => Arel.sql("COALESCE(applied_at, created_at) ASC")
+  }.freeze
+
   def index
-    @user_job_postings = current_user.user_job_postings.includes(:job_posting).order(created_at: :desc)
-    @favorites = @user_job_postings.where(status: "favorited")
-    @applied = @user_job_postings.where(status: "applied")
+    scoped = sorted_tracked_postings
+    @favorites = scoped.where(status: "favorited")
+    @applied = scoped.where(status: "applied")
   end
 
   def create
@@ -43,6 +52,14 @@ class UserJobPostingsController < ApplicationController
   end
 
   private
+
+  def sorted_tracked_postings
+    current_user.user_job_postings.includes(:job_posting).order(SORTS.fetch(sort_key))
+  end
+
+  def sort_key
+    @sort = SORTS.key?(params[:sort]) ? params[:sort] : "newest"
+  end
 
   def set_job_posting
     @job_posting = JobPosting.find(params.expect(:job_posting_id))
