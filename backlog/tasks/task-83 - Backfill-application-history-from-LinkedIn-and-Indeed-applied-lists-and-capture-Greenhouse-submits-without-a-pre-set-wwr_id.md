@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-22 19:43'
-updated_date: '2026-08-24 02:09'
+updated_date: '2026-08-24 16:34'
 labels: []
 dependencies: []
 priority: high
@@ -50,7 +50,7 @@ Reading application *outcome* status (rejected / in review / interview). LinkedI
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 LinkedIn applied-list entries import as applied transitions on the correct JobPosting
-- [ ] #2 Indeed applied-list entries do the same
+- [x] #2 Indeed applied-list entries do the same
 - [x] #3 Transitions are recorded at the real application date, not import time
 - [x] #4 List rows with no matching JobPosting are handled explicitly (created or held), never silently dropped
 - [x] #5 Re-running a backfill does not duplicate applications or create duplicate PipelineSteps
@@ -58,7 +58,7 @@ Reading application *outcome* status (rejected / in review / interview). LinkedI
 - [ ] #7 Every selector used was verified against a live page, not inferred
 - [ ] #8 extension/manifest.json version bumped
 - [ ] #9 Providers register against one shared applied-list adapter shape, not four bespoke integrations
-- [ ] #10 Whether my.greenhouse.io aggregates across tenants is verified before any Greenhouse design work
+- [x] #10 Whether my.greenhouse.io aggregates across tenants is verified before any Greenhouse design work
 - [ ] #11 Workday capture is opportunistic on candidate-home pages only, with no stored credentials and no scheduled sync
 <!-- AC:END -->
 
@@ -133,4 +133,45 @@ Two consequences:
 - **TASK-81 should measure the funnel from the backfill forward**, not treat historical overlap as a quality metric. Overlap before 2026-08 measures when the pipeline was built, not how well it aims.
 
 What survives as a real gap: coverage of the surfaces he actually browses, which is blocked on the two exports that captured nothing (AC #2 Indeed, AC #10 Greenhouse).
+
+## 2026-08-24 — Greenhouse and Indeed both landed. Tracked applications 12 -> 55.
+
+Both blocked ACs are now closed, and the mechanism was the same in each case: **the saved DOM was never going to work, and the HAR capture did.** Mike re-saved both pages *and* captured HARs; only the HARs carried data.
+
+### AC #10 — my.greenhouse.io DOES aggregate across tenants (Tier 1, not Tier 3)
+
+`GET my.greenhouse.io/applications.json?page=N&active_only=true` returns applications spanning every Greenhouse-powered company, not one board at a time. **32 applications captured across 6 pages; `total_applications: 36`** (the remainder are inactive/archived, not fetched by `active_only=true`).
+
+This was the open question gating Tier 2 vs Tier 3 in the implementation plan. It is Tier 1. The plan's Tier 2 caveat can be struck.
+
+Record shape: `{id, job_post_id, job_post_url, job_title, company_name, locations, description, applied_at}`. **`applied_at` is an exact ISO 8601 timestamp** — strictly better than LinkedIn, which only exposes relative ages.
+
+### AC #2 — Indeed via api/v1/appStatusJobs
+
+The saved DOM really is an app shell; the re-save confirmed it. The data is at `GET myjobs.indeed.com/api/v1/appStatusJobs`: **15 applications**, with `applyTime` in epoch ms (exact), plus `jobKey`, `jobUrl`, `company.name`, `location`, and a status block.
+
+**Bonus not in scope:** that payload also carries `applicationStatus`, `candidateStatus`, `employerJobStatus`, and `selfReportedStatus`. Outcome tracking was explicitly out of scope for this task, but Indeed hands it over for free if a follow-up wants it.
+
+### AC #3 is now genuinely satisfied, not partially
+
+Added `user_job_postings.applied_at` (migration `20260824154909`). Previously the real date could only go in a note, because there was no column for it. **44 of 55 tracked applications now carry a real date.**
+
+The index sorts on `COALESCE(applied_at, created_at)` so pre-column rows sort by when we learned of them rather than clumping at one end, and the view labels those "tracked" rather than presenting import time as an application date.
+
+### Cross-source dedup was necessary, not defensive
+
+Added `Applications::PostingMatcher`. The same application now arrives from four places with a different URL and id in each. **ApartmentIQ and Temporal Technologies appear in both the Greenhouse and Indeed exports** — without a company+title fallback they would each have been counted twice, which is precisely the funnel inflation this backfill exists to prevent.
+
+Match order: signature -> native id in `target_url` -> exact `target_url` -> normalized company+title. Exact-normalized rather than fuzzy; TASK-78's overlap coefficient would also catch "Files.com" vs "Files.com, Inc", but exact match has no false-positive mode and covers the overlap actually observed.
+
+### Two HAR gotchas worth keeping
+
+1. **Chrome mixes encodings within one capture.** Greenhouse pages 3 and 4 of 6 were base64; the rest were plain text. Reading only `.text` drops a third of the data **with no error**. Check `.response.content.encoding`.
+2. **A logged-in HAR carries live session cookies** in its request records. Both importers parse response bodies only and never touch headers.
+
+### Still open
+
+AC #6 (Greenhouse submit capture without a pre-set `wwr_id`), #8 (manifest bump), #9 (shared adapter shape), #11 (Workday). Note #9 is now *more* justified: three importers exist and only the matcher is shared.
+
+Also: `~/Desktop/inbox` moved to `~/ai/inbox` on 2026-08-24 — `~/Desktop` is TCC-blocked and unreadable from this environment.
 <!-- SECTION:NOTES:END -->

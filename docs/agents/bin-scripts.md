@@ -31,6 +31,25 @@ guidance needed.
 
 ## Application-history backfill
 
+All three write both `JobPosting` and `UserJobPosting` (separate state machines that drift when
+only one moves — TASK-82), are idempotent, and share `Applications::PostingMatcher` so the same
+application arriving from several sources is counted once. **Always `--dry-run` first.**
+
+Inputs live in `~/ai/inbox` (moved there 2026-08-24 — `~/Desktop` is TCC-blocked and
+unreadable from agent environments). That directory also holds financial PII and cookie-bearing
+HAR captures: read the specific file named for the task, never enumerate the directory.
+
+- **`bin/import_greenhouse_applications <har> [--dry-run]`** — parses a HAR capture of
+  `my.greenhouse.io` for `applications.json`, which **aggregates across every Greenhouse tenant**
+  rather than one company board (verified 2026-08-24; this is why Greenhouse is Tier 1, not
+  Tier 3). Gives exact ISO `applied_at` timestamps. HAR bodies mix base64 and plain text within
+  one capture — the script checks `.response.content.encoding`; reading only `.text` silently
+  drops rows.
+- **`bin/import_indeed_applications <har> [--dry-run]`** — same shape, reading
+  `myjobs.indeed.com/api/v1/appStatusJobs` out of a HAR. The saved DOM is useless here: Indeed
+  renders its list by XHR after load, so "Save Page As" captures an app shell with zero job ids.
+  `applyTime` is epoch ms and exact. The payload also carries employer/candidate status, which
+  no importer reads yet.
 - **`bin/import_linkedin_tracker <stage> <saved-html> [--dry-run]`** — reads a "Save Page As →
   Complete" of `linkedin.com/jobs-tracker/?stage=<applied|clicked_apply|saved>` and records the
   applications in it. LinkedIn has no export and no tracker API, and the list is client-rendered,
