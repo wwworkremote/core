@@ -1,22 +1,18 @@
 # frozen_string_literal: true
 
-require "yaml"
-
 class Resume::YamlImporter
-  # The only thing binding this app to the just3ws checkout. Overridable via
-  # JUST3WS_RESUME_PATH so a moved peer repo is config, not a code change. Should
-  # stop being a filesystem path at all -- see docs/just3ws-interop-protocol.md.
-  DEFAULT_BASE_PATH = "/Users/mike/github.com/just3ws/just3ws.github.io/_data/resume"
-  attr_reader :base_path
-
-  def self.call(user, base_path: nil)
-    new(user, base_path: base_path).call
+  # No longer reads the peer repo's working tree -- it consumes just3ws'
+  # published /resume.json through Resume::Source. Freshness is therefore the
+  # Jekyll build's job: the endpoint is only as current as the last build.
+  def self.call(user, source: nil, url: nil)
+    new(user, source: source, url: url).call
   end
 
-  def initialize(user, base_path: nil)
+  def initialize(user, source: nil, url: nil)
     @user = user
     @profile = user.career_profile || user.create_career_profile!
-    @base_path = base_path || ENV.fetch("JUST3WS_RESUME_PATH", DEFAULT_BASE_PATH)
+    @source = source
+    @url = url
   end
 
   def call
@@ -32,8 +28,12 @@ class Resume::YamlImporter
     import_positions
   end
 
+  def source
+    @source ||= Resume::Source.new(url: @url).to_h
+  end
+
   def import_profile
-    data = load_yaml("profile.yml")
+    data = source["profile"]
     return unless data
 
     @user.update!(name: data["name"])
@@ -46,30 +46,32 @@ class Resume::YamlImporter
   # back naming Solid Queue as an AI tool. The prompt renders this string
   # verbatim, so whatever is missing here the model cannot know.
   def import_skills
-    data = load_yaml("skills.yml")
-    return unless data
-
-    items = Array(data["categories"]).flat_map { |category| Array(category["items"]) }
+    items = skill_items
     return if items.empty?
 
     @profile.update!(skills: items.join(", "))
   end
 
-  def import_positions
-    Dir.glob(File.join(@base_path, "positions", "*.yml")).each { |file| import_position(file) }
+  def skill_items
+    Array(source.dig("skills", "categories")).flat_map { |category| Array(category["items"]) }
   end
 
-  def import_position(file)
-    data = YAML.load_file(file)
+  def import_positions
+    Hash(source["positions"]).each { |key, data| import_position(key, data) }
+  end
+
+  def import_position(key, data)
     return unless data
 
-    exp = find_or_initialize_experience(file, data)
+    exp = find_or_initialize_experience(key, data)
     exp.update!(position_attributes(data))
     import_highlights(exp, data)
   end
 
-  def find_or_initialize_experience(file, data)
-    external_id = data["id"] || File.basename(file, ".yml")
+  # The document keys positions by the same slug the files were named after,
+  # so external_id is stable across the move off disk.
+  def find_or_initialize_experience(key, data)
+    external_id = data["id"] || key
     @profile.work_experiences.find_or_initialize_by(external_id: external_id)
   end
 
@@ -164,11 +166,5 @@ class Resume::YamlImporter
   # Fallback for year only or other formats
   def parse_year_only(str)
     Date.new(str.to_i, 1, 1) if /^\d{4}$/.match?(str)
-  end
-
-  def load_yaml(filename)
-    path = File.join(@base_path, filename)
-    return nil unless File.exist?(path)
-    YAML.load_file(path)
   end
 end

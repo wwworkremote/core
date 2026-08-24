@@ -31,6 +31,17 @@ RSpec.describe "CareerProfiles" do
       expect(flash[:notice]).to include("synchronization initiated")
     end
 
+    # The importer now reads just3ws over HTTP, so an unreachable peer is an
+    # ordinary outcome. It must not 500, and it must not leave a half-import.
+    it "reports an unreachable resume endpoint instead of raising" do
+      allow(Resume::YamlImporter).to receive(:call).and_raise(Faraday::ConnectionFailed, "refused")
+
+      patch career_profile_path, params: { sync: "true" }
+
+      expect(response).to redirect_to(career_profile_path)
+      expect(flash[:alert]).to include("Could not reach the just3ws resume endpoint")
+    end
+
     it "enqueues embedding only when embed is requested" do
       expect {
         patch career_profile_path, params: { embed: "true" }

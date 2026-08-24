@@ -29,7 +29,13 @@ Checked before queueing anything, because most of this list turned out to be fin
 
 ---
 
-## 1. `klobomedia` has no `type:` — **unblocked, apply `Founder`**
+## 1. `klobomedia` has no `type:` — **APPLIED 2026-08-24** (just3ws `6ea30b5e`)
+
+Confirmed again in zdots round 2 (B1). It was load-bearing, not cosmetic: `Full-time`
+would have asserted a real 18-month simultaneous full-time overlap with ReachLocal
+(Mar 2015 – Sep 2016). Checked after the change — no true Full-time overlaps remain;
+the other apparent ones are month-adjacency, a role ending and the next starting in the
+same month. All 29 position files now carry a `type`.
 
 The only position file still missing one. Not contract and not full-time: sweat-equity
 startup, Mike was CTO, working days at ReachLocal concurrently.
@@ -37,7 +43,12 @@ startup, Mike was CTO, working days at ReachLocal concurrently.
 Answered 2026-08-23 (`HUMAN.answered.md` #4): **`type: Founder`**. Accurate for sweat-equity
 CTO work, and reads as ownership rather than as a gap beside the concurrent ReachLocal role.
 
-## 2. `tandem` conflicts with the YAML — **unblocked, `Contract` → `Full-time`**
+## 2. `tandem` conflicts with the YAML — **APPLIED 2026-08-24** (`6ea30b5e`, `a120e292`)
+
+`Full-time` set, and both further facts landed: `company.also_known_as: DevMynd`, and a
+summary line saying he was brought into an over-committed engagement following an
+a team transition. Public-safety constraint honoured — no characterisation, no
+payout, no attribution for the departure.
 
 `_data/resume/positions/tandem.yml:6` says `type: Contract`. The `26d528bd` type-setting
 commit did not touch tandem, so that value predates the pass and was never reconciled.
@@ -55,7 +66,20 @@ Two further facts from that answer belong in the YAML, both neutral enough for a
 **Public-safety constraint:** his characterisation of the engagement, the payout, and the
 walkout attribution stay out of the YAML. Interview-prep material, already in the vault.
 
-## 3. EMR-Bear reframe — **unblocked, approved**
+## 3. EMR-Bear reframe — **TITLE APPLIED, `case_study` WITHDRAWN 2026-08-24**
+
+Title applied in `ab3dddf6`. The `case_study` half is **withdrawn** by a later answer
+(zdots round 2, B5): *"I don't have any numbers for EMR-Bear. Take it off the case study.
+I'll have to figure out a replacement later. Just OMF for now."*
+
+`6ea30b5e` removed the `emr-bear-stabilization` entry from `_data/case_studies.yml` and
+the two hardcoded proof cards it fed on `/case-studies` (130+ Clinics / zero clinical
+outages, 36+ Vendors), plus the Governance tab they were the only members of.
+**Do not add a `case_study` block to `emr-bear.yml`.** OneMain is the only position with one.
+
+Still carrying unsourced "130+ clinics" outcome language, flagged to Mike rather than
+edited unilaterally — resume self-representation is his call: `positions/emr-bear.yml`,
+`_data/engagements.yml`, `exports/resume.md`, and the briefs under `docs/`.
 
 Current: `title: Development Manager`, `type: Full-time`, `start_date: May 2026`.
 
@@ -94,7 +118,19 @@ don't delete the references", which points both ways for this file. Proposed rea
 the `wwworkremote` entry, drop any repo URL, describe it plainly — pending one-word
 confirmation. Do not edit `ats.yml` until that lands.
 
-## 5. SCNA / Obtiva / SCMC chronology — research, not a question
+## 5. SCNA / Obtiva / SCMC chronology — **ACTED ON 2026-08-24** (`6ea30b5e`)
+
+The false causal chain is gone from both artifacts (`_posts/2026-08-16-history-of-
+software-craftsmanship-in-chicago.md` and `chicago-craftsmanship/index.html`). Round 2
+B3 added a primary source this table lacked: **Obtiva Corporation incorporated
+2005-08-24** (Illinois SoS, file 64384775), and Obtiva co-organised SCNA with 8th Light
+from the start — so Obtiva long predates both dates below.
+
+The replacement asserts no ordering, because per those dates there is none to assert:
+*"Obtiva and 8th Light organized that first SCNA together, and I had joined Obtiva that
+August."* Deliberately did **not** swap one tidy narrative for another.
+
+### The research that established this
 
 Three sources disagree and the corrected-history post's causal chain (SCNA → met Dave Hoover
 → Obtiva → founded SCMC) cannot hold if Obtiva started August 2009.
@@ -134,7 +170,11 @@ Local copies in `~/Desktop/inbox/SCNA History/`.
 timeline. If a fact turns out genuinely undecidable from them, ask it as a new numbered
 HUMAN.md question rather than guessing.
 
-## 6. KloboMedia / TheSocReport narrative — **approved, do it with #1**
+## 6. KloboMedia / TheSocReport narrative — **APPLIED 2026-08-24** (`3d2a81de`)
+
+One summary line naming the specific taps that closed (Twitter firehose, Facebook and
+Instagram user-intelligence APIs). Public-safety constraint honoured — his assessment of
+the founders is not in the YAML.
 
 Mike's account: TheSocReport was the product, killed when the data taps closed — Twitter's
 firehose shutdown, Facebook closing user-intelligence APIs, Instagram's APIs closing after
@@ -150,8 +190,14 @@ Approved 2026-08-23 (`HUMAN.answered.md` #4) as one line in the position summary
 
 ## Recommendation
 
-**Updated 2026-08-23 after Mike's answers.** Items 1, 2, 3, 6 are now unblocked; item 5 never
-needed permission; only item 4 still waits, on `HUMAN.md` #8.
+**Updated 2026-08-24.** Items 1, 2, 5, 6 are applied, and item 3 is applied in part — its
+`case_study` half was withdrawn by a later answer, so do not resurrect it. **Only item 4
+still waits**, on `HUMAN.md` #8.
+
+One thing this queue did not anticipate: `Resume::YamlImporter` no longer reads that repo's
+working tree at all. It fetches `http://just3ws.localhost/resume.json`, so changes there
+reach this app only after a Jekyll build. Applying a YAML edit is no longer sufficient to
+see it here.
 
 **Do not batch them into one commit.** Each is an independent fact about a different position,
 and one commit per item keeps a wrong call revertible on its own. That mattered more when they

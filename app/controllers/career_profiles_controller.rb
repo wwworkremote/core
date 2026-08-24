@@ -26,10 +26,24 @@ class CareerProfilesController < ApplicationController
     @career_profile = current_user.career_profile || current_user.create_career_profile!
   end
 
+  # The importer reads just3ws over HTTP now, so "peer site is down" is an
+  # ordinary outcome rather than a bug. It raises instead of importing half a
+  # profile, so catch it here and say so -- the previous profile stays intact.
   def sync_from_yaml
     Resume::YamlImporter.call(current_user)
     Resume::EmbeddingJob.perform_later(@career_profile.id)
     redirect_to career_profile_path, notice: "Career profile synchronization initiated."
+  rescue Faraday::Error, JSON::ParserError, RuntimeError => e
+    report_failed_sync(e)
+  end
+
+  # The importer reads just3ws over HTTP now, so "peer site is down" is an
+  # ordinary outcome, not a bug. It raises instead of importing half a profile,
+  # so report it here and leave the previous profile intact.
+  def report_failed_sync(error)
+    Rails.logger.warn("resume sync failed: #{error.class}: #{error.message}")
+    redirect_to career_profile_path,
+                alert: "Could not reach the just3ws resume endpoint — profile left unchanged."
   end
 
   def enqueue_embedding_only
