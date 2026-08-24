@@ -1,0 +1,122 @@
+<%#
+  Provenance and pipeline state, surfaced rather than left in the database.
+  This is a localhost single-operator tool: the answer to "is this field too
+  technical to show" is to show it. Every field here is one Mike had to open a
+  rails console to see, which is the specific failure this panel fixes.
+
+  Two things are deliberately loud rather than merely present:
+    - country_code, because a non-US or unknown posting should be obvious on
+      sight (nothing filters on it yet -- TASK-85)
+    - JobPosting.status vs UserJobPosting.status, because they are separate
+      state machines that silently drift (TASK-82)
+%>
+<% tracked = current_user&.user_job_postings&.find_by(job_posting: job_posting) %>
+<% cc = job_posting.country_code.presence %>
+<% us = cc == "US" %>
+
+<div class="card-neural p-8 shadow-2xl">
+  <h2 class="text-xs font-bold text-base-content/50 mb-6 pb-4 border-b border-white/5 flex items-center justify-between">
+    <span>Context &amp; provenance</span>
+    <span class="font-mono text-base-content/30">#<%= job_posting.id %></span>
+  </h2>
+
+  <%# Conclusions before data. Every field below is on screen, but reading them
+      requires knowing what each implies -- that derivation is work the tool
+      should do. Worst first, plain sentences, no jargon in the sentence itself. %>
+  <% findings = posting_findings(job_posting, tracked) %>
+  <% tone = { bad: ["border-error/30 bg-error/5", "text-error", "✕"],
+              warn: ["border-warning/30 bg-warning/5", "text-warning", "!"],
+              info: ["border-white/10 bg-white/5", "text-base-content/60", "·"] } %>
+
+  <% if findings.any? %>
+    <div class="mb-6 space-y-2">
+      <% findings.each do |severity, sentence| %>
+        <% border, text, mark = tone[severity] %>
+        <div class="flex gap-3 p-3 rounded-xl border <%= border %>">
+          <span class="text-xs font-bold <%= text %> shrink-0"><%= mark %></span>
+          <span class="text-xs font-bold text-base-content/70 leading-relaxed"><%= sentence %></span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mb-6 p-3 rounded-xl border border-success/20 bg-success/5">
+      <span class="text-xs font-bold text-success">Nothing flagged — US posting, enriched, states agree.</span>
+    </div>
+  <% end %>
+
+  <%# Location line stays, since "where" is a fact you want even when unflagged. %>
+  <div class="mb-6 flex items-center justify-between text-xs font-bold">
+    <span class="text-base-content/60"><%= job_posting.location.presence || "no location recorded" %></span>
+    <span class="text-base-content/40"><%= job_posting.data["is_remote"] ? "remote" : "on-site/hybrid" %></span>
+  </div>
+
+  <%# Both state machines, side by side, so drift is visible instead of inferred. %>
+  <div class="mb-6">
+    <div class="text-xs font-bold text-base-content/40 mb-2">Pipeline state</div>
+    <dl class="space-y-1 text-xs font-bold">
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">posting</dt>
+        <dd class="text-white font-mono"><%= job_posting.status %></dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">yours</dt>
+        <dd class="font-mono <%= tracked.nil? ? "text-base-content/30" : (tracked.status == job_posting.status ? "text-white" : "text-warning") %>">
+          <%= tracked&.status || "untracked" %>
+          <% if tracked && tracked.status != job_posting.status %>
+            <span title="These are separate state machines and have diverged (TASK-82)">⚠</span>
+          <% end %>
+        </dd>
+      </div>
+      <% if tracked&.applied_at %>
+        <div class="flex justify-between gap-4">
+          <dt class="text-base-content/50">applied</dt>
+          <dd class="text-white font-mono"><%= tracked.applied_at.strftime("%Y-%m-%d") %></dd>
+        </div>
+      <% end %>
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">crawl</dt>
+        <dd class="text-white font-mono"><%= job_posting.crawl_status.presence || "—" %></dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">enriched</dt>
+        <dd class="font-mono <%= job_posting.enriched_at ? "text-white" : "text-base-content/30" %>">
+          <%= job_posting.enriched_at&.strftime("%Y-%m-%d") || "never" %>
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <%# Identity: the values needed to find this row from a console or a script. %>
+  <div>
+    <div class="text-xs font-bold text-base-content/40 mb-2">Identity</div>
+    <dl class="space-y-1 text-xs font-bold">
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">source</dt>
+        <dd class="text-white font-mono text-right"><%= job_posting.source&.name || "—" %> <span class="text-base-content/30">(<%= job_posting.source_id || "nil" %>)</span></dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">external_id</dt>
+        <dd class="text-white font-mono text-right truncate max-w-[10rem]" title="<%= job_posting.external_id %>"><%= job_posting.external_id.presence || "—" %></dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">signature</dt>
+        <dd class="text-base-content/40 font-mono" title="<%= job_posting.signature %>"><%= job_posting.signature.to_s.first(12) %>…</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-base-content/50">first seen</dt>
+        <dd class="text-white font-mono"><%= job_posting.created_at.strftime("%Y-%m-%d") %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <%# The raw blob, collapsed. Everything above is a curated read of it; this is
+      the escape hatch for the fields nobody thought to surface yet. %>
+  <% if job_posting.data.present? %>
+    <details class="mt-6 pt-4 border-t border-white/5">
+      <summary class="text-xs font-bold text-base-content/40 cursor-pointer hover:text-white transition-colors">
+        raw data (<%= job_posting.data.keys.size %> keys)
+      </summary>
+      <pre class="mt-3 text-xs font-mono text-base-content/50 overflow-x-auto whitespace-pre-wrap break-all"><%= JSON.pretty_generate(job_posting.data) %></pre>
+    </details>
+  <% end %>
+</div>

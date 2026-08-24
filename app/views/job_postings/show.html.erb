@@ -159,6 +159,8 @@
   </article>
 
   <aside class="space-y-8">
+    <%= render "context", job_posting: @job_posting %>
+
     <!-- Application status -->
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.pipeline.heading') %></h3>

@@ -5,6 +5,57 @@ module JobPostingsHelper
   # they're not "what changed," just when.
   HISTORY_IGNORED_ATTRS = %w[updated_at created_at].freeze
 
+  # Plain-language conclusions about one posting, worst first.
+  #
+  # The raw fields (country_code, crawl_status, enriched_at, two status
+  # columns) are all on screen, but reading them requires knowing what each
+  # one implies -- which is work this tool should do rather than delegate.
+  # Each entry is [severity, sentence]; the sentence states the finding and
+  # what it means, so no derivation is needed to act on it.
+  #
+  # ponytail: a flat list of independent checks. No rules engine until there
+  # are enough of these to need one.
+  def posting_findings(posting, tracked)
+    checks = [geo_finding(posting), status_drift_finding(posting, tracked),
+              enrichment_finding(posting), expiry_finding(posting)]
+    checks.compact
+  end
+
+  NON_US = "This is a %s posting. It's outside your US-only rule and shouldn't be in your feed."
+  NO_COUNTRY = "No country recorded, so the US-only rule can't be applied to it."
+
+  private
+
+  def geo_finding(posting)
+    case posting.country_code.presence
+    when "US" then nil
+    when nil then [:warn, NO_COUNTRY]
+    else [:bad, format(NON_US, posting.country_code)]
+    end
+  end
+
+  # The two AASM machines drift silently (TASK-82); a mismatch usually means a
+  # transition was written to one and not the other.
+  def status_drift_finding(posting, tracked)
+    return nil if tracked.nil? || tracked.status == posting.status
+
+    [:warn, "You have this as \"#{tracked.status}\" but the posting says \"#{posting.status}\" — these disagree."]
+  end
+
+  def enrichment_finding(posting)
+    return nil if posting.enriched_at.present?
+
+    [:info, "Never enriched, so the description and salary may be incomplete."]
+  end
+
+  def expiry_finding(posting)
+    return nil unless posting.status == "expired"
+
+    [:info, "This posting is expired — the listing is probably gone."]
+  end
+
+  public
+
   ANSWER_SOURCE_BADGE_CLASSES = {
     "canned" => "border-success/40 text-success",
     "submitted" => "border-info/40 text-info",
