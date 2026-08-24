@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-22 19:43'
-updated_date: '2026-08-23 15:30'
+updated_date: '2026-08-24 02:09'
 labels: []
 dependencies: []
 priority: high
@@ -120,4 +120,17 @@ AC #5 verified by re-running: JP.applied 12, UJP.applied 12, PipelineStep 410, n
 ### Also worth knowing
 
 The applications and the ingestion corpus are **nearly disjoint**. Of 28 LinkedIn tracker rows, only 3 already existed among 6,136 ingested postings. The pipeline is not surfacing the jobs he actually applies to — that is a bigger finding than the backfill itself and belongs in TASK-81's analysis.
+
+**Correction 2026-08-23 — the disjointness inference is withdrawn.**
+
+The measurement stands: of 28 LinkedIn tracker rows, only 3 already existed among 6,136 ingested postings. The inference drawn from it above — "the pipeline is not surfacing the jobs he actually applies to" — does not.
+
+Mike's answer (HUMAN.answered.md #7): he was applying while the ingestion system was still being built out, because he had to. The near-disjointness is **chronology, not a targeting defect**. His applications predate the corpus that would have contained them.
+
+Two consequences:
+
+- **Do not retune ingestion against the 14 backfilled applications as ground truth.** That was the proposed fix and it is wrong — it would tune the corpus toward a sample that predates the corpus.
+- **TASK-81 should measure the funnel from the backfill forward**, not treat historical overlap as a quality metric. Overlap before 2026-08 measures when the pipeline was built, not how well it aims.
+
+What survives as a real gap: coverage of the surfaces he actually browses, which is blocked on the two exports that captured nothing (AC #2 Indeed, AC #10 Greenhouse).
 <!-- SECTION:NOTES:END -->
