@@ -1,0 +1,120 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Backfill application history from Indeed.
+#
+# The saved DOM is useless here -- myjobs.indeed.com renders its list by XHR
+# after load, so a "Save Page As" captures the app shell with zero job ids.
+# The data lives in GET myjobs.indeed.com/api/v1/appStatusJobs, which is in a
+# HAR capture of the page.
+#
+# Usage:
+#   bin/import_indeed_applications ~/ai/inbox/myjobs.indeed.com.har --dry-run
+#   bin/import_indeed_applications ~/ai/inbox/myjobs.indeed.com.har
+#
+# applyTime is epoch milliseconds and exact, so it goes straight into
+# applied_at -- same as Greenhouse, unlike LinkedIn's relative ages.
+require_relative "../config/environment"
+require "json"
+require "base64"
+
+def usage
+  warn "Usage: bin/import_indeed_applications <har-file> [--dry-run]"
+  exit 1
+end
+
+path, *flags = ARGV
+usage unless path
+dry_run = flags.include?("--dry-run")
+path = File.expand_path(path)
+abort "No such file: #{path}" unless File.exist?(path)
+
+# Chrome mixes base64 and plain text within one capture -- Indeed's HTML
+# document was base64 while its JSON was not. Reading only .text drops rows
+# with no error.
+def body_of(entry)
+  content = entry.dig("response", "content") || {}
+  text = content["text"].to_s
+  return nil if text.empty?
+
+  content["encoding"] == "base64" ? Base64.decode64(text) : text
+end
+
+# The endpoint is polled more than once per page load and the later responses
+# are partial, so take the richest rather than the last.
+def rows_from(har)
+  payloads = har.fetch("log", {}).fetch("entries", []).filter_map do |entry|
+    next unless entry.dig("request", "url").to_s.include?("appStatusJobs")
+
+    body = body_of(entry) or next
+    JSON.parse(body).dig("body", "appStatusJobs")
+  rescue JSON::ParserError
+    nil
+  end
+  payloads.max_by { |p| p.is_a?(Array) ? p.size : 0 } || []
+end
+
+def signature_for(row)
+  Digest::SHA256.hexdigest("indeed-app-#{row['jobKey']}")
+end
+
+def find_posting(row)
+  Applications::PostingMatcher.call(
+    signature: signature_for(row),
+    native_id_fragment: "jk=#{row['jobKey']}",
+    target_url: row["jobUrl"],
+    company: row.dig("company", "name"),
+    title: row["jobTitle"]
+  )
+end
+
+def upsert(row, dry_run)
+  posting = find_posting(row)
+  return ["exists", posting] if posting && dry_run
+  return ["backfill", backfill(posting, row)] if posting
+  return ["create", nil] if dry_run
+
+  ["create", JobPosting.create!(
+    signature: signature_for(row), title: row["jobTitle"].to_s.strip,
+    company_name: row.dig("company", "name").to_s.strip, location: row["location"],
+    source_id: indeed_source_id, target_url: row["jobUrl"],
+    status: "none", crawl_status: "pending"
+  )]
+end
+
+def backfill(posting, row)
+  company = row.dig("company", "name").to_s.strip
+  posting.update!(company_name: company) if posting.company_name.blank? && company.present?
+  posting
+end
+
+def indeed_source_id
+  @indeed_source_id ||= JobBoards::Source.find_or_create_by!(slug: "indeed") { |s| s.name = "Indeed" }.id
+end
+
+# Same two-machine write as the other importers -- JobPosting and
+# UserJobPosting drift when only one is moved (TASK-82).
+def advance(posting, user, applied_at)
+  posting.favorite! if posting.may_favorite?
+  posting.apply! if posting.may_apply?
+  tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
+  tracked.record_status_event!("apply") if tracked.status != "applied"
+  # Only fill a blank date. Indeed's applyTime is exact, but so is
+  # Greenhouse's, and when both describe one application the first writer is as
+  # good as the second -- overwriting would just churn the column.
+  tracked.update!(applied_at: applied_at) if applied_at && tracked.applied_at.blank?
+end
+
+user = User.sole
+rows = rows_from(JSON.parse(File.read(path)))
+abort "Parsed 0 applications -- does the HAR contain myjobs.indeed.com/api/v1/appStatusJobs?" if rows.empty?
+
+puts "#{rows.size} applications in #{File.basename(path)}#{' [DRY RUN]' if dry_run}"
+
+rows.sort_by { |r| r["applyTime"].to_i }.each do |row|
+  action, posting = upsert(row, dry_run)
+  applied_at = row["applyTime"] && Time.zone.at(row["applyTime"].to_i / 1000)
+  advance(posting, user, applied_at) unless dry_run
+  puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, row.dig("company", "name").to_s[0, 24],
+              row["jobTitle"].to_s[0, 42])
+end
