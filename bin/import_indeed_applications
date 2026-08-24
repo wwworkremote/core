@@ -14,6 +14,14 @@
 #
 # applyTime is epoch milliseconds and exact, so it goes straight into
 # applied_at -- same as Greenhouse, unlike LinkedIn's relative ages.
+#
+# Also imports outcome: Indeed's statuses.candidateStatus/selfReportedStatus
+# are the first real employer-response signal available anywhere in this app
+# (Greenhouse's equivalent, currentStage, comes back null when the employer
+# doesn't share it -- checked 2026-08-24, 32/32 null). Kept in a column
+# separate from `status`: "applied and rejected" and "applied and silent" are
+# the same AASM state but different facts, and collapsing them into `archived`
+# would destroy exactly the distinction a real funnel needs.
 require_relative "../config/environment"
 require "json"
 require "base64"
@@ -92,9 +100,27 @@ def indeed_source_id
   @indeed_source_id ||= JobBoards::Source.find_or_create_by!(slug: "indeed") { |s| s.name = "Indeed" }.id
 end
 
+# Employer signal beats his own self-report, and REJECTED beats REVIEWED --
+# once an employer has said no, a later "reviewed" from a different field
+# would otherwise look like progress. jobExpired is the weakest signal (the
+# posting could just be full), so it only fires when nothing stronger applies.
+OUTCOME_RANK = { "REJECTED" => 3, "REVIEWED" => 2, "CLOSED" => 1 }.freeze
+
+def outcome_for(row)
+  candidates = {
+    row.dig("statuses", "candidateStatus", "status") => "employer",
+    row.dig("statuses", "selfReportedStatus", "status") => "self_reported",
+    row.dig("statuses", "employerJobStatus", "status") => "employer"
+  }.compact
+  best = candidates.keys.max_by { |s| OUTCOME_RANK[s] || 0 }
+  return [nil, nil] unless best && OUTCOME_RANK.key?(best)
+
+  [best.downcase, candidates[best]]
+end
+
 # Same two-machine write as the other importers -- JobPosting and
 # UserJobPosting drift when only one is moved (TASK-82).
-def advance(posting, user, applied_at)
+def advance(posting, user, applied_at, row)
   posting.favorite! if posting.may_favorite?
   posting.apply! if posting.may_apply?
   tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
@@ -103,6 +129,9 @@ def advance(posting, user, applied_at)
   # Greenhouse's, and when both describe one application the first writer is as
   # good as the second -- overwriting would just churn the column.
   tracked.update!(applied_at: applied_at) if applied_at && tracked.applied_at.blank?
+
+  outcome, source = outcome_for(row)
+  tracked.update!(outcome: outcome, outcome_at: Time.current, outcome_source: source) if outcome
 end
 
 user = User.sole
@@ -114,7 +143,8 @@ puts "#{rows.size} applications in #{File.basename(path)}#{' [DRY RUN]' if dry_r
 rows.sort_by { |r| r["applyTime"].to_i }.each do |row|
   action, posting = upsert(row, dry_run)
   applied_at = row["applyTime"] && Time.zone.at(row["applyTime"].to_i / 1000)
-  advance(posting, user, applied_at) unless dry_run
-  puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, row.dig("company", "name").to_s[0, 24],
-              row["jobTitle"].to_s[0, 42])
+  advance(posting, user, applied_at, row) unless dry_run
+  outcome, = outcome_for(row)
+  puts format("  %-8s %-10s %-26s %-42s %s", action, applied_at&.to_date, row.dig("company", "name").to_s[0, 24],
+              row["jobTitle"].to_s[0, 42], outcome ? "[#{outcome}]" : "")
 end

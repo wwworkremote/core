@@ -16,15 +16,24 @@ module JobPostingsHelper
   # ponytail: a flat list of independent checks. No rules engine until there
   # are enough of these to need one.
   def posting_findings(posting, tracked)
-    checks = [geo_finding(posting), status_drift_finding(posting, tracked),
+    checks = [outcome_finding(tracked), geo_finding(posting), status_drift_finding(posting, tracked),
               enrichment_finding(posting), expiry_finding(posting)]
     checks.compact
   end
 
   NON_US = "This is a %s posting. It's outside your US-only rule and shouldn't be in your feed."
   NO_COUNTRY = "No country recorded, so the US-only rule can't be applied to it."
+  OUTCOME_FINDINGS = {
+    "rejected" => [:bad, "The employer rejected this application."],
+    "reviewed" => [:info, "Employer has reviewed this — no decision yet."],
+    "closed" => [:info, "The posting closed after you applied."]
+  }.freeze
 
   private
+
+  def outcome_finding(tracked)
+    OUTCOME_FINDINGS[tracked&.outcome]
+  end
 
   def geo_finding(posting)
     case posting.country_code.presence

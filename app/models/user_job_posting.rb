@@ -11,6 +11,9 @@
 #  match_score    :integer
 #  match_tags     :text             default([]), not null, is an Array
 #  notes          :text
+#  outcome        :string
+#  outcome_at     :datetime
+#  outcome_source :string
 #  priority_flag  :boolean
 #  status         :string
 #  strategy       :jsonb            not null
@@ -26,6 +29,7 @@
 #  index_user_job_postings_on_job_posting_id  (job_posting_id)
 #  index_user_job_postings_on_job_search_id   (job_search_id)
 #  index_user_job_postings_on_match_score     (match_score)
+#  index_user_job_postings_on_outcome         (outcome)
 #  index_user_job_postings_on_user_id         (user_id)
 #
 # Foreign Keys
