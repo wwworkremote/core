@@ -70,6 +70,10 @@ class Api::V0::JobPostingsController < ApiController
   end
 
   def enrich_params
-    params.permit(:body, data: {})
+    # Browser re-reads can follow a SPA from one posting to another while
+    # retaining the same wwwr_id. Persist the posting identity together with
+    # the richer body/data so a successful enrich cannot leave the tracked row
+    # pointing at the previous role.
+    params.permit(:title, :company, :location, :target_url, :body, data: {})
   end
 end

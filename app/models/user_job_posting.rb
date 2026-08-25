@@ -4,33 +4,38 @@
 #
 # Table name: user_job_postings
 #
-#  id             :bigint           not null, primary key
-#  applied_at     :datetime
-#  cover_letter   :text
-#  match_analysis :text
-#  match_score    :integer
-#  match_tags     :text             default([]), not null, is an Array
-#  notes          :text
-#  outcome        :string
-#  outcome_at     :datetime
-#  outcome_source :string
-#  priority_flag  :boolean
-#  status         :string
-#  strategy       :jsonb            not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  job_posting_id :bigint           not null
-#  job_search_id  :bigint
-#  user_id        :bigint           not null
+#  id                           :bigint           not null, primary key
+#  application_profile_snapshot :jsonb            not null
+#  applied_at                   :datetime
+#  cover_letter                 :text
+#  match_analysis               :text
+#  match_score                  :integer
+#  match_tags                   :text             default([]), not null, is an Array
+#  notes                        :text
+#  outcome                      :string
+#  outcome_at                   :datetime
+#  outcome_source               :string
+#  priority_flag                :boolean
+#  resume_persona_snapshot      :jsonb            not null
+#  status                       :string
+#  strategy                     :jsonb            not null
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  application_trace_id         :string
+#  job_posting_id               :bigint           not null
+#  job_search_id                :bigint
+#  resume_persona_id            :string
+#  user_id                      :bigint           not null
 #
 # Indexes
 #
-#  index_user_job_postings_on_applied_at      (applied_at)
-#  index_user_job_postings_on_job_posting_id  (job_posting_id)
-#  index_user_job_postings_on_job_search_id   (job_search_id)
-#  index_user_job_postings_on_match_score     (match_score)
-#  index_user_job_postings_on_outcome         (outcome)
-#  index_user_job_postings_on_user_id         (user_id)
+#  index_user_job_postings_on_application_trace_id  (application_trace_id)
+#  index_user_job_postings_on_applied_at            (applied_at)
+#  index_user_job_postings_on_job_posting_id        (job_posting_id)
+#  index_user_job_postings_on_job_search_id         (job_search_id)
+#  index_user_job_postings_on_match_score           (match_score)
+#  index_user_job_postings_on_outcome               (outcome)
+#  index_user_job_postings_on_user_id               (user_id)
 #
 # Foreign Keys
 #
@@ -44,6 +49,10 @@ class UserJobPosting < ApplicationRecord
   belongs_to :user
   belongs_to :job_posting
   belongs_to :job_search, optional: true
+
+  has_many :application_field_answers, dependent: :destroy
+  has_many :application_field_mappings, dependent: :destroy
+  has_many :application_field_observations, dependent: :destroy
 
   aasm column: :status, whiny_persistence: true do
     state :none, initial: true

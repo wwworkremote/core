@@ -419,7 +419,12 @@ function renderApplicationQA(qa) {
 // separate rows because plenty of ATS forms split the address instead of
 // taking `location`'s combined string.
 const PROFILE_FIELD_LABELS = [
-  ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'],
+  ['first_name', 'Legal first name'], ['middle_name', 'Legal middle name'],
+  ['last_name', 'Legal last name'], ['preferred_name', 'Preferred first name'],
+  ['name', 'Display name'], ['email', 'Email'], ['phone', 'Phone'],
+  ['address_line1', 'Address line 1'], ['postal_code', 'Postal code'],
+  ['phone_country_code', 'Country phone code'], ['phone_area_code', 'Area code'],
+  ['phone_number', 'Phone number'],
   ['location', 'Location'], ['city', 'City'], ['state', 'State'], ['country', 'Country'],
   ['linkedin_url', 'LinkedIn'], ['github_url', 'GitHub'], ['website_url', 'Website'],
 ];
@@ -429,7 +434,7 @@ function renderProfileFields(profile) {
   if (!container) return;
 
   const present = PROFILE_FIELD_LABELS.filter(([key]) => profile?.[key]);
-  if (!present.length) {
+  if (!present.length && !profile) {
     container.style.display = 'none';
     container.innerHTML = '';
     return;
@@ -443,9 +448,198 @@ function renderProfileFields(profile) {
     </div>
   `).join('');
 
-  container.innerHTML = `<div class="qa-header">Your Info — copy into the form</div>${items}`;
+  const editFields = PROFILE_FIELD_LABELS.slice(0, 14);
+  const editor = `<button type="button" id="edit-profile-fields-btn" class="app-map-btn">Edit key fields</button>
+    <div id="profile-edit-form" style="display:none">${editFields.map(([key, label]) =>
+      `<label class="profile-edit-label">${escapeHtml(label)}<input data-profile-key="${key}" value="${escapeHtml(profile?.[key] || '')}"></label>`
+    ).join('')}<button type="button" id="save-profile-fields-btn" class="app-fill-btn">Save key fields</button></div>`;
+  container.innerHTML = `<div class="qa-header">Your Info — copy into the form ${editor}</div>${items}`;
   container.style.display = 'block';
   attachCopyHandlers(container, i => profile[present[i][0]]);
+  document.getElementById('edit-profile-fields-btn').addEventListener('click', () => {
+    const form = document.getElementById('profile-edit-form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('save-profile-fields-btn').addEventListener('click', saveProfileFields);
+}
+
+async function saveProfileFields() {
+  const button = document.getElementById('save-profile-fields-btn');
+  const profile = Object.fromEntries([...document.querySelectorAll('[data-profile-key]')]
+    .map(input => [input.dataset.profileKey, input.value.trim()]));
+  button.disabled = true; button.textContent = 'Saving…';
+  try {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    const response = await fetch(`${apiBase}/api/v0/profile`, { method: 'PATCH', headers, body: JSON.stringify({ profile }) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    currentState.profileFields = data;
+    if (currentState.applicationContext) currentState.applicationContext.profile = data;
+    chrome.storage.session.set({ [SESSION_KEY]: currentState });
+    renderProfileFields(data);
+    renderApplicationContext(currentState.applicationContext, currentState.applicationFields || []);
+    setStatus('Key profile fields saved to WWWorkRemote', 'var(--green)');
+  } catch (error) {
+    setStatus(`Profile save failed: ${error.message}`, 'var(--red)');
+  } finally {
+    button.disabled = false; button.textContent = 'Save key fields';
+  }
+}
+
+// ── Application form assist ────────────────────────────────────────────────
+// Workday fields are discovered in the live page and keyed only for the
+// current document. Nothing is filled until the user clicks the row's button.
+function personaSuggestion(field, context, occurrence) {
+  const label = field.label.toLowerCase();
+  const profile = context?.profile || {};
+  const normalized = label.replace(/[^a-z0-9]+/g, ' ').trim();
+  const templates = (context?.answer_templates || []).filter(template =>
+    template.normalized_prompt === normalized &&
+    (!template.persona_id || template.persona_id === context?.selected_persona_id));
+  if (templates.length) return { value: templates[0].answer, source: 'template' };
+  const profileMap = [
+    ['email', 'email'], ['phone', 'phone'], ['mobile', 'phone'], ['linkedin', 'linkedin_url'],
+    ['github', 'github_url'], ['website', 'website_url'], ['city', 'city'],
+    ['state', 'state'], ['country', 'country'], ['location', 'location'],
+    ['preferred name', 'preferred_name'], ['first name', 'first_name'],
+    ['middle name', 'middle_name'], ['last name', 'last_name'], ['name', 'name'],
+  ];
+  const profileKey = profileMap.find(([needle]) => label.includes(needle))?.[1];
+  if (profileKey && profile[profileKey]) return { value: profile[profileKey], source: 'profile' };
+
+  const positions = context?.persona?.positions || [];
+  const index = occurrence[label] || 0;
+  if (/job title|title|role/.test(label)) return { value: positions[index]?.title || '', source: 'manual' };
+  if (/company|employer/.test(label)) return { value: positions[index]?.company?.name || '', source: 'manual' };
+  if (/description|responsibilit|duties|summary/.test(label)) return { value: positions[index]?.summary || '', source: 'manual' };
+  if (/start/.test(label)) return { value: positions[index]?.start_date || '', source: 'manual' };
+  if (/end|finish/.test(label)) return { value: positions[index]?.end_date || '', source: 'manual' };
+  return { value: '', source: 'manual' };
+}
+
+function semanticSuggestion(field) {
+  const label = field.label.toLowerCase();
+  const profileMap = [
+    ['email', 'profile.email', 'Personal email'], ['phone', 'profile.phone', 'Personal phone'],
+    ['mobile', 'profile.phone', 'Personal phone'], ['preferred name', 'profile.preferred_name', 'Preferred first name'],
+    ['first name', 'profile.first_name', 'Legal first name'], ['middle name', 'profile.middle_name', 'Legal middle name'],
+    ['last name', 'profile.last_name', 'Legal last name'], ['linkedin', 'profile.linkedin_url', 'LinkedIn URL'],
+    ['github', 'profile.github_url', 'GitHub URL'], ['city', 'profile.city', 'City'],
+    ['state', 'profile.state', 'State'], ['country', 'profile.country', 'Country'],
+  ];
+  const match = profileMap.find(([needle]) => label.includes(needle));
+  if (match) return { key: match[1], label: match[2], kind: 'profile' };
+  if (/job title|title|role/.test(label)) return { key: 'persona.positions[].title', label: 'Persona work history title', kind: 'persona' };
+  if (/company|employer/.test(label)) return { key: 'persona.positions[].company', label: 'Persona work history company', kind: 'persona' };
+  if (/question|why|interest|authorization|sponsor/.test(label)) return { key: 'application.question', label: 'Application question answer', kind: 'question' };
+  return { key: '', label: '', kind: 'manual' };
+}
+
+async function selectApplicationPersona(personaId) {
+  const { base: apiBase, authHeader } = await getApiConfig();
+  const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+  const response = await fetch(`${apiBase}/api/v0/job_postings/${currentState.wwrId}/application_context`, {
+    method: 'PATCH', headers, body: JSON.stringify({ persona_id: personaId }),
+  });
+  const data = await response.json();
+  if (!response.ok || !data.selected_persona_id) throw new Error(data.error || `HTTP ${response.status}`);
+  currentState.applicationContext = data;
+  currentState.profileFields = data.profile;
+  chrome.storage.session.set({ [SESSION_KEY]: currentState });
+  renderApplicationContext(data, currentState.applicationFields || []);
+  renderProfileFields(data.profile);
+}
+
+function renderApplicationContext(context, fields) {
+  const container = document.getElementById('application-context-section');
+  if (!container || !context) {
+    if (container) { container.style.display = 'none'; container.innerHTML = ''; }
+    return;
+  }
+
+  const occurrence = {};
+  const rows = (fields || []).map((field) => {
+    const normalized = field.label.toLowerCase();
+    const suggestion = personaSuggestion(field, context, occurrence);
+    occurrence[normalized] = (occurrence[normalized] || 0) + 1;
+    const saved = (context.field_answers || []).find(answer => answer.field_key === field.key);
+    const mapping = (context.mappings || []).find(item => item.field_key === field.key);
+    const value = saved?.answer || suggestion.value || field.currentValue || '';
+    const source = saved?.answer_source || suggestion.source;
+    return `<div class="app-field-row" data-field-key="${escapeHtml(field.key)}">
+      <div class="app-field-label"><span>${escapeHtml(field.label)}</span>${field.required ? '<b>*</b>' : ''}</div>
+      <textarea class="app-field-answer" rows="2">${escapeHtml(value)}</textarea>
+      <div class="app-field-actions"><span class="app-field-source">${mapping ? `mapped → ${escapeHtml(mapping.semantic_key)}` : (saved ? 'provided' : source)}</span>
+        <button type="button" class="app-map-btn">${mapping ? 'Remap' : 'Map'}</button>
+        <button type="button" class="app-fill-btn" data-source="${escapeHtml(source)}">Fill</button></div>
+    </div>`;
+  }).join('');
+
+  const personaOptions = (context.personas || []).map(persona =>
+    `<option value="${escapeHtml(persona.id)}" ${persona.id === context.selected_persona_id ? 'selected' : ''}>${escapeHtml(persona.label || persona.title || persona.id)}</option>`
+  ).join('');
+  const summary = context.question_summary || {};
+  const summaryText = Object.entries(summary).map(([kind, count]) => `${kind}: ${count}`).join(' · ');
+  container.innerHTML = `<div class="qa-header">Application cockpit — ${(fields || []).length} visible fields${summaryText ? ` · observed ${escapeHtml(summaryText)}` : ''}
+    <button type="button" id="refresh-application-fields" class="app-map-btn">↻ Refresh fields</button></div>
+    <div class="persona-picker"><label for="application-persona">Resume persona</label>
+      <select id="application-persona">${personaOptions}</select>
+      <button type="button" id="save-persona-btn">Use persona</button></div>${rows}`;
+  container.style.display = 'block';
+
+  document.getElementById('refresh-application-fields').addEventListener('click', () => {
+    chrome.runtime.sendMessage({ type: 'REFRESH_APPLICATION_FIELDS' });
+    setStatus('Refreshing visible application fields…', 'var(--purple)');
+  });
+
+  document.getElementById('save-persona-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('save-persona-btn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try { await selectApplicationPersona(document.getElementById('application-persona').value); setStatus('Persona locked to this application', 'var(--green)'); }
+    catch (err) { setStatus(`Persona save failed: ${err.message}`, 'var(--red)'); }
+    finally { btn.disabled = false; btn.textContent = 'Use persona'; }
+  });
+
+  container.querySelectorAll('.app-fill-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.app-field-row');
+      const fieldKey = row.dataset.fieldKey;
+      const value = row.querySelector('.app-field-answer').value.trim();
+      if (!value) { setStatus('Enter an answer before filling', 'var(--yellow)'); return; }
+      btn.disabled = true; btn.textContent = 'Filling…';
+      chrome.runtime.sendMessage({ type: 'FILL_APPLICATION_FIELD', fieldKey, value, source: btn.dataset.source }, response => {
+        btn.disabled = false;
+        if (!response?.ok) { btn.textContent = 'Retry'; setStatus(`Fill failed: ${response?.error || 'unknown error'}`, 'var(--red)'); return; }
+        btn.textContent = 'Filled ✓';
+        row.querySelector('.app-field-source').textContent = 'provided';
+        setStatus(`${response.field.label} provided and tracked`, 'var(--green)');
+        setTimeout(() => { btn.textContent = 'Fill'; }, 1500);
+      });
+    });
+  });
+
+  container.querySelectorAll('.app-map-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.app-field-row');
+      btn.disabled = true;
+      btn.textContent = 'Click field…';
+      startApplicationMapping(row.dataset.fieldKey, btn);
+    });
+  });
+}
+
+async function recordApplicationFieldObservations(state) {
+  if (!state?.wwrId || !state.applicationFields?.length) return;
+  const { base: apiBase, authHeader } = await getApiConfig();
+  const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+  await fetch(`${apiBase}/api/v0/job_postings/${state.wwrId}/application_field_observations`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ observations: state.applicationFields.map(field => ({
+      field_key: field.key, field_label: field.label, field_type: field.type,
+      page_url: state.pageUrl, context: { required: field.required, current_value: !!field.currentValue },
+    })) }),
+  });
 }
 
 // ── Application lifecycle (TASK-78) ─────────────────────────────────────────
@@ -504,6 +698,43 @@ function renderApplicationStatus(status) {
   });
 }
 
+function renderApplicationCompletion(completion) {
+  const container = document.getElementById('application-completion-section');
+  if (!container) return;
+  if (!completion) { container.style.display = 'none'; container.innerHTML = ''; return; }
+  const linked = currentState?.wwrId;
+  container.innerHTML = `
+    <div class="qa-header">Workday completion detected</div>
+    <div class="qa-answer">${escapeHtml((completion.evidence || []).join(' · '))}</div>
+    <div class="qa-answer">${linked ? `Tracked application #${escapeHtml(linked)} — ${escapeHtml(completion.title || '')}` : 'No tracked WWWorkRemote posting was carried across this tab.'}</div>
+    ${linked ? '<button type="button" class="status-btn" id="completion-mark-applied">Mark applied + save evidence</button>' : '<div class="qa-answer qa-unanswered">Open the tracked application link before submitting to preserve the association.</div>'}`;
+  container.style.display = 'block';
+  const btn = document.getElementById('completion-mark-applied');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      const { base: apiBase, authHeader } = await getApiConfig();
+      const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+      const response = await fetch(`${apiBase}/api/v0/job_postings/${currentState.wwrId}/application_status`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ event: 'apply', link: completion.pageUrl }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || `HTTP ${response.status}`);
+      currentState.applicationStatus = data;
+      renderApplicationStatus(data);
+      btn.textContent = '✓ Applied + evidence saved';
+      setStatus('Application marked applied', 'var(--green)');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Mark applied + save evidence';
+      setStatus('✗ ' + err.message, 'var(--red)');
+    }
+  });
+}
+
 function highlightSelectedCompany(selectedEl) {
   document.querySelectorAll('.company-match-option, .company-match-create')
     .forEach(el => el.classList.remove('selected'));
@@ -542,8 +773,11 @@ function populateForm(state) {
   document.getElementById('hdr-board').textContent = BOARD_LABELS[state.provider] || state.provider || '—';
   updateConfidenceBadge(e._method);
   renderApplicationStatus(state.applicationStatus);
+  renderApplicationCompletion(state.applicationCompletion);
   renderApplicationQA(state.applicationQA);
   renderProfileFields(state.profileFields);
+  renderApplicationContext(state.applicationContext, state.applicationFields);
+  recordApplicationFieldObservations(state).catch(() => {});
 
   // Company match picker only applies in capture mode -- enrich mode keeps
   // the plain text field (the JobPosting's Company link is set elsewhere).
@@ -885,6 +1119,9 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
         // before the panel resets for the next posting -- this is a
         // one-job-at-a-time workflow, not a "leave it submitted" one.
         setTimeout(resetForNextCapture, 1200);
+      } else {
+        await showRecordLinks(currentState?.extracted?.title, result.jobPostingId || currentState?.wwrId, result.leadId);
+        refreshIngestionLog();
       }
     } else {
       throw new Error(result?.error || 'Unknown error from server');
@@ -895,6 +1132,31 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     setStatus('✗ ' + err.message, 'var(--red)');
   }
 });
+
+async function showRecordLinks(title, jobPostingId, leadId) {
+  const el = document.getElementById('record-links');
+  if (!el || !jobPostingId) return;
+  const { base: apiBase } = await getApiConfig();
+
+  el.innerHTML = '';
+  const posting = document.createElement('a');
+  posting.href = `${apiBase}/job_postings/${encodeURIComponent(jobPostingId)}`;
+  posting.target = '_blank';
+  posting.rel = 'noopener';
+  posting.textContent = `View WWWorkRemote job #${jobPostingId} →`;
+  el.appendChild(posting);
+  if (leadId) {
+    const lead = document.createElement('a');
+    lead.href = `${apiBase}/admin/leads/${encodeURIComponent(leadId)}`;
+    lead.target = '_blank';
+    lead.rel = 'noopener';
+    lead.textContent = `View lead #${leadId} →`;
+    el.appendChild(document.createTextNode(' · '));
+    el.appendChild(lead);
+  }
+  el.dataset.title = title || '';
+  renderCurrentEnrichment(title, jobPostingId, leadId, apiBase);
+}
 
 // Shown in the empty state after a reset so the "did it work?" answer is
 // still visible (and clickable, to confirm on wwworkremote.localhost)
@@ -940,6 +1202,22 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (!change?.newValue) return;
 
   const newState = change.newValue;
+
+  const oldFieldKeys = (currentState?.applicationFields || []).map(field => field.key).join('|');
+  const newFieldKeys = (newState.applicationFields || []).map(field => field.key).join('|');
+  if (currentState && oldFieldKeys !== newFieldKeys && newState.applicationContext) {
+    const edits = Object.fromEntries([...document.querySelectorAll('.app-field-row')].map(row =>
+      [row.dataset.fieldKey, row.querySelector('.app-field-answer')?.value || '']));
+    currentState = newState;
+    renderApplicationContext(newState.applicationContext, newState.applicationFields || []);
+    recordApplicationFieldObservations(newState).catch(() => {});
+    for (const [key, value] of Object.entries(edits)) {
+      const input = document.querySelector(`.app-field-row[data-field-key="${CSS.escape(key)}"] .app-field-answer`);
+      if (input) input.value = value;
+    }
+    setStatus(`${newState.applicationFields.length} visible fields discovered`, 'var(--green)');
+    return;
+  }
 
   renderNewDiagEntries(newState.diagnostics);
 
@@ -1074,6 +1352,9 @@ async function refreshIngestionLog() {
     if (!response.ok) throw new Error(`Server error ${response.status}`);
     const leads = await response.json();
     renderIngestionLog(leads.slice(0, 10), apiBase);
+    if (currentState?.mode === 'enrich' && currentState.wwrId) {
+      renderCurrentEnrichment(currentState.extracted?.title, currentState.wwrId, null, apiBase);
+    }
   } catch (err) {
     list.innerHTML = `<div class="ingestion-log-empty">Log unavailable: ${escapeHtml(err.message)}</div>`;
   }
@@ -1102,6 +1383,20 @@ function renderIngestionLog(leads, apiBase) {
       </a>
     `;
   }).join('');
+}
+
+function renderCurrentEnrichment(title, jobPostingId, leadId, apiBase) {
+  const list = document.getElementById('ingestion-log-list');
+  if (!list || !jobPostingId || list.querySelector(`[data-job-posting-id="${CSS.escape(String(jobPostingId))}"]`)) return;
+
+  const item = document.createElement('a');
+  item.className = 'ingestion-log-item ingestion-log-current';
+  item.dataset.jobPostingId = jobPostingId;
+  item.href = `${apiBase}/job_postings/${encodeURIComponent(jobPostingId)}`;
+  item.target = '_blank';
+  item.rel = 'noopener';
+  item.innerHTML = `<div class="ilog-main"><div class="ilog-title">${escapeHtml(title || `Job #${jobPostingId}`)}</div><div class="ilog-company">WWWorkRemote job #${escapeHtml(jobPostingId)}</div></div><span class="ilog-status" style="background:#0d3320;color:var(--green);">Enriched</span>`;
+  list.prepend(item);
 }
 
 // ── Element picker ("Teach the extractor") ──────────────────────────────────
@@ -1162,7 +1457,82 @@ function clearPickerResult() {
   });
 }
 
+function startApplicationMapping(fieldKey, btn) {
+  setStatus('Click the corresponding Workday field on the page… (Esc to cancel)', 'var(--purple)');
+  chrome.runtime.sendMessage({ type: 'PICKER_START', fieldName: fieldKey, mapping: true }, (response) => {
+    if (!response?.ok) {
+      btn.disabled = false;
+      btn.textContent = 'Map';
+      setStatus('✗ ' + (response?.error || 'Could not start mapping picker'), 'var(--red)');
+    }
+  });
+}
+
+function renderApplicationMappingDraft(result) {
+  const row = document.querySelector(`.app-field-row[data-field-key="${CSS.escape(result.fieldName)}"]`);
+  if (!row) return;
+  row.querySelector('.app-map-editor')?.remove();
+  const suggestion = semanticSuggestion({ label: row.querySelector('.app-field-label span')?.textContent || '' });
+  const descriptor = result.elementDescriptor || {};
+  const editor = document.createElement('div');
+  editor.className = 'app-map-editor';
+  editor.innerHTML = `
+    <input class="app-map-key" type="text" placeholder="semantic key (e.g. profile.email)" value="${escapeHtml(suggestion.key)}">
+    <select class="app-map-kind">
+      ${['profile', 'persona', 'question', 'manual'].map(kind => `<option value="${kind}" ${kind === suggestion.kind ? 'selected' : ''}>${kind}</option>`).join('')}
+    </select>
+    <button type="button" class="app-map-save app-map-btn">Save map</button>`;
+  row.appendChild(editor);
+  editor.querySelector('.app-map-key').focus();
+  editor.querySelector('.app-map-save').addEventListener('click', () => {
+    const saveButton = editor.querySelector('.app-map-save');
+    saveButton.disabled = true;
+    saveApplicationMapping(row, result, descriptor)
+      .catch(err => setStatus('✗ Mapping save failed: ' + err.message, 'var(--red)'))
+      .finally(() => { saveButton.disabled = false; });
+  });
+}
+
+async function saveApplicationMapping(row, result, descriptor) {
+  const semanticKey = row.querySelector('.app-map-key').value.trim();
+  const sourceKind = row.querySelector('.app-map-kind').value;
+  if (!semanticKey) { setStatus('Enter a semantic key before saving', 'var(--yellow)'); return; }
+  const { base: apiBase, authHeader } = await getApiConfig();
+  const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+  const fieldLabel = row.querySelector('.app-field-label span')?.textContent || result.fieldName;
+  const response = await fetch(`${apiBase}/api/v0/job_postings/${currentState.wwrId}/application_field_mappings`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ application_field_mapping: {
+      field_key: result.fieldName, field_label: fieldLabel, semantic_key: semanticKey,
+      semantic_label: semanticKey, source_kind: sourceKind, provider: currentState.provider,
+      page_step: result.pageStep, page_url: currentState.pageUrl, page_title: result.pageTitle,
+      element_fingerprint: descriptor.selector || result.candidateSelector,
+      element_descriptor: descriptor,
+      context: { required: row.querySelector('.app-field-label b') !== null, clicked_label: descriptor.label || fieldLabel },
+    } }),
+  });
+  const data = await response.json();
+  if (!response.ok || !data.success) throw new Error(data.error || `HTTP ${response.status}`);
+  currentState.applicationContext.mappings = [data.mapping, ...(currentState.applicationContext.mappings || [])];
+  chrome.storage.session.set({ [SESSION_KEY]: currentState });
+  renderApplicationContext(currentState.applicationContext, currentState.applicationFields || []);
+  setStatus(`${fieldLabel} mapped to ${semanticKey}`, 'var(--green)');
+}
+
 async function handlePickerResult(result) {
+  if (result.mapping) {
+    const btn = document.querySelector(`.app-field-row[data-field-key="${CSS.escape(result.fieldName)}"] .app-map-btn`);
+    if (btn) { btn.disabled = false; btn.textContent = 'Map'; }
+    if (result.cancelled) {
+      setStatus('Mapping cancelled', 'var(--comment)');
+      clearPickerResult();
+      return;
+    }
+    renderApplicationMappingDraft(result);
+    setStatus('Review the semantic source, then save the mapping', 'var(--purple)');
+    clearPickerResult();
+    return;
+  }
   const inputId = DATA_KEY_TO_INPUT[result.fieldName];
   const btn = inputId ? document.querySelector(`#${fieldElId(inputId)} .teach-btn`) : null;
   if (btn) btn.disabled = false;
@@ -1209,6 +1579,14 @@ async function saveExtractionRule(result) {
 // ── Init ──────────────────────────────────────────────────────────────────
 
 function init() {
+  const manifest = chrome.runtime.getManifest();
+  const buildStamp = document.getElementById('build-stamp');
+  if (buildStamp) {
+    buildStamp.textContent = `WWWR EXT ${manifest.version} · MV${manifest.manifest_version} · LOCAL UNPACKED`;
+    buildStamp.title = 'Extension manifest/build information';
+  }
+  const headerBuildStamp = document.getElementById('header-build-stamp');
+  if (headerBuildStamp) headerBuildStamp.textContent = `v${manifest.version}`;
   chrome.storage.session.get(SESSION_KEY, (data) => {
     const state = data?.[SESSION_KEY];
     if (state?.extracted) populateForm(state);

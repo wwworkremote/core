@@ -28,8 +28,21 @@ RSpec.describe ProfileContactFields do
     user = create(:user, name: "No Profile")
 
     expect(described_class.call(user)).to eq(
-      name: "No Profile", email: nil, phone: nil, github_url: nil, linkedin_url: nil,
+      name: "No Profile", first_name: "No", middle_name: nil, last_name: "Profile",
+      preferred_name: nil, email: nil, phone: nil, github_url: nil, linkedin_url: nil,
       website_url: nil, location: nil, city: nil, state: nil, country: nil
+    )
+  end
+
+  it "preserves structured legal and preferred names when supplied by the canonical profile" do
+    user = create(:user, name: "Display Name")
+    create(:career_profile, user: user, contact_info: {
+      "name_parts" => { "first" => "Legal", "middle" => "Middle", "last" => "Family",
+                         "preferred_name" => "Display" }
+    })
+
+    expect(described_class.call(user)).to include(
+      first_name: "Legal", middle_name: "Middle", last_name: "Family", preferred_name: "Display"
     )
   end
 end

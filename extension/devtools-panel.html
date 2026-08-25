@@ -1,0 +1,13 @@
+<!doctype html><meta charset="utf-8"><title>WWWorkRemote telemetry</title>
+<style>body{background:#22212c;color:#f8f8f2;font:12px monospace;padding:12px}h1{font-size:14px;color:#ff80bf}pre{white-space:pre-wrap;border-top:1px solid #454158;padding:8px 0}</style>
+<h1>WWWorkRemote error telemetry</h1><div id="status">Listening…</div><pre id="events"></pre>
+<script>
+const key = 'wwr_panel_state';
+function render(state) {
+  const entries = (state?.diagnostics || []).filter(e => e.level === 'error' || e.detail?.event);
+  document.querySelector('#status').textContent = `${entries.length} local events · build ${state?.diagnostics?.at(-1)?.detail?.build_version || 'unknown'}`;
+  document.querySelector('#events').textContent = entries.map(e => `[${new Date(e.ts).toISOString()}] ${e.text}\n${JSON.stringify(e.detail || {})}`).join('\n\n');
+}
+chrome.storage.session.get(key, data => render(data[key]));
+chrome.storage.onChanged.addListener((changes, area) => { if (area === 'session' && changes[key]) render(changes[key].newValue); });
+</script>

@@ -3,6 +3,7 @@
 // Message relay map:
 //   OPEN_PANEL         content.js → background → storage + sidePanel.open()
 //   UPDATE_PANEL_DATA  content.js → background → storage only (panel already open)
+//   APPLICATION_FIELDS_UPDATED content.js → background → storage field patch
 //   SUBMIT_JOB         sidepanel.js → background → content.js (PANEL_SUBMIT)
 //   REEXTRACT          sidepanel.js → background → content.js
 //   GENERATE_ANSWER    sidepanel.js → background → content.js (TASK-78)
@@ -11,10 +12,33 @@
 //   API_FETCH          content.js → background → fetch (bypasses page CSP)
 //   PICKER_START       sidepanel.js → background → content.js (element picker)
 //   PICKER_RESULT      content.js → background → storage (picker patch)
+//   FILL_APPLICATION_FIELD sidepanel.js → background → content.js
 //   DIAG_LOG           content.js/sidepanel.js → background → storage (capped log)
 //   PROVIDER_DETECTED  content.js → background → chrome.action badge (per tab)
 
 const SESSION_KEY = 'wwr_panel_state';
+const TAB_STATES_KEY = 'wwr_panel_states';
+
+// Chrome will not permit an unsolicited page-load open, but it does support
+// opening from an explicit toolbar/keyboard action. Keep the panel one action
+// away and let the content script update its state as pages settle.
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (!['open-wwworkremote-panel', 'open-wwworkremote-panel-alt'].includes(command)) return;
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  if (!tab?.id) return;
+  try {
+    if (typeof chrome.sidePanel.close === 'function') await chrome.sidePanel.close({ tabId: tab.id });
+  } catch (_) { /* close is optional across Chrome versions */ }
+  try { await chrome.sidePanel.open({ tabId: tab.id }); }
+  catch (error) {
+    chrome.runtime.sendMessage({ type: 'EXTENSION_ERROR', event_name: 'shortcut_open', phase: 'command',
+      error_name: error?.name || 'SidePanelOpenError', error_message: String(error?.message || error).slice(0, 500),
+      recoverable: true, build_version: chrome.runtime.getManifest().version,
+      context: { command, tab_id: tab.id } }).catch(() => {});
+  }
+});
 
 // ── Toolbar badge ────────────────────────────────────────────────────────
 // Clear on every navigation start; only a PROVIDER_DETECTED message (sent
@@ -25,16 +49,21 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status === 'loading') chrome.action.setBadgeText({ tabId, text: '' });
 });
 
-function buildPanelState(msg, tabId) {
+function buildPanelState(msg, tabId, priorState = null) {
   return {
     tabId,
     mode:      msg.mode,
-    wwrId:     msg.wwrId,
+    // Workday drops the query string when it redirects to userHome. Keep the
+    // tracked posting only for an explicit completion event from that tab.
+    wwrId:     msg.wwrId || (msg.applicationCompletion ? priorState?.wwrId : null),
     leadId:    msg.leadId,
     extracted: msg.extracted,
     applicationQA: msg.applicationQA || { matches: [], unmatched: [] },
     profileFields: msg.profileFields || null,
     applicationStatus: msg.applicationStatus || null,
+    applicationContext: msg.applicationContext || null,
+    applicationFields: msg.applicationFields || [],
+    applicationCompletion: msg.applicationCompletion || null,
     provider:  msg.provider,
     pageUrl:   msg.pageUrl,
     pageTitle: msg.pageTitle,
@@ -53,11 +82,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const tabId = sender.tab?.id;
     if (!tabId) { sendResponse({ ok: false, error: 'No tab ID in sender' }); return; }
 
-    const state = buildPanelState(msg, tabId);
-    chrome.storage.session.set({ [SESSION_KEY]: state }, () => {
-      chrome.sidePanel.open({ tabId })
+    chrome.storage.session.get([SESSION_KEY, TAB_STATES_KEY], (data) => {
+      const tabStates = data[TAB_STATES_KEY] || {};
+      const state = buildPanelState(msg, tabId, tabStates[tabId]);
+      chrome.storage.session.set({ [SESSION_KEY]: state, [TAB_STATES_KEY]: { ...tabStates, [tabId]: state } }, () => {
+        chrome.sidePanel.open({ tabId })
         .then(() => sendResponse({ ok: true }))
-        .catch(err => sendResponse({ ok: false, error: err.message }));
+        .catch(err => sendResponse({ ok: false, recoverable: true, error: err.message }));
+      });
     });
     return true;
   }
@@ -69,10 +101,30 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const tabId = sender.tab?.id;
     if (!tabId) { sendResponse({ ok: false, error: 'No tab ID in sender' }); return; }
 
-    chrome.storage.session.set({ [SESSION_KEY]: buildPanelState(msg, tabId) }, () => {
+    chrome.storage.session.get(TAB_STATES_KEY, (data) => {
+      const tabStates = data[TAB_STATES_KEY] || {};
+      const state = buildPanelState(msg, tabId, tabStates[tabId]);
+      chrome.storage.session.set({ [SESSION_KEY]: state, [TAB_STATES_KEY]: { ...tabStates, [tabId]: state } }, () => {
       sendResponse({ ok: true });
+      });
     });
     return true;
+  }
+
+  if (msg.type === 'APPLICATION_FIELDS_UPDATED') {
+    const tabId = sender.tab?.id;
+    if (!tabId) return;
+    chrome.storage.session.get([SESSION_KEY, TAB_STATES_KEY], (data) => {
+      const current = data[SESSION_KEY];
+      const tabStates = data[TAB_STATES_KEY] || {};
+      const prior = tabStates[tabId] || current;
+      if (!prior) return;
+      const patched = { ...prior, tabId, applicationFields: msg.applicationFields || [],
+        pageUrl: msg.pageUrl || prior.pageUrl, pageTitle: msg.pageTitle || prior.pageTitle, stale: false };
+      chrome.storage.session.set({ [SESSION_KEY]: patched,
+        [TAB_STATES_KEY]: { ...tabStates, [tabId]: patched } });
+    });
+    return;
   }
 
   // ── API_FETCH ────────────────────────────────────────────────────────────
@@ -176,6 +228,38 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 
+  // ── FILL_APPLICATION_FIELD ────────────────────────────────────────────────
+  // The panel owns the answer; the content script owns the live DOM element.
+  if (msg.type === 'FILL_APPLICATION_FIELD') {
+    chrome.storage.session.get(SESSION_KEY, (data) => {
+      const state = data[SESSION_KEY];
+      if (!state?.tabId) {
+        sendResponse({ ok: false, error: 'No active application page' });
+        return;
+      }
+      chrome.tabs.sendMessage(state.tabId, {
+        type: 'FILL_APPLICATION_FIELD', fieldKey: msg.fieldKey, value: msg.value,
+        source: msg.source || 'manual',
+      }, (response) => {
+        if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        else sendResponse(response);
+      });
+    });
+    return true;
+  }
+
+  if (msg.type === 'REFRESH_APPLICATION_FIELDS') {
+    chrome.storage.session.get(SESSION_KEY, (data) => {
+      const state = data[SESSION_KEY];
+      if (!state?.tabId) { sendResponse({ ok: false, error: 'No active application page' }); return; }
+      chrome.tabs.sendMessage(state.tabId, { type: 'REFRESH_APPLICATION_FIELDS' }, response => {
+        if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        else sendResponse(response || { ok: true });
+      });
+    });
+    return true;
+  }
+
   // ── UPDATE_DESCRIPTION ────────────────────────────────────────────────────
   // Sent by content.js after a desc-only re-read; patches only description
   // fields in storage so the panel can update without clobbering user edits.
@@ -209,7 +293,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }
       chrome.tabs.sendMessage(
         state.tabId,
-        { type: 'PICKER_START', fieldName: msg.fieldName },
+        { type: 'PICKER_START', fieldName: msg.fieldName, mapping: !!msg.mapping },
         (response) => {
           if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
           else sendResponse(response);
@@ -261,5 +345,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const diagnostics = [...(state.diagnostics || []), entry].slice(-200);
       chrome.storage.session.set({ [SESSION_KEY]: { ...state, diagnostics } });
     });
+  }
+
+  if (msg.type === 'EXTENSION_ERROR') {
+    chrome.storage.session.get(SESSION_KEY, (data) => {
+      const state = data[SESSION_KEY];
+      if (state) {
+        const entry = { level: 'error', text: `${msg.event_name}: ${msg.error_message}`, ts: Date.now(), detail: msg };
+        chrome.storage.session.set({ [SESSION_KEY]: { ...state, diagnostics: [...(state.diagnostics || []), entry].slice(-200) } });
+      }
+    });
+    fetch('http://localhost:31000/api/v0/extension_error_events', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ extension_error_event: msg }),
+    }).catch(() => {});
   }
 });

@@ -1,10 +1,10 @@
 // WWWorkRemote Content Script — Rich Context Extraction
 //
 // Two trigger modes:
-//   enrich  — URL contains ?wwr_id=NNN, appended by the Rails app when the
+//   enrich  — URL contains ?wwwr_id=NNN, appended by the Rails app when the
 //             user clicks SOURCE_ORIGIN_VERIFY_&_ENRICH on a job posting show
 //             page. Enriches that existing JobPosting.
-//   capture — free browsing, no wwr_id. Auto-detects a supported job board's
+//   capture — free browsing, no wwwr_id. Auto-detects a supported job board's
 //             detail page (confirmed via provider.readySelector) and creates
 //             a Lead, later promoted to a JobPosting once the user reviews
 //             and submits the panel.
@@ -24,7 +24,8 @@
   if (document.getElementById('wwr-enrichment-overlay')) return;
 
   const urlParams = new URLSearchParams(window.location.search);
-  const wwrId = urlParams.get('wwr_id');
+  // wwwr_id is canonical; accept legacy wwr_id links during the transition.
+  const wwrId = urlParams.get('wwwr_id') || urlParams.get('wwr_id');
 
   // Set by popup.js's "Scan This Page" button immediately before injecting
   // this file, via a separate executeScript call -- allows generic capture
@@ -62,6 +63,27 @@
     fn();
     console.groupEnd();
   };
+
+  function safeErrorText(value) {
+    return String(value || 'Unknown browser error').replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[redacted-email]')
+      .replace(/https?:\/\/[^\s]+/g, '[redacted-url]').slice(0, 500);
+  }
+
+  function reportBrowserError(eventName, error, context = {}) {
+    try {
+      chrome.runtime.sendMessage({ type: 'EXTENSION_ERROR', event_name: eventName,
+        phase: 'page-runtime', provider: provider?.key || 'unknown', page_host: location.host,
+        error_name: error?.name || 'BrowserRuntimeError', error_message: safeErrorText(error?.message || error),
+        recoverable: true, build_version: chrome.runtime.getManifest().version, context });
+    } catch (_) { /* extension context may be gone during navigation */ }
+  }
+
+  window.addEventListener('error', event => {
+    reportBrowserError('page_error', event.error || event.message, { source: 'window', line: event.lineno || null });
+  });
+  window.addEventListener('unhandledrejection', event => {
+    reportBrowserError('unhandled_rejection', event.reason, { source: 'promise' });
+  });
 
   // ─── Provider definitions ──────────────────────────────────────────────────
   //
@@ -973,13 +995,137 @@
     return res.ok ? res.data : null;
   }
 
+  // Workday's generated ids are not durable enough to store as selectors.
+  // Keep a page-local registry keyed by a human-readable field key instead;
+  // the panel can request a fill while this document remains open.
+  const applicationFieldRegistry = new Map();
+  let applicationFieldObserver;
+  let applicationFieldRefreshTimer;
+
+  function applicationFieldLabel(el) {
+    const label = el.labels?.[0]?.textContent || el.getAttribute('aria-label') ||
+      el.getAttribute('data-automation-id') || el.closest('[role="group"]')?.querySelector('label')?.textContent;
+    return String(label || el.name || el.id || 'Application field').replace(/\s+/g, ' ').trim();
+  }
+
+  function discoverApplicationFields() {
+    applicationFieldRegistry.clear();
+    const fields = [];
+    document.querySelectorAll('input, textarea, select, [role="combobox"]').forEach((el, index) => {
+      if (el.type === 'hidden' || el.type === 'file' || el.disabled || el.offsetParent === null) return;
+      const label = applicationFieldLabel(el);
+      if (!label || /search|filter|menu/i.test(label)) return;
+      const type = el.type || el.getAttribute('role') || el.tagName.toLowerCase();
+      const key = `workday:${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}:${index}`;
+      applicationFieldRegistry.set(key, el);
+      fields.push({ key, label, type, required: el.getAttribute('aria-required') === 'true',
+        currentValue: el.type === 'checkbox' ? el.checked : (el.value || '') });
+    });
+    return fields;
+  }
+
+  function publishApplicationFields() {
+    if (!wwrId || !isWorkdayApplicationPage()) return;
+    const fields = discoverApplicationFields();
+    chrome.runtime.sendMessage({ type: 'APPLICATION_FIELDS_UPDATED', wwrId,
+      applicationFields: fields, pageUrl: window.location.href, pageTitle: document.title });
+  }
+
+  function startApplicationFieldObserver() {
+    if (applicationFieldObserver || !isWorkdayApplicationPage()) return;
+    const refresh = () => {
+      clearTimeout(applicationFieldRefreshTimer);
+      applicationFieldRefreshTimer = setTimeout(publishApplicationFields, 250);
+    };
+    applicationFieldObserver = new MutationObserver(refresh);
+    applicationFieldObserver.observe(document.body, { childList: true, subtree: true,
+      attributes: true, attributeFilter: ['aria-label', 'aria-required', 'value'] });
+    refresh();
+  }
+
+  async function waitForApplicationFields(timeout = 3000) {
+    const deadline = Date.now() + timeout;
+    let previousCount = -1;
+    let stableReads = 0;
+    while (Date.now() < deadline) {
+      const count = discoverApplicationFields().length;
+      if (count > 0 && count === previousCount) {
+        stableReads += 1;
+        if (stableReads >= 2) return discoverApplicationFields();
+      } else {
+        stableReads = 0;
+      }
+      previousCount = count;
+      await new Promise(resolve => setTimeout(resolve, 180));
+    }
+    return discoverApplicationFields();
+  }
+
+  function isWorkdayApplicationPage() {
+    return provider?.key === 'workday' &&
+      (document.querySelector('[data-automation-id="application-form"]') ||
+       document.querySelector('input[aria-required], textarea[aria-required], [role="combobox"]'));
+  }
+
+  async function fetchApplicationContext(jobPostingId) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = authHeader ? { Authorization: authHeader } : {};
+    const res = await apiFetch(`${apiBase}/api/v0/job_postings/${jobPostingId}/application_context`, { headers });
+    return res.ok ? res.data : null;
+  }
+
+  function setNativeValue(el, value) {
+    if (el.type === 'checkbox') el.checked = value === true || value === 'true' || value === 'on';
+    else if (el.tagName === 'SELECT') el.value = value;
+    else {
+      const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value')?.set;
+      if (setter) setter.call(el, value);
+      else el.value = value;
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    el.dispatchEvent(new Event('blur', { bubbles: true }));
+  }
+
+  async function fillApplicationField(fieldKey, value, source) {
+    const el = applicationFieldRegistry.get(fieldKey);
+    if (!el) return { ok: false, error: 'Field is no longer visible; rediscover the page fields.' };
+    setNativeValue(el, value);
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    const field = { key: fieldKey, label: applicationFieldLabel(el), type: el.type || el.tagName.toLowerCase() };
+    const res = await apiFetch(`${apiBase}/api/v0/job_postings/${wwrId}/application_field_answers`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ application_field_answer: {
+        field_key: field.key, field_label: field.label, field_type: field.type,
+        answer: String(value), answer_source: source || 'manual', page_url: window.location.href,
+      } }),
+    });
+    return res.ok && res.data?.success ? { ok: true, field } : { ok: false, error: res.data?.error || `HTTP ${res.status}` };
+  }
+
   // Only runs for Greenhouse (the only board this has been live-verified
   // against) and only once we know which JobPosting to match against (wwrId
   // -- set when the app links here via "Source & Enrich"), and only once the
   // application form is actually visible (user clicked "Apply").
   async function computeApplicationAssist() {
-    const empty = { qa: { matches: [], unmatched: [] }, profile: null, status: null };
-    if (!wwrId || provider?.key !== 'greenhouse') return empty;
+    const empty = { qa: { matches: [], unmatched: [] }, profile: null, status: null, context: null, fields: [] };
+    if (!wwrId) return empty;
+
+    if (isWorkdayApplicationPage()) {
+      try {
+        const context = await fetchApplicationContext(wwrId);
+        const fields = await waitForApplicationFields();
+        startApplicationFieldObserver();
+        LOG_OK(`Workday application assist — ${fields.length} visible fields, persona: ${context?.selected_persona_id || 'not selected'}`);
+        return { ...empty, context, fields, profile: context?.profile || null };
+      } catch (err) {
+        LOG_WARN('Workday application assist failed:', err.message);
+        return empty;
+      }
+    }
+
+    if (provider?.key !== 'greenhouse') return empty;
     const extracted = extractApplicationQuestions(document);
     if (!document.querySelector('#application-form')) return empty;
     try {
@@ -990,7 +1136,7 @@
       ]);
       const qa = extracted.length ? matchApplicationQuestions(extracted, stored) : { matches: [], unmatched: [] };
       LOG_OK(`Application assist — ${qa.matches.length} matched, ${qa.unmatched.length} new, profile: ${profile ? 'yes' : 'no'}, status: ${status?.status || 'unknown'}`);
-      return { qa, profile, status };
+      return { qa, profile, status, context: null, fields: [] };
     } catch (err) {
       LOG_WARN('Application assist fetch failed:', err.message);
       return empty;
@@ -1011,6 +1157,25 @@
 
   LOG('Provider detected:', provider ? provider.label : 'none — generic fallback');
 
+  function detectWorkdayCompletion() {
+    if (provider?.key !== 'workday') return null;
+    const text = document.body?.innerText || '';
+    const pathMatch = /\/jobTasks\/completed\/application/i.test(window.location.pathname);
+    const received = /application received/i.test(text);
+    const submitted = /\bsubmitted\b/i.test(text) && /application status/i.test(text);
+    if (!pathMatch && !(received && submitted)) return null;
+    const heading = document.querySelector('h1, [data-automation-id="jobTitle"], [data-automation-id="job-title"]');
+    return {
+      provider: 'workday',
+      title: heading?.textContent?.replace(/\s+/g, ' ').trim() || document.title.replace(/\s*[|–-].*$/, '').trim(),
+      evidence: ['Application Received', 'Submitted'],
+      pageUrl: window.location.href,
+      detectedAt: new Date().toISOString(),
+    };
+  }
+
+  const applicationCompletion = detectWorkdayCompletion();
+
   // Toolbar badge: lets the user see capture is available without opening
   // the popup or scrolling to the in-page overlay. Fire-and-forget --
   // background.js clears it on every navigation and only this message
@@ -1025,9 +1190,9 @@
   } catch (_) { /* ignore */ }
 
   // ─── Capture mode ──────────────────────────────────────────────────────────
-  // ?wwr_id=NNN means the Rails app linked us here to enrich a known posting
+  // ?wwwr_id=NNN means the Rails app linked us here to enrich a known posting
   // (existing flow, trusted — proceeds regardless of provider match). With no
-  // wwr_id we're free-browsing: only proceed on a curated board, OR when this
+  // wwwr_id we're free-browsing: only proceed on a curated board, OR when this
   // injection came from the "Scan This Page" popup button (manualScan) --
   // this file is only ever injected on other sites via that explicit,
   // one-tab, one-click action, never automatically.
@@ -1745,6 +1910,18 @@
       notifyPanel(e);
     });
   }
+
+  if (applicationCompletion) {
+    const completionExtraction = {
+      title: applicationCompletion.title || 'Workday application completion',
+      company: null,
+      description_text: 'Workday reports Application Received and Submitted.',
+      _method: 'workday-completion',
+      _confidence: 'high',
+      _applicationAssist: { qa: { matches: [], unmatched: [] }, profile: null, status: null, context: null, fields: [] },
+    };
+    cachedExtraction = completionExtraction;
+  }
   // In capture mode, nothing runs automatically -- extraction, lead capture,
   // and the panel all wait for the manual click below. Free browsing means
   // this content script fires on every matching-hostname page, including
@@ -1761,7 +1938,11 @@
   };
 
   document.getElementById('wwr-capture-btn').addEventListener('click', () => {
-    if (captureMode === 'enrich' || cachedExtraction) {
+    if (applicationCompletion) {
+      notifyPanel(cachedExtraction);
+      return;
+    }
+    if (cachedExtraction) {
       notifyPanel(cachedExtraction);
       return;
     }
@@ -1802,6 +1983,9 @@
       applicationQA: extracted._applicationAssist?.qa || { matches: [], unmatched: [] },
       profileFields: extracted._applicationAssist?.profile || null,
       applicationStatus: extracted._applicationAssist?.status || null,
+      applicationContext: extracted._applicationAssist?.context || null,
+      applicationFields: extracted._applicationAssist?.fields || [],
+      applicationCompletion,
       provider:   provider ? provider.key : 'generic',
       pageUrl:    window.location.href,
       pageTitle:  document.title,
@@ -1809,7 +1993,15 @@
       if (chrome.runtime.lastError || !response?.ok) {
         const err = chrome.runtime.lastError?.message || response?.error || 'Could not open panel';
         LOG_WARN('Panel update failed:', err);
-        if (!alreadyOpen) setStatus('Panel unavailable — see console', '#ff9580');
+        chrome.runtime.sendMessage({ type: 'EXTENSION_ERROR', event_name: 'panel_open', phase: alreadyOpen ? 'update' : 'open',
+          provider: provider?.key || 'unknown', page_host: location.host,
+          error_name: 'SidePanelOpenError', error_message: err.slice(0, 500), recoverable: !!response?.recoverable,
+          build_version: chrome.runtime.getManifest().version, context: { wwrId: wwrId || null } });
+        if (!alreadyOpen) {
+          setStatus(response?.recoverable
+            ? 'Panel data ready — open the side panel or retry'
+            : 'Panel unavailable — see console', response?.recoverable ? '#ffff80' : '#ff9580');
+        }
       } else if (!alreadyOpen) {
         setStatus('Panel open — review and submit', '#8aff80');
         LOG_OK('Side panel opened');
@@ -1878,6 +2070,7 @@
   const PickerMode = (() => {
     let active = false;
     let fieldName = null;
+    let mapping = false;
     let highlightEl = null;
     let hovered = null;
 
@@ -1919,22 +2112,37 @@
 
     function report(el) {
       LOG(el ? `Picker captured element for "${fieldName}"` : `Picker cancelled for "${fieldName}"`);
+      const elementDescriptor = el ? {
+        tag: el.tagName?.toLowerCase() || '',
+        role: el.getAttribute('role') || '',
+        automationId: el.getAttribute('data-automation-id') || '',
+        name: el.getAttribute('name') || '',
+        id: el.id || '',
+        label: applicationFieldLabel(el),
+        textPreview: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 160),
+        selector: computeSelector(el),
+      } : null;
       chrome.runtime.sendMessage({
         type: 'PICKER_RESULT',
         result: el ? {
           fieldName,
+          mapping,
           value: el.textContent?.trim() || '',
           elementHtml: el.outerHTML.slice(0, 4000),
           parentHtml: el.parentElement ? el.parentElement.outerHTML.slice(0, 6000) : '',
           candidateSelector: computeSelector(el),
+          elementDescriptor,
+          pageStep: document.querySelector('h1, h2, h3, legend')?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 160) || '',
+          pageTitle: document.title,
         } : { fieldName, cancelled: true },
       });
     }
 
-    function start(name) {
+    function start(name, options = {}) {
       if (active) stop();
       active = true;
       fieldName = name;
+      mapping = !!options.mapping;
       document.body.style.cursor = 'crosshair';
       document.addEventListener('mousemove', onMouseMove, true);
       document.addEventListener('click', onClick, true);
@@ -1944,6 +2152,7 @@
     function stop() {
       active = false;
       hovered = null;
+      mapping = false;
       document.body.style.cursor = '';
       if (highlightEl) highlightEl.style.display = 'none';
       document.removeEventListener('mousemove', onMouseMove, true);
@@ -1960,7 +2169,7 @@
 
     // PICKER_START: user clicked "Teach" next to a field in the panel
     if (msg.type === 'PICKER_START') {
-      PickerMode.start(msg.fieldName);
+      PickerMode.start(msg.fieldName, { mapping: msg.mapping });
       sendResponse({ ok: true });
       return;
     }
@@ -2019,6 +2228,19 @@
         .catch(err   => sendResponse({ ok: false, error: err.message }));
       return true;
     }
+
+    if (msg.type === 'FILL_APPLICATION_FIELD') {
+      fillApplicationField(msg.fieldKey, msg.value, msg.source)
+        .then(result => sendResponse(result))
+        .catch(err => sendResponse({ ok: false, error: err.message }));
+      return true;
+    }
+
+    if (msg.type === 'REFRESH_APPLICATION_FIELDS') {
+      publishApplicationFields();
+      sendResponse({ ok: true });
+      return;
+    }
   });
 
   // ─── SPA navigation staleness detection ───────────────────────────────────
@@ -2045,6 +2267,7 @@
     cachedExtraction = null;
     leadId = null;
     leadCapturePromise = null;
+    lastExtractedSnapshot = null;
 
     const preview = document.getElementById('wwr-preview');
     if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }

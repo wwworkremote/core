@@ -301,7 +301,10 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json }, constraints: { format: :json } do
     namespace :v0 do
       get "geo" => "geo#index"
-      get "profile" => "profile#show"
+      resource :profile, only: %i[show update], controller: "profile"
+      get "application_insights" => "application_insights#index"
+      resources :extension_error_events, only: [:create]
+      resources :application_answer_templates, only: %i[index create update]
       resource :outcomes, only: [], controller: "outcomes" do
         post :indeed
         post :greenhouse
@@ -312,6 +315,10 @@ Rails.application.routes.draw do
           post :enrich
         end
         resources :application_questions, only: %i[index create]
+        resources :application_field_answers, only: %i[index create]
+        resources :application_field_mappings, only: %i[index create]
+        resources :application_field_observations, only: [:create]
+        resource :application_context, only: %i[show update]
         resource :application_status, only: %i[show create]
       end
     end

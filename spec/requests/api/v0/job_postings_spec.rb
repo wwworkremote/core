@@ -68,6 +68,26 @@ RSpec.describe "Api::V0::JobPostings" do
       expect(job.crawl_status).to eq("enriched")
     end
 
+    it "persists the posting identity sent by an extension re-read" do
+      post enrich_api_v0_job_posting_path(job), params: {
+        title: "Principal Software Engineer",
+        company: "Cengage",
+        location: "United States",
+        target_url: "https://cengage.wd5.myworkdayjobs.com/CengageNorthAmericaCareers/job/United-States/Principal-Software-Engineer_R2026-711",
+        body: "Principal posting body",
+        data: { employment_type: "Full-time", remote: true }
+      }, as: :json
+
+      expect(response).to be_successful
+      job.reload
+      expect(job.title).to eq("Principal Software Engineer")
+      expect(job.company_name).to eq("Cengage")
+      expect(job.location).to eq("United States")
+      expect(job.target_url).to include("Principal-Software-Engineer_R2026-711")
+      expect(job.body).to eq("Principal posting body")
+      expect(job.data).to include("employment_type" => "Full-time", "remote" => true)
+    end
+
     it "returns errors when enrichment fails" do
       allow(JobPosting).to receive(:find).and_return(job)
       allow(job).to receive(:update) do

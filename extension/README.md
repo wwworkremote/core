@@ -1,14 +1,18 @@
 # WWWorkRemote Ingestion Assistant
 
+Current unpacked build: `1.24.3`.
+
+Keyboard shortcuts: `Ctrl+Shift+Y` (macOS: `Command+Shift+Y`) or alternate `Option+Shift+Y` opens the panel for the active tab. Configure them at `chrome://extensions/shortcuts` if Chrome reports a conflict. (`Option` is Chrome's `Alt` key.)
+
 Chrome extension that captures structured job data from third-party job boards and syncs it back into your local WWWorkRemote Rails application. Open a job posting from inside the app, let the extension extract everything it can find, review and fill any gaps in the side panel, then submit with one click.
 
 ---
 
 ## How it works
 
-1. **Trigger from the app** — click *Source & Enrich* on any job posting. The app opens the source URL with `?wwr_id=NNN` appended.
+1. **Trigger from the app** — click *Source & Enrich* on any job posting. The app opens the source URL with `?wwwr_id=NNN` appended.
 
-2. **Content script activates** — `content.js` detects `wwr_id`, shows the overlay badge, auto-expands truncated descriptions, waits for SPA content to render, then runs the extraction chain.
+2. **Content script activates** — `content.js` detects `wwwr_id` (and accepts legacy `wwr_id`), shows the overlay badge, auto-expands truncated descriptions, waits for SPA content to render, then runs the extraction chain.
 
 3. **Extraction chain runs** — four levels in priority order:
 
@@ -28,6 +32,24 @@ Chrome extension that captures structured job data from third-party job boards a
 ---
 
 ## Side panel fields
+
+### Application cockpit
+
+On a tracked Workday application page (`?wwwr_id=NNN`), the side panel also
+shows an application cockpit. Choose one of the canonical resume personas
+published by `just3ws.localhost`, edit the proposed value, and click **Fill**
+for each visible field. Workday controls are discovered per page because their
+generated DOM ids are not durable selectors. Filling is always explicit and
+never submits the application. Each successful fill is saved against the
+tracked WWWorkRemote application with its field label, value, source, and page
+URL. The selected persona and personal profile are snapshotted on that
+application so later canonical-resume edits do not rewrite history.
+
+Each application field also has a **Map/Remap** action. Click it, click the
+corresponding field on the live Workday page, then confirm the semantic source
+such as `profile.email`, `persona.positions[].title`, or `application.question`.
+Mappings are append-only and retain page/step context plus a compact element
+descriptor, allowing later tooling to learn stable associations and noise.
 
 | Indicator | Meaning |
 |-----------|---------|
@@ -147,7 +169,7 @@ content.js   ──UPDATE_DESCRIPTION──► background.js ──storage.set (
 
 ### 1. Enrich Existing Job
 `POST /api/v0/job_postings/:id/enrich`
-Used when triggered from the app via `?wwr_id=NNN`.
+Used when triggered from the app via `?wwwr_id=NNN`.
 
 ### 2. Submit New Job (Universal)
 `POST /api/v0/job_postings`
@@ -191,7 +213,7 @@ Filter DevTools by `[WWWR]` to isolate extension logs.
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| Overlay does not appear | URL missing `?wwr_id=NNN` | Use *Source & Enrich* from the app |
+| Overlay does not appear | URL missing `?wwwr_id=NNN` | Use *Source & Enrich* from the app |
 | Side panel opens empty | Extension needs reload | Click ↺ in `chrome://extensions` |
 | 401 Unauthorized on submit | Credentials not set or wrong | Open popup → enter email + password → SAVE |
 | Description empty or truncated | SPA not loaded / content hidden | Click ↺ Re-read page or ↺ Desc after expanding manually |

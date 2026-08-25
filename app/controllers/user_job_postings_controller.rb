@@ -12,11 +12,17 @@ class UserJobPostingsController < ApplicationController
     "oldest" => Arel.sql("COALESCE(applied_at, created_at) ASC")
   }.freeze
 
+  # The overview intentionally materializes one ordered collection so its
+  # columns and summary cards agree on the same funnel snapshot.
+  # rubocop:disable Metrics/AbcSize
   def index
     scoped = sorted_tracked_postings
-    @favorites = scoped.where(status: "favorited")
-    @applied = scoped.where(status: "applied")
+    @tracked = scoped.to_a
+    @funnel_stats = funnel_stats(@tracked)
+    @favorites = @tracked.select { |record| record.status == "favorited" }
+    @applied = @tracked.select { |record| record.status == "applied" }
   end
+  # rubocop:enable Metrics/AbcSize
 
   def create
     build_user_job_posting
@@ -71,8 +77,17 @@ class UserJobPostingsController < ApplicationController
   end
 
   def sorted_tracked_postings
-    current_user.user_job_postings.includes(:job_posting).order(SORTS.fetch(sort_key))
+    current_user.user_job_postings.includes(:job_posting, :application_field_answers).order(SORTS.fetch(sort_key))
   end
+
+  # rubocop:disable Metrics/AbcSize
+  def funnel_stats(records)
+    { tracked: records.length, applied: records.count { |record| record.status == "applied" },
+      personas: records.count { |record| record.resume_persona_id.present? },
+      answers: records.sum { |record| record.application_field_answers.length },
+      outcomes: records.count { |record| record.outcome.present? } }
+  end
+  # rubocop:enable Metrics/AbcSize
 
   def sort_key
     @sort = SORTS.key?(params[:sort]) ? params[:sort] : "newest"

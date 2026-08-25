@@ -126,7 +126,7 @@ paths:
       summary: Enrich an existing JobPosting (enrich mode)
       description: >
         The "SOURCE_ORIGIN_VERIFY & ENRICH" flow -- the Rails app links out
-        to the posting's original URL with `?wwr_id=NNN` appended; the
+        to the posting's original URL with `?wwwr_id=NNN` appended; the
         extension detects that param and, instead of capturing a Lead,
         submits straight back to this JobPosting.
       parameters:

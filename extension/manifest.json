@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WWWorkRemote Ingestion Assistant",
-  "version": "1.21.0",
+  "version": "1.24.3",
   "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
   "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
   "host_permissions": [
@@ -34,8 +34,25 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+  "devtools_page": "devtools.html",
   "action": {
     "default_popup": "popup.html"
+  },
+  "commands": {
+    "open-wwworkremote-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open the WWWorkRemote application panel"
+    },
+    "open-wwworkremote-panel-alt": {
+      "suggested_key": {
+        "default": "Alt+Shift+Y",
+        "mac": "Alt+Shift+Y"
+      },
+      "description": "Open the WWWorkRemote application panel (alternate)"
+    }
   },
   "content_scripts": [
     {

@@ -103,7 +103,7 @@
           <%= button_to t('.apply_on_site'), apply_on_site_job_posting_path(@job_posting),
                         form: { target: "_blank" }, class: "btn btn-primary rounded-xl px-10 font-bold" %>
 
-          <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold text-base-content/60 hover:text-white" do %>
+          <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold text-base-content/60 hover:text-white" do %>
             <%= t('.open_source_listing') %>
           <% end %>
         </div>

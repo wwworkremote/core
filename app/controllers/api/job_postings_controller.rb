@@ -15,7 +15,12 @@ class Api::JobPostingsController < ApplicationController
     return render_missing_description if markdown_body.blank?
 
     apply_enrichment!
-    render json: { success: true, message: "Job ##{job_posting.id} enriched." }
+    render json: {
+      success: true,
+      message: "Job ##{job_posting.id} enriched.",
+      job_posting_id: job_posting.id,
+      lead_id: job_posting.leads.order(id: :desc).pick(:id)
+    }
   end
 
   def job_posting
@@ -41,12 +46,18 @@ class Api::JobPostingsController < ApplicationController
 
     ac_params.permit(
       :title, :company, :location, :apply_url, :posted_at, :skills,
+      :canonical_url,
       :salary_min, :salary_max, :salary_currency, :salary_unit, :salary,
       :employment_type, :remote, :experience, :valid_through,
       :education, :qualifications, :responsibilities, :benefits,
       :company_logo_url, :industry, :description_text, :description_html,
       skills: []
-    ).to_h
+    ).to_h.tap do |attrs|
+      # Workday pages often expose the posting's canonical URL while the
+      # review panel leaves Apply URL blank. Do not preserve a stale URL from
+      # the previously selected SPA posting in that case.
+      attrs["apply_url"] ||= attrs["canonical_url"].presence || params[:url].presence
+    end
   end
   # rubocop:enable Metrics/MethodLength
 

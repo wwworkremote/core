@@ -21,19 +21,19 @@ class OutboundLinksController < ApplicationController
 
   def redirect_to_target(url, job_posting_id: nil)
     ahoy.track "Clicked Outbound Link", { url: url, job_posting_id: job_posting_id }.compact
-    redirect_to with_wwr_id(url, job_posting_id), allow_other_host: true
+    redirect_to with_wwwr_id(url, job_posting_id), allow_other_host: true
   end
 
   # The redirect target is always the DB-verified target_url (never the raw
   # incoming params[:url] -- that's the open-redirect guard above), which
-  # means a wwr_id the view appended to params[:url] was silently dropped
+  # means a wwwr_id the view appended to params[:url] was silently dropped
   # here, breaking the extension's "Source & Enrich" trigger. Re-append it
   # from the job_posting_id we already resolved, not from the untrusted param.
-  def with_wwr_id(url, job_posting_id)
+  def with_wwwr_id(url, job_posting_id)
     return url unless job_posting_id
 
     separator = url.include?("?") ? "&" : "?"
-    "#{url}#{separator}wwr_id=#{job_posting_id}"
+    "#{url}#{separator}wwwr_id=#{job_posting_id}"
   end
 
   def block_open_redirect

@@ -21,7 +21,29 @@ class ProfileContactFields
   private
 
   def basic_fields
-    { name: @user.name, email: @contact["email"], phone: @contact["phone"] }
+    name = structured_name
+    { name: @user.name, **name, email: @contact["email"], phone: @contact["phone"],
+      address_line1: @contact["address_line1"], postal_code: @contact["postal_code"],
+      phone_country_code: @contact["phone_country_code"], phone_area_code: @contact["phone_area_code"],
+      phone_number: @contact["phone_number"] }
+  end
+
+  # Canonical resume exports have used both flat contact keys and a nested
+  # name_parts object over time. Preserve either shape, and only fall back to
+  # the display name for first/last; guessing a middle or preferred name is
+  # worse than leaving the field for explicit review.
+  def structured_name
+    parts = @contact["name_parts"] || @contact["name"]
+    parts = {} unless parts.is_a?(Hash)
+    first = @contact["legal_first_name"] || parts["first"] || parts["first_name"]
+    middle = @contact["legal_middle_name"] || parts["middle"] || parts["middle_name"]
+    last = @contact["legal_last_name"] || parts["last"] || parts["last_name"]
+    display_parts = @user.name.to_s.split
+    first ||= display_parts.first
+    last ||= display_parts.drop(1).last if display_parts.length > 1
+
+    { first_name: first, middle_name: middle, last_name: last,
+      preferred_name: @contact["preferred_name"] || parts["preferred_name"] }
   end
 
   def url_fields

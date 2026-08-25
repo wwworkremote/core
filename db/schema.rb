@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -90,6 +90,84 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
     t.string "visitor_token"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "application_answer_templates", force: :cascade do |t|
+    t.text "answer", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.string "normalized_prompt", null: false
+    t.string "persona_id"
+    t.string "prompt", null: false
+    t.string "question_kind", null: false
+    t.string "source", default: "manual", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "persona_id", "normalized_prompt"], name: "idx_answer_templates_lookup"
+    t.index ["user_id"], name: "index_application_answer_templates_on_user_id"
+  end
+
+  create_table "application_field_answers", force: :cascade do |t|
+    t.text "answer", null: false
+    t.string "answer_source", null: false
+    t.datetime "created_at", null: false
+    t.string "field_key", null: false
+    t.string "field_label", null: false
+    t.string "field_type", null: false
+    t.string "page_url"
+    t.datetime "provided_at", null: false
+    t.string "trace_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_job_posting_id", null: false
+    t.index ["trace_id"], name: "index_application_field_answers_on_trace_id"
+    t.index ["user_job_posting_id", "field_key"], name: "idx_app_fields_on_app_and_key", unique: true
+    t.index ["user_job_posting_id"], name: "index_application_field_answers_on_user_job_posting_id"
+  end
+
+  create_table "application_field_mappings", force: :cascade do |t|
+    t.bigint "application_field_answer_id"
+    t.jsonb "context", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.jsonb "element_descriptor", default: {}, null: false
+    t.string "element_fingerprint"
+    t.string "field_key", null: false
+    t.string "field_label", null: false
+    t.datetime "mapped_at", null: false
+    t.string "page_step"
+    t.string "page_title"
+    t.string "page_url"
+    t.string "provider"
+    t.string "semantic_key", null: false
+    t.string "semantic_label"
+    t.string "source_kind", null: false
+    t.string "trace_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_job_posting_id", null: false
+    t.index ["application_field_answer_id"], name: "idx_on_application_field_answer_id_bd595d0770"
+    t.index ["trace_id"], name: "index_application_field_mappings_on_trace_id"
+    t.index ["user_job_posting_id", "field_key", "semantic_key"], name: "idx_app_field_mappings_on_application_field_semantic"
+    t.index ["user_job_posting_id"], name: "index_application_field_mappings_on_user_job_posting_id"
+  end
+
+  create_table "application_field_observations", force: :cascade do |t|
+    t.jsonb "context", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "field_key", null: false
+    t.string "field_label", null: false
+    t.string "field_type", null: false
+    t.string "normalized_prompt", null: false
+    t.datetime "observed_at", null: false
+    t.string "page_step"
+    t.string "page_url"
+    t.string "persona_id"
+    t.string "question_kind", null: false
+    t.string "trace_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_job_posting_id", null: false
+    t.index ["question_kind", "normalized_prompt"], name: "idx_app_observations_on_kind_and_prompt"
+    t.index ["trace_id"], name: "index_application_field_observations_on_trace_id"
+    t.index ["user_job_posting_id", "field_key"], name: "idx_app_observations_on_app_and_key", unique: true
+    t.index ["user_job_posting_id"], name: "index_application_field_observations_on_user_job_posting_id"
   end
 
   create_table "application_questions", force: :cascade do |t|
@@ -243,6 +321,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
     t.datetime "updated_at", null: false
     t.bigint "work_experience_id", null: false
     t.index ["work_experience_id"], name: "index_experience_highlights_on_work_experience_id"
+  end
+
+  create_table "extension_error_events", force: :cascade do |t|
+    t.string "build_version", null: false
+    t.jsonb "context", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.string "error_name"
+    t.string "event_name", null: false
+    t.datetime "occurred_at", null: false
+    t.string "page_host"
+    t.string "phase"
+    t.string "provider"
+    t.boolean "recoverable", default: false, null: false
+    t.string "trace_id"
+    t.datetime "updated_at", null: false
+    t.index ["event_name", "occurred_at"], name: "index_extension_error_events_on_event_name_and_occurred_at"
+    t.index ["trace_id"], name: "index_extension_error_events_on_trace_id"
   end
 
   create_table "extraction_rule_observations", force: :cascade do |t|
@@ -835,6 +931,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
   end
 
   create_table "user_job_postings", force: :cascade do |t|
+    t.jsonb "application_profile_snapshot", default: {}, null: false
+    t.string "application_trace_id"
     t.datetime "applied_at"
     t.text "cover_letter"
     t.datetime "created_at", null: false
@@ -848,10 +946,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
     t.datetime "outcome_at"
     t.string "outcome_source"
     t.boolean "priority_flag"
+    t.string "resume_persona_id"
+    t.jsonb "resume_persona_snapshot", default: {}, null: false
     t.string "status"
     t.jsonb "strategy", default: {}, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["application_trace_id"], name: "index_user_job_postings_on_application_trace_id"
     t.index ["applied_at"], name: "index_user_job_postings_on_applied_at"
     t.index ["job_posting_id"], name: "index_user_job_postings_on_job_posting_id"
     t.index ["job_search_id"], name: "index_user_job_postings_on_job_search_id"
@@ -908,6 +1009,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "application_answer_templates", "users"
+  add_foreign_key "application_field_answers", "user_job_postings"
+  add_foreign_key "application_field_mappings", "application_field_answers"
+  add_foreign_key "application_field_mappings", "user_job_postings"
+  add_foreign_key "application_field_observations", "user_job_postings"
   add_foreign_key "application_questions", "job_postings"
   add_foreign_key "application_questions", "users"
   add_foreign_key "career_profiles", "users"
