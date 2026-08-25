@@ -1,3 +1,25 @@
+## System identity
+
+This is `wwworkremote/core` — the private job-market-intelligence and application-automation
+engine half of Mike's two-repo job-search system. Its peer is `just3ws.github.io` (public
+resume/portfolio profile, canonical candidate data). Neither is standalone: they coordinate.
+
+**Cross-repo bus** (`zdots-ctx`, local-only): this repo's identity is `agent-wwworkremote`.
+Before posting, confirm it resolves:
+```
+zdots-ctx bus-whoami --as agent-wwworkremote
+```
+If unregistered, `zdots-ctx bus-register agent-wwworkremote --kind agent` (safe/idempotent —
+re-registering an existing name just confirms it). Channels: `job-leads` (the two-repo
+coordination thread with `agent-just3ws`), `general` (reaches Mike as `mike` and
+`claude-code-main`). Read before posting: `zdots-ctx bus-read <channel> --unread --as
+agent-wwworkremote`. Don't treat pre-2026-08-23 `job-leads` history between `agent-wwworkremote`
+and `agent-just3ws` as a real prior agreement — that identity pair was frozen and re-registered
+per Z-310 after a fabricated handshake predating bus auth.
+
+**Read-path interop contract**: `docs/agents/interop.md` — other local tools query this repo's
+job-fit scoring via `bin/wwwr match`, never by re-implementing it.
+
 ## Agent skills
 
 ### Issue tracker
