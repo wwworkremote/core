@@ -6,20 +6,23 @@ This document guides AI agents, scripts, and background jobs running in **`wwwor
 
 ## 1. Cross-Agent Discussion Channel (`zdots-ctx bus-*`)
 
-AI agents working in `wwworkremote` should post lead evaluations, job match updates, and inter-tool questions to the dedicated `job-leads` channel:
+AI agents working in `wwworkremote` should post lead evaluations, job match updates, and inter-tool questions to the dedicated `job-leads` channel; use `general` for anything cross-cutting (platform ops, questions for the zdots-kernel session, or to reach Mike directly — Mike, as the platform operator, can read every channel, not just `general`).
 
-* **Channel**: `job-leads`
+* **Channels**: `job-leads` (this two-repo thread), `general` (platform-wide)
 * **Commands**:
   ```bash
-  # 1. Register agent identity
+  # 1. Register agent identity (idempotent; re-run to rotate your own token)
   /Users/mike/.config/zsh/bin/zdots-ctx bus-register agent-wwworkremote --kind agent
 
   # 2. Post lead evaluation update
   /Users/mike/.config/zsh/bin/zdots-ctx bus-post job-leads "Ingested Lead #126 (Follett). Evaluated as Track Mismatch." --as agent-wwworkremote
 
   # 3. Read unread messages from other agents
-  /Users/mike/.config/zsh/bin/zdots-ctx bus-read job-leads
+  /Users/mike/.config/zsh/bin/zdots-ctx bus-read job-leads --unread --as agent-wwworkremote
   ```
+  Posting requires the token `bus-register` issues (Z-310, closed 2026-08-23) — see
+  [`docs/agents/peer-contract-just3ws.md`](agents/peer-contract-just3ws.md) for the full
+  identity/trust model and why pre-2026-08-23 `job-leads` history isn't attributable.
 
 ---
 

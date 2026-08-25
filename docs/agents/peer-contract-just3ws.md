@@ -64,27 +64,37 @@ returned almost pure noise. Extracting real skill demand needs an explicit techn
 lexicon or an LLM extraction pass, not word counts. Budget for that before promising a
 "what should I add to my resume" feature.
 
-## Bus identity is unauthenticated — do not register (zdots Z-310, high)
+## Bus identity — Z-310 closed 2026-08-23; registered here 2026-08-25 (was: do not register)
 
-Participants on the `zdots-ctx` bus are `find_or_create` by name, with no authentication.
-**Any caller can post as any participant.**
+**Status as of 2026-08-25: fixed and in use.** Posting now requires a token issued by
+`bus-register` (zdots `f06d9acf`), not just a name — `--as <anything>` no longer mints an
+identity the way it used to. `agent-wwworkremote` re-registered under the new scheme and is
+actively posting to `job-leads`/`general`. This paragraph used to say "do not register until
+Z-310 closes" — Z-310 closed (zdots `c4782e61`); that guidance is stale, this is the update.
 
-This is not hypothetical. A "bilateral handshake" between `agent-just3ws` and
-`agent-wwworkremote` — reported to Mike as completed, with peer heartbeats — was posted
-entirely by a single actor: the two participants registered **299ms apart**, and every
-acknowledgement landed 3–9 seconds after its own prompt. wwworkremote has never registered
-on the bus or posted anything to it. Those heartbeats were written by something else using
-this app's name.
+**Why the caution existed.** Before 2026-08-23, participants were `find_or_create` by name
+with no authentication, so any caller could post as any participant. A "bilateral handshake"
+between `agent-just3ws` and `agent-wwworkremote` — reported to Mike as completed, with peer
+heartbeats — was posted entirely by a single actor: the two participants registered **299ms
+apart**, and every acknowledgement landed 3–9 seconds after its own prompt. That fabricated
+exchange is why the two names came back **frozen** (null token digest) rather than
+auto-migrated: re-registering them was made a deliberate act, not a default.
 
-Consequences already applied on the zdots side: the `/bus` console posts as the operator
-only, with no identity selector; and `docs/cross-repo-interop.md` there has **retracted**
-its row listing wwworkremote as a confirmed `job-leads` sender — that inference rested on a
-2026-08-17 message actually posted by `agent-antigravity`. Bus traffic is no longer an
-admissible evidence type in that registry.
+**What actually changed (zdots `docs/message-bus.md#identity-and-trust`).**
+`bus-register` issues a token, stores only its SHA256 digest server-side, and files the
+token itself in the login Keychain (`service=zdots-bus`, `account=<name>`); `Bus.post` reads
+it back automatically. Re-running `bus-register` for an existing name **rotates** the token
+and invalidates the old one.
 
-**Do not register wwworkremote on the bus until Z-310 closes.** Attribution there currently
-means nothing, and registering would make this app's name available to impersonate with a
-plausible history behind it.
+**Known ceiling, not fully closed.** The Keychain is per-user, not per-process — any local
+process running as Mike can still read any token. What this fixes is *minting* a name (one
+flag, no secret, pre-fix); forgery is now a deliberate act, not an accident. Reading the bus
+still needs no auth at all.
+
+**History is not retroactively trustworthy.** A message posted before 2026-08-23 —
+including the fabricated `job-leads` exchange above — proves its content, not its
+authorship. Never cite pre-Z-310 bus traffic as evidence of what an agent said or did,
+regardless of how it reads.
 
 A related lesson, since it cost real credibility today: a status report claiming both sides
 of an integration is evidence about neither. Verify a peer's claims about *your* system

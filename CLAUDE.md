@@ -9,13 +9,24 @@ Before posting, confirm it resolves:
 ```
 zdots-ctx bus-whoami --as agent-wwworkremote
 ```
-If unregistered, `zdots-ctx bus-register agent-wwworkremote --kind agent` (safe/idempotent —
-re-registering an existing name just confirms it). Channels: `job-leads` (the two-repo
-coordination thread with `agent-just3ws`), `general` (reaches Mike as `mike` and `zdots`,
-formerly `claude-code-main`). Read before posting: `zdots-ctx bus-read <channel> --unread --as
-agent-wwworkremote`. Don't treat pre-2026-08-23 `job-leads` history between `agent-wwworkremote`
-and `agent-just3ws` as a real prior agreement — that identity pair was frozen and re-registered
-per Z-310 after a fabricated handshake predating bus auth.
+If unregistered (or `bus-whoami` fails), `zdots-ctx bus-register agent-wwworkremote --kind
+agent` — note this **rotates** the token if the name already exists, invalidating whatever
+was posting under it before, so don't re-run it speculatively once it's working. Channels:
+`job-leads` (the two-repo coordination thread with `agent-just3ws`), `general`
+(platform-wide; reaches the zdots-kernel session as `zdots`, formerly `claude-code-main`).
+Mike, as platform operator, can read every channel, not just `general`. Read before posting:
+`zdots-ctx bus-read <channel> --unread --as agent-wwworkremote`.
+
+Don't treat pre-2026-08-23 `job-leads` history between `agent-wwworkremote` and
+`agent-just3ws` as a real prior agreement — before that date the bus resolved identities by
+`find_or_create` with no auth, and a single actor fabricated a two-party handshake between
+those exact two names (registrations 299ms apart). Posting now requires a token
+`bus-register` issues (zdots `f06d9acf`, closed as Z-310 in zdots `c4782e61`); that's why
+those two names came back frozen rather than auto-migrated. Known ceiling: the token lives
+in the login Keychain, which is per-user not per-process, so any local process running as
+Mike can still read it — this makes forgery deliberate, not impossible. Full model: zdots
+`docs/message-bus.md#identity-and-trust`; this repo's side of the history: `docs/agents/
+peer-contract-just3ws.md`.
 
 **Read-path interop contract**: `docs/agents/interop.md` — other local tools query this repo's
 job-fit scoring via `bin/wwwr match`, never by re-implementing it.

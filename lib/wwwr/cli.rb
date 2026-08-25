@@ -28,9 +28,9 @@ class Wwwr::CLI
   private
 
   def print_usage(_args = [])
-    puts "Usage: bin/wwwr status | bin/wwwr postings [filters] | bin/wwwr transition <id> <event>"
+    puts "Usage: status | postings [filters] | transition <id> <event> | match <id> --source=<n> [--escalate]"
     puts "  filters: --company= --source-id= --role-family= --location= --remote --contract"
-    puts "  events:  #{STATUS_EVENTS.keys.join(' ')}"
+    puts "  events:  #{STATUS_EVENTS.keys.join(' ')} (match contract: docs/agents/interop.md)"
   end
 
   def print_status(_args = [])
