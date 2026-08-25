@@ -4,7 +4,7 @@ title: Triage the 531 accumulated SolidQueue failed executions
 status: To Do
 assignee: []
 created_date: '2026-08-24 16:46'
-updated_date: '2026-08-24 16:47'
+updated_date: '2026-08-25 16:19'
 labels: []
 dependencies: []
 priority: medium
@@ -52,3 +52,9 @@ Do not bulk-retry all 531 blindly — `ContentEnrichmentJob` and `AnalysisJob` m
 - [ ] #5 FailedExecution count is reduced to a level where a new failure is visible
 - [ ] #6 Any code bug found is fixed or filed as its own task, not just retried around
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+2026-08-25: pipeline-health-agent audit found 559 failed executions (up from ~531), and root-caused all 14 failing job classes to the SAME underlying cause: SolidQueue::Processes::ProcessPrunedError (11 classes) / ProcessMissingError (3 classes: SyncDashboardJob, JobBoards::AnalysisJob, JobBoards::GeocodingJob). Every failure traces to the worker process itself dying/getting reaped mid-job, not to any job's application logic -- this is a worker/infra problem (OOM? long-running job timeout? host restarts?), not 531+ separate job bugs. Next step should investigate why the `jobs` launchd service's worker process keeps dying, e.g. check bin/wwworkremote-ctl supervisor restart cadence and system resource limits, rather than triaging failures class-by-class.
+<!-- SECTION:NOTES:END -->

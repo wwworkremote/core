@@ -330,6 +330,49 @@
         </div>
       </div>
 
+      <input type="radio" name="job_tabs" role="tab" class="tab font-bold text-xs" aria-label="Job History">
+      <div role="tabpanel" class="tab-content card-neural p-0 border-white/10 mt-2">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
+              <tr>
+                <th class="px-6 py-4">Class</th>
+                <th class="px-6 py-4 text-center">Status</th>
+                <th class="px-6 py-4">Error</th>
+                <th class="px-6 py-4 text-right">Started</th>
+                <th class="px-6 py-4 text-right">Duration</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5 font-mono text-xs">
+              <% if @job_runs.any? %>
+                <% @job_runs.each do |run| %>
+                  <tr class="group hover:bg-white/[0.03] transition-colors">
+                    <td class="px-6 py-4 text-blue-400 font-bold truncate max-w-xs"><%= run.job_class %></td>
+                    <td class="px-6 py-4 text-center">
+                      <% status_classes = { "failed" => "bg-rose-500/10 text-rose-500 border-rose-500/20",
+                                            "finished" => "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+                                            "running" => "bg-blue-500/10 text-blue-400 border-blue-500/20" } %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded border text-xs font-bold <%= status_classes[run.status] %>">
+                        <%= run.status.capitalize %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-rose-400/80 truncate max-w-xs"><%= run.error_message %></td>
+                    <td class="px-6 py-4 text-right text-slate-500"><%= time_ago_in_words(run.started_at) %> ago</td>
+                    <td class="px-6 py-4 text-right text-slate-500">
+                      <%= run.finished_at ? "#{(run.finished_at - run.started_at).round(2)}s" : "—" %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr>
+                  <td colspan="5" class="px-6 py-12 text-center text-slate-500 italic">No job history recorded yet.</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <input type="radio" name="job_tabs" role="tab" class="tab font-bold text-xs" aria-label="Failed Jobs (<%= @failed_count %>)">
       <div role="tabpanel" class="tab-content card-neural p-0 border-white/10 mt-2">
         <div class="overflow-x-auto">

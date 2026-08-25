@@ -10,7 +10,7 @@ class Admin::JobsController::Dashboard
               :scheduler_info, :recurring_tasks, :last_runs,
               :latency, :throughput, :error_rate, :active_processes, :saturation,
               :throughput_per_min, :eta_minutes, :stalled_jobs, :running_too_long, :queues,
-              :failed_jobs, :recent_jobs
+              :failed_jobs, :recent_jobs, :job_runs
 
   def self.call
     new.call
@@ -91,6 +91,7 @@ class Admin::JobsController::Dashboard
                                   .order(created_at: :desc)
                                   .limit(50)
     @recent_jobs = SolidQueue::Job.order(created_at: :desc).limit(50)
+    @job_runs = JobRun.recent.limit(100)
   end
 
   def calculate_latency

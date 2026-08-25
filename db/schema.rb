@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_24_192334) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_25_162206) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -432,6 +432,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_192334) do
     t.index ["source_id", "published_at"], name: "index_job_postings_on_source_id_and_published_at", order: { published_at: :desc }
     t.index ["title"], name: "index_job_postings_on_title", opclass: :gin_trgm_ops, using: :gin
     t.index ["tsv_search"], name: "index_job_postings_on_tsv_search", using: :gin
+  end
+
+  create_table "job_runs", force: :cascade do |t|
+    t.string "active_job_id", null: false
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.datetime "finished_at"
+    t.string "job_class", null: false
+    t.string "queue_name"
+    t.datetime "started_at", null: false
+    t.string "status", default: "running", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active_job_id"], name: "index_job_runs_on_active_job_id"
+    t.index ["job_class", "created_at"], name: "index_job_runs_on_job_class_and_created_at"
+    t.index ["status", "created_at"], name: "index_job_runs_on_status_and_created_at"
   end
 
   create_table "job_searches", force: :cascade do |t|

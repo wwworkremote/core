@@ -33,6 +33,9 @@
       Skip to content
     </a>
 
+    <%= turbo_stream_from "job_activity" %>
+    <div id="job_activity_toasts" class="toast toast-top toast-end z-[60]"></div>
+
     <dialog data-command-palette-target="dialog" data-action="click->command-palette#backdropClick"
         class="backdrop:bg-black/60 bg-transparent p-0 m-auto w-full max-w-xl" aria-label="Command palette">
       <div class="bg-base-200 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
