@@ -1,14 +1,7 @@
 # frozen_string_literal: true
 
 class JobPostingsController < ApplicationController
-  ROLE_FAMILY_LABELS = {
-    staff_plus_ic: "Staff+ IC",
-    engineering_management: "Engineering Mgmt",
-    product_leadership: "Product Leadership",
-    design_leadership: "Design Leadership",
-    data_leadership: "Data Leadership"
-  }.freeze
-  helper_method :role_family_labels
+  include JobPostingFiltering
 
   # Lets "Not Interested"/"Expired" redirect back to wherever triage started.
   before_action(only: :show) { @return_to = safe_return_path(request.referer) }
@@ -23,29 +16,50 @@ class JobPostingsController < ApplicationController
     ahoy.track "Viewed Job Posting", job_posting_id: @job_posting.id, title: @job_posting.title
   end
 
+  # Corrects scraped-data damage (a truncated title, a blank company_name) --
+  # TASK-86. Deliberately excludes :status: writing that column directly would
+  # skip the AASM guards, same reason UserJobPosting's update already refuses
+  # it. A typo fix and a pipeline transition are different actions and must
+  # stay different code paths.
+  def update
+    job_posting = JobPosting.find(params.expect(:id))
+    job_posting.update!(job_posting_params)
+    redirect_to job_posting_path(job_posting), notice: "Posting updated."
+  end
+
   def reformat
     job_posting = mark_reformatting!(JobPosting.find(params.expect(:id)))
     JobPostingReformatJob.perform_later(job_posting.id)
     render turbo_stream: description_replace_stream(job_posting)
   end
 
-  def role_family_labels
-    ROLE_FAMILY_LABELS
+  # TASK-86: clicking through to the employer's site is intent, so it
+  # favorites -- but never marks applied. Auto-applying on an outbound click
+  # is exactly the funnel inflation bin/import_linkedin_tracker deliberately
+  # avoids by recording LinkedIn's clicked_apply as favorited, not applied.
+  # "Mark Applied" already exists in the Activity panel's available_status_events
+  # once a posting is favorited, so that's the "did you finish?" affordance --
+  # no new UI needed for it. Tracking and the open-redirect guard stay
+  # OutboundLinksController's job unchanged; this only favorites, then hands
+  # off to it, so the click is recorded exactly as it is today.
+  def apply_on_site
+    job_posting = JobPosting.find(params.expect(:id))
+    favorite_for_current_user(job_posting)
+    redirect_to outbound_link_path(url: job_posting.target_url, job_posting_id: job_posting.id)
   end
-
-  # Single source of truth for "every active filter, as URL params" -- every
-  # filter-badge/remove link builds off this hash instead of hand-threading
-  # each param through every link_to, which silently drops filters whenever
-  # a new one is added and someone forgets a spot.
-  def active_filter_params
-    {
-      q: @query, company: @company, source_id: @source_id, role_family: @role_family,
-      location: @location, remote: (@remote ? "1" : nil), contract: (@contract ? "1" : nil), sort: @sort
-    }
-  end
-  helper_method :active_filter_params
 
   private
+
+  # Same two-machine write as every importer this session -- JobPosting and
+  # UserJobPosting drift when only one is moved (TASK-82).
+  def favorite_for_current_user(job_posting)
+    job_posting.favorite! if job_posting.may_favorite?
+    current_user.user_job_postings.find_or_create_by!(job_posting: job_posting).record_status_event!("favorite")
+  end
+
+  def job_posting_params
+    params.expect(job_posting: %i[title company_name location])
+  end
 
   def mark_reformatting!(job_posting)
     job_posting.update!(data: job_posting.data.merge("reformatting" => true))
@@ -57,81 +71,5 @@ class JobPostingsController < ApplicationController
       ActionView::RecordIdentifier.dom_id(job_posting, :description),
       partial: "job_postings/description", locals: { job_posting: job_posting }
     )
-  end
-
-  def assign_filter_params
-    @query = params[:q]
-    @company = params[:company]
-    @source_id = params[:source_id]
-    @role_family = valid_role_family_param
-    assign_location_params
-  end
-
-  def valid_sort_param
-    params[:sort] if %w[match_score company].include?(params[:sort])
-  end
-
-  def assign_location_params
-    @location = params[:location]
-    @remote = params[:remote] == "1"
-    @contract = params[:contract] == "1"
-    @sort = valid_sort_param
-  end
-
-  def valid_role_family_param
-    return nil unless ROLE_FAMILY_LABELS.key?(params[:role_family]&.to_sym)
-
-    params[:role_family]
-  end
-
-  def filtered_job_postings
-    scope = base_job_postings
-    scope = scope.where(company_name: @company) if @company.present?
-    scope = scope.where(source_id: @source_id) if @source_id.present?
-    scope = apply_location_filter(scope)
-    apply_query_and_role_family(scope)
-  end
-
-  # Location text and "Remote" combine as OR, not AND -- "Chicago" + Remote
-  # checked means jobs near Chicago OR remote (either is accessible), the
-  # standard job-board convention, not jobs that are somehow both at once.
-  def apply_location_filter(scope)
-    filter = location_filter_scope
-    filter ? scope.merge(filter) : scope
-  end
-
-  def location_filter_scope
-    return nil if @location.blank? && !@remote
-    return JobPosting.remote_only if @location.blank?
-    return JobPosting.location_matches(@location) unless @remote
-
-    JobPosting.location_matches(@location).or(JobPosting.remote_only)
-  end
-
-  def apply_query_and_role_family(scope)
-    scope = apply_search(scope) if @query.present?
-    scope = scope.by_role_family(@role_family.to_sym) if @role_family.present?
-    scope = scope.contract_only if @contract
-    scope
-  end
-
-  # hybrid_search fuses keyword (pg_search) and vector (pgvector) results via
-  # RRF, but runs unscoped -- reorder(nil) drops the .recent order so match
-  # relevance wins over recency once a query is present.
-  def apply_search(scope)
-    ranked_ids = JobPosting.hybrid_search(@query, limit: 200).pluck(:id)
-    scope.where(id: ranked_ids).reorder(nil).in_order_of(:id, ranked_ids)
-  end
-
-  def base_job_postings
-    scope = base_sort_scope.includes(:company, source: :origin)
-    scope = scope.where.not(status: %w[ignored purged expired]) if params[:status].blank?
-    scope
-  end
-
-  def base_sort_scope
-    return JobPosting.by_match_score(current_user) if @sort == "match_score"
-
-    @sort == "company" ? JobPosting.by_company : JobPosting.recent
   end
 end

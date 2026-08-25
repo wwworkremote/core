@@ -442,4 +442,69 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Reformatting...")
     end
   end
+
+  describe "PATCH /job_postings/:id" do
+    it "corrects a scraped title, company_name, and location" do
+      patch job_posting_path(job),
+            params: { job_posting: { title: "Staff Software Engineer", company_name: "Acme Inc.",
+                                     location: "Remote (US)" } }
+
+      job.reload
+      expect(job).to have_attributes(title: "Staff Software Engineer", company_name: "Acme Inc.",
+                                     location: "Remote (US)")
+    end
+
+    it "redirects back to the posting" do
+      patch job_posting_path(job), params: { job_posting: { title: "Fixed Title" } }
+      expect(response).to redirect_to(job_posting_path(job))
+    end
+
+    it "ignores an attempt to set status directly -- transitions still require record_status_event!" do
+      expect {
+        patch job_posting_path(job), params: { job_posting: { title: "Fixed Title", status: "applied" } }
+      }.not_to(change { job.reload.status })
+
+      expect(job.reload.title).to eq("Fixed Title")
+    end
+  end
+
+  describe "POST /job_postings/:id/apply_on_site" do
+    let!(:job_with_url) {
+      JobPosting.create!(signature: "test-apply-1", title: "Engineer", company_name: "Acme",
+                         target_url: "https://acme.example/jobs/1", status: "none")
+    }
+
+    it "favorites the posting for the current user" do
+      post apply_on_site_job_posting_path(job_with_url)
+      current_user = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"))
+      expect(current_user.user_job_postings.find_by(job_posting: job_with_url).status).to eq("favorited")
+    end
+
+    it "favorites the JobPosting's own status too, not just the tracked record (TASK-82)" do
+      post apply_on_site_job_posting_path(job_with_url)
+      expect(job_with_url.reload.status).to eq("favorited")
+    end
+
+    it "does not mark the posting applied -- only a click, not evidence of finishing" do
+      post apply_on_site_job_posting_path(job_with_url)
+      current_user = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"))
+      expect(current_user.user_job_postings.find_by(job_posting: job_with_url).status).not_to eq("applied")
+    end
+
+    it "hands off to the same outbound-link tracking every other exit link uses" do
+      post apply_on_site_job_posting_path(job_with_url)
+      expect(response).to redirect_to(outbound_link_path(url: job_with_url.target_url, job_posting_id: job_with_url.id))
+    end
+
+    it "does not raise when the posting is already past favorited (e.g. applied)" do
+      current_user = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+                     User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike",
+                                  password: "password")
+      current_user.user_job_postings.create!(job_posting: job_with_url, status: "applied")
+      job_with_url.favorite!
+      job_with_url.apply!
+
+      expect { post apply_on_site_job_posting_path(job_with_url) }.not_to raise_error
+    end
+  end
 end
