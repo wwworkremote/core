@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WWWorkRemote Ingestion Assistant",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
   "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
   "host_permissions": [
@@ -39,7 +39,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://myjobs.indeed.com/*"],
+      "matches": ["https://myjobs.indeed.com/*", "https://my.greenhouse.io/*"],
       "js": ["outcome_capture.js"],
       "run_at": "document_idle"
     },

@@ -303,6 +303,7 @@ Rails.application.routes.draw do
       get "profile" => "profile#show"
       resource :outcomes, only: [], controller: "outcomes" do
         post :indeed
+        post :greenhouse
       end
       resources :sources, only: %i[index show]
       resources :job_postings, only: %i[index show create] do

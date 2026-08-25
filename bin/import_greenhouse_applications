@@ -56,57 +56,16 @@ def applications_from(har)
   end.flatten.uniq { |a| a["id"] }
 end
 
-# Greenhouse's own job_post_id is the stable key. Dedup against it inside
-# target_url first, the same way the LinkedIn importer matches on its job id,
-# so a posting already ingested from a board feed is not counted twice.
-def existing_posting(app)
-  JobPosting.find_by(signature: Digest::SHA256.hexdigest("greenhouse-app-#{app['id']}")) ||
-    JobPosting.where("target_url LIKE ?", "%/jobs/#{app['job_post_id']}%").first ||
-    JobPosting.find_by(target_url: app["job_post_url"])
-end
-
-def upsert(app, dry_run)
-  posting = existing_posting(app)
-  return ["exists", posting] if posting && dry_run
-  return ["backfill", backfill(posting, app)] if posting
-  return ["create", nil] if dry_run
-
-  ["create", JobPosting.create!(
+# Upsert + outcome logic lives in Applications::GreenhouseRowImporter,
+# shared with Api::V0::OutcomesController so the extension's live capture and
+# this HAR-replay backfill write through one code path.
+def dry_run_line(app)
+  posting = Applications::PostingMatcher.call(
     signature: Digest::SHA256.hexdigest("greenhouse-app-#{app['id']}"),
-    title: app["job_title"].to_s.strip, company_name: app["company_name"].to_s.strip,
-    location: app["locations"], source_id: greenhouse_source_id,
-    target_url: app["job_post_url"], status: "none", crawl_status: "pending"
-  )]
-end
-
-def backfill(posting, app)
-  posting.update!(company_name: app["company_name"].to_s.strip) if posting.company_name.blank?
-  posting
-end
-
-# JobPosting#source resolves to plain ::Source (an ingestion-event row
-# belonging to an Origin), NOT JobBoards::Source -- a same-named, unrelated
-# model with its own table. Using JobBoards::Source's id satisfied the FK by
-# coincidence in dev (both tables happened to have overlapping id ranges) but
-# pointed every posting at a random unrelated Source row. Mirrors
-# Leads::CaptureService#resolve_source, the extension's own real capture path.
-def greenhouse_source_id
-  @greenhouse_source_id ||= begin
-    origin = Origin.find_or_create_by!(name: "Greenhouse")
-    Source.find_or_create_by!(signature: "greenhouse-app-import") { |s| s.origin = origin; s.name = "Greenhouse" }.id
-  end
-end
-
-# Same two-machine write as bin/wwwr transition and the LinkedIn importer --
-# JobPosting and UserJobPosting drift when only one is moved (TASK-82).
-def advance(posting, user, applied_at)
-  posting.favorite! if posting.may_favorite?
-  posting.apply! if posting.may_apply?
-  tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
-  tracked.record_status_event!("apply") if tracked.status != "applied"
-  # Always set applied_at, even on a re-run: this is the authoritative date for
-  # these rows, and a LinkedIn approximation may have written a worse one first.
-  tracked.update!(applied_at: applied_at) if applied_at
+    native_id_fragment: "/jobs/#{app['job_post_id']}", target_url: app["job_post_url"],
+    company: app["company_name"], title: app["job_title"]
+  )
+  posting ? "exists" : "create"
 end
 
 user = User.sole
@@ -117,9 +76,15 @@ abort "Parsed 0 applications -- does the HAR contain my.greenhouse.io/applicatio
 puts "#{apps.size} applications in #{File.basename(path)}#{' [DRY RUN]' if dry_run}"
 
 apps.sort_by { |a| a["applied_at"].to_s }.each do |app|
-  action, posting = upsert(app, dry_run)
-  applied_at = Time.zone.parse(app["applied_at"].to_s)
-  advance(posting, user, applied_at) unless dry_run
-  puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, app["company_name"].to_s[0, 24],
-              app["job_title"].to_s[0, 44])
+  if dry_run
+    action = dry_run_line(app)
+    applied_at = Time.zone.parse(app["applied_at"].to_s)
+    puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, app["company_name"].to_s[0, 24],
+                app["job_title"].to_s[0, 44])
+  else
+    result = Applications::GreenhouseRowImporter.call(app, user: user)
+    puts format("  %-8s %-10s %-26s %-44s %s", "ok", result[:applied_at]&.to_date,
+                app["company_name"].to_s[0, 24], app["job_title"].to_s[0, 44],
+                result[:outcome] ? "[#{result[:outcome]}]" : "")
+  end
 end
