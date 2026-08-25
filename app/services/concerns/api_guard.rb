@@ -1,9 +1,17 @@
 # frozen_string_literal: true
 
 # Shared logic for rate limiting and circuit breaking across job board clients.
-# Uses Rails.cache (SolidCache) for distributed lock persistence.
+# Uses SolidCache directly (not Rails.cache) for distributed lock persistence --
+# Rails.cache is a NullStore in development unless `rails dev:cache` has been
+# run, which silently no-ops the circuit breaker for lock/cooldown state that
+# must actually persist. That toggle is meant for view/fragment caching, not
+# functional state, so this bypasses it in every environment.
 module ApiGuard
   extend ActiveSupport::Concern
+
+  def self.store
+    ActiveSupport::Cache.lookup_store(:solid_cache_store)
+  end
 
   # Executes a block within the protection of the API guard.
   # @param source_slug [String] Unique identifier for the job board.
@@ -24,33 +32,33 @@ module ApiGuard
   # success value, not to signal a yes/no question.
   # rubocop:disable Naming/PredicateMethod
   def record_fetch(source_slug)
-    Rails.cache.write("api_guard:#{source_slug}:last_fetched_at", Time.zone.now)
+    ApiGuard.store.write("api_guard:#{source_slug}:last_fetched_at", Time.zone.now)
     true
   end
   # rubocop:enable Naming/PredicateMethod
 
   def lock_source!(source_slug, duration: 1.hour)
     Rails.logger.warn "[ApiGuard] ⚡ Circuit Breaker Tripped for #{source_slug}. Locking for #{duration.inspect}."
-    Rails.cache.write("api_guard:#{source_slug}:locked_until", duration.from_now)
+    ApiGuard.store.write("api_guard:#{source_slug}:locked_until", duration.from_now)
   end
 
   def unlock_source!(source_slug)
     Rails.logger.info "[ApiGuard] 🔓 Unlocking #{source_slug}."
-    Rails.cache.delete("api_guard:#{source_slug}:locked_until")
+    ApiGuard.store.delete("api_guard:#{source_slug}:locked_until")
   end
 
   def source_locked?(source_slug)
-    locked_until = Rails.cache.read("api_guard:#{source_slug}:locked_until")
+    locked_until = ApiGuard.store.read("api_guard:#{source_slug}:locked_until")
     return false unless locked_until
     return true if locked_until > Time.zone.now
 
     # Lock expired, clean up
-    Rails.cache.delete("api_guard:#{source_slug}:locked_until")
+    ApiGuard.store.delete("api_guard:#{source_slug}:locked_until")
     false
   end
 
   def last_fetched_at(source_slug)
-    Rails.cache.read("api_guard:#{source_slug}:last_fetched_at")
+    ApiGuard.store.read("api_guard:#{source_slug}:last_fetched_at")
   end
 
   def can_fetch?(source_slug, cooldown: 15.minutes)

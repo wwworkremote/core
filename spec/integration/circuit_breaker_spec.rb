@@ -14,7 +14,7 @@ RSpec.describe "Distributed Circuit Breaker Integration" do
   let!(:query) { JobBoards::Query.find_or_create_by!(source_id: source.id) }
 
   before do
-    Rails.cache.clear
+    ApiGuard.store.clear
   end
 
   it "trips the circuit breaker on a 429 response" do
@@ -26,7 +26,7 @@ RSpec.describe "Distributed Circuit Breaker Integration" do
     # Directly test the helper first
     lock_source!(source_slug, duration: 10.seconds)
     expect(source_locked?(source_slug)).to be true
-    Rails.cache.delete("api_guard:#{source_slug}:locked_until")
+    ApiGuard.store.delete("api_guard:#{source_slug}:locked_until")
 
     # Now test via the client
     response = client.get("https://api.lever.co/v0/postings/test")

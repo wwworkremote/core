@@ -35,7 +35,7 @@ RSpec.describe HackerNews::FetchJobstoryJob do
   end
 
   it "skips silently when the hackernews source is locked" do
-    Rails.cache.write("api_guard:hackernews:locked_until", 1.hour.from_now)
+    ApiGuard.store.write("api_guard:hackernews:locked_until", 1.hour.from_now)
 
     expect { described_class.perform_now(jobstory_id) }.not_to change(JobBoards::Document, :count)
     expect(JobBoards::Syncer).not_to have_received(:new)

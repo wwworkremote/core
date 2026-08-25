@@ -16,7 +16,7 @@ RSpec.describe JobBoards::GeocodingJob do
     end
 
     it "does nothing when the geocoding source is locked" do
-      Rails.cache.write("api_guard:geocoding:locked_until", 1.hour.from_now)
+      ApiGuard.store.write("api_guard:geocoding:locked_until", 1.hour.from_now)
 
       described_class.perform_now(job_posting.id)
 
@@ -63,7 +63,7 @@ RSpec.describe JobBoards::GeocodingJob do
 
       described_class.perform_now(job_posting.id)
 
-      locked_until = Rails.cache.read("api_guard:geocoding:locked_until")
+      locked_until = ApiGuard.store.read("api_guard:geocoding:locked_until")
       expect(locked_until).to be_present
     end
 
@@ -72,7 +72,7 @@ RSpec.describe JobBoards::GeocodingJob do
 
       described_class.perform_now(job_posting.id)
 
-      expect(Rails.cache.read("api_guard:geocoding:locked_until")).to be_present
+      expect(ApiGuard.store.read("api_guard:geocoding:locked_until")).to be_present
     end
 
     it "logs and does not lock on other StandardErrors" do
@@ -80,7 +80,7 @@ RSpec.describe JobBoards::GeocodingJob do
 
       described_class.perform_now(job_posting.id)
 
-      expect(Rails.cache.read("api_guard:geocoding:locked_until")).to be_nil
+      expect(ApiGuard.store.read("api_guard:geocoding:locked_until")).to be_nil
     end
   end
 end
