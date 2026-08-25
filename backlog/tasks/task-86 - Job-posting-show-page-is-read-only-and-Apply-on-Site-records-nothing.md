@@ -1,9 +1,10 @@
 ---
 id: TASK-86
 title: Job posting show page is read-only and Apply on Site records nothing
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-24 19:02'
+updated_date: '2026-08-25 01:24'
 labels: []
 dependencies: []
 priority: high
@@ -51,3 +52,20 @@ Suggested shape: favorite immediately on click, then surface a visible "Did you 
 - The outbound click is still recorded as it is today
 - Both JobPosting and UserJobPosting stay consistent after any status change (TASK-82)
 <!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [x] #1 A posting's title, company_name, and location are editable from the UI
+- [x] #2 Editing a posting cannot change `status` directly -- transitions still go through `record_status_event!`
+- [x] #3 #5034's title is correctable through that UI
+- [x] #4 "Apply on Site" favorites the posting on click
+- [x] #5 "Apply on Site" does NOT silently mark applied; applied requires an explicit confirmation or real submit evidence
+- [x] #6 The outbound click is still recorded as it is today
+- [x] #7 Both JobPosting and UserJobPosting stay consistent after any status change (TASK-82)
+<!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added JobPostingsController#update (title/company_name/location only, :status excluded) with a <details> disclosure on the show page, and #apply_on_site (favorites via the same dual-write pattern as every importer this session, then delegates to the unchanged OutboundLinksController for tracking/redirect). Extracted JobPostingFiltering concern to keep the controller under ClassLength. 5 new request-spec examples plus the existing 70 across related specs all pass. Verified live: PATCHed #5034's real title through the endpoint (confirmed in the DB), and exercised apply_on_site against a real tracked posting, restoring its true status/outcome afterward via the authoritative importers since it was live data, not a fixture.
+<!-- SECTION:FINAL_SUMMARY:END -->
