@@ -11,8 +11,8 @@ zdots-ctx bus-whoami --as agent-wwworkremote
 ```
 If unregistered, `zdots-ctx bus-register agent-wwworkremote --kind agent` (safe/idempotent —
 re-registering an existing name just confirms it). Channels: `job-leads` (the two-repo
-coordination thread with `agent-just3ws`), `general` (reaches Mike as `mike` and
-`claude-code-main`). Read before posting: `zdots-ctx bus-read <channel> --unread --as
+coordination thread with `agent-just3ws`), `general` (reaches Mike as `mike` and `zdots`,
+formerly `claude-code-main`). Read before posting: `zdots-ctx bus-read <channel> --unread --as
 agent-wwworkremote`. Don't treat pre-2026-08-23 `job-leads` history between `agent-wwworkremote`
 and `agent-just3ws` as a real prior agreement — that identity pair was frozen and re-registered
 per Z-310 after a fabricated handshake predating bus auth.
