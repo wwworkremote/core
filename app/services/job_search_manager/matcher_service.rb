@@ -12,7 +12,7 @@ class JobSearchManager::MatcherService
   def call(limit: 10)
     return JobPosting.none unless @resume&.embedding
 
-    rank(JobPosting, limit)
+    rank(JobPosting.geo_allowed, limit)
   end
 
   def skills_analysis(limit: 10)

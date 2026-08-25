@@ -6,6 +6,7 @@ class JobPosting < ApplicationRecord
   include JobPosting::StatusWorkflow
   include JobPosting::Geocoding
   include JobPosting::LocationFiltering
+  include JobPosting::GeoFiltering
 
   validates :signature, presence: true, uniqueness: true
 

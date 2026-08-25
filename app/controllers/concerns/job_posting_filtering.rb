@@ -102,7 +102,7 @@ module JobPostingFiltering
   end
 
   def base_job_postings
-    scope = base_sort_scope.includes(:company, source: :origin)
+    scope = base_sort_scope.geo_allowed.includes(:company, source: :origin)
     scope = scope.where.not(status: %w[ignored purged expired]) if params[:status].blank?
     scope
   end

@@ -96,6 +96,10 @@ All of these are read-mostly and safe to run against development; none should be
   reverse-engineering a provider's API shape (see the ADP/Workday adapters' git history for the
   same technique). Reference material for building a new adapter, not part of the regular
   pipeline.
+- **`bin/backfill_country_codes [--dry-run|--status]`** — TASK-85: enqueues `JobBoards::GeocodingJob`
+  for postings with a location string but no `country_code`, so the historical backlog (4,150 nil
+  rows as of 2026-08-24) narrows over time via the same Nominatim lookup the live pipeline already
+  uses. `--status` prints current counts with no writes; safe to re-run anytime to check progress.
 
 ## User-facing / one-off
 

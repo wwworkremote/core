@@ -6,6 +6,7 @@ class Resume::SemanticMatchFinder
 
     # Find nearest neighbors in JobPosting
     JobPosting.where.not(embedding: nil)
+              .geo_allowed
               .nearest_neighbors(:embedding, career_profile.embedding, distance: "cosine")
               .limit(limit)
   end

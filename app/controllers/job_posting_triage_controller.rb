@@ -24,6 +24,7 @@ class JobPostingTriageController < ApplicationController
   def next_candidate
     JobPosting.where(status: "none")
               .where.not(id: session[:triage_skipped_ids] || [])
+              .geo_allowed
               .recent
               .first
   end
