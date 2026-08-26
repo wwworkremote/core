@@ -559,7 +559,7 @@ function renderApplicationContext(context, fields) {
   }
 
   const occurrence = {};
-  const rows = (fields || []).map((field) => {
+  const rows = (fields || []).map((field, index) => {
     const normalized = field.label.toLowerCase();
     const suggestion = personaSuggestion(field, context, occurrence);
     occurrence[normalized] = (occurrence[normalized] || 0) + 1;
@@ -567,12 +567,14 @@ function renderApplicationContext(context, fields) {
     const mapping = (context.mappings || []).find(item => item.field_key === field.key);
     const value = saved?.answer || suggestion.value || field.currentValue || '';
     const source = saved?.answer_source || suggestion.source;
+    const answerId = `app-field-answer-${index}`;
     return `<div class="app-field-row" data-field-key="${escapeHtml(field.key)}">
-      <div class="app-field-label"><span>${escapeHtml(field.label)}</span>${field.required ? '<b>*</b>' : ''}</div>
-      <textarea class="app-field-answer" rows="2">${escapeHtml(value)}</textarea>
+      <div class="app-field-label"><label for="${answerId}"><span>${escapeHtml(field.label)}</span></label>${field.required ? '<b>*</b>' : ''}</div>
+      <textarea class="app-field-answer" id="${answerId}" rows="2">${escapeHtml(value)}</textarea>
       <div class="app-field-actions"><span class="app-field-source">${mapping ? `mapped → ${escapeHtml(mapping.semantic_key)}` : (saved ? 'provided' : source)}</span>
-        <button type="button" class="app-map-btn">${mapping ? 'Remap' : 'Map'}</button>
-        <button type="button" class="app-fill-btn" data-source="${escapeHtml(source)}">Fill</button></div>
+        <button type="button" class="app-skip-btn" aria-label="Skip ${escapeHtml(field.label)} for now">Skip</button>
+        <button type="button" class="app-map-btn" aria-label="${mapping ? 'Remap' : 'Map'} ${escapeHtml(field.label)}">${mapping ? 'Remap' : 'Map'}</button>
+        <button type="button" class="app-fill-btn" data-source="${escapeHtml(source)}" aria-label="Fill answer for ${escapeHtml(field.label)}">Fill</button></div>
     </div>`;
   }).join('');
 
@@ -616,6 +618,15 @@ function renderApplicationContext(context, fields) {
         setStatus(`${response.field.label} provided and tracked`, 'var(--green)');
         setTimeout(() => { btn.textContent = 'Fill'; }, 1500);
       });
+    });
+  });
+
+  container.querySelectorAll('.app-skip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Dismiss this field for the current view only -- it reappears on the
+      // next REFRESH_APPLICATION_FIELDS / renderApplicationContext call, same
+      // as the "skip for now" behavior on the triage queue.
+      btn.closest('.app-field-row')?.remove();
     });
   });
 

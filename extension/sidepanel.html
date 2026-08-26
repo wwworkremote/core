@@ -178,7 +178,7 @@
     .status-actions { display: flex; flex-wrap: wrap; gap: 6px; }
     .status-btn {
       background: none; border: 1px solid var(--cyan); border-radius: 4px; color: var(--cyan);
-      font-family: var(--font); font-size: 12px; padding: 3px 9px; cursor: pointer;
+      font-family: var(--font); font-size: 12px; padding: 6px 9px; min-height: 36px; cursor: pointer;
     }
     .status-btn:hover:not(:disabled) { background: var(--bg-mid); }
     .status-btn:disabled { opacity: 0.6; cursor: default; }
@@ -206,14 +206,21 @@
     .persona-picker { display: grid; grid-template-columns: 1fr auto; gap: 5px; margin-bottom: 8px; }
     .persona-picker label { grid-column: 1 / -1; font-size: 11px; color: var(--comment); text-transform: uppercase; }
     .persona-picker select { min-width: 0; }
-    .persona-picker button, .app-fill-btn, .app-map-btn { background: none; border: 1px solid var(--purple); border-radius: 4px; color: var(--purple); font-family: var(--font); font-size: 12px; padding: 3px 8px; cursor: pointer; }
+    .persona-picker button, .app-fill-btn, .app-map-btn { background: none; border: 1px solid var(--purple); border-radius: 4px; color: var(--purple); font-family: var(--font); font-size: 12px; padding: 6px 10px; min-height: 36px; cursor: pointer; }
+    .app-skip-btn { background: none; border: 1px solid var(--comment); border-radius: 4px; color: var(--comment); font-family: var(--font); font-size: 12px; padding: 6px 10px; min-height: 36px; cursor: pointer; }
+    .app-skip-btn:hover { background: var(--bg-mid); }
     .app-field-row { border-top: 1px solid var(--bg-mid); padding: 7px 0; }
     .app-field-label { display: flex; justify-content: space-between; color: var(--fg); font-size: 12px; margin-bottom: 3px; }
+    .app-field-label label { cursor: pointer; }
     .app-field-label b { color: var(--red); }
     .app-field-answer { min-height: 34px; }
-    .app-field-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 3px; }
+    .app-field-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 3px; }
     .app-field-source { color: var(--comment); font-size: 10px; text-transform: uppercase; }
     .app-fill-btn:disabled, .app-map-btn:disabled, .persona-picker button:disabled { opacity: .5; cursor: default; }
+    @media (max-width: 360px) {
+      .app-field-actions { justify-content: stretch; }
+      .app-skip-btn, .app-map-btn, .app-fill-btn { flex: 1 1 auto; }
+    }
     .app-map-editor { display: grid; grid-template-columns: 1fr auto auto; gap: 5px; margin-top: 6px; }
     .app-map-editor input, .app-map-editor select { min-width: 0; padding: 4px 6px; font-size: 11px; }
     .app-map-editor button { padding: 3px 6px; }
