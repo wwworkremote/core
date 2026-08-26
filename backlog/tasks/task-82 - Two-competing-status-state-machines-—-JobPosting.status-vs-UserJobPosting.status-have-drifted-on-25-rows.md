@@ -3,9 +3,11 @@ id: TASK-82
 title: >-
   Two competing status state machines — JobPosting.status vs
   UserJobPosting.status have drifted on 25 rows
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - claude
 created_date: '2026-08-22 15:39'
+updated_date: '2026-08-26 23:13'
 labels: []
 dependencies: []
 priority: high
@@ -54,3 +56,46 @@ Reconcile the existing 25 before or during.
 - [ ] #4 A PipelineStep is never created for a transition that did not actually change pipeline state
 - [ ] #5 Funnel counts return the same answer regardless of which model is queried
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+## Research findings (2026-08-26)
+
+Full writer inventory across the codebase:
+
+**Already dual-writing (a prior session's stopgap, same comment repeated verbatim at each site: "Same two-machine write as every importer/every session — JobPosting and UserJobPosting drift when only one is moved (TASK-82)"):**
+- `lib/wwwr/cli.rb#perform_transition` (bin/wwwr transition)
+- `app/services/applications/indeed_row_importer.rb#advance`
+- `app/services/applications/greenhouse_row_importer.rb#advance`
+- `app/controllers/job_postings_controller.rb#favorite_for_current_user`
+
+All four call `posting.<event>!` (JobPosting AASM) *and* `record_status_event!` (UserJobPosting AASM) together. This keeps the two in sync going forward for these four call sites only — it is not AC #1's "one model owns pipeline state," it's a stopgap that stops new drift at these specific sites.
+
+**JobPosting-only, and correctly so (posting-lifecycle, not user-pipeline — no change needed here):**
+- `app/jobs/job_lifecycle/expiry_sweep_job.rb` — `expire!`
+- `app/models/concerns/job_posting/geocoding.rb#enforce_commute_zone` — `ignore!`
+- `app/controllers/admin/job_postings_controller.rb#purge` / `#restore` — `purge!` / `restore!`
+
+**UserJobPosting-only, correctly so (already routes through record_status_event!):**
+- `app/controllers/user_job_postings_controller.rb` ("Your Activity" section on job_postings/show)
+- `app/controllers/api/v0/application_statuses_controller.rb` (Chrome extension)
+
+**The one remaining, actively-drifting writer — the real gap:**
+- `app/controllers/admin/pipeline_steps_controller.rb#apply_status_event` — writes `@job_posting.public_send(bang)` (favorite!/apply!/interview!/offer!/archive!/ignore!/expire! on JobPosting) with **no dual-write at all**. This backs BOTH the triage queue (job_posting_triage/show.html.erb — this session's Skip Tax work) and the "Application Status" sidebar card on job_postings/show.html.erb (TASK-64) — the two highest-traffic interaction points in the app. Every triage decision and every Application Status pill click today still causes new drift, on the busiest surfaces, right now.
+
+## Proposed phasing
+
+Given the size (schema change + data backfill + every JobPosting.status-reading call site), this needs to be staged rather than done as one change. Presenting for approval before writing code, per the material-decision review rule.
+
+**Phase 1 — stop the active bleeding (small, low-risk, consistent with the existing stopgap pattern):**
+Add the same dual-write to `Admin::PipelineStepsController#apply_status_event` that the four other call sites already use, for the pipeline-state events only (favorite/apply/interview/offer/archive — not ignore/expire, which stay JobPosting-only like every other site). One or two lines, following an established pattern, not a new one.
+
+**Phase 2 — reconcile the 25 existing drifted rows (AC #3):**
+Needs the actual 25 rows pulled and a reconciliation rule decided (naive "most recent wins" is wrong here since JobPosting alone holds ignored/purged/expired, which aren't blind overwrites) — will present the data and a proposed rule before writing any reconciliation script, since this mutates real records including #2125 (applied+ignored).
+
+**Phase 3 — the actual architectural fix (AC #1, #5):**
+Remove favorited/applied/interview/offered/archived from JobPosting's AASM entirely (keep only none/ignored/purged/expired), migrate every remaining JobPosting.status-reading call site (dashboards, funnel counts, bin/wwwr filters/print_postings, admin views) to read UserJobPosting instead, then delete the now-redundant dual-write plumbing from all 5 sites. Highest risk/effort of the three phases — likely warrants its own dedicated pass rather than folding into this one.
+
+Recommending: do Phase 1 now (bounded, safe, immediately stops the worst ongoing damage), surface Phase 2's actual data before touching it, and treat Phase 3 as a separate follow-up once 1+2 are settled — rather than attempting the full schema migration in this pass.
+<!-- SECTION:PLAN:END -->

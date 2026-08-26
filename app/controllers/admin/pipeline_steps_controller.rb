@@ -72,13 +72,32 @@ class Admin::PipelineStepsController < Admin::ApplicationController
   # double-click or stale page (e.g. two "Not interested" clicks before the
   # card is removed) would otherwise raise AASM::InvalidTransition instead
   # of just no-op'ing.
+  # One extra line to keep UserJobPosting.status in sync (TASK-82);
+  # splitting it further would obscure the transition sequence, not
+  # simplify it.
+  # rubocop:disable-next Metrics/MethodLength
   def apply_status_event
     bang, guard = STATUS_EVENTS[params[:status]]
     return unless bang && @job_posting.public_send(guard)
 
     @job_posting.public_send(bang)
+    sync_user_pipeline_state
     log_status_change_step
     record_triage_history
+  end
+
+  # Same two-machine write every other caller already does (TASK-82) --
+  # JobPosting and UserJobPosting drift when only one is moved. Calls
+  # advance_pipeline_state! rather than record_status_event! specifically
+  # because log_status_change_step below already creates this action's
+  # PipelineStep (with triage reason_tags UserJobPosting knows nothing
+  # about); record_status_event! would create a second, plainer one for the
+  # same click. ignore/expire silently no-op here since they aren't real
+  # UserJobPosting pipeline states -- they're posting-lifecycle facts, not
+  # part of Mike's relationship to the posting.
+  def sync_user_pipeline_state
+    current_user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
+                .advance_pipeline_state!(params[:status])
   end
 
   # Lets the triage queue offer a "Back" link to the previous decision so a
@@ -86,18 +105,17 @@ class Admin::PipelineStepsController < Admin::ApplicationController
   # has the full set of status-transition buttons, including restore).
   # Capped at 20 so the session cookie doesn't grow unbounded across a long
   # triage streak.
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable-next Metrics/AbcSize
   def record_triage_history
     return unless params[:from_triage] == "true"
 
     history = session[:triage_history].presence || []
     session[:triage_history] = (history << @job_posting.id).last(20)
   end
-  # rubocop:enable Metrics/AbcSize
 
   # One cohesive create! call plus its tracking event -- splitting it
   # further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def log_status_change_step
     ahoy.track "Pipeline Status Changed", status: params[:status], job_posting_id: @job_posting.id
     @job_posting.pipeline_steps.create!(
@@ -107,24 +125,22 @@ class Admin::PipelineStepsController < Admin::ApplicationController
       user: current_user
     )
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   # params.expect(:reason_tags) (the rubocop-suggested rewrite) is wrong
   # here: expect on a bare key treats it as a required *scalar*, so it
   # raises ActionController::ParameterMissing given the Hash reason_tags
   # actually is. Permit + to_h is the correct shape for an optional,
   # arbitrarily-keyed nested hash.
-  # rubocop:disable Rails/StrongParametersExpect
+  # rubocop:disable-next Rails/StrongParametersExpect
   def triage_reason_tags
     return {} if params[:reason_tags].blank?
 
     params[:reason_tags].permit(*REASON_TAG_KEYS).to_h.compact_blank
   end
-  # rubocop:enable Rails/StrongParametersExpect
 
   # One cohesive create! call -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def log_note_step
     @job_posting.pipeline_steps.create!(
       status: "noted",
@@ -134,5 +150,4 @@ class Admin::PipelineStepsController < Admin::ApplicationController
       user: current_user
     )
   end
-  # rubocop:enable Metrics/MethodLength
 end

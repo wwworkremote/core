@@ -90,6 +90,20 @@ class UserJobPosting < ApplicationRecord
     STATUS_EVENTS.select { |event| send("may_#{event}?") }
   end
 
+  # Guarded AASM transition with no side effect beyond the state change --
+  # split out of record_status_event! so a caller that already logs its own
+  # richer PipelineStep (e.g. Admin::PipelineStepsController, which captures
+  # triage reason_tags that this model knows nothing about) can keep
+  # UserJobPosting.status in sync without also getting a second, plainer
+  # PipelineStep row for the same click. Returns the AASM event's own truthy
+  # result on success, nil on a no-op -- same "no exception, just falsy"
+  # contract record_status_event! already gives every other caller.
+  def advance_pipeline_state!(event)
+    return unless STATUS_EVENTS.include?(event.to_s) && send("may_#{event}?")
+
+    send("#{event}!")
+  end
+
   # Applies an AASM event and logs it to the pipeline timeline, so a status
   # change made from the web UI and one made from the extension leave the same
   # trail. `link` records where it happened -- the extension passes the ATS
@@ -98,9 +112,8 @@ class UserJobPosting < ApplicationRecord
   # nil when the transition isn't legal -- callers get a no-op instead of an
   # AASM::InvalidTransition.
   def record_status_event!(event, link: nil)
-    return unless STATUS_EVENTS.include?(event.to_s) && send("may_#{event}?")
+    return unless advance_pipeline_state!(event)
 
-    send("#{event}!")
     user.pipeline_steps.create!(job_posting: job_posting, status: event.to_s, link: link,
                                 note: "User marked as #{event}")
   end
