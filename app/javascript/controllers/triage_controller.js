@@ -6,7 +6,14 @@ import { Controller } from "@hotwired/stimulus"
 // fire a decision. B has no target when there's no prior triage decision
 // this session, so it's checked with hasXTarget rather than clicked blind.
 export default class extends Controller {
-  static targets = ["favorite", "ignore", "expire", "skip", "back"]
+  static targets = ["favorite", "ignore", "expire", "skip", "back", "heading"]
+
+  connect() {
+    // Full-page reload on every decision/skip -- move focus to the new
+    // posting's heading so screen readers announce it without relying on
+    // the browser's own (often silent) same-URL navigation behavior.
+    if (this.hasHeadingTarget) this.headingTarget.focus()
+  }
 
   keydown(event) {
     if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
