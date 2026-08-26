@@ -7,6 +7,11 @@ class JobPostingTriageController < ApplicationController
     apply_queue_params
     @job_posting = next_candidate
     @last_triaged = JobPosting.find_by(id: session[:triage_history]&.last)
+    # The fixed thumb-zone decision bar sits at the true viewport bottom;
+    # on a short page (this one) the site footer can render close enough
+    # to the bottom that they'd overlap. Simplest fix is not showing the
+    # footer during a focused single-task flow.
+    @hide_page_footer = true
   end
 
   private

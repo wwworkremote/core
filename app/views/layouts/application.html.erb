@@ -136,23 +136,25 @@
       <%= yield %>
     </main>
 
-    <footer class="footer p-6 sm:p-10 bg-base-200 text-base-content border-t border-white/5">
-      <nav aria-label="<%= t('.footer.links_heading') %>">
-        <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.links_heading') %></h6>
-        <%= link_to t('.footer.about'), about_path, class: "link link-hover text-xs font-bold text-slate-400" %>
-        <%= link_to t('.footer.source_code'), 'https://github.com/wwworkremote/core', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
-        <%= link_to 'just3ws.com', 'https://www.just3ws.com', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
-      </nav>
-      <nav aria-label="<%= t('.footer.also_built_heading') %>">
-        <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.also_built_heading') %></h6>
-        <%= link_to 'Phalanx Duel', 'https://phalanxduel.com', class: "link link-hover text-xs font-bold text-primary", target: "_blank" %>
-      </nav>
-      <aside class="md:justify-self-end">
-        <p class="font-black uppercase tracking-tighter text-xl text-right">WWWork<span class="text-primary">Remote</span></p>
-        <p class="text-xs opacity-50 text-right font-bold">
-          &copy; <%= Time.current.year %> &mdash; <%= t('.footer.tagline') %>
-        </p>
-      </aside>
-    </footer>
+    <% unless @hide_page_footer %>
+      <footer class="footer p-6 sm:p-10 bg-base-200 text-base-content border-t border-white/5">
+        <nav aria-label="<%= t('.footer.links_heading') %>">
+          <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.links_heading') %></h6>
+          <%= link_to t('.footer.about'), about_path, class: "link link-hover text-xs font-bold text-slate-400" %>
+          <%= link_to t('.footer.source_code'), 'https://github.com/wwworkremote/core', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
+          <%= link_to 'just3ws.com', 'https://www.just3ws.com', class: "link link-hover text-xs font-bold text-slate-400", target: "_blank" %>
+        </nav>
+        <nav aria-label="<%= t('.footer.also_built_heading') %>">
+          <h6 class="footer-title text-white opacity-60 text-xs font-bold"><%= t('.footer.also_built_heading') %></h6>
+          <%= link_to 'Phalanx Duel', 'https://phalanxduel.com', class: "link link-hover text-xs font-bold text-primary", target: "_blank" %>
+        </nav>
+        <aside class="md:justify-self-end">
+          <p class="font-black uppercase tracking-tighter text-xl text-right">WWWork<span class="text-primary">Remote</span></p>
+          <p class="text-xs opacity-50 text-right font-bold">
+            &copy; <%= Time.current.year %> &mdash; <%= t('.footer.tagline') %>
+          </p>
+        </aside>
+      </footer>
+    <% end %>
   </body>
 </html>
