@@ -978,7 +978,10 @@
     const res = await apiFetch(`${apiBase}/api/v0/job_postings/${wwrId}/application_status`, {
       method: 'POST', headers, body: JSON.stringify({ event, answers, link: window.location.href }),
     });
-    if (!res.ok || !res.data?.success) return { ok: false, error: res.data?.error || `HTTP ${res.status}` };
+    const alreadyApplied = res.data?.status === 'applied';
+    if (!res.ok || (!res.data?.success && !alreadyApplied)) {
+      return { ok: false, error: res.data?.error || `HTTP ${res.status}` };
+    }
     LOG_OK(`Status → ${res.data.status}, captured ${res.data.captured_answers} answer(s)`);
     return {
       ok: true,
@@ -1162,7 +1165,8 @@
     const text = document.body?.innerText || '';
     const pathMatch = /\/jobTasks\/completed\/application/i.test(window.location.pathname);
     const received = /application received/i.test(text);
-    const submitted = /\bsubmitted\b/i.test(text) && /application status/i.test(text);
+    const submitted = /application\s+submitted/i.test(text) ||
+      (/\bsubmitted\b/i.test(text) && /application status/i.test(text));
     if (!pathMatch && !(received && submitted)) return null;
     const heading = document.querySelector('h1, [data-automation-id="jobTitle"], [data-automation-id="job-title"]');
     return {
@@ -1174,7 +1178,7 @@
     };
   }
 
-  const applicationCompletion = detectWorkdayCompletion();
+  let applicationCompletion = detectWorkdayCompletion();
 
   // Toolbar badge: lets the user see capture is available without opening
   // the popup or scrolling to the in-page overlay. Fire-and-forget --
@@ -1877,6 +1881,9 @@
 
     // Step 3: Run extraction chain, apply any taught field overrides, show preview
     const extracted = Extractor.run(extractDoc, provider);
+    // Workday completion dialogs are often mounted after the initial DOM
+    // settles. Re-evaluate here so the panel receives completion evidence.
+    applicationCompletion = detectWorkdayCompletion() || applicationCompletion;
     await applyLearnedRules(extracted);
 
     // Step 3b: In capture mode, bail out only if extraction found essentially

@@ -1,6 +1,6 @@
 # WWWorkRemote Ingestion Assistant
 
-Current unpacked build: `1.24.3`.
+Current unpacked build: `1.24.7`.
 
 Keyboard shortcuts: `Ctrl+Shift+Y` (macOS: `Command+Shift+Y`) or alternate `Option+Shift+Y` opens the panel for the active tab. Configure them at `chrome://extensions/shortcuts` if Chrome reports a conflict. (`Option` is Chrome's `Alt` key.)
 

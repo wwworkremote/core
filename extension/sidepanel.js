@@ -647,7 +647,7 @@ async function recordApplicationFieldObservations(state) {
 // this is where the status transition belongs -- previously the only control
 // lived in the web app and `applied` was effectively never recorded.
 const STATUS_EVENT_LABELS = {
-  favorite: '♥ Favorite', apply: '✓ Mark Applied', interview: '◎ Interviewing',
+  favorite: '♥ Favorite', apply: '✓ Mark Application Submitted', interview: '◎ Interviewing',
   offer: '★ Offered', archive: '⨯ Archive',
 };
 
@@ -656,9 +656,13 @@ function renderApplicationStatus(status) {
   if (!container) return;
 
   if (!status) {
-    container.style.display = 'none';
-    container.innerHTML = '';
-    return;
+    if (currentState?.mode === 'enrich' && currentState.wwrId) {
+      status = { status: 'none', available_events: ['apply'], captured: 0 };
+    } else {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
   }
 
   const buttons = (status.available_events || [])
@@ -722,11 +726,14 @@ function renderApplicationCompletion(completion) {
         body: JSON.stringify({ event: 'apply', link: completion.pageUrl }),
       });
       const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.error || `HTTP ${response.status}`);
+      const alreadyApplied = data.status === 'applied';
+      if (!response.ok || (!data.success && !alreadyApplied)) {
+        throw new Error(data.error || `HTTP ${response.status}`);
+      }
       currentState.applicationStatus = data;
       renderApplicationStatus(data);
-      btn.textContent = '✓ Applied + evidence saved';
-      setStatus('Application marked applied', 'var(--green)');
+      btn.textContent = alreadyApplied ? '✓ Already applied' : '✓ Applied + evidence saved';
+      setStatus(alreadyApplied ? 'Application was already marked applied' : 'Application marked applied', 'var(--green)');
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Mark applied + save evidence';
