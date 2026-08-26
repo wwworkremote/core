@@ -72,10 +72,12 @@ Enable an intentional, secure way to use WWWorkRemote from another device on the
 
 - Puma is configured for port `31000` and currently reports a wildcard listener (`*:31000`).
 - DHCP now reserves `10.36.1.149` for the WWWorkRemote Mac, making the LAN address stable.
-- AdGuard DNS rewrites now map `wwworkremote.home.arpa` and `wwr.home.arpa` to `10.36.1.149`.
+- AdGuard DNS rewrites now map `wwworkremote.home.arpa` and `wwwr.home.arpa` to `10.36.1.149` (`wwr.home.arpa` is also allowed as an alias).
 - The supported service controller is `bin/wwworkremote-ctl`, with launchd-backed `start`, `stop`, `restart`, and `status` commands.
 - Rails development host authorization now allows the two approved LAN names and loopback addresses.
 - `bin/wwworkremote-ctl start/restart web` now waits up to 30 seconds for Puma to answer HTTP requests.
+- Shared navigation, admin dashboard/jobs, job-posting index, and job-posting detail views now have a mobile-first responsive pass.
+- Source-owned Nginx vhost/deploy verification now includes both approved `.home.arpa` names; the live Nginx config and local certificate still require operator deployment.
 - No network exposure, firewall rule, public DNS, or authentication change is authorized by this task alone.
 
 ### Completed prerequisites
@@ -83,9 +85,12 @@ Enable an intentional, secure way to use WWWorkRemote from another device on the
 - [x] Reserve a stable DHCP lease for the host.
 - [x] Add the `wwworkremote.home.arpa` AdGuard rewrite.
 - [x] Add the `wwr.home.arpa` AdGuard rewrite.
+- [x] Allow the canonical `wwwr.home.arpa` LAN hostname through Rails Host Authorization.
 - [x] Allow the approved LAN hostnames through Rails Host Authorization.
 - [x] Make web start/restart wait for HTTP readiness.
+- [x] Add the first mobile-friendly admin and job-posting views.
 - [ ] Verify resolution and HTTP reachability from a second LAN device.
+- [ ] Deploy the updated Nginx vhost and regenerate the local certificate with both `.home.arpa` SANs.
 
 ### Required changes
 
@@ -114,3 +119,11 @@ Enable an intentional, secure way to use WWWorkRemote from another device on the
 - [ ] Choose and verify the authentication method from the phone; do not expose an unauthenticated dashboard.
 - [ ] Decide whether to use HTTPS with a locally trusted certificate for phone access.
 - [ ] Test `/admin/jobs` and the mobile funnel on the phone and report the exact URL/status if either fails.
+
+### Still not enabled
+
+- LAN reachability from the phone has not been verified from a second device.
+- macOS firewall policy, HTTPS/local certificate trust, and production-grade LAN authentication remain unconfigured.
+- Mobile-specific application-funnel actions, extension controls, and offline/PWA behavior are not enabled.
+- Nginx has been reloaded successfully, but the repo does not yet own a stable LAN virtual-host configuration or readiness-aware Nginx health check.
+- Responsive rendering has been covered by markup/request tests only; a real-device viewport pass is still required.

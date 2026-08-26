@@ -1,11 +1,11 @@
 <%= render "admin/shared/nav" %>
 
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-10">
   <div>
     <h1 class="text-3xl font-black tracking-tight text-white mb-1">Background Jobs</h1>
     <p class="text-slate-500 font-bold text-sm">Solid Queue job execution and worker status.</p>
   </div>
-  <div class="flex gap-4">
+  <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
     <%= button_to prune_admin_jobs_path, method: :post, class: "btn btn-outline border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-sm font-bold", data: { turbo_confirm: "Force prune all dead worker heartbeats?" } do %>
       <i class="bi bi-scissors"></i> Prune Dead Workers
     <% end %>
@@ -17,19 +17,19 @@
 
 <!-- Golden Signals -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-  <div class="card-neural p-6 border-l-4 border-l-blue-500">
+  <div class="card-neural p-4 sm:p-6 border-l-4 border-l-blue-500">
     <div class="text-xs font-bold text-slate-500 mb-1">Latency (Oldest Ready)</div>
     <div class="text-2xl font-black text-white"><%= @latency %>s</div>
   </div>
-  <div class="card-neural p-6 border-l-4 border-l-emerald-500">
+  <div class="card-neural p-4 sm:p-6 border-l-4 border-l-emerald-500">
     <div class="text-xs font-bold text-slate-500 mb-1">Throughput</div>
     <div class="text-2xl font-black text-white"><%= @throughput %> <small class="text-xs opacity-60">jobs/min</small></div>
   </div>
-  <div class="card-neural p-6 border-l-4 border-l-rose-500">
+  <div class="card-neural p-4 sm:p-6 border-l-4 border-l-rose-500">
     <div class="text-xs font-bold text-slate-500 mb-1">Error Rate (1h)</div>
     <div class="text-2xl font-black text-white"><%= @error_rate %>%</div>
   </div>
-  <div class="card-neural p-6 border-l-4 border-l-amber-500">
+  <div class="card-neural p-4 sm:p-6 border-l-4 border-l-amber-500">
     <div class="text-xs font-bold text-slate-500 mb-1">Saturation</div>
     <div class="text-2xl font-black text-white"><%= @saturation %>%</div>
   </div>
@@ -37,14 +37,14 @@
 
 <!-- Queue Depletion -->
 <div class="card-neural mb-8 p-6 bg-blue-900/10 border border-blue-500/20">
-  <div class="flex items-center justify-between gap-6">
-    <div class="flex items-center gap-4">
+  <div class="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center sm:gap-6">
+    <div class="flex items-center gap-3 sm:gap-4">
       <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400">
         <i class="bi bi-hourglass-split text-2xl"></i>
       </div>
       <div>
         <h3 class="text-xs font-bold text-blue-400 mb-1">Queue Depletion</h3>
-        <div class="flex items-center gap-6">
+        <div class="flex flex-wrap items-center gap-4 sm:gap-6">
           <div>
             <span class="text-xs text-slate-500 font-bold">Remaining Jobs</span>
             <div class="text-xl font-black text-white"><%= number_with_delimiter(@ready_count) %></div>
@@ -68,9 +68,9 @@
         </div>
       </div>
     </div>
-    <div class="hidden md:block">
+    <div class="hidden sm:block w-full sm:w-auto">
       <div class="text-xs text-slate-500 font-bold mb-1">Load</div>
-      <div class="h-2 w-48 bg-white/5 rounded-full overflow-hidden">
+      <div class="h-2 w-full sm:w-48 bg-white/5 rounded-full overflow-hidden">
         <div class="h-full bg-blue-500 animate-pulse" style="width: <%= [@saturation, 100].min %>%"></div>
       </div>
     </div>

@@ -10,13 +10,13 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
   <article class="lg:col-span-2 space-y-8">
-    <header class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl relative overflow-hidden">
+    <header class="bg-base-200 border border-white/5 rounded-2xl p-5 sm:p-10 shadow-2xl relative overflow-hidden">
       <div class="absolute top-0 right-0 p-8 opacity-5">
         <%= heroicon "briefcase", options: { class: "w-32 h-32" } %>
       </div>
 
       <div class="relative z-10">
-        <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none">
+        <h1 class="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight leading-none">
           <%= @job_posting.title %>
           <% status_badges = {
                "favorited" => ["Favorited", "border-primary/40 text-primary"],
@@ -91,7 +91,7 @@
       </div>
     </header>
 
-    <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-5 sm:p-10 shadow-2xl">
       <%= turbo_stream_from @job_posting %>
       <%= render "description", job_posting: @job_posting %>
 

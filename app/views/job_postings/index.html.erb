@@ -1,6 +1,6 @@
-<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-10 mb-16">
+<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 lg:gap-10 mb-10 lg:mb-16">
   <div class="max-w-2xl">
-    <h1 class="text-4xl font-black tracking-tight text-white mb-2"><%= t('.title') %></h1>
+    <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white mb-2"><%= t('.title') %></h1>
     <p class="text-base-content/60 font-bold text-sm"><%= t('.subtitle') %></p>
   </div>
 
@@ -8,15 +8,15 @@
     <div class="bg-base-200 p-3 rounded-xl shadow-2xl border border-white/5 group focus-within:border-primary/50 transition-all">
       <%= form_with url: job_postings_path, method: :get, class: "space-y-2",
           data: { controller: "filter-form", turbo_frame: "job_postings_results" } do |f| %>
-        <div class="flex items-center">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
           <%= f.text_field :q, value: @query,
               placeholder: t('.search_placeholder'),
               class: "flex-1 bg-transparent border-none text-white placeholder:text-base-content/40 px-2 py-1 focus:ring-0 text-sm font-bold tracking-tight",
               style: "caret-color: var(--color-primary);",
               data: { action: "input->filter-form#submit" } %>
-          <%= f.submit t('.search_submit'), class: "btn btn-primary btn-sm rounded-lg font-bold px-6" %>
+          <%= f.submit t('.search_submit'), class: "btn btn-primary btn-sm rounded-lg font-bold px-6 w-full sm:w-auto" %>
         </div>
-        <div class="flex items-center gap-3 px-2 pt-2 border-t border-white/5">
+        <div class="flex flex-col items-stretch gap-3 px-2 pt-2 border-t border-white/5 sm:flex-row sm:items-center">
           <%= heroicon "map-pin", variant: :solid, options: { class: "w-3 h-3 text-primary shrink-0" } %>
           <%= f.text_field :location, value: @location,
               placeholder: t('.location_placeholder'),
@@ -39,7 +39,7 @@
 </div>
 
 <%= turbo_frame_tag "job_postings_results", class: "block" do %>
-  <div class="flex flex-wrap gap-2 mb-10">
+  <div class="flex flex-wrap gap-2 mb-6 lg:mb-10">
     <% if @sort == "match_score" %>
       <%= link_to "✕ #{t('.sort_match_score')}", job_postings_path(active_filter_params.except(:sort)),
           class: "btn btn-xs btn-primary rounded-lg font-bold" %>
@@ -141,7 +141,7 @@
               <% end %>
             <% end %>
           </div>
-          <div class="card-body p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="card-body p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
             <div class="flex-1 relative">
               <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors mb-1">
                 <%= link_to job.title, job_posting_path(job), data: { turbo_frame: "_top" }, class: "before:absolute before:inset-0" %>
