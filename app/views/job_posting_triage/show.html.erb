@@ -19,15 +19,15 @@
 
     <% if @job_posting.nil? %>
       <div class="py-20 text-center bg-base-200 rounded-2xl border border-dashed border-white/10">
-        <h3 class="text-xl font-black text-white mb-2" data-triage-target="heading" tabindex="-1"><%= t('.empty.title') %></h3>
+        <h2 class="text-xl font-black text-white mb-2" data-triage-target="heading" tabindex="-1"><%= t('.empty.title') %></h2>
         <p class="text-base-content/50 font-bold text-sm mb-8"><%= t('.empty.body') %></p>
         <%= link_to t('.empty.reset_skips'), job_posting_triage_path(reset_skips: true), class: "btn btn-outline btn-sm rounded-lg font-bold" %>
       </div>
     <% else %>
       <div class="card bg-base-200 border border-white/5 p-8">
-        <h4 class="text-2xl font-black text-white mb-1" data-triage-target="heading" tabindex="-1">
+        <h2 class="text-2xl font-black text-white mb-1" data-triage-target="heading" tabindex="-1">
           <%= link_to @job_posting.title, job_posting_path(@job_posting), class: "hover:text-primary" %>
-        </h4>
+        </h2>
         <p class="text-secondary font-bold text-sm mb-3">
           <% if (company_name = @job_posting.company.presence&.to_s) %>
             <%= company_name %>

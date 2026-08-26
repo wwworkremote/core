@@ -88,3 +88,9 @@
   .text-base-content\/30, .opacity-30 { opacity: 0.65 !important; }
   .text-base-content\/20, .opacity-20 { opacity: 0.55 !important; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin, .animate-pulse, .animate-bounce, .animate-ping {
+    animation: none !important;
+  }
+}
