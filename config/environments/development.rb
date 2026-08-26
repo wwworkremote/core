@@ -24,6 +24,10 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: "localhost", port: 31_000 }
 
+  # Rails rejects non-local Host headers by default. These names are served
+  # only on the trusted LAN through the local AdGuard rewrites.
+  config.hosts = ["localhost", "127.0.0.1", "::1", "wwworkremote.home.arpa", "wwr.home.arpa"]
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join("tmp/caching-dev.txt").exist?

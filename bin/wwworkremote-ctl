@@ -46,6 +46,7 @@ _meta() {
 }
 
 ALL_SVCS=(web jobs)
+WEB_READY_TIMEOUT=30
 
 # Solid Queue's ForkSupervisor uses fork(), not exec() -- if a prior
 # non-launchd-managed run's supervisor dies (crash, nohup/foreman restart
@@ -111,10 +112,25 @@ _sq_current_pid() {
   echo "${sp#* }"
 }
 
+_web_ready() {
+  local port="${PORT:-31000}" deadline=$((SECONDS + WEB_READY_TIMEOUT)) status
+  while (( SECONDS < deadline )); do
+    status=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+      --connect-timeout 1 --max-time 2 "http://127.0.0.1:${port}/" 2>/dev/null || true)
+    case "$status" in
+      2??|3??) return 0 ;;
+    esac
+    sleep 1
+  done
+  echo "web: Puma did not become HTTP-ready within ${WEB_READY_TIMEOUT}s" >&2
+  return 1
+}
+
 cmd_start() {
   _meta "$1"
   zdots_svc_launchd_register "$SVC_LABEL" "$SVC_PLIST" "$SVC_BIN" "$SVC_LOG"
   zdots_svc_launchd_start "$SVC_LABEL" "$SVC_PLIST"
+  [[ "$SVC_NAME" != "web" ]] || _web_ready
 }
 
 cmd_stop() {
@@ -127,6 +143,7 @@ cmd_restart() {
   zdots_svc_launchd_stop "$SVC_LABEL"
   zdots_svc_launchd_register "$SVC_LABEL" "$SVC_PLIST" "$SVC_BIN" "$SVC_LOG"
   zdots_svc_launchd_start "$SVC_LABEL" "$SVC_PLIST"
+  [[ "$SVC_NAME" != "web" ]] || _web_ready
   if [[ "$SVC_NAME" == "jobs" ]]; then
     sleep 2 # let the new supervisor fork its worker/dispatcher/scheduler tree
     _sq_reap_orphans "$(_sq_current_pid)"
@@ -168,7 +185,7 @@ Usage: bin/wwworkremote-ctl <command> [web|jobs|all]
 COMMANDS
   start   <svc|all>   Register + start (RunAtLoad, KeepAlive, 30s throttle)
   stop    <svc|all>   Stop and unregister
-  restart <svc|all>   Stop, re-register, start
+  restart <svc|all>   Stop, re-register, start; web waits for HTTP readiness
   status  <svc|all>   running/stopped + pid
   logs    <svc>       Tail the service log (Ctrl+C to stop)
 
