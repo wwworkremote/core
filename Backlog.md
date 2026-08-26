@@ -158,11 +158,23 @@ ranking: see the "Skip Tax" artifact from this session.
       per-row `aria-label`s so repeated "Fill"/"Map" buttons are distinguishable to assistive tech.
 - [x] Added a per-field Skip to the sidepanel's application field review -- the one primitive triage
       had that the extension didn't. Dismisses the row for the current render only, not persisted.
+- [x] Heading-level skip fixed (h1 -> h2, was skipping straight to h3/h4), a global
+      `prefers-reduced-motion` guard added for animate-spin/pulse/bounce/ping (8 view files used
+      them unguarded), and a suppressed focus ring on the command palette search input replaced
+      with a real `focus:border-primary` indicator.
+- [x] Replaced the Dracula Pro theme with a verified-contrast graphite/blue palette -- every color
+      checked against all three base surfaces (the old palette was only ever checked against
+      base-100, and silently failed 4.5:1 against base-300). Caught and fixed a real regression in
+      the same pass: the Agent Wire tab hardcoded literal `dracula-*` classes that would have lost
+      their styling.
+- [x] Site footer hidden during triage -- the fixed decision bar was overlapping it on short
+      viewports, found by actually looking at the rendered page rather than trusting the CSS.
+- [x] Live-viewport confirmation that the triage decision trio doesn't truncate at 375px width --
+      confirmed on a real phone (Firefox/Android): "Not interested" wraps to two lines cleanly,
+      doesn't truncate, no footer overlap, Skip reachable without scrolling.
 
 ### Not done
 
-- [ ] Live-viewport confirmation that the triage decision trio doesn't truncate at 375px width
-      (flagged in the audit as needing a real screenshot, not just CSS review).
 - [ ] One documented shared interaction pattern (target sizing, labeling, "decide and advance"
       vocabulary) applied consistently to both surfaces, rather than fixed independently as above.
 - [ ] Swipe gesture on the triage view as the phone-native equivalent of the F/N/E/S/B keyboard
