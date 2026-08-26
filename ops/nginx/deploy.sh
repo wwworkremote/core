@@ -3,7 +3,9 @@
 #
 # Distinct from bin/register-nginx-conf / bin/register-puma-service, which target
 # the Linux production box (systemd, /etc/nginx/sites-available). This is for the
-# local macOS dev setup: Homebrew nginx + mkcert, localhost and trusted-LAN home.arpa names,
+# local macOS dev setup: Homebrew nginx + mkcert, localhost names plus the
+# trusted-LAN name lan.wwworkremote.com (a real public DNS A record pointing at
+# this Mac's LAN address -- resolves everywhere, only connects from the LAN),
 # following the same ops/nginx/servers/<name>.conf pattern as ~/my/context-engine.
 #
 # Not run automatically by anything in this repo -- nginx/cert changes are
@@ -29,7 +31,7 @@ echo "==> Regenerating cert (picks up new SANs, validates, reloads nginx)"
 nginx-regen-certs
 
 echo "==> Verifying (redirect-blind, per decision-011; cert-validating so a SAN gap fails loudly)"
-for h in wwworkremote.localhost wwwr.localhost wwworkremote.home.arpa wwwr.home.arpa; do
+for h in wwworkremote.localhost wwwr.localhost lan.wwworkremote.com; do
   printf '    %s: ' "$h"
   curl -s "https://$h" -o /dev/null -w '%{http_code}\n' --max-redirs 0
 done
