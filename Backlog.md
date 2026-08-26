@@ -137,3 +137,35 @@ Enable an intentional, secure way to use WWWorkRemote from another device on the
 - Mobile-specific application-funnel actions, extension controls, and offline/PWA behavior are not enabled.
 - Nginx has been reloaded successfully, but the repo does not yet own a stable LAN virtual-host configuration or readiness-aware Nginx health check.
 - Responsive rendering has been covered by markup/request tests only; a real-device viewport pass is still required.
+
+## Backlog task: Review-queue UX ("Skip Tax" audit)
+
+Both review-queue screens -- Rails job posting triage and the extension's application field
+review -- implement the same loop (show one item, decide, advance) with mismatched touch-target
+sizing and no shared interaction language between them. Full audit, evidence, and severity
+ranking: see the "Skip Tax" artifact from this session.
+
+### Shipped
+
+- [x] Real 44px `<button>` for triage Skip, moved to primary visual weight (was `btn-ghost btn-sm`).
+- [x] Triage decision bar (Skip + Favorite/Not interested/Expired) pinned to the viewport bottom
+      via a `fixed` bar, decoupled from the form with an HTML `form="triage-form"` attribute so it
+      stays reachable regardless of scroll position.
+- [x] Focus moves to the posting heading on every triage page load (`triage_controller.js#connect`),
+      so a screen reader announces the new item across the full-page reload.
+- [x] Real `<label for>` on both free-text fields (triage note, sidepanel field answer).
+- [x] Sidepanel action buttons (`Fill`/`Map`/`Skip`/status) resized to a 36px minimum height, with
+      per-row `aria-label`s so repeated "Fill"/"Map" buttons are distinguishable to assistive tech.
+- [x] Added a per-field Skip to the sidepanel's application field review -- the one primitive triage
+      had that the extension didn't. Dismisses the row for the current render only, not persisted.
+
+### Not done
+
+- [ ] Live-viewport confirmation that the triage decision trio doesn't truncate at 375px width
+      (flagged in the audit as needing a real screenshot, not just CSS review).
+- [ ] One documented shared interaction pattern (target sizing, labeling, "decide and advance"
+      vocabulary) applied consistently to both surfaces, rather than fixed independently as above.
+- [ ] Swipe gesture on the triage view as the phone-native equivalent of the F/N/E/S/B keyboard
+      shortcuts (shortcuts still have no mobile equivalent).
+- [ ] Progress indicator ("N left in today's queue") on the triage bar -- was in the revamp mockup,
+      not in the shipped fix list.
