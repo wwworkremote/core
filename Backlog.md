@@ -72,25 +72,35 @@ Enable an intentional, secure way to use WWWorkRemote from another device on the
 
 - Puma is configured for port `31000` and currently reports a wildcard listener (`*:31000`).
 - DHCP now reserves `10.36.1.149` for the WWWorkRemote Mac, making the LAN address stable.
-- AdGuard DNS rewrites now map `wwworkremote.home.arpa` and `wwwr.home.arpa` to `10.36.1.149` (`wwr.home.arpa` is also allowed as an alias).
+- The `.home.arpa` + local AdGuard DNS rewrite approach was abandoned: macOS/iOS's resolver
+  (`getaddrinfo`, used by curl, Safari, and every real app) silently refuses to resolve `.arpa`
+  names at all, even though `dig` against the AdGuard server succeeded — nginx, the cert, and
+  Rails all worked once DNS was bypassed with `--resolve`, confirming it was purely a resolver
+  issue with the reserved TLD, not fixable on this end.
+- Replaced with a real public DNS A record: `lan.wwworkremote.com → 10.36.1.149`, added directly
+  in DNSimple (same zone as `node01`–`node05.wwworkremote.com`). This resolves normally
+  everywhere via the standard resolver path (no mDNS/`.arpa` special-casing) but only connects
+  from the trusted LAN, since the address itself isn't routable from outside it.
 - The supported service controller is `bin/wwworkremote-ctl`, with launchd-backed `start`, `stop`, `restart`, and `status` commands.
-- Rails development host authorization now allows the two approved LAN names and loopback addresses.
+- Rails development host authorization now allows `lan.wwworkremote.com` and loopback addresses.
 - `bin/wwworkremote-ctl start/restart web` now waits up to 30 seconds for Puma to answer HTTP requests.
 - Shared navigation, admin dashboard/jobs, job-posting index, and job-posting detail views now have a mobile-first responsive pass.
-- Source-owned Nginx vhost/deploy verification now includes both approved `.home.arpa` names; the live Nginx config and local certificate still require operator deployment.
-- No network exposure, firewall rule, public DNS, or authentication change is authorized by this task alone.
+- Source-owned Nginx vhost now serves `lan.wwworkremote.com`; the live Nginx config and local
+  certificate still require operator deployment (`ops/nginx/deploy.sh`, which now verifies with
+  real cert validation instead of `curl -k`, so a SAN gap fails loudly).
+- No network exposure, firewall rule, or authentication change beyond the above is authorized by this task alone.
 
 ### Completed prerequisites
 
 - [x] Reserve a stable DHCP lease for the host.
-- [x] Add the `wwworkremote.home.arpa` AdGuard rewrite.
-- [x] Add the `wwr.home.arpa` AdGuard rewrite.
-- [x] Allow the canonical `wwwr.home.arpa` LAN hostname through Rails Host Authorization.
-- [x] Allow the approved LAN hostnames through Rails Host Authorization.
+- [x] Add a real public DNS A record (`lan.wwworkremote.com`) instead of a reserved-TLD LAN rewrite.
+- [x] Allow `lan.wwworkremote.com` through Rails Host Authorization.
 - [x] Make web start/restart wait for HTTP readiness.
 - [x] Add the first mobile-friendly admin and job-posting views.
-- [ ] Verify resolution and HTTP reachability from a second LAN device.
-- [ ] Deploy the updated Nginx vhost and regenerate the local certificate with both `.home.arpa` SANs.
+- [x] Verify DNS resolution for `lan.wwworkremote.com` via the real resolver path (curl/getaddrinfo), not just `dig`.
+- [ ] Verify HTTP reachability from a second LAN device (phone).
+- [ ] Deploy the updated Nginx vhost and regenerate the local certificate with the `lan.wwworkremote.com` SAN.
+- [ ] Remove the now-unused `wwworkremote.home.arpa`/`wwwr.home.arpa` AdGuard rewrites (operator-owned, outside this repo).
 
 ### Required changes
 

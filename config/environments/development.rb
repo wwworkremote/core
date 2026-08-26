@@ -27,11 +27,13 @@ Rails.application.configure do
   # Rails rejects non-local Host headers by default. Setting config.hosts
   # explicitly drops Rails' implicit "allow any .localhost subdomain in
   # development" behavior, so the existing dev vhost names have to be listed
-  # too, not just the new trusted-LAN .home.arpa names served via AdGuard.
+  # too, not just the trusted-LAN name. lan.wwworkremote.com is a real public
+  # DNS A record pointing at this Mac's LAN address -- resolves everywhere,
+  # only connects from the trusted LAN.
   config.hosts = [
     "localhost", "127.0.0.1", "::1",
     "wwworkremote.localhost", "wwwr.localhost",
-    "wwworkremote.home.arpa", "wwwr.home.arpa", "wwr.home.arpa"
+    "lan.wwworkremote.com"
   ]
 
   # Enable/disable caching. By default caching is disabled.
