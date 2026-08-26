@@ -24,9 +24,15 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: "localhost", port: 31_000 }
 
-  # Rails rejects non-local Host headers by default. These names are served
-  # only on the trusted LAN through the local AdGuard rewrites.
-  config.hosts = ["localhost", "127.0.0.1", "::1", "wwworkremote.home.arpa", "wwwr.home.arpa", "wwr.home.arpa"]
+  # Rails rejects non-local Host headers by default. Setting config.hosts
+  # explicitly drops Rails' implicit "allow any .localhost subdomain in
+  # development" behavior, so the existing dev vhost names have to be listed
+  # too, not just the new trusted-LAN .home.arpa names served via AdGuard.
+  config.hosts = [
+    "localhost", "127.0.0.1", "::1",
+    "wwworkremote.localhost", "wwwr.localhost",
+    "wwworkremote.home.arpa", "wwwr.home.arpa", "wwr.home.arpa"
+  ]
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.

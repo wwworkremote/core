@@ -28,10 +28,10 @@ echo "    $SRC -> $DST"
 echo "==> Regenerating cert (picks up new SANs, validates, reloads nginx)"
 nginx-regen-certs
 
-echo "==> Verifying (redirect-blind, per decision-011)"
+echo "==> Verifying (redirect-blind, per decision-011; cert-validating so a SAN gap fails loudly)"
 for h in wwworkremote.localhost wwwr.localhost wwworkremote.home.arpa wwwr.home.arpa; do
   printf '    %s: ' "$h"
-  curl -sk "https://$h" -o /dev/null -w '%{http_code}\n' --max-redirs 0
+  curl -s "https://$h" -o /dev/null -w '%{http_code}\n' --max-redirs 0
 done
 
 echo "==> Done. Start the app with 'bin/dev' if it isn't already running."
