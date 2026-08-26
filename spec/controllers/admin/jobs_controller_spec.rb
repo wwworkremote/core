@@ -20,6 +20,11 @@ RSpec.describe Admin::JobsController do
       get :index
       expect(assigns(:scheduler_info)).to be_present
     end
+
+    it "assigns job_runs" do
+      get :index
+      expect(assigns(:job_runs)).to be_a(ActiveRecord::Relation)
+    end
   end
 
   describe "POST #trigger" do

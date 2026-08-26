@@ -76,10 +76,8 @@ class Admin::JobsController < Admin::ApplicationController
   end
 
   def assign_dashboard_ivars(dashboard)
-    %i[scheduled_count ready_count blocked_count failed_count scheduler_info recurring_tasks
-       last_runs latency throughput error_rate active_processes saturation throughput_per_min
-       eta_minutes stalled_jobs running_too_long queues failed_jobs recent_jobs].each do |attr|
-      instance_variable_set(:"@#{attr}", dashboard.public_send(attr))
+    dashboard.instance_variables.each do |ivar|
+      instance_variable_set(ivar, dashboard.instance_variable_get(ivar))
     end
   end
 
