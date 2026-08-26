@@ -22,7 +22,7 @@
       <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.job_aggregation_title') %></h2>
       <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.job_aggregation_body') %></p>
       <%= link_to job_postings_path, class: "btn btn-ghost btn-xs p-0 text-primary hover:bg-transparent font-bold" do %>
-        <%= t('.capabilities.browse_jobs') %> <i class="bi bi-arrow-right"></i>
+        <%= t('.capabilities.browse_jobs') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
       <% end %>
     </div>
     <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -36,7 +36,7 @@
       <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.match_scoring_title') %></h2>
       <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.match_scoring_body') %></p>
       <%= link_to user_job_postings_path, class: "btn btn-ghost btn-xs p-0 text-secondary hover:bg-transparent font-bold" do %>
-        <%= t('.capabilities.view_saved_jobs') %> <i class="bi bi-arrow-right"></i>
+        <%= t('.capabilities.view_saved_jobs') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
       <% end %>
     </div>
     <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -50,7 +50,7 @@
       <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.pipeline_status_title') %></h2>
       <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.pipeline_status_body') %></p>
       <%= link_to admin_root_path, class: "btn btn-ghost btn-xs p-0 text-accent hover:bg-transparent font-bold" do %>
-        <%= t('.capabilities.open_admin') %> <i class="bi bi-arrow-right"></i>
+        <%= t('.capabilities.open_admin') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
       <% end %>
     </div>
     <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">

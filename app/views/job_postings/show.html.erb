@@ -3,7 +3,7 @@
 <div class="mb-10 text-xs font-bold opacity-60">
   <div class="flex items-center gap-3">
     <%= link_to t('.breadcrumb_root'), job_postings_path, class: "hover:text-primary transition-all" %>
-    <i class="bi bi-chevron-right text-xs"></i>
+    <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
     <span class="text-white"><%= truncate(@job_posting.title, length: 48) %></span>
   </div>
 </div>
@@ -122,7 +122,7 @@
         <!-- New Session Form -->
         <div class="bg-white/5 rounded-2xl p-6 border border-white/5">
           <h3 class="text-sm font-bold text-primary mb-6 flex items-center gap-2">
-            <i class="bi bi-plus-circle-fill"></i> <%= t('.interview_notes.log_session') %>
+            <%= heroicon "plus-circle", variant: :solid, options: { class: "w-4 h-4" } %> <%= t('.interview_notes.log_session') %>
           </h3>
           <%= form_with url: admin_job_posting_interview_sessions_path(@job_posting), class: "grid grid-cols-1 md:grid-cols-3 gap-4" do |f| %>
             <%= f.select :session_type, InterviewSession::SESSION_TYPES, {}, class: "select select-bordered bg-base-300 rounded-xl text-sm font-mono" %>
@@ -239,7 +239,7 @@
                       <%= image_tag artifact.variant(resize_to_limit: [100, 100]), class: "rounded-lg border border-white/10 hover:border-primary/50 transition-all cursor-zoom-in" %>
                     <% else %>
                       <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                        <i class="bi bi-file-earmark-zip text-slate-500"></i>
+                        <%= heroicon "archive-box", variant: :outline, options: { class: "w-4 h-4 text-slate-500" } %>
                       </div>
                     <% end %>
                     <%= link_to url_for(artifact), target: "_blank", class: "absolute inset-0 z-10" do %><% end %>
@@ -271,7 +271,7 @@
 
           <% if @job_posting.company_record.toxic_culture_flag %>
             <div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 font-bold leading-relaxed">
-              <i class="bi bi-exclamation-octagon-fill mr-1 text-rose-500"></i> <%= t('.company.toxicity_flag') %>
+              <%= heroicon "shield-exclamation", variant: :solid, options: { class: "w-4 h-4 mr-1 text-rose-500" } %> <%= t('.company.toxicity_flag') %>
             </div>
           <% end %>
 

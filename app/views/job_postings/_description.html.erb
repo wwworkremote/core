@@ -5,7 +5,7 @@
     <% if job_posting.body.present? %>
       <% if job_posting.reformatting? %>
         <span class="text-xs font-bold text-base-content/40 flex items-center gap-2">
-          <i class="bi bi-arrow-repeat animate-spin"></i> <%= t('job_postings.show.reformatting') %>
+          <%= heroicon "arrow-path", variant: :outline, options: { class: "w-4 h-4 animate-spin" } %> <%= t('job_postings.show.reformatting') %>
         </span>
       <% else %>
         <%= button_to t('job_postings.show.reformat_button'), reformat_job_posting_path(job_posting),

@@ -7,10 +7,10 @@
   </div>
   <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
     <%= button_to prune_admin_jobs_path, method: :post, class: "btn btn-outline border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-sm font-bold", data: { turbo_confirm: "Force prune all dead worker heartbeats?" } do %>
-      <i class="bi bi-scissors"></i> Prune Dead Workers
+      <%= heroicon "scissors", variant: :outline, options: { class: "w-4 h-4" } %> Prune Dead Workers
     <% end %>
     <%= link_to "/jobs", class: "btn-neural !bg-slate-800 !text-white flex items-center gap-2", target: "_blank" do %>
-      <i class="bi bi-box-arrow-up-right"></i> Open Job Queue
+      <%= heroicon "arrow-top-right-on-square", variant: :outline, options: { class: "w-4 h-4" } %> Open Job Queue
     <% end %>
   </div>
 </div>
@@ -40,7 +40,7 @@
   <div class="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center sm:gap-6">
     <div class="flex items-center gap-3 sm:gap-4">
       <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400">
-        <i class="bi bi-hourglass-split text-2xl"></i>
+        <%= heroicon "clock", variant: :outline, options: { class: "w-6 h-6" } %>
       </div>
       <div>
         <h3 class="text-xs font-bold text-blue-400 mb-1">Queue Depletion</h3>
@@ -136,7 +136,7 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                   <%= button_to trigger_admin_jobs_path(task_id: task[:id]), class: "btn btn-ghost btn-xs text-blue-500 hover:text-blue-400", data: { turbo_confirm: "Trigger #{task[:id]} now?" } do %>
-                    <i class="bi bi-play-fill"></i> Run
+                    <%= heroicon "play", variant: :solid, options: { class: "w-4 h-4" } %> Run
                   <% end %>
                 </td>
               </tr>
@@ -197,7 +197,7 @@
               <td class="px-6 py-4 text-right text-slate-500"><%= claimed.created_at.strftime("%H:%M:%S") %></td>
               <td class="px-6 py-4 text-center">
                 <%= button_to cancel_admin_job_path(claimed.job_id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", data: { turbo_confirm: "Cancel Job ##{claimed.job_id}?" } do %>
-                  <i class="bi bi-stop-circle"></i> Cancel
+                  <%= heroicon "stop", variant: :outline, options: { class: "w-4 h-4" } %> Cancel
                 <% end %>
               </td>
             </tr>
@@ -319,7 +319,7 @@
                   <td class="px-6 py-4 text-center">
                     <% unless job.finished? %>
                       <%= button_to cancel_admin_job_path(job.id), class: "btn btn-ghost btn-xs text-rose-500 hover:text-rose-400", title: "Cancel Job", data: { turbo_confirm: "Cancel Job ##{job.id}?" } do %>
-                        <i class="bi bi-stop-circle text-lg"></i>
+                        <%= heroicon "stop", variant: :outline, options: { class: "w-5 h-5" } %>
                       <% end %>
                     <% end %>
                   </td>

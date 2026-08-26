@@ -2,9 +2,9 @@
   <div class="mb-10 text-xs font-bold opacity-60">
     <div class="flex items-center gap-3">
       <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-xs"></i>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
       <%= link_to t('.breadcrumb_resumes'), resumes_path, class: "hover:text-primary transition-all" %>
-      <i class="bi bi-chevron-right text-xs"></i>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
       <span class="text-white"><%= @resume.name %> v<%= @resume.version %></span>
     </div>
   </div>
@@ -23,7 +23,7 @@
     <div class="flex flex-wrap gap-4">
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost border-white/10 rounded-xl px-6 font-bold">
-          <i class="bi bi-download mr-2"></i> <%= t('.export') %>
+          <%= heroicon "arrow-down-tray", variant: :outline, options: { class: "w-4 h-4 mr-2" } %> <%= t('.export') %>
         </div>
         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
           <li><%= link_to "Markdown (.md)", export_resume_path(@resume, format: :markdown) %></li>
@@ -36,12 +36,12 @@
 
       <% if @parent %>
         <%= link_to diff_resume_path(@resume, other_id: @parent.id), class: "btn btn-ghost border-white/10 rounded-xl px-6 font-bold hover:text-blue-400" do %>
-          <i class="bi bi-intersect mr-2"></i> <%= t('.compare_with_parent', version: @parent.version) %>
+          <%= heroicon "arrows-right-left", variant: :outline, options: { class: "w-4 h-4 mr-2" } %> <%= t('.compare_with_parent', version: @parent.version) %>
         <% end %>
       <% end %>
 
       <%= button_to fork_resume_path(@resume), method: :post, class: "btn btn-ghost border-white/10 rounded-xl px-6 font-bold hover:text-accent" do %>
-        <i class="bi bi-git mr-2"></i> <%= t('.fork') %>
+        <%= heroicon "document-duplicate", variant: :outline, options: { class: "w-4 h-4 mr-2" } %> <%= t('.fork') %>
       <% end %>
 
       <%= link_to edit_resume_path(@resume), class: "btn btn-primary rounded-xl px-10 font-bold" do %>
@@ -148,7 +148,7 @@
       <div class="card-neural p-8 border-l-4 border-primary bg-primary/5">
         <h3 class="text-xs font-bold text-white/60 mb-6 flex justify-between items-center">
           <span><%= t('.active_searches_heading') %></span>
-          <i class="bi bi-broadcast text-primary"></i>
+          <%= heroicon "signal", variant: :outline, options: { class: "w-4 h-4 text-primary" } %>
         </h3>
         <div class="space-y-4">
           <% if @resume.job_searches.active.any? %>

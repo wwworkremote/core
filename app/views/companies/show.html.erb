@@ -3,7 +3,7 @@
 <div class="mb-10 text-xs font-bold opacity-60">
   <div class="flex items-center gap-3">
     <%= link_to t('.breadcrumb_root'), job_postings_path, class: "hover:text-primary transition-all" %>
-    <i class="bi bi-chevron-right text-xs"></i>
+    <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
     <span class="text-white"><%= @company.name %></span>
   </div>
 </div>

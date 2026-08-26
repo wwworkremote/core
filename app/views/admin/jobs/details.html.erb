@@ -11,7 +11,7 @@
         <div class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 inline-block font-bold"><%= @job.queue_name %></div>
       </div>
       <%= button_to discard_admin_job_path(@job), method: :post, class: "btn btn-outline border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white btn-sm rounded-lg text-xs font-bold", data: { turbo_confirm: "Discard this job? This will stop it from being retried, though the current worker process may continue until it finishes its current task." } do %>
-        <i class="bi bi-x-circle-fill"></i> Discard
+        <%= heroicon "x-circle", variant: :solid, options: { class: "w-4 h-4" } %> Discard
       <% end %>
     </div>
   </div>

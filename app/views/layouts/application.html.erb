@@ -108,7 +108,7 @@
 
       <details class="dropdown dropdown-end md:hidden">
         <summary class="btn btn-primary btn-sm rounded-lg font-bold list-none" aria-label="Open navigation">
-          <i class="bi bi-list text-lg"></i>
+          <%= heroicon "bars-3", variant: :outline, options: { class: "w-5 h-5" } %>
         </summary>
         <ul class="dropdown-content z-[60] menu p-3 mt-3 w-64 gap-1 rounded-2xl border border-white/10 bg-base-300 shadow-2xl font-bold">
           <% nav_links.each_value do |label, path| %>
