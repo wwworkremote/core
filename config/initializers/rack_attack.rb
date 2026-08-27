@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 # Rate limiting for API and ingestion endpoints.
-# rack-attack uses Rails.cache as its backing store (Solid Cache).
+# Deliberately NOT Rails.cache (Solid Cache) -- a dedicated in-process
+# MemoryStore keeps throttle counters off the DB-backed cache so a slow
+# Solid Cache write can't add latency to every request. Disabled entirely
+# in test (config/environments/test.rb) since this store is process-global
+# and nothing in the RSpec suite resets it between examples -- see TASK-110.
 Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
 
 # Throttle API requests by IP (60 requests per minute)

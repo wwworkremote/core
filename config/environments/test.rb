@@ -26,6 +26,16 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
 
   config.after_initialize do
+    # Rack::Attack's throttle counters live in their own process-global
+    # MemoryStore (config/initializers/rack_attack.rb), not Rails.cache, so
+    # nothing in the RSpec suite resets them between examples. A full-suite
+    # run fires far more than 60 requests/minute at /api/* paths from the
+    # same test-client IP, so the throttle trips mid-suite and silently
+    # 429s unrelated specs depending on run order (TASK-110). Rate limiting
+    # isn't something app/request specs are testing, so turn it off here
+    # the same way it would be off for any other non-production concern.
+    Rack::Attack.enabled = false
+
     Ahoy.geocode = false
 
     Bullet.enable = true
