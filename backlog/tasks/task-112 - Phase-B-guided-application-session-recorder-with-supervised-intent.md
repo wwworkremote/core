@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-27 23:26'
+updated_date: '2026-08-27 23:30'
 labels:
   - architecture
   - application-workflow
@@ -88,5 +88,10 @@ Connected the local unpacked Chrome extension to the guided-session event seam. 
 created: 2026-08-27 23:26
 ---
 Dogfood check: localhost guided session #1 was created successfully and the real Chrome extension overlay loaded on the sandbox posting. The installed unpacked extension is still the prior bundle, so no page_arrived event appeared after navigation/reload; reload the extension from chrome://extensions before the next browser pass. Source and all implementation changes are committed through e8f99ae9.
+---
+
+created: 2026-08-27 23:30
+---
+Verified end to end after reloading Chrome extension v1.26.0: opening the tokenized sandbox posting produced the page_arrived event, and guided session #1 rendered it with intent plus recommended/reversible/not-required classifications. This validates the first real Chrome correlation checkpoint; application-phase transitions and approval-gated actions remain next.
 ---
 <!-- COMMENTS:END -->
