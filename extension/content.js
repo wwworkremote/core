@@ -112,20 +112,47 @@
       match: h => h.includes('linkedin.com'),
       readySelector: '.show-more-less-html__markup, .jobs-description__content, .description__text',
       readyTimeout: 8000,
+      // LinkedIn has moved (as of 2026-08) to fully hashed/obfuscated CSS
+      // class names on at least one render path (the standalone
+      // /jobs/view/:id page) -- no semantic classes, no data-testid, and no
+      // <h1> at all, so every selector above (already patched twice before,
+      // see history) can return null across the board while the content is
+      // plainly on the page. Two selector-free fallbacks that don't depend
+      // on LinkedIn's class names at all: <title> is still reliably
+      // "<Job Title> | <Company> | LinkedIn", and the description sits in
+      // the DOM right after a heading whose *text* says "About the job" --
+      // both survive a class-name reshuffle that breaks everything above.
+      titleCompanyFromDocTitle(doc) {
+        const m = doc.title.match(/^(.*?)\s\|\s(.*?)\s\|\s*LinkedIn$/);
+        return m ? { title: m[1].trim(), company: m[2].trim() } : {};
+      },
+      descriptionFromHeading(doc) {
+        const heading = Array.from(doc.querySelectorAll('h2, h3'))
+          .find(el => /about the job/i.test(el.textContent));
+        const container = heading?.parentElement?.parentElement;
+        if (!container) return {};
+        return { description_html: container.innerHTML, description_text: container.innerText };
+      },
       extract(doc) {
         const pills = pickAllText(
           doc,
           '.job-details-jobs-unified-top-card__container--two-pane strong, ' +
           '.jobs-unified-top-card__job-insight span, .job-details-jobs-unified-top-card__job-insight span'
         );
+        const title            = pickText(doc, 'h1.top-card-layout__title, h1.jobs-unified-top-card__job-title, h1');
+        const company          = pickText(doc, '.job-details-jobs-unified-top-card__company-name, .topcard__org-name-link, .jobs-unified-top-card__company-name a, .top-card-layout__first-subline a');
+        const description_html = pickHtml(doc, '.show-more-less-html__markup, .description__text--rich, .jobs-description__content');
+        const description_text = pickInnerText(doc, '.description__text, .jobs-description__content');
+        const docTitleFallback = (!title || !company) ? this.titleCompanyFromDocTitle(doc) : {};
+        const headingFallback  = !description_html ? this.descriptionFromHeading(doc) : {};
         return {
-          title:            pickText(doc, 'h1.top-card-layout__title, h1.jobs-unified-top-card__job-title, h1'),
-          company:          pickText(doc, '.job-details-jobs-unified-top-card__company-name, .topcard__org-name-link, .jobs-unified-top-card__company-name a, .top-card-layout__first-subline a'),
+          title:            title || docTitleFallback.title || null,
+          company:          company || docTitleFallback.company || null,
           location:         pickText(doc, '.job-details-jobs-unified-top-card__tertiary-description-container .tvm__text, .topcard__flavor--bullet, .jobs-unified-top-card__bullet'),
           posted_at:        pickText(doc, '.posted-time-ago__text, .jobs-unified-top-card__posted-date'),
           ...classifyInsightPills(pills),
-          description_html: pickHtml(doc, '.show-more-less-html__markup, .description__text--rich, .jobs-description__content'),
-          description_text: pickInnerText(doc, '.description__text, .jobs-description__content'),
+          description_html: description_html || headingFallback.description_html || null,
+          description_text: description_text || headingFallback.description_text || null,
         };
       },
     },
