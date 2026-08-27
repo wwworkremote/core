@@ -370,4 +370,14 @@ Rails.application.routes.draw do
     mount AhoyCaptain::Engine, at: "analytics"
   end
   get "/pages/*page" => "pages#show"
+
+  # Fake Greenhouse-shaped ATS, gated hard: the route doesn't exist at all
+  # (not just 403) outside development/test. See
+  # docs/architecture/sandbox-provider.md.
+  if Rails.env.local?
+    namespace :sandbox do
+      resources :postings, only: [:show]
+      resources :applications, only: [:create]
+    end
+  end
 end

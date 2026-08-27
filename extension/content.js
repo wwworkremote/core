@@ -85,6 +85,15 @@
     reportBrowserError('unhandled_rejection', event.reason, { source: 'promise' });
   });
 
+  // Extension-side mirror of the Rails sandbox provider's Rails.env.local?
+  // gate (docs/architecture/sandbox-provider.md) -- an extension loaded
+  // unpacked (dev) has no update_url in its own manifest; a Chrome Web
+  // Store install always does. Keeps wwworkremote.localhost recognizable as
+  // "greenhouse" only on a dev build, never in a build actually shipped to
+  // users, so a real site can never be mistaken for fixture data or vice
+  // versa. TASK-104.
+  const IS_LOCAL_BUILD = !('update_url' in chrome.runtime.getManifest());
+
   // ─── Provider definitions ──────────────────────────────────────────────────
   //
   // readySelector  CSS selector whose presence signals the SPA has rendered.
@@ -284,7 +293,11 @@
     // parseSalaryPill's regex still finds the number pair inside it.
     greenhouse: {
       label: 'Greenhouse',
-      match: h => h.includes('greenhouse.io'),
+      // wwworkremote.localhost only recognized on a local build (see
+      // IS_LOCAL_BUILD above) -- the sandbox provider fixture mirrors real
+      // Greenhouse DOM closely enough to be driven through this same
+      // provider's extraction path. TASK-104.
+      match: h => h.includes('greenhouse.io') || (IS_LOCAL_BUILD && h === 'wwworkremote.localhost'),
       readySelector: '.job__description, #content, .section-wrapper',
       readyTimeout: 5000,
       extract(doc) {
