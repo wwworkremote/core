@@ -1,17 +1,30 @@
 ---
 id: TASK-106
 title: 'Reference Scenario: marking, storage, and the manual promotion workflow'
-status: In Progress
+status: Done
 assignee:
   - '@mike'
 created_date: '2026-08-27 17:25'
-updated_date: '2026-08-27 21:57'
+updated_date: '2026-08-27 22:05'
 labels:
   - architecture
   - signature-registry
 dependencies:
   - TASK-102
 documentation:
+  - docs/architecture/signature-registry.md
+modified_files:
+  - db/migrate/20260827200000_create_reference_scenarios.rb
+  - db/schema.rb
+  - app/models/reference_scenario.rb
+  - app/models/scenario.rb
+  - app/services/scenarios/reference_diff.rb
+  - app/services/scenarios/promote_reference.rb
+  - lib/tasks/scenarios.rake
+  - spec/factories/scenarios.rb
+  - spec/models/reference_scenario_spec.rb
+  - spec/services/scenarios/reference_diff_spec.rb
+  - spec/services/scenarios/promote_reference_spec.rb
   - docs/architecture/signature-registry.md
 priority: medium
 type: feature
@@ -54,3 +67,9 @@ Depends on TASK-102 (capture path) -- no real Scenario data to mark as a referen
 <!-- SECTION:NOTES:BEGIN -->
 Selected a separate ReferenceScenario pointer table rather than a boolean Scenario flag: it keeps captured Scenario rows immutable, makes one-reference-per-provider enforceable with a unique provider index, and leaves promotion as a distinct explicit action.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Implemented manual Reference Scenario management. Added a database-enforced one-row-per-provider ReferenceScenario pointer, read-only Scenarios::ReferenceDiff reporting ordered candidate/reference sequences plus gained/lost/reordered kinds, and explicit Scenarios::PromoteReference promotion. Added preview-first rake task scenarios:reference_diff[TOKEN], with PROMOTE=1 as the separate write action. Updated signature-registry architecture documentation. Focused suite: 26 examples, 0 failures. Commit: e4ba7c2f.
+<!-- SECTION:FINAL_SUMMARY:END -->
