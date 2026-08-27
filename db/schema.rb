@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -214,6 +214,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
     t.string "disposition"
     t.jsonb "glassdoor_data"
     t.boolean "ingestion_enabled", default: true, null: false
+    t.datetime "last_declined_at"
     t.string "name"
     t.float "sentiment_score"
     t.string "slug"
@@ -388,6 +389,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["id"], name: "index_hacker_news_v0_jobstories_on_id", unique: true
+  end
+
+  create_table "human_tasks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "job_posting_id", null: false
+    t.string "kind", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.string "proposed_by", default: "ai", null: false
+    t.text "resolution_note"
+    t.datetime "resolved_at"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["job_posting_id", "kind", "status"], name: "index_human_tasks_on_job_posting_id_and_kind_and_status"
+    t.index ["job_posting_id"], name: "index_human_tasks_on_job_posting_id"
+    t.index ["status"], name: "index_human_tasks_on_status"
+    t.index ["user_id"], name: "index_human_tasks_on_user_id"
   end
 
   create_table "interview_questions", force: :cascade do |t|
@@ -720,6 +738,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
     t.index ["user_id"], name: "index_resumes_on_user_id"
   end
 
+  create_table "scenario_signatures", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "first_observed_at", null: false
+    t.string "kind", null: false
+    t.bigint "scenario_id", null: false
+    t.string "step"
+    t.datetime "updated_at", null: false
+    t.string "value", null: false
+    t.index ["scenario_id", "kind", "value"], name: "idx_scenario_signatures_uniq", unique: true
+    t.index ["scenario_id"], name: "index_scenario_signatures_on_scenario_id"
+  end
+
+  create_table "scenarios", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "provider", null: false
+    t.string "scenario_token", null: false
+    t.datetime "started_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_job_posting_id"
+    t.index ["scenario_token"], name: "index_scenarios_on_scenario_token", unique: true
+    t.index ["user_job_posting_id"], name: "index_scenarios_on_user_job_posting_id"
+  end
+
   create_table "skills", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at", null: false
@@ -944,6 +985,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
     t.text "notes"
     t.string "outcome"
     t.datetime "outcome_at"
+    t.text "outcome_reason"
     t.string "outcome_source"
     t.boolean "priority_flag"
     t.string "resume_persona_id"
@@ -1022,6 +1064,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
   add_foreign_key "contacts", "job_postings"
   add_foreign_key "contacts", "users"
   add_foreign_key "experience_highlights", "work_experiences"
+  add_foreign_key "human_tasks", "job_postings"
+  add_foreign_key "human_tasks", "users"
   add_foreign_key "interview_questions", "interview_sessions"
   add_foreign_key "interview_sessions", "job_postings"
   add_foreign_key "interview_sessions", "users"
@@ -1044,6 +1088,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_220000) do
   add_foreign_key "resume_skills", "resumes"
   add_foreign_key "resume_skills", "skills"
   add_foreign_key "resumes", "users"
+  add_foreign_key "scenario_signatures", "scenarios"
+  add_foreign_key "scenarios", "user_job_postings"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
