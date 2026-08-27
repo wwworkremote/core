@@ -22,6 +22,7 @@ class JobPosting < ApplicationRecord
   has_many :user_job_postings, dependent: :destroy
   has_many :users, through: :user_job_postings
   has_many :pipeline_steps, dependent: :destroy
+  has_many :human_tasks, dependent: :destroy
   has_many :contacts, dependent: :destroy
   has_many :interview_sessions, dependent: :destroy
   has_many :interview_tasks, dependent: :destroy

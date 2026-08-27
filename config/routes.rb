@@ -264,6 +264,12 @@ Rails.application.routes.draw do
       end
     end
     resources :leads, only: %i[index show]
+    resources :human_tasks, only: %i[index] do
+      member do
+        post :approve
+        post :reject
+      end
+    end
     resources :extraction_rules, only: %i[index show]
     resources :pipeline_filters, only: [:index]
     resources :queries, only: %i[index show]
