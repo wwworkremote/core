@@ -377,6 +377,7 @@ en:
         system_health: "System Health"
         background_jobs: "Background Jobs"
         data_sources: "Data Sources"
+        extraction_rules: "Extraction Rules"
         tools_section_label: "Tools"
         pghero: "PgHero"
         job_queue: "Job Queue"
