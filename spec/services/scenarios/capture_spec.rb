@@ -50,6 +50,16 @@ RSpec.describe Scenarios::Capture do
       )
     end
 
+    it "extracts Greenhouse signatures from the sandbox DOM" do
+      source = '<form data-job-post-id="sandbox-job"><div data-ats-application-id="sandbox-application"></div></form>'
+
+      scenario = described_class.call(source, provider: "greenhouse")
+
+      expect(scenario.scenario_signatures.pluck(:kind, :value)).to contain_exactly(
+        %w[job_post_id sandbox-job], %w[ats_application_id sandbox-application]
+      )
+    end
+
     it "extracts nothing for a provider with no configured patterns, but still creates the Scenario" do
       scenario = described_class.call("irrelevant text", provider: "unknown_board")
 

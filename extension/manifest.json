@@ -7,6 +7,8 @@
   "host_permissions": [
     "http://localhost:31000/*",
     "http://localhost:*/*",
+    "http://wwworkremote.localhost/*",
+    "https://wwworkremote.localhost/*",
     "https://www.linkedin.com/*",
     "https://www.indeed.com/*",
     "https://myjobs.indeed.com/*",
@@ -63,6 +65,8 @@
     {
       "matches": [
         "https://www.linkedin.com/*",
+        "http://wwworkremote.localhost/*",
+        "https://wwworkremote.localhost/*",
         "https://www.indeed.com/*",
         "https://*.adzuna.com/*",
         "https://weworkremotely.com/*",

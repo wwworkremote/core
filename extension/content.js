@@ -293,11 +293,11 @@
     // parseSalaryPill's regex still finds the number pair inside it.
     greenhouse: {
       label: 'Greenhouse',
-      // wwworkremote.localhost only recognized on a local build (see
-      // IS_LOCAL_BUILD above) -- the sandbox provider fixture mirrors real
-      // Greenhouse DOM closely enough to be driven through this same
+      // The exact wwworkremote.localhost host is the extension-side sandbox
+      // gate; the Rails route itself exists only in development/test. The
+      // fixture mirrors real Greenhouse DOM closely enough to exercise this
       // provider's extraction path. TASK-104.
-      match: h => h.includes('greenhouse.io') || (IS_LOCAL_BUILD && h === 'wwworkremote.localhost'),
+      match: h => h.includes('greenhouse.io') || IS_SANDBOX_HOST,
       readySelector: '.job__description, #content, .section-wrapper',
       readyTimeout: 5000,
       extract(doc) {
@@ -1193,6 +1193,7 @@
   // ─── Provider detection ────────────────────────────────────────────────────
 
   const hostname = window.location.hostname;
+  const IS_SANDBOX_HOST = hostname === 'wwworkremote.localhost';
   let provider = null;
   for (const [key, p] of Object.entries(PROVIDERS)) {
     if (p.match(hostname)) { provider = { key, ...p }; break; }
@@ -1219,6 +1220,43 @@
   }
 
   let applicationCompletion = detectWorkdayCompletion();
+
+  const SANDBOX_SCENARIO_KEY = 'wwr_sandbox_scenario_token';
+  const isSandboxWalkthrough = () => IS_SANDBOX_HOST && provider?.key === 'greenhouse';
+
+  async function captureSandboxScenario() {
+    if (!isSandboxWalkthrough()) return;
+    try {
+      const { base: apiBase, authHeader } = await getApiConfig();
+      // Content scripts cannot depend on chrome.storage.session access. The
+      // walkthrough token is harmless local state, so keep it in the storage
+      // area available to both the extension and its content scripts.
+      const stored = await new Promise(resolve => chrome.storage.local.get(SANDBOX_SCENARIO_KEY,
+        data => resolve(data[SANDBOX_SCENARIO_KEY] || null)));
+      const headers = { 'Content-Type': 'application/json' };
+      if (authHeader) headers['Authorization'] = authHeader;
+      const { ok, data } = await apiFetch(`${apiBase}/api/scenarios`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ provider: 'greenhouse', scenario_token: stored,
+          source: document.documentElement.outerHTML }),
+      });
+      if (!ok || !data.success) throw new Error(data.error || 'Scenario capture failed');
+      await new Promise(resolve => chrome.storage.local.set({ [SANDBOX_SCENARIO_KEY]: data.scenario_token }, resolve));
+      LOG_OK('Sandbox Scenario captured:', data.signatures);
+      updateLeadStatus('Scenario captured ✓', '#8aff80');
+    } catch (err) {
+      LOG_WARN('Sandbox Scenario capture failed:', err.message);
+      updateLeadStatus('Scenario capture failed', '#ff9580');
+    }
+  }
+
+  if (isSandboxWalkthrough() && document.querySelector('[data-ats-application-id]')) {
+    // Let the confirmation DOM settle before taking the snapshot. This also
+    // keeps the page-load path inside the same error boundary as the lead
+    // capture path, so a browser/storage failure is visible in the overlay.
+    setTimeout(() => captureSandboxScenario(), 0);
+  }
 
   // Toolbar badge: lets the user see capture is available without opening
   // the popup or scrolling to the in-page overlay. Fire-and-forget --
@@ -1949,6 +1987,18 @@
   let leadId = null;
   let leadCapturePromise = null;
 
+  // Deliberate Phase A mode for the local sandbox. Normal capture browsing
+  // remains click-to-capture; this opt-in query parameter lets a walkthrough
+  // driver exercise the same extraction/capture path without a human click.
+  const automaticSandboxWalkthrough = isSandboxWalkthrough() &&
+    urlParams.get('scenario_walkthrough') === '1';
+
+  if (automaticSandboxWalkthrough) {
+    previewExtraction().then(extracted => {
+      if (extracted) captureLead(extracted);
+    });
+  }
+
   if (captureMode === 'enrich') {
     // Trusted flow (user explicitly clicked "Source & Enrich" in the app) —
     // extract and open the panel immediately, same as before.
@@ -1988,6 +2038,9 @@
     if (applicationCompletion) {
       notifyPanel(cachedExtraction);
       return;
+    }
+    if (isSandboxWalkthrough() && document.querySelector('[data-ats-application-id]')) {
+      captureSandboxScenario();
     }
     if (cachedExtraction) {
       notifyPanel(cachedExtraction);
@@ -2098,6 +2151,7 @@
       leadId = data.id;
       LOG_OK(`Lead captured — #${leadId}`);
       updateLeadStatus('Lead captured ✓', '#8aff80');
+      await captureSandboxScenario();
     } catch (err) {
       LOG_ERR('Lead capture failed:', err);
       updateLeadStatus('Lead capture failed', '#ff9580');

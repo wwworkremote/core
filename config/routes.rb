@@ -347,6 +347,7 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
+    resources :scenarios, only: [:create]
     resources :job_postings, only: [] do
       member do
         post :enrich

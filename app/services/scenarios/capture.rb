@@ -36,8 +36,16 @@ class Scenarios::Capture
       "job_id" => [%r{/jobs/view/(\d+)}]
     },
     "greenhouse" => {
-      "job_post_id" => [%r{greenhouse\.io/[^/\s"]+/jobs/(\d+)}, /"job_post_id"\s*:\s*"?(\d+)"?/],
-      "ats_application_id" => [/"ats_application_id"\s*:\s*"?([\w-]+)"?/i, /"application_id"\s*:\s*"?([\w-]+)"?/i]
+      "job_post_id" => [
+        %r{greenhouse\.io/[^/\s"]+/jobs/(\d+)},
+        /"job_post_id"\s*:\s*"?(\d+)"?/,
+        /data-job-post-id=["']([^"']+)["']/i
+      ],
+      "ats_application_id" => [
+        /"ats_application_id"\s*:\s*"?([\w-]+)"?/i,
+        /"application_id"\s*:\s*"?([\w-]+)"?/i,
+        /data-ats-application-id=["']([^"']+)["']/i
+      ]
     },
     "indeed" => {
       "job_key" => [/[?&]jk=([0-9a-f]{10,20})/i, /"jobKey"\s*:\s*"([^"]+)"/]
