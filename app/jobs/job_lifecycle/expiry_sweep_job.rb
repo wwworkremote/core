@@ -4,8 +4,6 @@ class JobLifecycle::ExpirySweepJob < ApplicationJob
   queue_as :low
   mediumweight!
 
-  PRESERVED_STATUSES = %w[favorited applied interview offered].freeze
-
   def perform
     Rails.logger.info "[ExpirySweep] Found #{stale_postings.count} stale postings to expire."
     stale_postings.find_each { |posting| expire_if_eligible(posting) }
@@ -21,10 +19,19 @@ class JobLifecycle::ExpirySweepJob < ApplicationJob
               .where.not(status: %w[expired purged])
   end
 
-  # Skip if favorited or applied - user action should preserve them
+  # Pipeline stage/outcome live entirely on UserJobPosting as of TASK-82
+  # phase 3 -- checking JobPosting.status against favorited/applied/etc
+  # (the pre-phase-3 shape) would never match anything anymore and silently
+  # expire postings Mike is actively pursuing. Preserve if any user has
+  # active pipeline involvement (UserJobPosting::ACTIVE_STATUSES) or an
+  # offer recorded.
   def expire_if_eligible(posting)
-    return if PRESERVED_STATUSES.include?(posting.status)
+    return if active_pipeline?(posting)
 
     posting.expire!
+  end
+
+  def active_pipeline?(posting)
+    posting.user_job_postings.exists?(["status IN (?) OR outcome = ?", UserJobPosting::ACTIVE_STATUSES, "offered"])
   end
 end
