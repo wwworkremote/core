@@ -4,7 +4,7 @@ title: Make HandshakeCheck step-aware by comparing against the Reference Scenari
 status: To Do
 assignee: []
 created_date: '2026-08-27 17:25'
-updated_date: '2026-08-27 17:26'
+updated_date: '2026-08-27 22:17'
 labels:
   - architecture
   - signature-registry
@@ -34,3 +34,12 @@ Depends on TASK-106 (Reference Scenario marking/storage) existing first -- nothi
 - [ ] #2 Existing Scenarios::HandshakeCheck spec coverage still passes -- this is a precision upgrade, not a behavior change for the kinds that already work correctly
 - [ ] #3 The documented ceiling comment in handshake_check.rb is removed or updated to reflect the new step-aware behavior
 <!-- AC:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+created: 2026-08-27 22:17
+---
+New domain context: step-aware handshake results should align with pump-track phases and distinguish required, optional, recommended, reversible, and approval-gated transitions when the guided session recorder exists (TASK-112).
+---
+<!-- COMMENTS:END -->

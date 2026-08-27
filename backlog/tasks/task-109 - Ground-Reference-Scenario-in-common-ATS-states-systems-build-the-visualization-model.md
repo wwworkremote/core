@@ -6,11 +6,14 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-27 17:50'
+updated_date: '2026-08-27 22:17'
 labels:
   - architecture
   - signature-registry
 dependencies:
   - TASK-106
+references:
+  - TASK-112
 documentation:
   - docs/architecture/panoramic-view.md
   - docs/architecture/signature-registry.md
@@ -39,3 +42,12 @@ Depends on TASK-106 (Reference Scenario storage) existing -- nothing concrete to
 - [ ] #2 A rendered (not just designed) view exists showing at least the left-to-right actor-journey axis for one real traced Scenario
 - [ ] #3 The vertical/topology-lane dimension from the visualization model is represented in that view in some form -- full sinusoidal rendering is not required for this task to be considered done, a first pass that captures the two axes is sufficient
 <!-- AC:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+created: 2026-08-27 22:17
+---
+New domain context from the pump-track ADR: the visualization should render a supervised application lap across Intake, Resolution, Response Construction, and Reorientation, with approval gates and intent annotations visible at transitions. The first Phase B recorder is now tracked as TASK-112; this task should consume its recorded session timeline rather than inventing a parallel capture model.
+---
+<!-- COMMENTS:END -->

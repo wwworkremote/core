@@ -18,9 +18,10 @@ diagrams, not just source. This file itself is best read there.
 - **[Application Sequence](architecture/application-sequence.md)**: One posting's journey, start to finish, as a sequence diagram.
 - **[Human Task Pipeline](architecture/human-task-pipeline.md)**: BPMN-lite Service Task/User Task split for AI-proposed, human-approved decisions (persona picks, drafted answers).
 - **[Job Application Pump Track](architecture/pump-track.md)**: The recurring actor-system loop behind discovery, evaluation, application, and what comes next.
-- **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace_id-correlated, read-only evidence timeline of one application (not yet built).
-- **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, when there's no automatic trace propagation to lean on. `Scenario`/`ScenarioSignature`/`HandshakeCheck` built; no capture path into them yet.
-- **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally, so the Signature Registry harness can be built and iterated without needing a live third-party site (not yet built).
+- **[Supervised Intent Capture ADR](adr/005-supervised-intent-capture.md)**: How guided sessions preserve Mike's intent while keeping automation bounded.
+- **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace-correlated, read-only evidence timeline and supervised application session.
+- **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, with capture and human-approved references built.
+- **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally for safe extension dogfooding and Reference Scenario capture.
 - **[Configuration](configuration.md)**: Environment variables and credentials.
 - **[Troubleshooting](troubleshooting.md)**: Common failures and fixes.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.

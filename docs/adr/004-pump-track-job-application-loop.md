@@ -51,6 +51,8 @@ to benefit from the previous one.
   choice legible to Mike.
 - A provider-specific subflow earns its own module when its behavior differs,
   while the shared phase model remains stable.
+- A complete lap is recorded as a supervised session when the system is being
+  taught intent; see ADR 005.
 
 ## Rejected Alternatives
 

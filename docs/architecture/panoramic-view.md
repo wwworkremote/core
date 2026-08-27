@@ -139,7 +139,7 @@ this repo already rejected both shapes once this session.
 | Panoramic View page + routes | **Not built** |
 | "View full trace" entry point on the job posting page | **Not built** |
 | Backfilling `application_trace_id` for pre-existing untraced applications | **Open question** — not attempted, not scoped |
-| Persisting the HAR/DOM capture itself (not just the parsed fields) as a replayable artifact | **Deferred, separate proposal** — this doc covers correlating what's already captured, not capturing more |
+| Persisting the HAR/DOM capture itself (not just the parsed fields) as a replayable artifact | **Deferred to TASK-112** — guided sessions will capture meaningful transitions and intent, not indiscriminate telemetry |
 | Correlating a *remotely-recorded* session (no automatic trace propagation possible) | **Deferred to [Signature Registry](signature-registry.md)** — a real gap in this doc's propagation assumption, not just an extension |
 
 ## Open questions for Mike
@@ -178,3 +178,8 @@ common ATS states (applied, screening, phone screen, interview loop, offer, reje
 and common system shapes (Greenhouse, Lever, Workday, iCIMS, Taleo, SmartRecruiters) beyond the
 four providers this doc and Signature Registry currently name. This wasn't invented from nothing;
 don't design the Reference Scenario's expected shape as if it were.
+
+The next implementation seam is the supervised application session: a durable pump-track lap
+that starts from a copied posting URL, records meaningful transitions and Mike's intent, and
+pauses at ambiguous or irreversible actions. See [ADR 005](../adr/005-supervised-intent-capture.md)
+and TASK-112.

@@ -6,6 +6,8 @@
 - **Resume:** A specific, versioned instance of a resume track (e.g., "Backend" vs "Engineering Manager").
 - **Job Search:** A campaign grouping applications using a specific Resume version.
 - **Skill:** A centralized master list of technical and soft skills with vector embeddings.
+- **Pump Track:** The recurring four-phase loop of Intake, Resolution, Response Construction, and Reorientation that describes one lap of the job-search game.
+- **Guided Session:** A supervised lap in which the system records what happened and why, while Mike retains authority at ambiguous or irreversible transitions.
 
 ## Core Concepts
 - **Vector Search:** Using pgvector to find similarities between Resume versions and Job Postings.
@@ -16,4 +18,5 @@
 - **Asymmetric Sync Rule:** Use soft deletes (`discarded_at`) for user-managed data to prevent "record resurrection" during external API syncs.
 - **Solid Stack Safety:** SolidQueue/Cache/Cable must use explicit `connects_to` write connections.
 - **zdots Rule (Account Separation):** Strict isolation of `_ro` (Read-only), `_w` (Write-only), and `_rw` (Read-write) database accounts to prevent drift.
-
+- **Intent Is First-Class:** Capturing an action is not enough; the system must preserve the actor's intent, available alternatives, state changes, reversibility, and approval requirements.
+- **Bounded Agency:** Automation may handle deterministic, reversible work, but Mike remains the approving actor for ambiguity and irreversible actions such as final application submission.

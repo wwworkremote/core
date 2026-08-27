@@ -6,12 +6,15 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-27 17:27'
+updated_date: '2026-08-27 22:17'
 labels:
   - architecture
   - sandbox-provider
   - spike
 dependencies:
   - TASK-104
+references:
+  - TASK-112
 documentation:
   - docs/architecture/sandbox-provider.md
 priority: low
@@ -35,3 +38,12 @@ Explicitly a spike: evaluate and report, not a commitment to build. Depends on T
 - [ ] #2 A small prototype (or documented reasoning why not) showing on-device classification of at least one real field-classification case against the sandbox provider
 - [ ] #3 A recommendation: adopt, defer, or reject, with reasoning -- this task's output is a decision, not necessarily shipped code
 <!-- AC:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+created: 2026-08-27 22:17
+---
+New domain context: on-device sense-making is valuable only inside the supervised pump-track loop, especially for classifying unfamiliar fields and proposing deterministic versus approval-gated actions. Keep the spike explicitly advisory; it must not weaken human approval at irreversible transitions.
+---
+<!-- COMMENTS:END -->
