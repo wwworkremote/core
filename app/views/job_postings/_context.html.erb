@@ -40,7 +40,7 @@
     </div>
   <% else %>
     <div class="mb-6 p-3 rounded-xl border border-success/20 bg-success/5">
-      <span class="text-xs font-bold text-success">Nothing flagged — US posting, enriched, states agree.</span>
+      <span class="text-xs font-bold text-success">Nothing flagged — US posting, enriched.</span>
     </div>
   <% end %>
 
@@ -50,7 +50,11 @@
     <span class="text-base-content/40"><%= job_posting.data["is_remote"] ? "remote" : "on-site/hybrid" %></span>
   </div>
 
-  <%# Both state machines, side by side, so drift is visible instead of inferred. %>
+  <%# Two independent facts, not one compared against the other (TASK-82):
+      "posting" is JobPosting's own lifecycle (none/ignored/purged/expired/
+      archived); "yours" is your pipeline stage and outcome on UserJobPosting.
+      They're expected to differ for anything you've favorited/applied to --
+      that's not drift, it's the point of the split. %>
   <div class="mb-6">
     <div class="text-xs font-bold text-base-content/40 mb-2">Pipeline state</div>
     <dl class="space-y-1 text-xs font-bold">
@@ -60,13 +64,16 @@
       </div>
       <div class="flex justify-between gap-4">
         <dt class="text-base-content/50">yours</dt>
-        <dd class="font-mono <%= tracked.nil? ? "text-base-content/30" : (tracked.status == job_posting.status ? "text-white" : "text-warning") %>">
+        <dd class="font-mono <%= tracked.nil? ? "text-base-content/30" : "text-white" %>">
           <%= tracked&.status || "untracked" %>
-          <% if tracked && tracked.status != job_posting.status %>
-            <span title="These are separate state machines and have diverged (TASK-82)">⚠</span>
-          <% end %>
         </dd>
       </div>
+      <% if tracked&.outcome.present? %>
+        <div class="flex justify-between gap-4">
+          <dt class="text-base-content/50">outcome</dt>
+          <dd class="text-white font-mono"><%= tracked.outcome %></dd>
+        </div>
+      <% end %>
       <% if tracked&.applied_at %>
         <div class="flex justify-between gap-4">
           <dt class="text-base-content/50">applied</dt>

@@ -24,7 +24,7 @@ RSpec.describe JobPosting::StatusWorkflow do
     end
 
     it "refuses to restore a posting in an unrelated state" do
-      posting = create(:job_posting, status: "favorited")
+      posting = create(:job_posting, status: "expired")
 
       expect { posting.restore! }.to raise_error(AASM::InvalidTransition)
     end

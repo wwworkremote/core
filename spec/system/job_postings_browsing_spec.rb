@@ -32,7 +32,9 @@ RSpec.describe "Browsing and triaging job postings" do
 
     click_on "Favorite"
     expect(older.reload.status).to eq("none")
-    expect(newest.reload.status).to eq("favorited")
+    expect(newest.reload.status).to eq("none") # pipeline stage lives on UserJobPosting, not JobPosting (TASK-82)
+    admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"))
+    expect(admin.user_job_postings.find_by(job_posting: newest).status).to eq("favorited")
 
     expect(page).to have_link("Back", href: job_posting_path(newest))
     click_link(href: job_posting_path(newest))

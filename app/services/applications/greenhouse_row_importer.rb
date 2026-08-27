@@ -89,19 +89,13 @@ class Applications::GreenhouseRowImporter
     nil
   end
 
-  # Same two-machine write as every other importer -- JobPosting and
-  # UserJobPosting drift when only one is moved (TASK-82).
+  # UserJobPosting owns pipeline state entirely as of TASK-82 phase 3 --
+  # JobPosting no longer has favorite!/apply! at all.
   def advance(posting, applied_at)
-    advance_posting_status(posting)
     tracked = tracked_record(posting)
     tracked.record_status_event!("apply") if tracked.status != "applied"
     apply_dates(tracked, applied_at)
     apply_outcome(tracked)
-  end
-
-  def advance_posting_status(posting)
-    posting.favorite! if posting.may_favorite?
-    posting.apply! if posting.may_apply?
   end
 
   def tracked_record(posting)

@@ -8,6 +8,8 @@
   </div>
 </div>
 
+<% user_job = current_user.user_job_postings.find_by(job_posting: @job_posting) %>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
   <article class="lg:col-span-2 space-y-8">
     <header class="bg-base-200 border border-white/5 rounded-2xl p-5 sm:p-10 shadow-2xl relative overflow-hidden">
@@ -18,17 +20,31 @@
       <div class="relative z-10">
         <h1 class="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight leading-none">
           <%= @job_posting.title %>
-          <% status_badges = {
+          <%# Pipeline stage and outcome are UserJobPosting's, not
+              JobPosting's -- TASK-82. Lifecycle facts (ignored/expired/
+              purged/archived) are JobPosting's; "archived" can happen on
+              either (Mike gave up, or the link died), so it's checked on
+              both, with JobPosting's own archived value taking the
+              lifecycle-specific label since a dead link outranks an old
+              pipeline decision as the more current fact. %>
+          <% pipeline_badges = {
                "favorited" => ["Favorited", "border-primary/40 text-primary"],
                "applied" => ["Applied", "border-info/40 text-info"],
                "interview" => ["Interviewing", "border-accent/40 text-accent"],
+               "archived" => ["Archived", "border-white/20 text-slate-400"]
+             } %>
+          <% outcome_badges = {
                "offered" => ["Offered", "border-success/40 text-success"],
+               "rejected" => ["Rejected", "border-rose-500/40 text-rose-400"]
+             } %>
+          <% lifecycle_badges = {
                "archived" => ["Archived", "border-white/20 text-slate-400"],
                "ignored" => ["Not Interested", "border-error/40 text-error"],
                "expired" => ["Expired", "border-warning/40 text-warning"],
                "purged" => ["Purged", "border-error/60 text-error"]
              } %>
-          <% if (badge = status_badges[@job_posting.status]) %>
+          <% badge = lifecycle_badges[@job_posting.status] || outcome_badges[user_job&.outcome] || pipeline_badges[user_job&.status] %>
+          <% if badge %>
             <span class="badge badge-outline <%= badge[1] %> text-xs font-bold align-middle ml-1">
               <%= badge[0] %>
             </span>
@@ -188,8 +204,11 @@
       <!-- Status Transitions -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-8">
         <div class="flex flex-wrap gap-2">
-          <% ['favorite', 'apply', 'interview', 'offer', 'archive'].each do |event| %>
-            <% if @job_posting.send("may_#{event}?") %>
+          <%# Mike's own pipeline stage -- UserJobPosting, not JobPosting
+              (TASK-82). "offer" isn't here: it's the employer's decision,
+              recorded as an outcome below, not a stage. %>
+          <% ['favorite', 'apply', 'interview', 'archive'].each do |event| %>
+            <% if (user_job || UserJobPosting.new).send("may_#{event}?") %>
               <%= button_to event.humanize, admin_job_posting_pipeline_steps_path(@job_posting), params: { status: event }, class: "px-3 py-1.5 rounded-lg text-xs font-bold border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all" %>
             <% end %>
           <% end %>
@@ -312,7 +331,6 @@
     <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
       <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
         <h3 class="text-xs font-bold text-base-content/50"><%= t('.activity.heading') %></h3>
-        <% user_job = current_user.user_job_postings.find_by(job_posting: @job_posting) %>
         <div class="flex items-center gap-4 flex-wrap justify-end">
           <div class="text-xs font-bold text-primary flex items-center gap-2">
             <%= heroicon "heart", variant: :solid, options: { class: "w-3 h-3" } %>
@@ -333,12 +351,17 @@
           status column can't hold. Manual button here so this can be logged
           the moment it happens instead of waiting on any import. %>
       <% if user_job&.persisted? %>
+        <% outcome_color = { "rejected" => "text-rose-500", "offered" => "text-success" }.fetch(user_job.outcome, "text-base-content/40") %>
         <div class="flex items-center justify-between mb-8 -mt-4 pb-4 border-b border-white/5">
-          <div class="text-xs font-bold flex items-center gap-2 <%= user_job.outcome == 'rejected' ? 'text-rose-500' : 'text-base-content/40' %>">
+          <div class="text-xs font-bold flex items-center gap-2 <%= outcome_color %>">
             <%= heroicon "flag", options: { class: "w-3 h-3" } %>
             Outcome: <%= user_job.outcome&.humanize || "none recorded" %>
           </div>
           <div class="flex items-center gap-3">
+            <% unless user_job.outcome == "offered" %>
+              <%= button_to "Mark Offered", user_job_postings_path(job_posting_id: @job_posting.id, outcome: "offered"),
+                            class: "text-xs font-bold text-slate-400 hover:text-success transition-colors" %>
+            <% end %>
             <% unless user_job.outcome == "rejected" %>
               <%= button_to "Mark Rejected", user_job_postings_path(job_posting_id: @job_posting.id, outcome: "rejected"),
                             class: "text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors" %>

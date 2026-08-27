@@ -50,10 +50,9 @@ class JobPostingsController < ApplicationController
 
   private
 
-  # Same two-machine write as every importer this session -- JobPosting and
-  # UserJobPosting drift when only one is moved (TASK-82).
+  # UserJobPosting owns pipeline state entirely as of TASK-82 phase 3 --
+  # JobPosting no longer has favorite! at all.
   def favorite_for_current_user(job_posting)
-    job_posting.favorite! if job_posting.may_favorite?
     current_user.user_job_postings.find_or_create_by!(job_posting: job_posting).record_status_event!("favorite")
   end
 

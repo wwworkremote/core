@@ -24,10 +24,12 @@ class Source < ApplicationRecord
 
   # Mirrors Company#mark_not_interested! -- ignores this source's untouched
   # postings (status: none), leaving anything already favorited/applied/etc
-  # alone. Queries JobPosting directly rather than through job_postings
-  # (declared readonly above) since #ignore! needs to save.
+  # alone (without_pipeline_activity, TASK-82 phase 3 -- status: none alone
+  # no longer implies "untouched", since pipeline decisions live entirely
+  # on UserJobPosting now). Queries JobPosting directly rather than through
+  # job_postings (declared readonly above) since #ignore! needs to save.
   def mark_not_interested!
-    JobPosting.where(source: self, status: "none").find_each(&:ignore!)
+    JobPosting.where(source: self, status: "none").without_pipeline_activity(User.sole).find_each(&:ignore!)
   end
 
   # rails_admin do

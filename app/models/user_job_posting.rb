@@ -54,9 +54,14 @@ class UserJobPosting < ApplicationRecord
   has_many :application_field_mappings, dependent: :destroy
   has_many :application_field_observations, dependent: :destroy
 
+  # `offered` deliberately isn't a status here -- it's the employer's
+  # decision, the same kind of fact as outcome's `rejected`, not a stage
+  # Mike walks through like `applied`/`interview` are (TASK-82/TASK-94).
+  # Marking an offer goes through the outcome column instead; see
+  # UserJobPostingsController::MANUAL_OUTCOMES.
   aasm column: :status, whiny_persistence: true do
     state :none, initial: true
-    state :favorited, :applied, :interview, :offered, :archived
+    state :favorited, :applied, :interview, :archived
 
     event :favorite do
       transitions from: %i[none archived], to: :favorited
@@ -73,16 +78,17 @@ class UserJobPosting < ApplicationRecord
       transitions from: %i[favorited applied], to: :interview
     end
 
-    event :offer do
-      transitions from: %i[favorited applied interview], to: :offered
-    end
-
+    # :none is a valid origin -- the admin UI's Application Status card lets
+    # Mike archive a posting he's never favorited/applied to, to dismiss it
+    # without going through the rest of the pipeline first. JobPosting's own
+    # archive event allowed this too before TASK-82 phase 3 moved archiving
+    # off JobPosting, so this preserves the same reachable behavior.
     event :archive do
-      transitions from: %i[favorited applied interview offered], to: :archived
+      transitions from: %i[none favorited applied interview], to: :archived
     end
   end
 
-  STATUS_EVENTS = %w[favorite apply interview offer archive].freeze
+  STATUS_EVENTS = %w[favorite apply interview archive].freeze
 
   # The transitions legal from the current state. An unsaved record answers
   # for a posting the user hasn't tracked yet, so callers need no nil branch.

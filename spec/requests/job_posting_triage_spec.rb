@@ -8,7 +8,7 @@ RSpec.describe "JobPostingTriage" do
       # published_at 1.year.from_now, not just 1.hour.ago -- guards against
       # unrelated "none"-status postings that other specs may leave behind
       # in the shared test DB (see TASK-56) outranking this one by recency.
-      create(:job_posting, status: "favorited", published_at: 1.year.from_now)
+      create(:job_posting, status: "ignored", published_at: 1.year.from_now)
       newest = create(:job_posting, status: "none", published_at: 1.year.from_now)
       create(:job_posting, status: "none", published_at: 1.day.ago)
 
@@ -18,7 +18,7 @@ RSpec.describe "JobPostingTriage" do
     end
 
     it "shows an empty state when nothing is left to triage" do
-      create(:job_posting, status: "favorited")
+      create(:job_posting, status: "ignored")
 
       get job_posting_triage_path
 

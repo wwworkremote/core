@@ -73,14 +73,14 @@ RSpec.describe JobPosting do
     let(:job) { create(:job_posting, status: "none") }
 
     it "prevents direct status updates" do
-      job.status = "applied"
+      job.status = "ignored"
       expect(job.save).to be false
       expect(job.errors[:status]).to include("cannot be updated directly. Use state machine events.")
     end
 
     it "permits status updates via events" do
-      job.favorite!
-      expect(job.status).to eq("favorited")
+      job.ignore!
+      expect(job.status).to eq("ignored")
     end
 
     it "nils out the embedding when purged" do
@@ -267,13 +267,13 @@ RSpec.describe JobPosting do
       expect(job.status).to eq("none")
     end
 
-    it "does not attempt an invalid AASM transition on an already-favorited posting" do
+    it "does not attempt an invalid AASM transition on an already-ignored posting" do
       job = create(:job_posting, status: "none")
-      job.favorite!
+      job.ignore!
       allow(Geo::CommuteZone).to receive(:call).with(job).and_return(:blocked)
 
       expect { job.send(:enforce_commute_zone) }.not_to raise_error
-      expect(job.status).to eq("favorited")
+      expect(job.status).to eq("ignored")
     end
 
     # TASK-82 (#2125): JobPosting.status can still read "none" here even

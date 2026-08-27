@@ -14,7 +14,7 @@ class UserJobPostingsController < ApplicationController
 
   # The overview intentionally materializes one ordered collection so its
   # columns and summary cards agree on the same funnel snapshot.
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable-next Metrics/AbcSize
   def index
     scoped = sorted_tracked_postings
     @tracked = scoped.to_a
@@ -22,7 +22,6 @@ class UserJobPostingsController < ApplicationController
     @favorites = @tracked.select { |record| record.status == "favorited" }
     @applied = @tracked.select { |record| record.status == "applied" }
   end
-  # rubocop:enable Metrics/AbcSize
 
   def create
     build_user_job_posting
@@ -61,8 +60,9 @@ class UserJobPostingsController < ApplicationController
   # write (see bin/import_indeed_applications, bin/import_linkedin_tracker),
   # so a manually-logged rejection and an imported one render identically.
   # "manual" as outcome_source still lets a later import overwrite this if a
-  # stronger automated signal shows up.
-  MANUAL_OUTCOMES = %w[rejected reviewed closed].freeze
+  # stronger automated signal shows up. "offered" lives here, not on status
+  # -- see the comment on UserJobPosting's aasm block (TASK-82/TASK-94).
+  MANUAL_OUTCOMES = %w[rejected reviewed closed offered].freeze
 
   private
 
@@ -80,14 +80,13 @@ class UserJobPostingsController < ApplicationController
     current_user.user_job_postings.includes(:job_posting, :application_field_answers).order(SORTS.fetch(sort_key))
   end
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable-next Metrics/AbcSize
   def funnel_stats(records)
     { tracked: records.length, applied: records.count { |record| record.status == "applied" },
       personas: records.count { |record| record.resume_persona_id.present? },
       answers: records.sum { |record| record.application_field_answers.length },
       outcomes: records.count { |record| record.outcome.present? } }
   end
-  # rubocop:enable Metrics/AbcSize
 
   def sort_key
     @sort = SORTS.key?(params[:sort]) ? params[:sort] : "newest"

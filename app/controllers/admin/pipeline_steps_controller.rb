@@ -1,19 +1,21 @@
 # frozen_string_literal: true
 
 class Admin::PipelineStepsController < Admin::ApplicationController
-  # Explicit literal-symbol dispatch table, not dynamic send("#{params[:status]}!") --
-  # Brakeman flags any send/public_send built from user input as unsafe reflection
-  # even when pre-checked against an allowlist, since it can't verify the check
-  # happens on every call path. A fixed hash keeps the AASM event names as literals.
-  STATUS_EVENTS = {
-    "favorite" => %i[favorite! may_favorite?],
-    "apply" => %i[apply! may_apply?],
-    "interview" => %i[interview! may_interview?],
-    "offer" => %i[offer! may_offer?],
-    "archive" => %i[archive! may_archive?],
+  # ignore/expire are facts about the posting itself -- JobPosting owns
+  # them directly. Explicit literal-symbol dispatch table, not dynamic
+  # send("#{params[:status]}!") -- Brakeman flags any send/public_send
+  # built from user input as unsafe reflection even when pre-checked
+  # against an allowlist, since it can't verify the check happens on every
+  # call path. A fixed hash keeps the AASM event names as literals.
+  LIFECYCLE_EVENTS = {
     "ignore" => %i[ignore! may_ignore?],
     "expire" => %i[expire! may_expire?]
   }.freeze
+
+  # favorite/apply/interview/archive are Mike's own pipeline stage --
+  # UserJobPosting owns them (TASK-82). JobPosting has no such methods as
+  # of phase 3.
+  PIPELINE_EVENTS = %w[favorite apply interview archive].freeze
 
   # Whitelisted by key, not passed through raw -- these are jsonb-column
   # values, not model attributes, so strong params' usual guard against
@@ -68,36 +70,60 @@ class Admin::PipelineStepsController < Admin::ApplicationController
     end
   end
 
-  # Checks the transition is actually legal from the current state -- a
-  # double-click or stale page (e.g. two "Not interested" clicks before the
-  # card is removed) would otherwise raise AASM::InvalidTransition instead
-  # of just no-op'ing.
-  # One extra line to keep UserJobPosting.status in sync (TASK-82);
-  # splitting it further would obscure the transition sequence, not
-  # simplify it.
-  # rubocop:disable-next Metrics/MethodLength
+  # Dispatches on which model actually owns params[:status] -- see
+  # LIFECYCLE_EVENTS/PIPELINE_EVENTS above. "offer" is neither: it's the
+  # employer's decision (TASK-82/TASK-94), recorded as an outcome, not a
+  # status transition on either model.
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def apply_status_event
-    bang, guard = STATUS_EVENTS[params[:status]]
-    return unless bang && @job_posting.public_send(guard)
+    if LIFECYCLE_EVENTS.key?(params[:status])
+      apply_lifecycle_event
+    elsif params[:status] == "offer"
+      apply_offer_outcome
+    elsif PIPELINE_EVENTS.include?(params[:status])
+      apply_pipeline_event
+    end
+  end
+
+  # A double-click or stale page (e.g. two "Not interested" clicks before
+  # the card is removed) would otherwise raise AASM::InvalidTransition
+  # instead of just no-op'ing.
+  def apply_lifecycle_event
+    bang, guard = LIFECYCLE_EVENTS[params[:status]]
+    return unless @job_posting.public_send(guard)
 
     @job_posting.public_send(bang)
-    sync_user_pipeline_state
     log_status_change_step
     record_triage_history
   end
 
-  # Same two-machine write every other caller already does (TASK-82) --
-  # JobPosting and UserJobPosting drift when only one is moved. Calls
-  # advance_pipeline_state! rather than record_status_event! specifically
-  # because log_status_change_step below already creates this action's
-  # PipelineStep (with triage reason_tags UserJobPosting knows nothing
-  # about); record_status_event! would create a second, plainer one for the
-  # same click. ignore/expire silently no-op here since they aren't real
-  # UserJobPosting pipeline states -- they're posting-lifecycle facts, not
-  # part of Mike's relationship to the posting.
-  def sync_user_pipeline_state
-    current_user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
-                .advance_pipeline_state!(params[:status])
+  # log_status_change_step still writes through @job_posting.pipeline_steps
+  # -- PipelineStep belongs_to both job_posting and user regardless of
+  # which model's own state actually changed. advance_pipeline_state! (not
+  # record_status_event!) because log_status_change_step already creates
+  # this click's PipelineStep, with triage reason_tags UserJobPosting
+  # knows nothing about -- record_status_event! would create a second,
+  # plainer one for the same click. Its own may_#{event}? guard makes an
+  # illegal/no-op transition here a silent no-op too, matching
+  # apply_lifecycle_event's behavior.
+  def apply_pipeline_event
+    return unless user_job_posting.advance_pipeline_state!(params[:status])
+
+    log_status_change_step
+    record_triage_history
+  end
+
+  # Same outcome column "Mark Rejected" already writes to (see
+  # UserJobPostingsController::MANUAL_OUTCOMES) -- offered/rejected are the
+  # same kind of fact, not a stage.
+  def apply_offer_outcome
+    user_job_posting.update!(outcome: "offered", outcome_at: Time.current, outcome_source: "manual")
+    log_status_change_step
+    record_triage_history
+  end
+
+  def user_job_posting
+    @user_job_posting ||= current_user.user_job_postings.find_or_create_by!(job_posting: @job_posting)
   end
 
   # Lets the triage queue offer a "Back" link to the previous decision so a

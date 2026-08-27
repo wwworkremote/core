@@ -12,7 +12,8 @@ RSpec.describe "Admin::PipelineSteps" do
       }.to change(PipelineStep, :count).by(1)
 
       expect(response).to redirect_to(job_posting_path(job))
-      expect(job.reload.status).to eq("favorited")
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"))
+      expect(admin.user_job_postings.find_by(job_posting: job).status).to eq("favorited")
     end
 
     it "logs a research note" do
@@ -133,7 +134,8 @@ RSpec.describe "Admin::PipelineSteps" do
       it "still redirects with a flash notice for a plain status change" do
         post admin_job_posting_pipeline_steps_path(job), params: { status: "favorite" }, as: :turbo_stream
 
-        expect(job.reload.status).to eq("favorited")
+        admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"))
+        expect(admin.user_job_postings.find_by(job_posting: job).status).to eq("favorited")
         expect(response).to redirect_to(job_posting_path(job))
         follow_redirect!
         expect(response.body).to include("Activity logged")

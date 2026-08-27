@@ -16,7 +16,10 @@ RSpec.describe "Api::V0::ApplicationStatus" do
     it "reports none with the events available to an untracked posting" do
       get "/api/v0/job_postings/#{job_posting.id}/application_status"
 
-      expect(response.parsed_body).to include("status" => "none", "available_events" => %w[favorite apply])
+      # archive is legal from none too -- lets Mike dismiss a posting he's
+      # never favorited/applied to without going through the rest of the
+      # pipeline first (TASK-82 phase 3).
+      expect(response.parsed_body).to include("status" => "none", "available_events" => %w[favorite apply archive])
     end
 
     it "reports the current status once the posting is tracked" do

@@ -37,13 +37,14 @@ RSpec.describe "User Pipeline UX" do
   end
 
   it "allows a user to move a job through the Research Pipeline" do
-    # Transition the JobPosting itself to 'favorited' so 'Apply' becomes possible in Admin view
-    job.favorite!
+    # Pipeline stage lives on UserJobPosting, not JobPosting (TASK-82 phase 3)
+    # -- favorite it there so "Apply" becomes available in the Admin view.
+    create(:user_job_posting, user: user, job_posting: job, status: "favorited")
     visit job_posting_path(job)
 
     # Move to 'Apply'
     click_on "Apply"
     expect(page).to have_text(/Activity logged/i)
-    expect(job.reload.status).to eq("applied")
+    expect(user.user_job_postings.find_by(job_posting: job).status).to eq("applied")
   end
 end

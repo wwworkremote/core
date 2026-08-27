@@ -298,7 +298,9 @@ RSpec.describe "Job Postings" do
     end
 
     it "shows a Favorited badge once favorited" do
-      job.favorite!
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+              User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike", password: "password")
+      create(:user_job_posting, user: admin, job_posting: job, status: "favorited")
       get job_posting_path(job)
       expect(response.body).to include("Favorited")
     end
@@ -480,9 +482,9 @@ RSpec.describe "Job Postings" do
       expect(current_user.user_job_postings.find_by(job_posting: job_with_url).status).to eq("favorited")
     end
 
-    it "favorites the JobPosting's own status too, not just the tracked record (TASK-82)" do
+    it "does not touch JobPosting's own status -- pipeline stage lives entirely on UserJobPosting (TASK-82 phase 3)" do
       post apply_on_site_job_posting_path(job_with_url)
-      expect(job_with_url.reload.status).to eq("favorited")
+      expect(job_with_url.reload.status).to eq("none")
     end
 
     it "does not mark the posting applied -- only a click, not evidence of finishing" do
@@ -501,8 +503,6 @@ RSpec.describe "Job Postings" do
                      User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike",
                                   password: "password")
       current_user.user_job_postings.create!(job_posting: job_with_url, status: "applied")
-      job_with_url.favorite!
-      job_with_url.apply!
 
       expect { post apply_on_site_job_posting_path(job_with_url) }.not_to raise_error
     end

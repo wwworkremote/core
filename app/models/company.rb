@@ -85,11 +85,11 @@ class Company < ApplicationRecord
   # same way (CompanyResolver already auto-ignores new postings when
   # ingestion_enabled is false), but *ignores* rather than purges existing
   # ones, matching the same "Not interested" semantics as a single job
-  # posting -- only untouched postings (status: none) are affected, so
-  # anything already favorited/applied/etc is left alone.
+  # posting -- only untouched postings are affected (without_pipeline_activity,
+  # TASK-82 phase 3), so anything already favorited/applied/etc is left alone.
   def mark_not_interested!
     update!(ingestion_enabled: false)
-    job_postings.where(status: "none").find_each(&:ignore!)
+    job_postings.where(status: "none").without_pipeline_activity(User.sole).find_each(&:ignore!)
   end
 
   def to_s

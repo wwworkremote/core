@@ -4,6 +4,7 @@ require "rails_helper"
 require Rails.root.join("lib/wwwr")
 require Rails.root.join("lib/wwwr/interop")
 require Rails.root.join("lib/wwwr/queue_status")
+require Rails.root.join("lib/wwwr/transition_runner")
 require Rails.root.join("lib/wwwr/cli")
 
 RSpec.describe Wwwr::CLI do
@@ -48,7 +49,8 @@ RSpec.describe Wwwr::CLI do
 
       cli.run(["transition", posting.id.to_s, "favorite"])
 
-      expect(posting.reload.status).to eq("favorited")
+      expect(posting.reload.status).to eq("none") # pipeline stage lives on UserJobPosting, not JobPosting (TASK-82)
+      expect(user.user_job_postings.find_by(job_posting: posting).status).to eq("favorited")
       expect(posting.pipeline_steps.last.status).to eq("favorite")
     end
 

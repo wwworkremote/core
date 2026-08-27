@@ -5,11 +5,6 @@
 # Split out of bin/wwwr (a five-line shim) only so it's requireable from
 # a spec without shelling out.
 class Wwwr::CLI
-  # Same literal dispatch table Admin::PipelineStepsController already
-  # uses -- reused directly so the CLI's valid events can't drift from
-  # the web UI's.
-  STATUS_EVENTS = Admin::PipelineStepsController::STATUS_EVENTS
-
   # Explicit literal-symbol dispatch, not dynamic send(argv[0]) -- same
   # reasoning as STATUS_EVENTS above: argv[0] only ever selects a key in
   # this fixed table, never becomes part of a method name itself.
@@ -30,7 +25,7 @@ class Wwwr::CLI
   def print_usage(_args = [])
     puts "Usage: status | postings [filters] | transition <id> <event> | match <id> --source=<n> [--escalate]"
     puts "  filters: --company= --source-id= --role-family= --location= --remote --contract"
-    puts "  events:  #{STATUS_EVENTS.keys.join(' ')} (match contract: docs/agents/interop.md)"
+    puts "  events:  #{Wwwr::TransitionRunner::ALL_EVENTS.join(' ')} (match contract: docs/agents/interop.md)"
   end
 
   def print_status(_args = [])
@@ -56,44 +51,7 @@ class Wwwr::CLI
     posting = JobPosting.find_by(id: id)
     return puts "Posting ##{id} not found." unless posting
 
-    apply_transition(posting, event)
-  end
-
-  def apply_transition(posting, event)
-    bang, guard = STATUS_EVENTS[event]
-    return unknown_event(event) unless bang
-    return illegal_transition(posting, event) unless posting.public_send(guard)
-
-    perform_transition(posting, bang, event)
-  end
-
-  def unknown_event(event)
-    puts "Unknown event #{event.inspect}. Valid: #{STATUS_EVENTS.keys.join(', ')}"
-  end
-
-  def illegal_transition(posting, event)
-    puts "Cannot transition ##{posting.id} (#{posting.status}) via #{event}."
-  end
-
-  # JobPosting#status and UserJobPosting#status are two AASM machines with
-  # overlapping state names. This CLI and the admin UI drove the first; the
-  # Chrome extension drives the second. Nothing reconciled them, so 25 rows
-  # disagreed and one posting read as both "applied" and "ignored" -- which
-  # makes every funnel number depend on which model you happen to query.
-  #
-  # record_status_event! is the extension's path and already does the guard,
-  # the transition and the PipelineStep, so routing through it replaces the
-  # hand-rolled step below rather than adding to it. Behaviour change worth
-  # naming: ignore/expire aren't pipeline events on UserJobPosting, so they no
-  # longer create a PipelineStep. They're properties of the posting, not of a
-  # relationship to it, and 452 ignored postings would be noise in a pipeline.
-  #
-  # ponytail: keeps the two machines in step so recording an application today
-  # is trustworthy either way. One owner for pipeline state is TASK-82.
-  def perform_transition(posting, bang, event)
-    posting.public_send(bang)
-    User.sole.user_job_postings.find_or_create_by!(job_posting: posting).record_status_event!(event)
-    puts "##{posting.id} #{posting.title.to_s.truncate(50)} -> #{event}"
+    Wwwr::TransitionRunner.call(posting, event)
   end
 
   def print_postings(args)

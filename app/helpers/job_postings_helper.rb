@@ -16,7 +16,7 @@ module JobPostingsHelper
   # ponytail: a flat list of independent checks. No rules engine until there
   # are enough of these to need one.
   def posting_findings(posting, tracked)
-    checks = [outcome_finding(tracked), geo_finding(posting), status_drift_finding(posting, tracked),
+    checks = [outcome_finding(tracked), geo_finding(posting),
               enrichment_finding(posting), expiry_finding(posting)]
     checks.compact
   end
@@ -41,14 +41,6 @@ module JobPostingsHelper
     when nil then [:warn, NO_COUNTRY]
     else [:bad, format(NON_US, posting.country_code)]
     end
-  end
-
-  # The two AASM machines drift silently (TASK-82); a mismatch usually means a
-  # transition was written to one and not the other.
-  def status_drift_finding(posting, tracked)
-    return nil if tracked.nil? || tracked.status == posting.status
-
-    [:warn, "You have this as \"#{tracked.status}\" but the posting says \"#{posting.status}\" — these disagree."]
   end
 
   def enrichment_finding(posting)
