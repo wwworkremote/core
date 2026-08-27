@@ -3,11 +3,11 @@ id: TASK-105
 title: >-
   Automatic walkthrough driver (Phase A: exercise the harness against the
   sandbox provider)
-status: In Progress
+status: Done
 assignee:
   - mike
 created_date: '2026-08-27 17:25'
-updated_date: '2026-08-27 21:34'
+updated_date: '2026-08-27 21:55'
 labels:
   - architecture
   - sandbox-provider
@@ -17,6 +17,14 @@ dependencies:
 documentation:
   - docs/architecture/signature-registry.md
   - docs/architecture/sandbox-provider.md
+modified_files:
+  - extension/manifest.json
+  - extension/content.js
+  - app/controllers/api/scenarios_controller.rb
+  - app/services/scenarios/capture.rb
+  - config/routes.rb
+  - spec/requests/api/scenarios_spec.rb
+  - spec/services/scenarios/capture_spec.rb
 priority: medium
 type: feature
 ordinal: 400
@@ -90,3 +98,9 @@ created: 2026-08-27 21:34
 Live run is blocked at Chrome content-script injection, not Rails or Scenario persistence. The extension is installed from the expected repository path and enabled; no new runtime errors appeared.
 ---
 <!-- COMMENTS:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Implemented and dogfooded the Phase A Chrome walkthrough against https://wwworkremote.localhost. The unpacked extension now matches the secure sandbox origin, opt-in scenario walkthrough captures the posting and confirmation DOM through a local-only API endpoint, persists both Greenhouse signatures, and reports a passing live HandshakeCheck. Focused suite: 22 examples, 0 failures. Commit: 735c72e6.
+<!-- SECTION:FINAL_SUMMARY:END -->
