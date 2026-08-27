@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-27 23:24'
+updated_date: '2026-08-27 23:26'
 labels:
   - architecture
   - application-workflow
@@ -83,5 +83,10 @@ Implemented the next vertical slice: GuidedSessionEvent persists meaningful time
 created: 2026-08-27 23:24
 ---
 Connected the local unpacked Chrome extension to the guided-session event seam. An explicit guided_session_token URL parameter records a page_arrived event with page URL/title/provider evidence; ordinary browsing is unchanged and non-local/Web Store builds are excluded by the existing IS_LOCAL_BUILD gate. Extension lint passes.
+---
+
+created: 2026-08-27 23:26
+---
+Dogfood check: localhost guided session #1 was created successfully and the real Chrome extension overlay loaded on the sandbox posting. The installed unpacked extension is still the prior bundle, so no page_arrived event appeared after navigation/reload; reload the extension from chrome://extensions before the next browser pass. Source and all implementation changes are committed through e8f99ae9.
 ---
 <!-- COMMENTS:END -->
