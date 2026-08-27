@@ -17,8 +17,10 @@ diagrams, not just source. This file itself is best read there.
 - **[Pipeline Statechart](architecture/pipeline-statechart.md)**: The three independent state machines behind "what happened to this posting."
 - **[Application Sequence](architecture/application-sequence.md)**: One posting's journey, start to finish, as a sequence diagram.
 - **[Human Task Pipeline](architecture/human-task-pipeline.md)**: BPMN-lite Service Task/User Task split for AI-proposed, human-approved decisions (persona picks, drafted answers).
+- **[Guided Session Flow](architecture/guided-session-flow.md)**: BPMN-lite Mermaid validation scheme for supervised posting-to-application laps, approval gates, and loop-back.
 - **[Job Application Pump Track](architecture/pump-track.md)**: The recurring actor-system loop behind discovery, evaluation, application, and what comes next.
 - **[Supervised Intent Capture ADR](adr/005-supervised-intent-capture.md)**: How guided sessions preserve Mike's intent while keeping automation bounded.
+- **[BPMN-lite Guided Session ADR](adr/006-bpmn-lite-guided-session-validation.md)**: Why Mermaid validates the flow while ActiveRecord/AASM remain the runtime state tools.
 - **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace-correlated, read-only evidence timeline and supervised application session.
 - **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, with capture and human-approved references built.
 - **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally for safe extension dogfooding and Reference Scenario capture.

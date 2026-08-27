@@ -11,6 +11,12 @@ server for a single-user app. What's here instead borrows only BPMN's *vocabular
 User Task — applied with the state-machine tools this app already uses (AASM, a plain ActiveRecord
 table), not a workflow engine.
 
+The broader supervised application lap is validated by the separate
+[Guided Session Flow](guided-session-flow.md). `HumanTask` remains the inbox
+for a discrete proposal; `GuidedSessionEvent` records the meaningful event and
+safety classification across the pump-track phases. The two are related
+interfaces, not competing workflow engines.
+
 ## Roles
 
 - **Service Task** — an automated evaluator (`Pipeline::PersonaRecommender`) that reads a

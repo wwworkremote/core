@@ -53,6 +53,12 @@ Model the job search as a recurring four-phase actor-system loop: Intake,
 Resolution, Response Construction, and Reorientation. See
 [the full decision](adr/004-pump-track-job-application-loop.md).
 
+### ADR 006: BPMN-lite Guided Session Validation
+Use Mermaid as the reviewable BPMN-lite scheme for guided-session ordering,
+handoffs, and approval gates while ActiveRecord/AASM remain the runtime state
+tools. See [the full decision](adr/006-bpmn-lite-guided-session-validation.md)
+and the [flow sketch](architecture/guided-session-flow.md).
+
 ### ADR 001: Audit Strategy
 Remove Rails Event Store (RES) and utilize **PaperTrail** for field-level auditing.
 

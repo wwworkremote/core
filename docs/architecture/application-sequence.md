@@ -12,6 +12,7 @@ sequenceDiagram
     participant Triage as Triage queue
     participant UJP as UserJobPosting
     participant Ext as Chrome extension
+    participant Session as GuidedSession timeline
     participant Comp as Company
 
     Board->>Ingest: raw listing
@@ -31,10 +32,15 @@ sequenceDiagram
     end
 
     Mike->>Ext: opens the ATS application page
+    Mike->>Session: starts supervised pump-track lap
+    Session-->>Mike: current phase + next proposed move
     Ext->>Ext: content.js extracts fields
+    Ext->>Session: record meaningful transition + intent
     Mike->>Ext: submits application
+    Note over Session: Final submission is an explicit<br/>approval-gated User Task
     Ext->>UJP: record_status_event!("apply")
     UJP->>UJP: PipelineStep logged
+    Session->>Session: retain evidence, classification, and decision
 
     alt Interview scheduled
         Mike->>UJP: mark interviewing

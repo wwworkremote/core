@@ -42,6 +42,10 @@ The session transition is:
 The system may propose the next move; Mike remains the actor who authorizes
 the move.
 
+The ordering and role contract for these transitions is sketched in the
+[BPMN-lite Guided Session Flow](../architecture/guided-session-flow.md), whose
+Mermaid diagram serves as the validation scheme for implementation.
+
 ## Consequences
 
 - A localhost entry flow should accept a copied posting URL and create a

@@ -26,3 +26,7 @@ lap. Employment changes the terrain; it does not end the game.
 
 See [ADR 004: Model the Job Search as a Pump Track](../adr/004-pump-track-job-application-loop.md)
 for the architectural decision.
+
+For the operational validation scheme—Service Tasks, User Tasks, gateways,
+approval interrupts, and the continue/stop loop—see [Guided Session Flow](guided-session-flow.md)
+and [ADR 006](../adr/006-bpmn-lite-guided-session-validation.md).

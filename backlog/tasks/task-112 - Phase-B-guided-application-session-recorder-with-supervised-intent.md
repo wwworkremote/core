@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-27 23:30'
+updated_date: '2026-08-27 23:37'
 labels:
   - architecture
   - application-workflow
@@ -19,6 +19,8 @@ documentation:
   - docs/architecture/pump-track.md
   - docs/architecture/panoramic-view.md
   - docs/architecture/signature-registry.md
+  - docs/architecture/guided-session-flow.md
+  - docs/adr/006-bpmn-lite-guided-session-validation.md
 modified_files:
   - extension/content.js
   - app/controllers/api/guided_session_events_controller.rb
@@ -93,5 +95,10 @@ Dogfood check: localhost guided session #1 was created successfully and the real
 created: 2026-08-27 23:30
 ---
 Verified end to end after reloading Chrome extension v1.26.0: opening the tokenized sandbox posting produced the page_arrived event, and guided session #1 rendered it with intent plus recommended/reversible/not-required classifications. This validates the first real Chrome correlation checkpoint; application-phase transitions and approval-gated actions remain next.
+---
+
+created: 2026-08-27 23:37
+---
+Added the canonical BPMN-lite Mermaid validation scheme in docs/architecture/guided-session-flow.md and ADR 006. It now shows the four pump-track phases, User Tasks, Service Tasks, gateways, intermediate timeline events, approval interruption, and continue/stop loop. Updated the application sequence, human-task pipeline, pump-track page, docs index, and architecture summary to stay aligned.
 ---
 <!-- COMMENTS:END -->
