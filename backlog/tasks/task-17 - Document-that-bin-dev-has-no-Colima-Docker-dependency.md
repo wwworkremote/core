@@ -1,12 +1,16 @@
 ---
 id: TASK-17
 title: Document that bin/dev has no Colima/Docker dependency
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-07-27 17:27'
+updated_date: '2026-08-27 17:59'
 labels: []
 dependencies: []
 references:
+  - docs/development.md
+  - docker-compose.yml
+modified_files:
   - docs/development.md
   - docker-compose.yml
 priority: low
@@ -21,6 +25,12 @@ docker-compose.yml exists for optional containerized builds and bin/ci (act), bu
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 docs/development.md Prerequisites section marks Docker/Colima explicitly optional (act CI + container builds only)
-- [ ] #2 docker-compose.yml gets a top comment clarifying it is not used by bin/dev
+- [x] #1 docs/development.md Prerequisites section marks Docker/Colima explicitly optional (act CI + container builds only)
+- [x] #2 docker-compose.yml gets a top comment clarifying it is not used by bin/dev
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+docs/development.md's Prerequisites now names Colima explicitly and states bin/dev has zero Colima/Docker involvement. docker-compose.yml gets a top-of-file comment clarifying it's not used by bin/dev, only act CI and optional container builds.
+<!-- SECTION:FINAL_SUMMARY:END -->

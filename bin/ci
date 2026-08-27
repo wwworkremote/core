@@ -17,11 +17,15 @@ if [[ -z "${DOCKER_HOST:-}" ]]; then
   if [[ -n "$CURRENT_HOST" ]]; then
     export DOCKER_HOST="$CURRENT_HOST"
   else
-    # Fallback to common socket paths
-    COLIMA_SOCKET="$HOME/.config/colima/default/docker.sock"
+    # colima-status is the source of truth for the real socket path --
+    # colima ignores XDG paths and ~/.colima is canonical (Z-195/Z-181,
+    # 2026-07-04), so a hardcoded ~/.config/colima guess silently misses it.
+    if command -v colima-status >/dev/null 2>&1; then
+      COLIMA_SOCKET=$(colima-status socket 2>/dev/null || true)
+    fi
     ORBSTACK_SOCKET="$HOME/.orbstack/run/docker.sock"
 
-    if [[ -S "$COLIMA_SOCKET" ]]; then
+    if [[ -n "${COLIMA_SOCKET:-}" && -S "$COLIMA_SOCKET" ]]; then
       export DOCKER_HOST="unix://$COLIMA_SOCKET"
     elif [[ -S "$ORBSTACK_SOCKET" ]]; then
       export DOCKER_HOST="unix://$ORBSTACK_SOCKET"
