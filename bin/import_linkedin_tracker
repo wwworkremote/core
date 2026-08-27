@@ -17,39 +17,26 @@
 # per stage before "show more", so a heavy month needs scrolling before the
 # save. If that becomes the norm, drive it with the Chrome extension instead
 # of hand-saving.
+#
+# Row upsert/advance logic lives in Applications::LinkedinRowImporter
+# (TASK-83 AC #9's shared adapter shape) -- this script only parses the
+# saved DOM into rows.
 require_relative "../config/environment"
 require "nokogiri"
 
-STAGES = {
-  # LinkedIn's own vocabulary -> our event. "clicked_apply" means he left for
-  # the employer's site; LinkedIn cannot see whether he finished, so it is
-  # deliberately NOT recorded as applied.
-  "applied" => :apply,
-  "clicked_apply" => :favorite,
-  "saved" => :favorite
-}.freeze
+STAGES = Applications::LinkedinRowImporter::STAGES.keys
 
 def usage
-  warn "Usage: bin/import_linkedin_tracker <#{STAGES.keys.join('|')}> <saved-html> [--dry-run]"
+  warn "Usage: bin/import_linkedin_tracker <#{STAGES.join('|')}> <saved-html> [--dry-run]"
   exit 1
 end
 
 stage, path, *flags = ARGV
-usage unless STAGES.key?(stage) && path
+usage unless STAGES.include?(stage) && path
 dry_run = flags.include?("--dry-run")
 path = File.expand_path(path)
 abort "No such file: #{path}" unless File.exist?(path)
 abort "Empty file (the save produced 0 bytes): #{path}" if File.size(path).zero?
-
-# Relative ages are all LinkedIn gives ("Applied 3mo ago"). Approximate is
-# enough for a staleness signal and is recorded as approximate, not as a date
-# we can defend.
-def approximate_date(note)
-  n, unit = note.to_s.match(/(\d+)\s*(d|w|mo|yr)\b/)&.captures
-  return nil unless n
-
-  { "d" => n.to_i.days, "w" => n.to_i.weeks, "mo" => n.to_i.months, "yr" => n.to_i.years }[unit]&.ago&.to_date
-end
 
 def rows_from(doc)
   doc.css('a[href*="/jobs/view/"]').filter_map do |a|
@@ -73,88 +60,28 @@ def rows_from(doc)
   end.uniq { |r| r[:id] }
 end
 
-# Dedup on the LinkedIn job id inside target_url, not just our own signature.
-# The same posting routinely arrives twice -- once scraped from a LinkedIn job
-# alert email (source "Email (LinkedIn)") and once here -- and matching only on
-# signature would double-count it in every funnel number. Confirmed against
-# #5653/#5654, which were already in the DB under these exact ids.
-def existing_posting(row)
-  JobPosting.find_by(signature: Digest::SHA256.hexdigest("linkedin-tracker-#{row[:id]}")) ||
-    JobPosting.where("target_url LIKE ?", "%/jobs/view/#{row[:id]}%").first
-end
-
-def upsert(row, dry_run)
-  posting = existing_posting(row)
-  return ["exists", posting] if posting && dry_run
-  return [:backfill, backfill(posting, row)] if posting
-  return ["create", nil] if dry_run
-
-  ["create", JobPosting.create!(
-    signature: Digest::SHA256.hexdigest("linkedin-tracker-#{row[:id]}"), title: row[:title],
-    company_name: row[:company], location: row[:location], source_id: linkedin_source_id,
-    target_url: "https://www.linkedin.com/jobs/view/#{row[:id]}/", status: "none", crawl_status: "pending"
-  )]
-end
-
-# Email-scraped LinkedIn postings arrive with company_name nil, so a match here
-# is a chance to fill it in rather than just skip.
-def backfill(posting, row)
-  posting.update!(company_name: row[:company]) if posting.company_name.blank? && row[:company].present?
-  posting
-end
-
-# apply requires favorited, so a brand-new posting takes two steps. Same two
-# writes bin/wwwr transition makes -- JobPosting and UserJobPosting -- because
-# they are separate state machines that drift when only one is moved (TASK-82).
-def advance(posting, user, event, note, row)
-  posting.favorite! if posting.may_favorite?
-  posting.apply! if event == :apply && posting.may_apply?
-  tracked = user.user_job_postings.find_or_create_by!(job_posting: posting)
-  tracked.record_status_event!("favorite") if tracked.status == "none"
-  tracked.record_status_event!("apply") if event == :apply && tracked.status != "applied"
-  append_note(tracked, note)
-  # Only when closed and only when nothing stronger is already recorded --
-  # Indeed's REJECTED (import_indeed_applications) is a stronger fact than
-  # LinkedIn's "listing closed" and should not be overwritten by it.
-  tracked.update!(outcome: "closed", outcome_at: Time.current, outcome_source: "self_reported") if row[:closed] && tracked.outcome.blank?
-end
-
-# Statuses and PipelineSteps are already idempotent via the may_* guards, but
-# the note is a plain append and re-running a backfill stacked a second copy.
-# Match on the age string ("Applied 3mo ago") rather than the whole line: the
-# trailing "imported <date>" changes every run, so a full-string compare would
-# never see the duplicate.
-def append_note(tracked, note)
-  return if note.blank? || tracked.notes.to_s.include?(note[/^[^(]+/].to_s.strip)
-
-  tracked.update!(notes: [tracked.notes, note].compact_blank.join("\n"))
-end
-
-# JobPosting#source resolves to plain ::Source (an ingestion-event row
-# belonging to an Origin), NOT JobBoards::Source -- a same-named, unrelated
-# model with its own table. Using JobBoards::Source's id satisfied the FK by
-# coincidence in dev (both tables happened to have overlapping id ranges) but
-# pointed every posting at a random unrelated Source row. Mirrors
-# Leads::CaptureService#resolve_source, the extension's own real capture path.
-def linkedin_source_id
-  @linkedin_source_id ||= begin
-    origin = Origin.find_or_create_by!(name: "LinkedIn")
-    Source.find_or_create_by!(signature: "linkedin-tracker-import") { |s| s.origin = origin; s.name = "LinkedIn" }.id
-  end
+def dry_run_line(row)
+  posting = Applications::PostingMatcher.call(
+    signature: Digest::SHA256.hexdigest("linkedin-tracker-#{row[:id]}"), native_id_fragment: "/jobs/view/#{row[:id]}",
+    target_url: "https://www.linkedin.com/jobs/view/#{row[:id]}/", company: row[:company], title: row[:title]
+  )
+  posting ? "exists" : "create"
 end
 
 user = User.sole
-event = STAGES.fetch(stage)
 rows = rows_from(Nokogiri::HTML(File.read(path)))
 abort "Parsed 0 rows -- was the page fully loaded before saving?" if rows.empty?
 
-puts "#{rows.size} rows in #{File.basename(path)} (stage=#{stage} -> #{event})#{' [DRY RUN]' if dry_run}"
+puts "#{rows.size} rows in #{File.basename(path)} (stage=#{stage})#{' [DRY RUN]' if dry_run}"
 
 rows.each do |row|
-  action, posting = upsert(row, dry_run)
-  date = approximate_date(row[:note])
-  note = date && "LinkedIn tracker: #{row[:note]} (~#{date}), imported #{Date.current}"
-  advance(posting, user, event, note, row) unless dry_run
-  puts format("  %-8s %-44s %-24s %-12s %s", action, row[:title].to_s[0, 42], row[:company].to_s[0, 22],
-              date || "", row[:closed] ? "[closed]" : "")
+  if dry_run
+    action = dry_run_line(row)
+    puts format("  %-8s %-44s %-24s %s", action, row[:title].to_s[0, 42], row[:company].to_s[0, 22],
+                row[:closed] ? "[closed]" : "")
+  else
+    result = Applications::LinkedinRowImporter.call(row, user: user, stage: stage)
+    puts format("  %-8s %-44s %-24s %-12s %s", "ok", row[:title].to_s[0, 42], row[:company].to_s[0, 22],
+                result[:applied_at]&.to_date || "", row[:closed] ? "[closed]" : "")
+  end
 end

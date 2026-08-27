@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-22 19:43'
-updated_date: '2026-08-24 16:34'
+updated_date: '2026-08-27 14:40'
 labels: []
 dependencies: []
 priority: high
@@ -57,7 +57,7 @@ Reading application *outcome* status (rejected / in review / interview). LinkedI
 - [ ] #6 A Greenhouse submit is captured even when the posting was not already tracked with a wwr_id
 - [ ] #7 Every selector used was verified against a live page, not inferred
 - [ ] #8 extension/manifest.json version bumped
-- [ ] #9 Providers register against one shared applied-list adapter shape, not four bespoke integrations
+- [x] #9 Providers register against one shared applied-list adapter shape, not four bespoke integrations
 - [x] #10 Whether my.greenhouse.io aggregates across tenants is verified before any Greenhouse design work
 - [ ] #11 Workday capture is opportunistic on candidate-home pages only, with no stored credentials and no scheduled sync
 <!-- AC:END -->
@@ -174,4 +174,20 @@ Match order: signature -> native id in `target_url` -> exact `target_url` -> nor
 AC #6 (Greenhouse submit capture without a pre-set `wwr_id`), #8 (manifest bump), #9 (shared adapter shape), #11 (Workday). Note #9 is now *more* justified: three importers exist and only the matcher is shared.
 
 Also: `~/Desktop/inbox` moved to `~/ai/inbox` on 2026-08-24 — `~/Desktop` is TCC-blocked and unreadable from this environment.
+
+## 2026-08-27 -- AC #9 done (shared adapter shape). AC #6/#7/#8/#11 still blocked on the human.
+
+Built Applications::RowImporter, a template-method base class capturing the sequence all three providers repeated: find-or-create the JobPosting via PostingMatcher, resolve a Source, advance the tracked UserJobPosting. GreenhouseRowImporter and IndeedRowImporter now subclass it (pure refactor -- 15 new characterization spec examples prove identical behavior to before, since neither had any test coverage at all until now). LinkedIn's inline bin-script logic became a real service, Applications::LinkedinRowImporter, on the same base (10 new examples).
+
+**Real, live bug found and fixed in the process:** bin/import_linkedin_tracker called posting.favorite!/apply!/may_favorite? -- JobPosting AASM events TASK-82 phase 3 removed entirely yesterday (2026-08-26). Any re-run of this script would have raised NoMethodError. Confirmed broken via bin/rails runner before fixing, confirmed fixed via the new spec suite and a dry-run smoke test against a synthetic fixture.
+
+Two real behavior changes, both intentional and safe:
+- LinkedIn dedup now goes through the full Applications::PostingMatcher (signature -> native id -> target_url -> company+title), not just the first two tiers the bin script checked by hand. Closes a real gap: LinkedIn rows previously couldn't cross-match against a Greenhouse/Indeed-sourced posting for the same job the way those two already could against each other.
+- LinkedIn's approximate applied_at can now land in UserJobPosting#applied_at (fill-only, never overwriting a real date) instead of only ever going into a note -- that column didn't exist when the LinkedIn importer was first written. Improves TASK-81's staleness signal for the ~12 LinkedIn-sourced applications that had no applied_at at all.
+
+Also generalized the LinkedIn-specific 'don't let a weaker outcome overwrite a stronger one' guard into the base class (outcome_overwrite?, default true = preserves Greenhouse/Indeed's existing unconditional-overwrite behavior exactly, LinkedIn overrides to false) rather than leaving it as a special case.
+
+**AC #6 (Greenhouse submit capture without a pre-set wwr_id), #7 (live-verified selectors), #11 (Workday opportunistic capture) are genuinely blocked, not skipped.** All three need either a live logged-in browser session against the real target (Greenhouse's own apply-flow DOM for a posting with no wwr_id, a real Workday candidate-home page) or a fresh HAR/DOM capture Mike provides -- exactly the same wall this task's own history already hit twice for Indeed and Greenhouse's aggregation endpoint. Building extension selectors blind against a live third-party apply flow without verification is exactly what AC #7 exists to prevent. AC #8 (manifest bump) is only warranted once #6/#11 actually touch extension/ -- untouched by this pass.
+
+All 31 Applications:: spec examples + the 14 pre-existing Api::V0::Outcomes request specs pass. Rubocop clean (bin/ scripts are excluded from the project's rubocop config entirely, confirmed against the two pre-existing scripts, which carry the same style offenses when linted directly).
 <!-- SECTION:NOTES:END -->
