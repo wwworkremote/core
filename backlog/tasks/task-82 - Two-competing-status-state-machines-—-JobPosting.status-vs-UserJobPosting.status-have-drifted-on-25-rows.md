@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - claude
 created_date: '2026-08-22 15:39'
-updated_date: '2026-08-26 23:38'
+updated_date: '2026-08-27 00:10'
 labels: []
 dependencies: []
 modified_files:
@@ -55,8 +55,8 @@ Reconcile the existing 25 before or during.
 <!-- AC:BEGIN -->
 - [ ] #1 One model owns the user's pipeline state; the other owns posting lifecycle only
 - [ ] #2 bin/wwwr transition writes through the same path as the UI and extension
-- [ ] #3 The 25 drifted rows are reconciled, #2125 (applied+ignored) explicitly resolved
-- [ ] #4 A PipelineStep is never created for a transition that did not actually change pipeline state
+- [x] #3 The 25 drifted rows are reconciled, #2125 (applied+ignored) explicitly resolved
+- [x] #4 A PipelineStep is never created for a transition that did not actually change pipeline state
 - [ ] #5 Funnel counts return the same answer regardless of which model is queried
 <!-- AC:END -->
 
@@ -107,4 +107,14 @@ Recommending: do Phase 1 now (bounded, safe, immediately stops the worst ongoing
 
 <!-- SECTION:NOTES:BEGIN -->
 Phase 1 done and committed (74acba4b): Admin::PipelineStepsController now syncs UserJobPosting.status via a new UserJobPosting#advance_pipeline_state! (state-only, no duplicate PipelineStep -- see plan for why record_status_event! wasn't reused directly here). Verified live: favorited a real posting through the UI, confirmed JobPosting.status and UserJobPosting.status both read 'favorited' and exactly one PipelineStep exists, then reverted the test posting. 46 specs green, rubocop clean. Active drift on the two busiest surfaces (triage, Application Status pills) is stopped as of this commit. Phase 2 (reconcile the 25 already-drifted rows) and phase 3 (remove pipeline states from JobPosting's AASM, migrate remaining readers) still open -- task stays In Progress.
+
+Phase 2 done. Pulled the real drifted set: 31 rows (not 25 -- count had moved since the task was filed), of which only 3 were real problems once actually read:
+
+- 21 rows are NOT conflicts at all: JobPosting holds a lifecycle fact (LinkMonitorJob dead-link auto-archive, geo-ignore, admin purge) that's independently true alongside whatever UserJobPosting shows -- e.g. #764/#6691/#6697/#6663/#2117 all show Mike applied or favorited, then the listing died weeks later per a `[SYSTEM_MONITOR]` PipelineStep. That's the target model already working correctly. No action; they stop even looking like drift once phase 3 removes pipeline states from JobPosting.
+- #5810 and #5817 were real fossils of the exact bug phase 1 fixed -- literal PipelineStep note text "Status changed to favorite" (Admin::PipelineStepsController's pre-fix, JobPosting-only write) with UserJobPosting never touched. Reconciled: advanced both to UserJobPosting.status=favorited via advance_pipeline_state! (not record_status_event!, to avoid a second PipelineStep for a click already logged in 2026-08). Verified no duplicate PipelineStep created.
+- #2125, the case AC #3 names explicitly: not a data conflict to patch at all. Mike genuinely favorited and applied (real PipelineSteps, 2026-04-22). JobPosting.status separately read 'ignored' with *no* PipelineStep -- that's JobPosting::Geocoding#enforce_commute_zone (the geo auto-classifier) silently overriding a posting he'd already acted on, since it only checked JobPosting's own AASM guard, not whether the user had any real activity on it. Real fix: added a guard so enforce_commute_zone skips any posting with a non-none UserJobPosting -- geo-blocking should only ever apply before Mike's touched a posting, never override that he did. Covered by a new spec case (spec/models/job_posting_spec.rb) reproducing #2125's exact shape: JobPosting.status still 'none' while a UserJobPosting shows real activity.
+
+AC #4 (PipelineStep never created for a no-op transition) was already satisfied by the existing guard-before-create pattern in both apply_status_event and record_status_event!/advance_pipeline_state! -- verified, not newly built.
+
+AC #1, #2, #5 remain open -- that's phase 3 (removing pipeline states from JobPosting's AASM entirely), not done here.
 <!-- SECTION:NOTES:END -->

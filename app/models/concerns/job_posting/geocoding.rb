@@ -29,8 +29,14 @@ module JobPosting::Geocoding
     JobBoards::GeocodingJob.perform_later(id)
   end
 
+  # TASK-82 (#2125): a posting geocoded (or re-geocoded) after Mike already
+  # favorited/applied/etc. would otherwise get silently auto-ignored out
+  # from under him, with no PipelineStep recording why JobPosting.status
+  # and his real activity stopped agreeing. Geo-blocking should only ever
+  # apply before he's touched a posting, never override that he did.
   def enforce_commute_zone
     return unless may_ignore?
+    return if user_job_postings.where.not(status: [nil, "none"]).exists?
 
     ignore! if Geo::CommuteZone.call(self) == :blocked
   end

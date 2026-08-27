@@ -275,5 +275,20 @@ RSpec.describe JobPosting do
       expect { job.send(:enforce_commute_zone) }.not_to raise_error
       expect(job.status).to eq("favorited")
     end
+
+    # TASK-82 (#2125): JobPosting.status can still read "none" here even
+    # though Mike has real recorded activity on it -- that's exactly the
+    # split this task is about, UserJobPosting owns his pipeline stage, not
+    # JobPosting. Re-geocoding shouldn't silently ignore a posting out from
+    # under him just because JobPosting itself never got a status write.
+    it "does not ignore a posting the user has already applied to, even though JobPosting.status is still none" do
+      job = create(:job_posting, status: "none")
+      create(:user_job_posting, job_posting: job, status: "applied")
+      allow(Geo::CommuteZone).to receive(:call).with(job).and_return(:blocked)
+
+      job.send(:enforce_commute_zone)
+
+      expect(job.status).to eq("none")
+    end
   end
 end
