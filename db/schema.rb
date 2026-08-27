@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_213000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -363,6 +363,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_213000) do
     t.string "source_url"
     t.datetime "updated_at", null: false
     t.index ["provider", "field_name"], name: "index_extraction_rules_on_provider_and_field_name", unique: true
+  end
+
+  create_table "guided_session_events", force: :cascade do |t|
+    t.string "action", null: false
+    t.string "approval_state", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "evidence", default: {}, null: false
+    t.bigint "guided_session_id", null: false
+    t.text "intent", null: false
+    t.string "kind", null: false
+    t.datetime "occurred_at", null: false
+    t.string "page_url"
+    t.string "phase", null: false
+    t.string "requirement", null: false
+    t.string "reversibility", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guided_session_id", "occurred_at"], name: "idx_on_guided_session_id_occurred_at_296f9f4e6b"
+    t.index ["guided_session_id"], name: "index_guided_session_events_on_guided_session_id"
   end
 
   create_table "guided_sessions", force: :cascade do |t|
@@ -1086,6 +1104,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_213000) do
   add_foreign_key "contacts", "job_postings"
   add_foreign_key "contacts", "users"
   add_foreign_key "experience_highlights", "work_experiences"
+  add_foreign_key "guided_session_events", "guided_sessions"
   add_foreign_key "human_tasks", "job_postings"
   add_foreign_key "human_tasks", "users"
   add_foreign_key "interview_questions", "interview_sessions"

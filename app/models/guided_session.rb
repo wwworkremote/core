@@ -26,6 +26,7 @@ class GuidedSession < ApplicationRecord
   STATUSES = %w[active paused completed stopped].freeze
 
   has_secure_token :session_token
+  has_many :guided_session_events, dependent: :destroy
 
   validates :source_url, :provider, :phase, :status, :started_at, presence: true
   validates :phase, inclusion: { in: PHASES }

@@ -31,4 +31,26 @@
       Session <code class="text-slate-300"><%= @guided_session.session_token %></code> · Provider <span class="text-slate-300"><%= @guided_session.provider %></span>
     </div>
   </div>
+
+  <div class="mt-10">
+    <div class="text-xs font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Recorded timeline</div>
+    <% if @events.any? %>
+      <div class="space-y-4">
+        <% @events.each do |event| %>
+          <article class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="text-xs font-black uppercase tracking-widest text-primary"><%= event.kind.humanize %></span>
+              <span class="badge badge-ghost text-xs"><%= event.requirement.humanize %></span>
+              <span class="badge badge-ghost text-xs"><%= event.reversibility.humanize %></span>
+              <span class="badge badge-ghost text-xs"><%= event.approval_state.humanize %></span>
+            </div>
+            <div class="text-white font-bold"><%= event.action %></div>
+            <p class="text-sm text-slate-400 mt-2"><%= event.intent %></p>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="rounded-xl border border-dashed border-white/10 p-6 text-sm text-slate-500">No meaningful transitions recorded yet.</div>
+    <% end %>
+  </div>
 </div>

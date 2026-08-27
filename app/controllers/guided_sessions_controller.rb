@@ -3,7 +3,9 @@
 class GuidedSessionsController < ApplicationController
   before_action :set_guided_session, only: :show
 
-  def show; end
+  def show
+    @events = @guided_session.guided_session_events.order(:occurred_at, :id)
+  end
 
   def new
     @guided_session = GuidedSession.new

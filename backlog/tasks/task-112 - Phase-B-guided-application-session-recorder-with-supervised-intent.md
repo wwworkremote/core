@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-27 22:22'
+updated_date: '2026-08-27 23:22'
 labels:
   - architecture
   - application-workflow
@@ -20,13 +20,15 @@ documentation:
   - docs/architecture/panoramic-view.md
   - docs/architecture/signature-registry.md
 modified_files:
+  - app/controllers/api/guided_session_events_controller.rb
   - app/controllers/guided_sessions_controller.rb
   - app/models/guided_session.rb
-  - app/views/guided_sessions/new.html.erb
+  - app/models/guided_session_event.rb
   - app/views/guided_sessions/show.html.erb
   - config/routes.rb
-  - db/migrate/20260827213000_create_guided_sessions.rb
-  - spec/requests/guided_sessions_spec.rb
+  - db/migrate/20260827220000_create_guided_session_events.rb
+  - db/schema.rb
+  - spec/requests/api/guided_session_events_spec.rb
 priority: high
 type: feature
 ordinal: 118000
@@ -70,5 +72,10 @@ Prepared to implement the first Phase B vertical slice. Domain constraints: pump
 created: 2026-08-27 22:22
 ---
 Implemented the first vertical slice: GuidedSession now accepts a copied HTTP(S) posting URL, persists provider host plus Intake/active state, and presents the supervised next move at a durable session URL. Added request coverage and local migration. The extension/provider event recorder remains the next slice; no provider submission or autonomous action is introduced.
+---
+
+created: 2026-08-27 23:22
+---
+Implemented the next vertical slice: GuidedSessionEvent persists meaningful timeline transitions with pump-track phase, intent, requirement classification, reversibility, approval state, page URL, and evidence. Added a local-only tokenized API endpoint for extension correlation and rendered events in the guided-session review page. Focused suite: 8 examples, 0 failures; targeted RuboCop clean. No autonomous provider action or submission was added.
 ---
 <!-- COMMENTS:END -->
