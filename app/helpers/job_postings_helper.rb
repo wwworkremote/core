@@ -72,6 +72,30 @@ module JobPostingsHelper
     [ANSWER_SOURCE_BADGE_CLASSES.fetch(key), t("job_postings.show.qa.badges.#{key}")]
   end
 
+  PIPELINE_STATUS_BADGE_CLASSES = {
+    lifecycle_archived: "border-white/20 text-slate-400",
+    lifecycle_ignored: "border-error/40 text-error",
+    lifecycle_expired: "border-warning/40 text-warning",
+    lifecycle_purged: "border-error/60 text-error",
+    outcome_offered: "border-success/40 text-success",
+    outcome_rejected: "border-rose-500/40 text-rose-400",
+    outcome_reviewed: "border-amber-500/40 text-amber-400",
+    outcome_closed: "border-slate-500/40 text-slate-400",
+    pipeline_favorited: "border-primary/40 text-primary",
+    pipeline_applied: "border-info/40 text-info",
+    pipeline_interview: "border-accent/40 text-accent",
+    pipeline_archived: "border-white/20 text-slate-400"
+  }.freeze
+
+  # Badge-outline styling for Pipeline::DisplayStatus's result -- [css,
+  # label] or nil, matching answer_source_badge's shape above.
+  def pipeline_status_badge(job_posting, user_job)
+    badge = Pipeline::DisplayStatus.call(job_posting: job_posting, user_job: user_job)
+    return nil unless badge
+
+    [PIPELINE_STATUS_BADGE_CLASSES.fetch(badge[:semantic]), badge[:label]]
+  end
+
   def safe_job_url(url)
     return "#" if url.blank?
 

@@ -8,6 +8,7 @@
 #  disposition        :string
 #  glassdoor_data     :jsonb
 #  ingestion_enabled  :boolean          default(TRUE), not null
+#  last_declined_at   :datetime
 #  name               :string
 #  sentiment_score    :float
 #  slug               :string
@@ -63,6 +64,26 @@ class Company < ApplicationRecord
 
   def add_pipeline_note(note, link: nil)
     company_pipeline_steps.create!(status: "noted", note: note, link: link)
+  end
+
+  # TASK-91.2: evaluating a company he was just rejected by is consistently
+  # a waste of Mike's time.
+  COOLDOWN = 6.months
+
+  # [last_declined_at, at].compact.max, not a plain overwrite -- a second
+  # decline (AC #6) should move the date forward, but a backfill entered
+  # out of order (e.g. an older decline logged after a newer one's already
+  # recorded) must not regress it.
+  def record_decline!(at: Time.current)
+    update!(last_declined_at: [last_declined_at, at].compact.max)
+  end
+
+  def cooldown_ends_at
+    last_declined_at && (last_declined_at + COOLDOWN)
+  end
+
+  def in_cooldown?
+    cooldown_ends_at.present? && cooldown_ends_at.future?
   end
 
   def big_tech?

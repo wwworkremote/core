@@ -14,6 +14,27 @@
   </div>
 </div>
 
+<!-- Funnel Health (TASK-81): the narrowest point in the funnel, not the
+     healthiest -- deliberately 3 numbers, no chart. -->
+<div class="flex flex-wrap items-center gap-x-10 gap-y-3 mb-12 px-2">
+  <div>
+    <div class="text-2xl font-black text-warning tabular-nums">
+      <%= @last_application_at ? distance_of_time_in_words(@last_application_at, Time.current) : t('.funnel_health.never') %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider"><%= t('.funnel_health.since_last_application') %></div>
+  </div>
+  <div>
+    <div class="text-2xl font-black text-warning tabular-nums"><%= @untriaged_count %></div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider"><%= t('.funnel_health.untriaged') %></div>
+  </div>
+  <% if @oldest_untriaged_at %>
+    <div>
+      <div class="text-2xl font-black text-warning tabular-nums"><%= distance_of_time_in_words(@oldest_untriaged_at, Time.current) %></div>
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider"><%= t('.funnel_health.oldest_untriaged') %></div>
+    </div>
+  <% end %>
+</div>
+
 <!-- What this app does -->
 <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
   <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
@@ -89,6 +110,40 @@
                   <%= button_to t('.priority_inbox.favorite'), user_job_postings_path(job_posting_id: job.id, status: 'favorited'), class: "text-xs font-bold text-primary hover:underline" %>
                   <%= link_to t('.priority_inbox.review'), job_posting_path(job), class: "text-xs font-bold text-slate-400 hover:text-white" %>
                 </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Idle Follow-ups Block -->
+  <% if @idle_followups.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-warning"><%= t('.idle_followups.heading') %></h2>
+        <div class="h-px flex-1 bg-warning/20"></div>
+        <span class="badge badge-warning badge-xs font-black"><%= @idle_followups.count %> <%= t('.idle_followups.pending') %></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @idle_followups.each do |user_job| %>
+          <% job = user_job.job_posting %>
+          <div class="card bg-base-200 border border-warning/10 hover:border-warning/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
+                <div class="badge badge-warning badge-outline text-xs font-bold">
+                  <%= t('.idle_followups.idle_badge', duration: distance_of_time_in_words(user_job.last_pipeline_activity_at, Time.current)) %>
+                </div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-warning transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-xs font-bold text-slate-500"><%= user_job.status.humanize %></div>
+                <%= link_to t('.idle_followups.follow_up'), job_posting_path(job), class: "text-xs font-bold text-warning hover:underline" %>
               </div>
             </div>
           </div>

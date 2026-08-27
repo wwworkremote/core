@@ -14,6 +14,7 @@
 #  notes                        :text
 #  outcome                      :string
 #  outcome_at                   :datetime
+#  outcome_reason               :text
 #  outcome_source               :string
 #  priority_flag                :boolean
 #  resume_persona_snapshot      :jsonb            not null

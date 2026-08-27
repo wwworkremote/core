@@ -8,6 +8,7 @@
 #  disposition        :string
 #  glassdoor_data     :jsonb
 #  ingestion_enabled  :boolean          default(TRUE), not null
+#  last_declined_at   :datetime
 #  name               :string
 #  sentiment_score    :float
 #  slug               :string
@@ -105,6 +106,43 @@ RSpec.describe Company do
 
       expect { company.disable_ingestion! }.not_to raise_error
       expect(expired.reload.status).to eq("expired")
+    end
+  end
+
+  describe "#record_decline!" do
+    it "sets last_declined_at when none is recorded" do
+      company = create(:company)
+      company.record_decline!(at: Time.zone.parse("2026-08-01"))
+      expect(company.reload.last_declined_at).to eq(Time.zone.parse("2026-08-01"))
+    end
+
+    it "moves the date forward on a later decline" do
+      company = create(:company, last_declined_at: Time.zone.parse("2026-01-01"))
+      company.record_decline!(at: Time.zone.parse("2026-08-01"))
+      expect(company.reload.last_declined_at).to eq(Time.zone.parse("2026-08-01"))
+    end
+
+    it "does not regress the date on an out-of-order backfill" do
+      company = create(:company, last_declined_at: Time.zone.parse("2026-08-01"))
+      company.record_decline!(at: Time.zone.parse("2026-01-01"))
+      expect(company.reload.last_declined_at).to eq(Time.zone.parse("2026-08-01"))
+    end
+  end
+
+  describe "#in_cooldown? / #cooldown_ends_at" do
+    it "is not in cooldown with no decline recorded" do
+      expect(create(:company).in_cooldown?).to be false
+    end
+
+    it "is in cooldown within 6 months of the decline" do
+      company = create(:company, last_declined_at: 1.month.ago)
+      expect(company.in_cooldown?).to be true
+      expect(company.cooldown_ends_at).to be_within(1.second).of(1.month.ago + Company::COOLDOWN)
+    end
+
+    it "is no longer in cooldown after 6 months" do
+      company = create(:company, last_declined_at: 7.months.ago)
+      expect(company.in_cooldown?).to be false
     end
   end
 end

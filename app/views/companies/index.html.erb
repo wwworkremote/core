@@ -44,6 +44,12 @@
               <%= heroicon "exclamation-triangle", variant: :outline, options: { class: "w-4 h-4" } %> <%= t('.toxicity_alert') %>
             </div>
           <% end %>
+
+          <% if company.in_cooldown? %>
+            <div class="badge badge-outline border-warning/40 text-warning gap-1 text-xs font-bold">
+              <%= heroicon "clock", variant: :outline, options: { class: "w-4 h-4" } %> <%= t('.cooldown_alert') %>
+            </div>
+          <% end %>
         </div>
       </div>
 

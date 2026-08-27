@@ -1,12 +1,17 @@
 ---
 id: TASK-81
 title: Surface a stalled application funnel — and fix the numbers it reports
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-22 15:22'
-updated_date: '2026-08-22 15:39'
+updated_date: '2026-08-27 12:45'
 labels: []
 dependencies: []
+modified_files:
+  - app/controllers/home_controller.rb
+  - app/views/home/index.html.erb
+  - config/locales/en.yml
+  - spec/requests/home_spec.rb
 priority: high
 type: feature
 ordinal: 94000
@@ -37,10 +42,10 @@ Related: `docs/agents/peer-contract-just3ws.md` records the same finding from th
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Days-since-last-application is visible without running a query
-- [ ] #2 Untriaged count and oldest-untriaged age are surfaced
-- [ ] #3 The signal is visible where Mike already looks, not on a new page he must remember to visit
-- [ ] #4 No new scraping or ingestion capability is added by this task
+- [x] #1 Days-since-last-application is visible without running a query
+- [x] #2 Untriaged count and oldest-untriaged age are surfaced
+- [x] #3 The signal is visible where Mike already looks, not on a new page he must remember to visit
+- [x] #4 No new scraping or ingestion capability is added by this task
 <!-- AC:END -->
 
 ## Implementation Notes
@@ -52,3 +57,11 @@ The funnel is narrow but not as dead as filed. The application step is still the
 
 **Blocked on TASK-82.** Any staleness metric built now would inherit the same ambiguity, since which model you query changes the answer. Fix the dual state machine first, then build the signal on the reconciled number.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Unblocked by TASK-82 (dual state machine reconciliation, done 2026-08-26) -- built directly on the reconciled UserJobPosting.status/outcome model rather than the ambiguous JobPosting.status this task was originally filed against. 3 numbers, no chart, at the very top of the home dashboard (above the capability cards, not a new page): time since last application (checking both the live PipelineStep signal and the import scripts' applied_at, whichever is more recent), untriaged count, oldest-untriaged age.
+
+Real numbers on first load: 141 untriaged, oldest since April 21 (4+ months), last application 12 hours ago. The funnel isn't as dead as the task's original filing feared (imports keep applied_at current), but the untriaged pile is real and now unavoidable at the top of the page Mike already lands on. No scraping/ingestion code touched. 7 request spec examples, 0 failures, rubocop/erb_lint/i18n-tasks clean.
+<!-- SECTION:FINAL_SUMMARY:END -->

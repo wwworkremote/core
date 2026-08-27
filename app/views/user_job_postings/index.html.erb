@@ -93,12 +93,11 @@
                 <%# Employer response, kept visually distinct from the "Applied" badge above --
                     they're different facts (what he did vs. what the employer did) and
                     collapsing them would hide exactly the signal outcome tracking exists for. %>
-                <% if user_job.outcome == "rejected" %>
-                  <span class="px-2 py-1 rounded bg-rose-900/20 text-rose-500 text-xs font-bold border border-rose-500/10">Rejected</span>
-                <% elsif user_job.outcome == "reviewed" %>
-                  <span class="px-2 py-1 rounded bg-amber-900/20 text-amber-500 text-xs font-bold border border-amber-500/10">Reviewed</span>
-                <% elsif user_job.outcome == "closed" %>
-                  <span class="px-2 py-1 rounded bg-slate-700/40 text-slate-400 text-xs font-bold border border-slate-500/10">Posting closed</span>
+                <% badge_class, badge_label = outcome_badge(user_job) %>
+                <% if badge_label %>
+                  <span class="px-2 py-1 rounded <%= badge_class %> text-xs font-bold border">
+                    <%= badge_label %>
+                  </span>
                 <% end %>
                 <% if user_job.resume_persona_id.present? %>
                   <span class="px-2 py-1 rounded bg-secondary/10 text-secondary text-xs font-bold border border-secondary/10">

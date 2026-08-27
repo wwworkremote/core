@@ -43,6 +43,57 @@ RSpec.describe "UserJobPostings" do
 
       expect(UserJobPosting.last.job_search_id).to eq(job_search.id)
     end
+
+    it "records a decline reason alongside a rejected outcome" do
+      post user_job_postings_path,
+           params: { job_posting_id: job_posting.id, outcome: "rejected",
+                     outcome_reason: "Not enough Rails experience" }
+
+      expect(UserJobPosting.last.outcome).to eq("rejected")
+      expect(UserJobPosting.last.outcome_reason).to eq("Not enough Rails experience")
+    end
+
+    it "attaches evidence alongside a rejected outcome" do
+      file = fixture_file_upload(Rails.root.join("spec/fixtures/files/sample.txt"), "text/plain")
+
+      post user_job_postings_path,
+           params: { job_posting_id: job_posting.id, outcome: "rejected", outcome_evidence: file }
+
+      expect(UserJobPosting.last.outcome_evidence).to be_attached
+    end
+
+    it "marks rejected with no reason or evidence exactly as before" do
+      post user_job_postings_path, params: { job_posting_id: job_posting.id, outcome: "rejected" }
+
+      expect(UserJobPosting.last.outcome).to eq("rejected")
+      expect(UserJobPosting.last.outcome_reason).to be_nil
+      expect(UserJobPosting.last.outcome_evidence).not_to be_attached
+    end
+
+    it "starts the company's decline cooldown when marked rejected" do
+      company = create(:company)
+      posting = create(:job_posting, company_id: company.id)
+
+      post user_job_postings_path, params: { job_posting_id: posting.id, outcome: "rejected" }
+
+      expect(company.reload.last_declined_at).to be_present
+      expect(company.in_cooldown?).to be true
+    end
+
+    it "does not touch the company's cooldown for a non-rejected outcome" do
+      company = create(:company)
+      posting = create(:job_posting, company_id: company.id)
+
+      post user_job_postings_path, params: { job_posting_id: posting.id, outcome: "offered" }
+
+      expect(company.reload.last_declined_at).to be_nil
+    end
+
+    it "does not raise when the posting has no resolved company" do
+      expect {
+        post user_job_postings_path, params: { job_posting_id: job_posting.id, outcome: "rejected" }
+      }.not_to raise_error
+    end
   end
 
   describe "PATCH /user_job_postings/:id" do
@@ -53,6 +104,57 @@ RSpec.describe "UserJobPostings" do
 
       expect(ujp.reload.notes).to eq("Great fit")
       expect(response).to redirect_to(user_job_postings_path)
+    end
+
+    it "clearing the outcome also clears the reason and evidence" do
+      ujp = user.user_job_postings.create!(job_posting: job_posting, outcome: "rejected",
+                                           outcome_reason: "Not a fit")
+      ujp.outcome_evidence.attach(io: StringIO.new("evidence"), filename: "evidence.txt", content_type: "text/plain")
+
+      patch user_job_posting_path(ujp),
+            params: { user_job_posting: { outcome: nil, outcome_at: nil, outcome_source: nil,
+                                          outcome_reason: nil, outcome_evidence: nil } }
+
+      ujp.reload
+      expect(ujp.outcome).to be_nil
+      expect(ujp.outcome_reason).to be_nil
+      expect(ujp.outcome_evidence).not_to be_attached
+    end
+
+    it "cannot set a real outcome directly via PATCH, only clear one" do
+      ujp = user.user_job_postings.create!(job_posting: job_posting)
+
+      patch user_job_posting_path(ujp), params: { user_job_posting: { outcome: "rejected", outcome_reason: "sneaky" } }
+
+      expect(ujp.reload.outcome).to be_nil
+    end
+  end
+
+  describe "GET /user_job_postings" do
+    it "shows a Rejected badge for a rejected outcome" do
+      user.user_job_postings.create!(job_posting: job_posting, status: "applied", outcome: "rejected")
+      get user_job_postings_path
+      expect(response.body).to include("Rejected")
+    end
+
+    it "shows a Reviewed badge for a reviewed outcome" do
+      user.user_job_postings.create!(job_posting: job_posting, status: "applied", outcome: "reviewed")
+      get user_job_postings_path
+      expect(response.body).to include("Reviewed")
+    end
+
+    it "shows a Posting closed badge for a closed outcome" do
+      user.user_job_postings.create!(job_posting: job_posting, status: "applied", outcome: "closed")
+      get user_job_postings_path
+      expect(response.body).to include("Posting closed")
+    end
+
+    it "shows no outcome badge when there is no outcome yet" do
+      user.user_job_postings.create!(job_posting: job_posting, status: "applied")
+      get user_job_postings_path
+      expect(response.body).not_to include("Rejected")
+      expect(response.body).not_to include("Reviewed")
+      expect(response.body).not_to include("Posting closed")
     end
   end
 

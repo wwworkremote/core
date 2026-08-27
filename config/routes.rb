@@ -229,6 +229,7 @@ Rails.application.routes.draw do
       member do
         post :toggle_ingestion
         post :mark_not_interested
+        post :set_decline_date
       end
       resources :company_pipeline_steps, only: [:create]
     end

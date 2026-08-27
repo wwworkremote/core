@@ -28,7 +28,35 @@ class Admin::CompaniesController < Admin::ApplicationController
     redirect_back_or_to(admin_companies_path, notice: not_interested_message)
   end
 
+  # TASK-91.2 AC #3: backfilling history (e.g. Cengage) independent of any
+  # specific posting's outcome. Blank/invalid input is silently ignored --
+  # no record_decline! call, no error -- rather than nulling out an
+  # existing date on an empty submit.
+  def set_decline_date
+    @company = Company.find(params.expect(:id))
+    apply_decline_date
+
+    redirect_back_or_to(admin_company_path(@company), notice: decline_date_message)
+  end
+
   private
+
+  def apply_decline_date
+    @company.record_decline!(at: parsed_decline_date) if parsed_decline_date
+  end
+
+  def decline_date_message
+    "Decline date recorded for #{@company.name}."
+  end
+
+  # Time.zone.parse, not Date.iso8601(...).to_time -- Date#to_time converts
+  # using the system's local zone, not the app's configured Time.zone,
+  # which silently shifted the recorded instant by several hours.
+  def parsed_decline_date
+    Time.zone.parse(params[:last_declined_at]) if params[:last_declined_at].present?
+  rescue ArgumentError, TypeError
+    nil
+  end
 
   def toggle_ingestion_message
     return "Ingestion resumed for #{@company.name}." if @company.ingestion_enabled?

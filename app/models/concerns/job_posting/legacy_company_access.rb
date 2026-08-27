@@ -28,9 +28,14 @@ module JobPosting::LegacyCompanyAccess
     company_name
   end
 
+  # #company already returns the real Company when company_id is resolved
+  # (see above) -- Company.find_by(name: company) unconditionally would
+  # pass that Company object as the :name lookup value in that case and
+  # silently return nil, not the record already in hand.
   def company_record
     return @company_record if defined?(@company_record)
 
-    @company_record = Company.find_by(name: company)
+    resolved = company
+    @company_record = resolved.is_a?(Company) ? resolved : Company.find_by(name: resolved)
   end
 end

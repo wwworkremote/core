@@ -14,6 +14,7 @@
 #  notes                        :text
 #  outcome                      :string
 #  outcome_at                   :datetime
+#  outcome_reason               :text
 #  outcome_source               :string
 #  priority_flag                :boolean
 #  resume_persona_snapshot      :jsonb            not null
@@ -49,6 +50,16 @@ class UserJobPosting < ApplicationRecord
   belongs_to :user
   belongs_to :job_posting
   belongs_to :job_search, optional: true
+
+  # Set only when a Scenario (a deliberately recorded verification capture,
+  # see docs/architecture/signature-registry.md) turns out to correspond to
+  # this real tracked application. Most UserJobPostings have none.
+  has_many :scenarios, dependent: :nullify
+
+  # TASK-91.1: the rejection email/screenshot, kept as evidence alongside
+  # outcome_reason. Generic on the model (any outcome could attach one) --
+  # the UI only exposes it on the Reject flow, see job_postings/show.html.erb.
+  has_one_attached :outcome_evidence
 
   has_many :application_field_answers, dependent: :destroy
   has_many :application_field_mappings, dependent: :destroy
@@ -89,6 +100,53 @@ class UserJobPosting < ApplicationRecord
   end
 
   STATUS_EVENTS = %w[favorite apply interview archive].freeze
+
+  # TASK-93: "actively pursuing, gone quiet." archived/none excluded --
+  # archived means Mike stopped, none means he never started.
+  ACTIVE_STATUSES = %w[favorited applied interview].freeze
+  TERMINAL_OUTCOMES = %w[offered rejected].freeze
+  IDLE_AFTER = 3.days
+
+  # Mirrors #last_pipeline_activity_at's fallback (see there for why a
+  # COALESCE to created_at is needed, not just MAX(pipeline_steps.created_at))
+  # -- shared as one fragment so the .idle scope's WHERE and ORDER BY can't
+  # drift from what that method actually returns.
+  LAST_ACTIVITY_SQL = <<~SQL.squish.freeze
+    COALESCE(
+      (SELECT MAX(ps.created_at) FROM pipeline_steps ps
+       WHERE ps.job_posting_id = user_job_postings.job_posting_id
+       AND ps.user_id = user_job_postings.user_id),
+      user_job_postings.created_at
+    )
+  SQL
+
+  # "outcome IS NULL OR outcome NOT IN (...)" rather than where.not(outcome:
+  # ...) -- SQL's NOT IN silently excludes NULLs, and outcome is nil for
+  # nearly every actively-tracked posting (only set once a manual/imported
+  # outcome lands). where.not would have quietly matched almost nothing.
+  # Same reasoning for job_postings.status. Excludes JobPosting-side
+  # archived/expired too (a dead link or auto-expiry isn't something to nag
+  # Mike about following up on).
+  scope :idle, lambda {
+    where(status: ACTIVE_STATUSES)
+      .where("outcome IS NULL OR outcome NOT IN (?)", TERMINAL_OUTCOMES)
+      .joins(:job_posting)
+      .where("job_postings.status IS NULL OR job_postings.status NOT IN (?)", %w[archived expired])
+      .where("#{LAST_ACTIVITY_SQL} < ?", IDLE_AFTER.ago)
+      .order(Arel.sql("#{LAST_ACTIVITY_SQL} ASC"))
+  }
+
+  # Falls back to created_at, never nil -- the live UI always logs a
+  # PipelineStep on every status change (record_status_event!/
+  # advance_pipeline_state!), but the backfill importers
+  # (bin/import_indeed_applications, bin/import_linkedin_tracker) write
+  # status directly and don't, so an imported row can have none at all.
+  # created_at is still the honest answer to "since when has this sat
+  # untouched" for that row -- and matches what makes it count as idle in
+  # the first place (see LAST_ACTIVITY_SQL above).
+  def last_pipeline_activity_at
+    PipelineStep.where(job_posting_id: job_posting_id, user_id: user_id).maximum(:created_at) || created_at
+  end
 
   # The transitions legal from the current state. An unsaved record answers
   # for a posting the user hasn't tracked yet, so callers need no nil branch.

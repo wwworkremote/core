@@ -20,6 +20,11 @@
           <div>
             <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= @company.name %></h1>
             <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
+            <% if @company.in_cooldown? %>
+              <span class="badge badge-outline border-warning/40 text-warning text-xs font-bold mt-3">
+                <%= t('.cooldown_until', date: @company.cooldown_ends_at.to_date) %>
+              </span>
+            <% end %>
           </div>
           <% if @company.ingestion_enabled? %>
             <%= button_to t('.not_interested'), mark_not_interested_admin_company_path(@company),

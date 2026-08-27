@@ -16,6 +16,10 @@ diagrams, not just source. This file itself is best read there.
 - **[Component Overview](architecture/component-overview.md)**: Diagram of how the major pieces collaborate.
 - **[Pipeline Statechart](architecture/pipeline-statechart.md)**: The three independent state machines behind "what happened to this posting."
 - **[Application Sequence](architecture/application-sequence.md)**: One posting's journey, start to finish, as a sequence diagram.
+- **[Human Task Pipeline](architecture/human-task-pipeline.md)**: BPMN-lite Service Task/User Task split for AI-proposed, human-approved decisions (persona picks, drafted answers).
+- **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace_id-correlated, read-only evidence timeline of one application (not yet built).
+- **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, when there's no automatic trace propagation to lean on. `Scenario`/`ScenarioSignature`/`HandshakeCheck` built; no capture path into them yet.
+- **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally, so the Signature Registry harness can be built and iterated without needing a live third-party site (not yet built).
 - **[Configuration](configuration.md)**: Environment variables and credentials.
 - **[Troubleshooting](troubleshooting.md)**: Common failures and fixes.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.

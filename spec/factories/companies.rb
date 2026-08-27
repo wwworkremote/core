@@ -8,6 +8,7 @@
 #  disposition        :string
 #  glassdoor_data     :jsonb
 #  ingestion_enabled  :boolean          default(TRUE), not null
+#  last_declined_at   :datetime
 #  name               :string
 #  sentiment_score    :float
 #  slug               :string

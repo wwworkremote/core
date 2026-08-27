@@ -3,11 +3,11 @@ id: TASK-82
 title: >-
   Two competing status state machines — JobPosting.status vs
   UserJobPosting.status have drifted on 25 rows
-status: In Progress
+status: Done
 assignee:
   - claude
 created_date: '2026-08-22 15:39'
-updated_date: '2026-08-27 00:10'
+updated_date: '2026-08-27 01:16'
 labels: []
 dependencies: []
 modified_files:
@@ -53,11 +53,11 @@ Reconcile the existing 25 before or during.
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 One model owns the user's pipeline state; the other owns posting lifecycle only
-- [ ] #2 bin/wwwr transition writes through the same path as the UI and extension
+- [x] #1 One model owns the user's pipeline state; the other owns posting lifecycle only
+- [x] #2 bin/wwwr transition writes through the same path as the UI and extension
 - [x] #3 The 25 drifted rows are reconciled, #2125 (applied+ignored) explicitly resolved
 - [x] #4 A PipelineStep is never created for a transition that did not actually change pipeline state
-- [ ] #5 Funnel counts return the same answer regardless of which model is queried
+- [x] #5 Funnel counts return the same answer regardless of which model is queried
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -118,3 +118,13 @@ AC #4 (PipelineStep never created for a no-op transition) was already satisfied 
 
 AC #1, #2, #5 remain open -- that's phase 3 (removing pipeline states from JobPosting's AASM entirely), not done here.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Three phases: (1) stopped the actively-drifting writer (Admin::PipelineStepsController) with the same dual-write stopgap every other caller already had, (2) reconciled the real drifted rows (2 fossils of the same bug, plus a missing guard in the geo auto-classifier -- most of the "31 drifted rows" turned out not to be drift at all under the target model), (3) the actual architectural fix -- JobPosting's AASM now only has none/ignored/purged/expired/archived; UserJobPosting owns favorited/applied/interview/archived entirely; offered moved to outcome alongside rejected (TASK-94's finding). All five dual-writing callers simplified to write UserJobPosting only. 89 existing rows backfilled.
+
+Found and fixed 4 real regressions along the way that only surfaced from actually using the UI and running the full suite: the status badge/pill UI was entirely JobPosting-driven (would have silently stopped showing pipeline state forever), the triage queue and Source/Company#mark_not_interested! filtered on JobPosting.status=="none" to mean "untouched" (would have shown the same triage card forever / re-ignored already-favorited postings), a "these disagree" warning banner existed specifically to flag what's now the *correct* state, and JobBoards::Syncer's non-bang `ignore` call on an unsaved record would have raised on every low-quality ingestion once lifecycle transitions started logging PipelineSteps.
+
+Verified live in a real browser end-to-end and via the full spec suite (isolated-file re-runs used to separate real signal from TASK-56's pre-existing test-order pollution). Commits: 74acba4b (phase 1), 3534da2b (phase 2), f48d774a (phase 3).
+<!-- SECTION:FINAL_SUMMARY:END -->

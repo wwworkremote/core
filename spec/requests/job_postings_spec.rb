@@ -311,6 +311,66 @@ RSpec.describe "Job Postings" do
       expect(response.body).to include("Not Interested")
     end
 
+    it "shows a Reviewed badge for a manual reviewed outcome" do
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+              User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike", password: "password")
+      create(:user_job_posting, user: admin, job_posting: job, status: "applied", outcome: "reviewed")
+      get job_posting_path(job)
+      expect(response.body).to include("Reviewed")
+    end
+
+    it "shows a Posting closed badge for a manual closed outcome" do
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+              User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike", password: "password")
+      create(:user_job_posting, user: admin, job_posting: job, status: "applied", outcome: "closed")
+      get job_posting_path(job)
+      expect(response.body).to include("Posting closed")
+    end
+
+    it "prefers JobPosting's own Archived over UserJobPosting's archived pipeline stage" do
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+              User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike", password: "password")
+      create(:user_job_posting, user: admin, job_posting: job, status: "archived")
+      job.archive!
+      get job_posting_path(job)
+      expect(response.body).to include("Archived")
+    end
+
+    it "shows the decline reason and evidence link for a rejected outcome" do
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+              User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike", password: "password")
+      ujp = create(:user_job_posting, user: admin, job_posting: job, status: "applied", outcome: "rejected",
+                                      outcome_reason: "Went with an internal candidate")
+      ujp.outcome_evidence.attach(io: StringIO.new("evidence"), filename: "decline.eml", content_type: "message/rfc822")
+
+      get job_posting_path(job)
+
+      expect(response.body).to include("Went with an internal candidate")
+      expect(response.body).to include("decline.eml")
+    end
+
+    it "warns when the posting's company is within its decline cooldown" do
+      create(:company, name: "Acme Corp", last_declined_at: 1.month.ago)
+      get job_posting_path(job)
+      expect(response.body).to include("recently declined you")
+    end
+
+    it "omits the cooldown warning when the company has no recent decline" do
+      create(:company, name: "Acme Corp")
+      get job_posting_path(job)
+      expect(response.body).not_to include("recently declined you")
+    end
+
+    it "omits the reason/evidence block when a rejected outcome has neither" do
+      admin = User.find_by(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")) ||
+              User.create!(email: ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com"), name: "mike", password: "password")
+      create(:user_job_posting, user: admin, job_posting: job, status: "applied", outcome: "rejected")
+
+      get job_posting_path(job)
+
+      expect(response.body).to include("Outcome: Rejected")
+    end
+
     it "shows Purge instead of Restore for a non-purged posting" do
       get job_posting_path(job)
       expect(response.body).to include("Purge")

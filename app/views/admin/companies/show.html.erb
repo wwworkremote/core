@@ -33,6 +33,27 @@
   </div>
 
   <div class="space-y-6">
+    <div class="card-neural p-6 <%= "border-l-4 border-l-warning" if @company.in_cooldown? %>">
+      <h3 class="text-xs font-bold text-slate-500 mb-4 border-b border-white/5 pb-4">Decline Cooldown</h3>
+      <% if @company.last_declined_at %>
+        <p class="text-xs font-bold <%= @company.in_cooldown? ? 'text-warning' : 'text-slate-500' %> mb-4">
+          <% if @company.in_cooldown? %>
+            In cooldown until <%= @company.cooldown_ends_at.to_date %>
+          <% else %>
+            Last declined <%= @company.last_declined_at.to_date %> (cooldown ended <%= @company.cooldown_ends_at.to_date %>)
+          <% end %>
+        </p>
+      <% else %>
+        <p class="text-xs font-bold text-slate-500 mb-4">No decline recorded.</p>
+      <% end %>
+      <%# TASK-91.2 AC #3: backfill independent of any specific posting's outcome %>
+      <%= form_with url: set_decline_date_admin_company_path(@company), class: "flex gap-2" do %>
+        <%= date_field_tag :last_declined_at, @company.last_declined_at&.to_date,
+                            class: "input input-bordered input-xs bg-base-300 flex-1", autocomplete: "off" %>
+        <%= submit_tag "Set", class: "btn-admin btn-xs bg-white/5" %>
+      <% end %>
+    </div>
+
     <div class="card-neural p-6">
       <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Activity</h3>
 

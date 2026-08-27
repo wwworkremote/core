@@ -63,6 +63,7 @@ class UserJobPostingsController < ApplicationController
   # stronger automated signal shows up. "offered" lives here, not on status
   # -- see the comment on UserJobPosting's aasm block (TASK-82/TASK-94).
   MANUAL_OUTCOMES = %w[rejected reviewed closed offered].freeze
+  CLEARABLE_OUTCOME_ATTRS = %i[outcome outcome_at outcome_source outcome_reason outcome_evidence].freeze
 
   private
 
@@ -70,10 +71,39 @@ class UserJobPostingsController < ApplicationController
     @user_job_posting.record_status_event!(params[:status]) if params[:status].present?
   end
 
+  # outcome_reason/outcome_evidence are optional and only ever meaningful
+  # for a rejected outcome in the UI (see the Reject form in
+  # job_postings/show.html.erb), but the model doesn't enforce that -- no
+  # value is provided for the other MANUAL_OUTCOMES buttons, which just
+  # POST outcome alone.
   def apply_manual_outcome
     return unless MANUAL_OUTCOMES.include?(params[:outcome])
 
-    @user_job_posting.update!(outcome: params[:outcome], outcome_at: Time.current, outcome_source: "manual")
+    @user_job_posting.update!(manual_outcome_attrs)
+    attach_outcome_evidence
+    record_company_decline
+  end
+
+  # TASK-91.2: starts the company's cooldown the moment Mike marks a
+  # rejection here. Scoped to this manual flow only -- the import scripts
+  # (bin/import_indeed_applications etc.) write outcome directly and don't
+  # go through this action, so an imported rejection doesn't yet start a
+  # cooldown.
+  def record_company_decline
+    return unless params[:outcome] == "rejected"
+
+    @user_job_posting.job_posting.company_record&.record_decline!
+  end
+
+  def manual_outcome_attrs
+    { outcome: params[:outcome], outcome_at: Time.current, outcome_source: "manual",
+      outcome_reason: params[:outcome_reason].presence }
+  end
+
+  def attach_outcome_evidence
+    return if params[:outcome_evidence].blank?
+
+    @user_job_posting.outcome_evidence.attach(params[:outcome_evidence])
   end
 
   def sorted_tracked_postings
@@ -120,12 +150,14 @@ class UserJobPostingsController < ApplicationController
 
   # Deliberately excludes :status -- writing that column directly would skip
   # the AASM guards entirely. Status changes go through record_status_event!.
-  # outcome/outcome_at/outcome_source ARE permitted here, but only to support
-  # clearing a mistaken mark (the form posts all three as nil together) --
-  # setting a real outcome goes through apply_manual_outcome's fixed
-  # vocabulary in #create, not through arbitrary values on this action.
+  # outcome and friends (including outcome_reason/outcome_evidence, TASK-91.1)
+  # ARE permitted here, but only to support clearing a mistaken mark (the
+  # Clear form posts all of CLEARABLE_OUTCOME_ATTRS as nil together, and
+  # assigning nil to outcome_evidence purges the attachment) -- setting a
+  # real outcome goes through apply_manual_outcome's fixed vocabulary in
+  # #create, not through arbitrary values on this action.
   def user_job_posting_params
-    permitted = params.expect(user_job_posting: %i[notes outcome outcome_at outcome_source])
-    permitted[:outcome].present? ? permitted.except(:outcome, :outcome_at, :outcome_source) : permitted
+    permitted = params.expect(user_job_posting: [:notes, *CLEARABLE_OUTCOME_ATTRS])
+    permitted[:outcome].present? ? permitted.except(*CLEARABLE_OUTCOME_ATTRS) : permitted
   end
 end

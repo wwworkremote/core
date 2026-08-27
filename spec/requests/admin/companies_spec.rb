@@ -29,4 +29,32 @@ RSpec.describe "Admin::Companies" do
       )
     end
   end
+
+  describe "POST /admin/companies/:id/set_decline_date" do
+    it "backfills a decline date independent of any posting's outcome" do
+      company = create(:company)
+
+      post set_decline_date_admin_company_path(company), params: { last_declined_at: "2026-04-01" }
+
+      expect(company.reload.last_declined_at).to eq(Time.zone.parse("2026-04-01"))
+      expect(flash[:notice]).to eq("Decline date recorded for #{company.name}.")
+    end
+
+    it "ignores a blank date without raising or clearing an existing one" do
+      company = create(:company, last_declined_at: Time.zone.parse("2026-04-01"))
+
+      post set_decline_date_admin_company_path(company), params: { last_declined_at: "" }
+
+      expect(company.reload.last_declined_at).to eq(Time.zone.parse("2026-04-01"))
+    end
+
+    it "ignores a malformed date without raising" do
+      company = create(:company)
+
+      expect {
+        post set_decline_date_admin_company_path(company), params: { last_declined_at: "not-a-date" }
+      }.not_to raise_error
+      expect(company.reload.last_declined_at).to be_nil
+    end
+  end
 end

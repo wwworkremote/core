@@ -82,11 +82,13 @@ en:
       not_interested: "Not interested"
       open_postings: "Open Postings"
       toxicity_alert: "Flagged"
+      cooldown_alert: "Cooldown"
     show:
       breadcrumb_root: "Job Postings"
       subtitle: "Company profile and posting history."
       not_interested: "Not interested"
       marked_not_interested: "Not interested"
+      cooldown_until: "Declined -- cooldown until %{date}"
       postings_heading: "Postings"
       view_posting: "View"
       no_postings: "No postings from this company yet."
@@ -99,6 +101,11 @@ en:
       subtitle: "Your job search, aggregated and AI-matched."
       edit_profile: "Edit Profile"
       data_sources_cta: "Data Sources"
+      funnel_health:
+        since_last_application: "Since Last Application"
+        untriaged: "Untriaged"
+        oldest_untriaged: "Oldest Untriaged"
+        never: "Never"
       capabilities:
         job_postings_eyebrow: "Aggregation"
         job_aggregation_title: "Every Board, One Feed"
@@ -118,6 +125,11 @@ en:
         high_match: "High Match"
         favorite: "Favorite"
         review: "Review"
+      idle_followups:
+        heading: "Needs Follow-up"
+        pending: "idle"
+        idle_badge: "Idle %{duration}"
+        follow_up: "Follow Up"
       matches:
         heading: "Top Matches"
         ai_match: "AI Match"
@@ -223,6 +235,7 @@ en:
         reputation_label: "Reputation"
         not_reviewed: "Not reviewed"
         toxicity_flag: "This company has been flagged for toxic culture signals."
+        cooldown_flag: "This company recently declined you -- cooldown until %{date}."
         pros: "Pros"
         cons: "Cons"
       activity:

@@ -20,33 +20,13 @@
       <div class="relative z-10">
         <h1 class="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight leading-none">
           <%= @job_posting.title %>
-          <%# Pipeline stage and outcome are UserJobPosting's, not
-              JobPosting's -- TASK-82. Lifecycle facts (ignored/expired/
-              purged/archived) are JobPosting's; "archived" can happen on
-              either (Mike gave up, or the link died), so it's checked on
-              both, with JobPosting's own archived value taking the
-              lifecycle-specific label since a dead link outranks an old
-              pipeline decision as the more current fact. %>
-          <% pipeline_badges = {
-               "favorited" => ["Favorited", "border-primary/40 text-primary"],
-               "applied" => ["Applied", "border-info/40 text-info"],
-               "interview" => ["Interviewing", "border-accent/40 text-accent"],
-               "archived" => ["Archived", "border-white/20 text-slate-400"]
-             } %>
-          <% outcome_badges = {
-               "offered" => ["Offered", "border-success/40 text-success"],
-               "rejected" => ["Rejected", "border-rose-500/40 text-rose-400"]
-             } %>
-          <% lifecycle_badges = {
-               "archived" => ["Archived", "border-white/20 text-slate-400"],
-               "ignored" => ["Not Interested", "border-error/40 text-error"],
-               "expired" => ["Expired", "border-warning/40 text-warning"],
-               "purged" => ["Purged", "border-error/60 text-error"]
-             } %>
-          <% badge = lifecycle_badges[@job_posting.status] || outcome_badges[user_job&.outcome] || pipeline_badges[user_job&.status] %>
-          <% if badge %>
-            <span class="badge badge-outline <%= badge[1] %> text-xs font-bold align-middle ml-1">
-              <%= badge[0] %>
+          <%# Precedence (lifecycle > outcome > pipeline stage) lives in
+              Pipeline::DisplayStatus, not here -- see that module for why
+              JobPosting's own archived outranks UserJobPosting's archived. %>
+          <% badge_class, badge_label = pipeline_status_badge(@job_posting, user_job) %>
+          <% if badge_label %>
+            <span class="badge badge-outline <%= badge_class %> text-xs font-bold align-middle ml-1">
+              <%= badge_label %>
             </span>
           <% end %>
           <% if @job_posting.leads.any? %>
@@ -294,6 +274,16 @@
             </div>
           <% end %>
 
+          <%# TASK-91.2 AC #5: the moment Mike is evaluating whether to
+              pursue this posting is exactly where a "they just rejected
+              you" warning earns its keep. %>
+          <% if @job_posting.company_record.in_cooldown? %>
+            <div class="p-3 rounded-lg bg-warning/10 border border-warning/20 text-xs text-warning font-bold leading-relaxed">
+              <%= heroicon "clock", variant: :solid, options: { class: "w-4 h-4 mr-1 text-warning" } %>
+              <%= t('.company.cooldown_flag', date: @job_posting.company_record.cooldown_ends_at.to_date) %>
+            </div>
+          <% end %>
+
           <% if audit = @job_posting.company_record.glassdoor_data&.dig('reputation_audit') %>
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -352,26 +342,53 @@
           the moment it happens instead of waiting on any import. %>
       <% if user_job&.persisted? %>
         <% outcome_color = { "rejected" => "text-rose-500", "offered" => "text-success" }.fetch(user_job.outcome, "text-base-content/40") %>
-        <div class="flex items-center justify-between mb-8 -mt-4 pb-4 border-b border-white/5">
-          <div class="text-xs font-bold flex items-center gap-2 <%= outcome_color %>">
-            <%= heroicon "flag", options: { class: "w-3 h-3" } %>
-            Outcome: <%= user_job.outcome&.humanize || "none recorded" %>
+        <div class="mb-8 -mt-4 pb-4 border-b border-white/5">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-bold flex items-center gap-2 <%= outcome_color %>">
+              <%= heroicon "flag", options: { class: "w-3 h-3" } %>
+              Outcome: <%= user_job.outcome&.humanize || "none recorded" %>
+            </div>
+            <div class="flex items-center gap-3">
+              <% unless user_job.outcome == "offered" %>
+                <%= button_to "Mark Offered", user_job_postings_path(job_posting_id: @job_posting.id, outcome: "offered"),
+                              class: "text-xs font-bold text-slate-400 hover:text-success transition-colors" %>
+              <% end %>
+              <%# TASK-91.1: reason/evidence captured at the same moment as the
+                  outcome, not as a later step -- a disclosure instead of a
+                  single button since it now needs two optional fields. %>
+              <% if user_job.outcome != "rejected" %>
+                <details class="relative">
+                  <summary class="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer list-none">Mark Rejected</summary>
+                  <%= form_with url: user_job_postings_path, method: :post, multipart: true,
+                                class: "absolute right-0 mt-2 z-10 w-72 card-neural p-4 space-y-3 text-left" do %>
+                    <%= hidden_field_tag :job_posting_id, @job_posting.id %>
+                    <%= hidden_field_tag :outcome, "rejected" %>
+                    <%= text_area_tag :outcome_reason, nil, rows: 2, placeholder: "Why? (optional)",
+                                      class: "textarea textarea-bordered textarea-xs w-full text-xs" %>
+                    <%= file_field_tag :outcome_evidence, class: "file-input file-input-xs w-full" %>
+                    <%= submit_tag "Confirm Rejected", class: "btn btn-xs btn-error w-full" %>
+                  <% end %>
+                </details>
+              <% end %>
+              <% if user_job.outcome.present? %>
+                <%= button_to "Clear", user_job_posting_path(user_job), method: :patch,
+                              params: { user_job_posting: { outcome: nil, outcome_at: nil, outcome_source: nil,
+                                                             outcome_reason: nil, outcome_evidence: nil } },
+                              class: "text-xs font-bold text-slate-500 hover:text-white transition-colors" %>
+              <% end %>
+            </div>
           </div>
-          <div class="flex items-center gap-3">
-            <% unless user_job.outcome == "offered" %>
-              <%= button_to "Mark Offered", user_job_postings_path(job_posting_id: @job_posting.id, outcome: "offered"),
-                            class: "text-xs font-bold text-slate-400 hover:text-success transition-colors" %>
-            <% end %>
-            <% unless user_job.outcome == "rejected" %>
-              <%= button_to "Mark Rejected", user_job_postings_path(job_posting_id: @job_posting.id, outcome: "rejected"),
-                            class: "text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors" %>
-            <% end %>
-            <% if user_job.outcome.present? %>
-              <%= button_to "Clear", user_job_posting_path(user_job), method: :patch,
-                            params: { user_job_posting: { outcome: nil, outcome_at: nil, outcome_source: nil } },
-                            class: "text-xs font-bold text-slate-500 hover:text-white transition-colors" %>
-            <% end %>
-          </div>
+          <% if user_job.outcome == "rejected" && (user_job.outcome_reason.present? || user_job.outcome_evidence.attached?) %>
+            <div class="mt-3 pl-5 space-y-1">
+              <% if user_job.outcome_reason.present? %>
+                <p class="text-xs text-slate-400"><%= user_job.outcome_reason %></p>
+              <% end %>
+              <% if user_job.outcome_evidence.attached? %>
+                <%= link_to "View evidence (#{user_job.outcome_evidence.filename})", url_for(user_job.outcome_evidence),
+                            target: "_blank", rel: "noopener", class: "text-xs font-bold text-rose-400 hover:underline" %>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       <% end %>
 
