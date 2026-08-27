@@ -1,0 +1,34 @@
+<div class="max-w-4xl mx-auto py-16 px-6">
+  <div class="flex items-start justify-between gap-6 mb-10">
+    <div>
+      <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-4">Guided application session</div>
+      <h1 class="text-4xl font-black text-white mb-3">Your lap is at Intake</h1>
+      <p class="text-slate-400 font-medium">The posting is queued for supervised review. No provider action has been taken.</p>
+    </div>
+    <span class="badge badge-primary badge-outline font-bold"><%= @guided_session.status.humanize %></span>
+  </div>
+
+  <div class="grid md:grid-cols-4 gap-3 mb-10">
+    <% %w[Intake Resolution Response\ Construction Reorientation].each_with_index do |phase, index| %>
+      <div class="rounded-xl border <%= index.zero? ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5' %> p-4">
+        <div class="text-xs font-black text-slate-500 mb-2">0<%= index + 1 %></div>
+        <div class="text-sm font-bold text-white"><%= phase %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card-neural p-8 space-y-5">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Source posting</div>
+      <%= link_to @guided_session.source_url, @guided_session.source_url, target: "_blank", rel: "noreferrer", class: "text-primary break-all" %>
+    </div>
+    <div>
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Next move</div>
+      <div class="text-xl font-black text-white">Review the posting</div>
+      <p class="text-sm text-slate-400 mt-2">Confirm the opportunity and tell the system what matters before it proposes the next step.</p>
+    </div>
+    <div class="border-t border-white/10 pt-5 text-sm text-slate-500">
+      Session <code class="text-slate-300"><%= @guided_session.session_token %></code> · Provider <span class="text-slate-300"><%= @guided_session.provider %></span>
+    </div>
+  </div>
+</div>

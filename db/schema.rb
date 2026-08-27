@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_213000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -363,6 +363,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_200000) do
     t.string "source_url"
     t.datetime "updated_at", null: false
     t.index ["provider", "field_name"], name: "index_extraction_rules_on_provider_and_field_name", unique: true
+  end
+
+  create_table "guided_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "phase", default: "intake", null: false
+    t.string "provider", null: false
+    t.string "session_token", null: false
+    t.string "source_url", null: false
+    t.datetime "started_at", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_token"], name: "index_guided_sessions_on_session_token", unique: true
   end
 
   create_table "hacker_news_items", id: false, force: :cascade do |t|
