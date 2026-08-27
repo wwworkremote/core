@@ -48,6 +48,11 @@ The system implements a production-grade AI stack designed for reliability, safe
 
 ## 📜 Architectural Decisions (ADR Summary)
 
+### ADR 004: Job Application Pump Track
+Model the job search as a recurring four-phase actor-system loop: Intake,
+Resolution, Response Construction, and Reorientation. See
+[the full decision](adr/004-pump-track-job-application-loop.md).
+
 ### ADR 001: Audit Strategy
 Remove Rails Event Store (RES) and utilize **PaperTrail** for field-level auditing.
 
