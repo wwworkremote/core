@@ -43,6 +43,7 @@ class Scenario < ApplicationRecord
 
   belongs_to :user_job_posting, optional: true
   has_many :scenario_signatures, dependent: :destroy
+  has_one :reference_scenario, dependent: :restrict_with_error
 
   validates :provider, :started_at, presence: true
 end

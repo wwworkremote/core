@@ -27,4 +27,9 @@ FactoryBot.define do
     provider { "linkedin" }
     started_at { Time.current }
   end
+
+  factory :reference_scenario do
+    provider { scenario.provider }
+    scenario
+  end
 end

@@ -209,7 +209,7 @@ currently have a mechanism for.
 | `Scenarios::HandshakeCheck` | Built (2026-08-27) |
 | Anything that actually records a HAR/DOM capture into a `Scenario` | Built (2026-08-27, TASK-102) — `Scenarios::Capture` (`app/services/scenarios/capture.rb`), a standalone capture path, not routed through Panoramic View |
 | Sandbox provider (a fake ATS served from `wwworkremote.localhost`, resembling a real one closely enough to exercise the harness against safely) | **Not built** — see [Sandbox Provider](sandbox-provider.md) |
-| Reference Scenario (golden-master baseline per provider) | **Not built** — this doc's proposal, shape described above, promotion mechanism open |
+| Reference Scenario (golden-master baseline per provider) | Built (2026-08-27, TASK-106) — ReferenceScenario is an explicit one-row-per-provider pointer; promotion is preview-first and manual |
 | `HandshakeCheck` compared against a Reference Scenario rather than a flat requirement hash (the actual fix for the `:required_after_submit` ceiling) | **Not built** |
 
 ## Decided
@@ -243,5 +243,10 @@ currently have a mechanism for.
 
 1. **The marking mechanism itself** for "current Reference Scenario for this provider" — a
    boolean flag on `Scenario`, or a separate one-row-per-provider pointer table? Low-stakes storage
-   detail, not a behavior change; can be decided at implementation time rather than needing its own
-   round-trip.
+   detail, not a behavior change; resolved at implementation time with a separate pointer table.
+
+Resolved by TASK-106: `ReferenceScenario` keeps captured `Scenario` rows immutable, lets the
+database enforce one reference per provider, and makes promotion a distinct explicit action.
+`rake scenarios:reference_diff[TOKEN]` prints the ordered candidate/reference signature sequences
+plus gained, lost, and reordered kinds; adding `PROMOTE=1` is the separate write action after
+Mike has inspected that diff.

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -711,6 +711,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_180000) do
     t.index ["user_id"], name: "index_pipeline_steps_on_user_id"
   end
 
+  create_table "reference_scenarios", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "provider", null: false
+    t.bigint "scenario_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider"], name: "index_reference_scenarios_on_provider", unique: true
+    t.index ["scenario_id"], name: "index_reference_scenarios_on_scenario_id", unique: true
+  end
+
   create_table "resume_skills", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "resume_id", null: false
@@ -1086,6 +1095,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_180000) do
   add_foreign_key "llm_messages", "tool_calls"
   add_foreign_key "pipeline_steps", "job_postings"
   add_foreign_key "pipeline_steps", "users"
+  add_foreign_key "reference_scenarios", "scenarios"
   add_foreign_key "resume_skills", "resumes"
   add_foreign_key "resume_skills", "skills"
   add_foreign_key "resumes", "users"

@@ -1,9 +1,11 @@
 ---
 id: TASK-106
 title: 'Reference Scenario: marking, storage, and the manual promotion workflow'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mike'
 created_date: '2026-08-27 17:25'
+updated_date: '2026-08-27 21:57'
 labels:
   - architecture
   - signature-registry
@@ -35,3 +37,20 @@ Depends on TASK-102 (capture path) -- no real Scenario data to mark as a referen
 - [ ] #3 A tool exists (rake task, console helper, or similar) that shows the diff between a candidate Scenario and the current reference for its provider, in terms of ScenarioSignature kinds gained/lost/reordered
 - [ ] #4 No code path promotes a Scenario to reference status without an explicit, separate action -- a clean matching run alone never changes what's marked as reference
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Read the signature-registry decisions and existing Scenario conventions.
+2. Add a one-row-per-provider ReferenceScenario pointer with a database uniqueness invariant and document the choice.
+3. Build a small ReferenceDiff module reporting gained, lost, and reordered ScenarioSignature kinds.
+4. Add an explicit promotion command/task that requires a candidate and prints or returns the diff before writing the pointer.
+5. Add focused model/service/task specs proving lookup, diff semantics, and no implicit promotion.
+6. Run focused checks, inspect the diff, and commit without pushing.
+<!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Selected a separate ReferenceScenario pointer table rather than a boolean Scenario flag: it keeps captured Scenario rows immutable, makes one-reference-per-provider enforceable with a unique provider index, and leaves promotion as a distinct explicit action.
+<!-- SECTION:NOTES:END -->
