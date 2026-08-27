@@ -26,6 +26,10 @@
   const urlParams = new URLSearchParams(window.location.search);
   // wwwr_id is canonical; accept legacy wwr_id links during the transition.
   const wwrId = urlParams.get('wwwr_id') || urlParams.get('wwr_id');
+  // Explicit opt-in correlation for a local guided session. The token is
+  // supplied by the localhost intake flow; normal extension browsing remains
+  // unchanged when it is absent.
+  const guidedSessionToken = urlParams.get('guided_session_token');
 
   // Set by popup.js's "Scan This Page" button immediately before injecting
   // this file, via a separate executeScript call -- allows generic capture
@@ -1200,6 +1204,36 @@
   }
 
   LOG('Provider detected:', provider ? provider.label : 'none — generic fallback');
+
+  async function recordGuidedPageArrival() {
+    if (!IS_LOCAL_BUILD || !guidedSessionToken) return;
+
+    try {
+      const { base: apiBase, authHeader } = await getApiConfig();
+      const headers = { 'Content-Type': 'application/json' };
+      if (authHeader) headers['Authorization'] = authHeader;
+      const res = await apiFetch(`${apiBase}/api/guided_sessions/${encodeURIComponent(guidedSessionToken)}/events`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ event: {
+          kind: 'page_arrived',
+          action: 'Observe current page',
+          intent: 'Continue the supervised guided session from the copied posting URL',
+          requirement: 'recommended',
+          reversibility: 'reversible',
+          approval_state: 'not_required',
+          page_url: window.location.href,
+          evidence: { page_title: document.title, provider: provider?.key || 'unknown' },
+        } }),
+      });
+      if (!res.ok || !res.data?.success) throw new Error(res.data?.error || `HTTP ${res.status}`);
+      LOG_OK('Guided session page arrival recorded');
+    } catch (err) {
+      LOG_WARN('Guided session page arrival failed:', err.message);
+    }
+  }
+
+  recordGuidedPageArrival();
 
   function detectWorkdayCompletion() {
     if (provider?.key !== 'workday') return null;

@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-27 23:22'
+updated_date: '2026-08-27 23:24'
 labels:
   - architecture
   - application-workflow
@@ -20,11 +20,12 @@ documentation:
   - docs/architecture/panoramic-view.md
   - docs/architecture/signature-registry.md
 modified_files:
+  - extension/content.js
   - app/controllers/api/guided_session_events_controller.rb
-  - app/controllers/guided_sessions_controller.rb
-  - app/models/guided_session.rb
   - app/models/guided_session_event.rb
   - app/views/guided_sessions/show.html.erb
+  - app/controllers/guided_sessions_controller.rb
+  - app/models/guided_session.rb
   - config/routes.rb
   - db/migrate/20260827220000_create_guided_session_events.rb
   - db/schema.rb
@@ -77,5 +78,10 @@ Implemented the first vertical slice: GuidedSession now accepts a copied HTTP(S)
 created: 2026-08-27 23:22
 ---
 Implemented the next vertical slice: GuidedSessionEvent persists meaningful timeline transitions with pump-track phase, intent, requirement classification, reversibility, approval state, page URL, and evidence. Added a local-only tokenized API endpoint for extension correlation and rendered events in the guided-session review page. Focused suite: 8 examples, 0 failures; targeted RuboCop clean. No autonomous provider action or submission was added.
+---
+
+created: 2026-08-27 23:24
+---
+Connected the local unpacked Chrome extension to the guided-session event seam. An explicit guided_session_token URL parameter records a page_arrived event with page URL/title/provider evidence; ordinary browsing is unchanged and non-local/Web Store builds are excluded by the existing IS_LOCAL_BUILD gate. Extension lint passes.
 ---
 <!-- COMMENTS:END -->
