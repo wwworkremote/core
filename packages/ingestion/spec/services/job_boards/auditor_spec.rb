@@ -75,13 +75,17 @@ RSpec.describe JobBoards::Auditor do
     end
 
     it "skips the ignore fix when the posting cannot transition to ignored" do
-      jp = create(:job_posting, status: "favorited")
+      # "favorited" was a JobPosting status pre-TASK-82 phase 3; pipeline
+      # stage lives entirely on UserJobPosting now, so "archived" (also not
+      # reachable from :ignore, see JobPosting::StatusWorkflow) is the
+      # current equivalent of "already decided, not eligible for auto-ignore".
+      jp = create(:job_posting, status: "archived")
       filter = instance_double(JobBoards::QualityFilter, useful?: false)
       allow(JobBoards::QualityFilter).to receive(:new).with(jp).and_return(filter)
 
       expect { described_class.new(fix: true, limit: 10).call }.not_to raise_error
 
-      expect(jp.reload.status).to eq("favorited")
+      expect(jp.reload.status).to eq("archived")
     end
 
     it "stops fixing once the limit is reached" do

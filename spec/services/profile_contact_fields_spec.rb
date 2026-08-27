@@ -27,19 +27,23 @@ RSpec.describe ProfileContactFields do
   it "returns nils for every field when the user has no career profile" do
     user = create(:user, name: "No Profile")
 
+    # address_line1/postal_code/phone_country_code/phone_area_code/phone_number
+    # added by commit 2ce53c52 ("add application assist and tracking") --
+    # this example predated that and was never updated to match.
     expect(described_class.call(user)).to eq(
       name: "No Profile", first_name: "No", middle_name: nil, last_name: "Profile",
-      preferred_name: nil, email: nil, phone: nil, github_url: nil, linkedin_url: nil,
-      website_url: nil, location: nil, city: nil, state: nil, country: nil
+      preferred_name: nil, email: nil, phone: nil, address_line1: nil, postal_code: nil,
+      phone_country_code: nil, phone_area_code: nil, phone_number: nil, github_url: nil,
+      linkedin_url: nil, website_url: nil, location: nil, city: nil, state: nil, country: nil
     )
   end
 
   it "preserves structured legal and preferred names when supplied by the canonical profile" do
     user = create(:user, name: "Display Name")
     create(:career_profile, user: user, contact_info: {
-      "name_parts" => { "first" => "Legal", "middle" => "Middle", "last" => "Family",
-                         "preferred_name" => "Display" }
-    })
+             "name_parts" => { "first" => "Legal", "middle" => "Middle", "last" => "Family",
+                               "preferred_name" => "Display" }
+           })
 
     expect(described_class.call(user)).to include(
       first_name: "Legal", middle_name: "Middle", last_name: "Family", preferred_name: "Display"
