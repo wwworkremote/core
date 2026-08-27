@@ -2,6 +2,9 @@
 
 Welcome to the WWWorkRemote documentation nodes.
 
+This whole tree is browsable from inside the running app at `/docs` — including rendered Mermaid
+diagrams, not just source. This file itself is best read there.
+
 ## 🗺️ Documentation Map
 
 ### Core Guides
@@ -10,6 +13,9 @@ Welcome to the WWWorkRemote documentation nodes.
 - **[Development](development.md)**: Local setup, prerequisites, and common tasks.
 - **[Testing](testing.md)**: RSpec strategy, contracts, and VCR usage.
 - **[Architecture](architecture.md)**: Subsystems, data flow, and "Solid" stack.
+- **[Component Overview](architecture/component-overview.md)**: Diagram of how the major pieces collaborate.
+- **[Pipeline Statechart](architecture/pipeline-statechart.md)**: The three independent state machines behind "what happened to this posting."
+- **[Application Sequence](architecture/application-sequence.md)**: One posting's journey, start to finish, as a sequence diagram.
 - **[Configuration](configuration.md)**: Environment variables and credentials.
 - **[Troubleshooting](troubleshooting.md)**: Common failures and fixes.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.

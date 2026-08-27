@@ -7,9 +7,12 @@ status: In Progress
 assignee:
   - claude
 created_date: '2026-08-22 15:39'
-updated_date: '2026-08-26 23:13'
+updated_date: '2026-08-26 23:38'
 labels: []
 dependencies: []
+modified_files:
+  - app/models/user_job_posting.rb
+  - app/controllers/admin/pipeline_steps_controller.rb
 priority: high
 type: bug
 ordinal: 95000
@@ -99,3 +102,9 @@ Remove favorited/applied/interview/offered/archived from JobPosting's AASM entir
 
 Recommending: do Phase 1 now (bounded, safe, immediately stops the worst ongoing damage), surface Phase 2's actual data before touching it, and treat Phase 3 as a separate follow-up once 1+2 are settled — rather than attempting the full schema migration in this pass.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Phase 1 done and committed (74acba4b): Admin::PipelineStepsController now syncs UserJobPosting.status via a new UserJobPosting#advance_pipeline_state! (state-only, no duplicate PipelineStep -- see plan for why record_status_event! wasn't reused directly here). Verified live: favorited a real posting through the UI, confirmed JobPosting.status and UserJobPosting.status both read 'favorited' and exactly one PipelineStep exists, then reverted the test posting. 46 specs green, rubocop clean. Active drift on the two busiest surfaces (triage, Application Status pills) is stopped as of this commit. Phase 2 (reconcile the 25 already-drifted rows) and phase 3 (remove pipeline states from JobPosting's AASM, migrate remaining readers) still open -- task stays In Progress.
+<!-- SECTION:NOTES:END -->

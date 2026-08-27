@@ -23,6 +23,11 @@ Located in `app/services/LLM/`, this layer manages all interaction with language
 3.  **Synthesis**: `Categorizer` (LLM) and `Embedder` (Vector) process the posting.
 4.  **Resonance**: `JobSearch` campaigns rank postings based on user `Resume` embeddings.
 
+Diagrammed versions of this, plus the application pipeline's state machines, live in
+[`architecture/component-overview.md`](architecture/component-overview.md),
+[`architecture/pipeline-statechart.md`](architecture/pipeline-statechart.md), and
+[`architecture/application-sequence.md`](architecture/application-sequence.md).
+
 ## 🧠 AI Architectural Principles
 
 The system implements a production-grade AI stack designed for reliability, safety, and deep technical alignment.

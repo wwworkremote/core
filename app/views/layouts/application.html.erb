@@ -66,7 +66,8 @@
                companies: [t('.nav.companies'), companies_path],
                job_postings: [t('.nav.job_postings'), job_postings_path],
                triage: [t('.nav.triage'), job_posting_triage_path],
-               saved_jobs: [t('.nav.saved_jobs'), user_job_postings_path]
+               saved_jobs: [t('.nav.saved_jobs'), user_job_postings_path],
+               docs: [t('.nav.docs'), docs_path]
              } %>
           <% nav_links.each_value do |label, path| %>
             <% active = current_page?(path) %>
