@@ -1,7 +1,7 @@
 # Signature Registry: Mapping a Scenario Against What a Remote Site Actually Says
 
-**Status: `Scenario`/`ScenarioSignature`/`HandshakeCheck` built (2026-08-27); nothing captures a
-session into one yet.** This is the piece [Panoramic View](panoramic-view.md) silently assumed
+**Status: `Scenario`/`ScenarioSignature`/`HandshakeCheck` built (2026-08-27); `Scenarios::Capture`
+(2026-08-27, TASK-102) turns a HAR or DOM capture into real rows.** This is the piece [Panoramic View](panoramic-view.md) silently assumed
 away, and the mechanism TASK-83's blocked AC #7 (every selector verified against a live capture,
 not guessed) actually needs to become checkable rather than eyeballed.
 
@@ -207,7 +207,7 @@ currently have a mechanism for.
 | `Scenario` / `ScenarioSignature` models | Built (2026-08-27) |
 | `Scenarios::HandshakeCheck::SIGNATURE_EXPECTATIONS` per provider | Built (2026-08-27) — lives on the checker itself, not a separate module |
 | `Scenarios::HandshakeCheck` | Built (2026-08-27) |
-| Anything that actually records a HAR/DOM capture into a `Scenario` | **Not built** — depends on [Panoramic View](panoramic-view.md)'s deferred raw-capture item, or a standalone capture path |
+| Anything that actually records a HAR/DOM capture into a `Scenario` | Built (2026-08-27, TASK-102) — `Scenarios::Capture` (`app/services/scenarios/capture.rb`), a standalone capture path, not routed through Panoramic View |
 | Sandbox provider (a fake ATS served from `wwworkremote.localhost`, resembling a real one closely enough to exercise the harness against safely) | **Not built** — see [Sandbox Provider](sandbox-provider.md) |
 | Reference Scenario (golden-master baseline per provider) | **Not built** — this doc's proposal, shape described above, promotion mechanism open |
 | `HandshakeCheck` compared against a Reference Scenario rather than a flat requirement hash (the actual fix for the `:required_after_submit` ceiling) | **Not built** |
