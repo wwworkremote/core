@@ -6,7 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-27 17:27'
-updated_date: '2026-08-27 22:17'
+updated_date: '2026-08-28 18:47'
 labels:
   - architecture
   - sandbox-provider
@@ -15,8 +15,13 @@ dependencies:
   - TASK-104
 references:
   - TASK-112
+  - 'https://developer.chrome.com/docs/extensions/reference/api/debugger'
+  - 'https://developer.chrome.com/docs/ai/prompt-api'
+  - 'https://developer.chrome.com/docs/extensions/reference/api/offscreen'
 documentation:
   - docs/architecture/sandbox-provider.md
+  - docs/research/chrome-built-in-ai-flags.md
+  - docs/research/chrome-platform-and-wasm-leverage.md
 priority: low
 type: spike
 ordinal: 700
@@ -45,5 +50,10 @@ Explicitly a spike: evaluate and report, not a commitment to build. Depends on T
 created: 2026-08-27 22:17
 ---
 New domain context: on-device sense-making is valuable only inside the supervised pump-track loop, especially for classifying unfamiliar fields and proposing deterministic versus approval-gated actions. Keep the spike explicitly advisory; it must not weaken human approval at irreversible transitions.
+---
+
+created: 2026-08-28 18:47
+---
+Research reconciled and preserved in docs/research/chrome-built-in-ai-flags.md and docs/research/chrome-platform-and-wasm-leverage.md. Verdict: no flags are needed for the core MV3 Prompt/Summarizer path; keep Autofill AI and glic actor flags off during guided dogfooding. The highest-leverage next spike is a local-only chrome.debugger/CDP prototype for selector-free AX/DOMSnapshot capture and ATS response-body evidence. WASM stays a later prototype in an Offscreen Document, SIMD-only; a shared Rust core and IWA/Controlled Frame remain watch items.
 ---
 <!-- COMMENTS:END -->

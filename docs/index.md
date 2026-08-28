@@ -30,6 +30,10 @@ diagrams, not just source. This file itself is best read there.
 - **[Troubleshooting](troubleshooting.md)**: Common failures and fixes.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.
 
+### Research Notes
+- **[Chrome built-in AI flags](research/chrome-built-in-ai-flags.md)**: Which browser AI flags help or interfere with the extension and guided-session dogfooding.
+- **[Chrome platform and WASM leverage](research/chrome-platform-and-wasm-leverage.md)**: Ranked opportunities for CDP, Offscreen Documents, WASM inference, and future harness work.
+
 ### Special Interest
 - **[Changelog](changelog.md)**: Narrative project history by era, from git log + Backlog.md.
 - **[ADR Registry](adr/001-audit-strategy.md)**: Architecture Decision Records.
