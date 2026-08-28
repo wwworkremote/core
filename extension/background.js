@@ -18,6 +18,46 @@
 
 const SESSION_KEY = 'wwr_panel_state';
 const TAB_STATES_KEY = 'wwr_panel_states';
+const IS_LOCAL_BUILD = !('update_url' in chrome.runtime.getManifest());
+
+// Read-only CDP probe for the local sandbox. It answers whether accessibility
+// and DOM snapshots can provide stable recorder evidence before any driver
+// behavior is introduced.
+async function captureCdpSnapshot(tabId) {
+  if (!IS_LOCAL_BUILD) throw new Error('CDP capture is available only in the local extension build');
+
+  await chrome.debugger.attach({ tabId }, '1.3');
+  try {
+    await chrome.debugger.sendCommand({ tabId }, 'Accessibility.enable');
+    const accessibility = await chrome.debugger.sendCommand({ tabId }, 'Accessibility.getFullAXTree');
+    const domSnapshot = await chrome.debugger.sendCommand({ tabId }, 'DOMSnapshot.captureSnapshot', {
+      computedStyles: ['display', 'visibility'], includePaintOrder: false, includeTextColorOpacities: false,
+    });
+    return summarizeCdpSnapshot(accessibility, domSnapshot);
+  } finally {
+    await chrome.debugger.detach({ tabId }).catch(() => {});
+  }
+}
+
+function summarizeCdpSnapshot(accessibility, domSnapshot) {
+  const formRoles = new Set(['textbox', 'combobox', 'checkbox', 'radio', 'listbox', 'spinbutton']);
+  const fields = (accessibility.nodes || [])
+    .filter(node => formRoles.has(node.role?.value))
+    .slice(0, 100)
+    .map(node => ({
+      role: node.role?.value || null,
+      name: node.name?.value || null,
+      required: node.properties?.some(property => property.name === 'required' && property.value?.value === true) || false,
+    }));
+  return {
+    capturedAt: new Date().toISOString(),
+    accessibilityNodeCount: accessibility.nodes?.length || 0,
+    formFieldCount: fields.length,
+    fields,
+    domSnapshotNodeCount: domSnapshot.nodes?.nodeName?.length || 0,
+    domSnapshotStringCount: domSnapshot.strings?.length || 0,
+  };
+}
 
 // Chrome will not permit an unsolicited page-load open, but it does support
 // opening from an explicit toolbar/keyboard action. Keep the panel one action
@@ -72,6 +112,13 @@ function buildPanelState(msg, tabId, priorState = null) {
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+
+  if (msg.type === 'CDP_CAPTURE_SNAPSHOT') {
+    captureCdpSnapshot(msg.tabId)
+      .then(snapshot => sendResponse({ ok: true, snapshot }))
+      .catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
 
   // ── OPEN_PANEL ─────────────────────────────────────────────────────────────
   // Must be called synchronously within the tab's user gesture window --

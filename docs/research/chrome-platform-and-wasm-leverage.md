@@ -353,6 +353,26 @@ control, and Mike's `chrome://flags` already has the IWA family enabled.
 built separately from the production extension, an IWA + `<controlledframe>` + Direct Sockets is
 the right shape for it. Don't rebuild the shipping extension as an IWA.
 
+## Prototype checkpoint: local CDP snapshot capture
+
+The first CDP slice is implemented in the unpacked extension (v1.27.0). The
+DevTools panel sends a read-only `CDP_CAPTURE_SNAPSHOT` request to the local
+service worker. The worker attaches to the inspected tab, requests
+`Accessibility.getFullAXTree` and `DOMSnapshot.captureSnapshot`, returns only
+field names/roles/required state plus snapshot dimensions, and always detaches
+in a `finally` path. It does not navigate, click, fill, read response bodies,
+or submit forms.
+
+The first dogfood pass confirmed the unpacked extension reloads as v1.27.0,
+shows the debugger permission, and renders the panel against the authenticated
+`wwworkremote.localhost` sandbox without page mutation. The capture result is
+not yet considered verified: the panel control did not produce a visible
+response while Chrome itself was being debugged by the automation harness.
+That leaves the next checkpoint narrowly defined: run the same control with
+the competing debugger detached, then record whether Chrome permits the
+extension attachment and guaranteed detach. Network response-body capture or
+browser driving remain out of scope until that succeeds.
+
 ---
 
 ## 7. Thread E — Other capabilities considered
