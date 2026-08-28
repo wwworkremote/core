@@ -16,6 +16,24 @@
       <p class="text-xs text-slate-500 mt-2">Copy the link from the posting, then return here. Nothing is submitted to the employer from this step.</p>
     </div>
 
+    <fieldset class="space-y-3">
+      <legend class="label text-xs font-bold text-slate-400">Session purpose</legend>
+      <label class="flex gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 cursor-pointer">
+        <%= form.radio_button :purpose, "application_research", class: "radio radio-primary mt-1" %>
+        <span>
+          <span class="block font-black text-white">Research the application</span>
+          <span class="block text-sm text-slate-400 mt-1">Open the employer flow, inspect its steps and questions, and record what it asks. Stop before any commitment or sensitive-data transmission.</span>
+        </span>
+      </label>
+      <label class="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4 cursor-pointer">
+        <%= form.radio_button :purpose, "application_execution", class: "radio radio-primary mt-1" %>
+        <span>
+          <span class="block font-black text-white">Work toward applying</span>
+          <span class="block text-sm text-slate-400 mt-1">Prepare and fill the application under supervision. Final submission still requires explicit approval.</span>
+        </span>
+      </label>
+    </fieldset>
+
     <%= form.submit "Start intake", class: "btn btn-primary rounded-xl font-bold" %>
   <% end %>
 </div>

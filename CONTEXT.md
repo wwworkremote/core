@@ -8,6 +8,7 @@
 - **Skill:** A centralized master list of technical and soft skills with vector embeddings.
 - **Pump Track:** The recurring four-phase loop of Intake, Resolution, Response Construction, and Reorientation that describes one lap of the job-search game.
 - **Guided Session:** A supervised lap in which the system records what happened and why, while Mike retains authority at ambiguous or irreversible transitions.
+- **Session Purpose:** The declared intent for a Guided Session: application research observes and records an employer flow without commitment, while application execution works toward applying under supervision.
 
 ## Core Concepts
 - **Vector Search:** Using pgvector to find similarities between Resume versions and Job Postings.
@@ -20,3 +21,4 @@
 - **zdots Rule (Account Separation):** Strict isolation of `_ro` (Read-only), `_w` (Write-only), and `_rw` (Read-write) database accounts to prevent drift.
 - **Intent Is First-Class:** Capturing an action is not enough; the system must preserve the actor's intent, available alternatives, state changes, reversibility, and approval requirements.
 - **Bounded Agency:** Automation may handle deterministic, reversible work, but Mike remains the approving actor for ambiguity and irreversible actions such as final application submission.
+- **Commitment Boundary:** The point where a provider action transmits sensitive data, creates consequential persistent state, accepts terms, or submits an application. Crossing it is distinct from opening and researching an application flow and requires explicit approval.

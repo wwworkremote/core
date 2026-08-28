@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-28 17:19'
+updated_date: '2026-08-28 20:49'
 labels:
   - architecture
   - application-workflow
@@ -22,16 +22,16 @@ documentation:
   - docs/architecture/guided-session-flow.md
   - docs/adr/006-bpmn-lite-guided-session-validation.md
 modified_files:
-  - extension/content.js
-  - app/controllers/api/guided_session_events_controller.rb
+  - CONTEXT.md
   - app/controllers/guided_sessions_controller.rb
-  - app/models/guided_session_event.rb
+  - app/models/guided_session.rb
+  - app/views/guided_sessions/new.html.erb
   - app/views/guided_sessions/show.html.erb
-  - config/routes.rb
-  - spec/requests/api/guided_session_events_spec.rb
-  - spec/requests/guided_sessions_spec.rb
+  - db/migrate/20260828200000_add_purpose_to_guided_sessions.rb
+  - db/schema.rb
+  - docs/adr/005-supervised-intent-capture.md
   - docs/architecture/guided-session-flow.md
-  - docs/adr/006-bpmn-lite-guided-session-validation.md
+  - spec/requests/guided_sessions_spec.rb
 priority: high
 type: feature
 ordinal: 118000
@@ -45,7 +45,7 @@ Build the supervised real-browser workflow that starts from a pasted job-posting
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 A localhost entry flow accepts a copied job-posting URL and starts a durable guided session against a supported provider.
+- [x] #1 A localhost entry flow accepts a copied job-posting URL and starts a durable guided session against a supported provider.
 - [ ] #2 A real Chrome-extension run records the posting, application phases, page transitions, meaningful field actions, and provider signatures into a reviewable session timeline.
 - [ ] #3 The actor can annotate intent and classify actions as required, optional, recommended, reversible, irreversible, or approval-gated.
 - [ ] #4 Irreversible actions, especially final application submission, require explicit Mike approval; no clean run auto-promotes or auto-submits.
@@ -115,5 +115,17 @@ Handoff verification found Rails CSRF blocked the playback cursor. Narrowed the 
 created: 2026-08-28 17:19
 ---
 Implemented the application-boundary vertical slice: the local extension records application-form arrival in Resolution, intercepts the guided sandbox form's final submit boundary, and records a pending irreversible submission_attempted event. The guided-session UI now exposes explicit Approve/Deny controls that record Mike's decision; approved execution remains a separate future seam. Focused suite: 15 examples, 0 failures; extension lint and focused RuboCop clean.
+---
+
+author: Codex
+created: 2026-08-28 20:48
+---
+Captured the new application-research boundary. GuidedSession now has a durable Session Purpose: application_research or application_execution. Research sessions may enter and observe reversible provider steps, questions, and transitions without trying to submit; execution sessions may work toward applying under supervision. Purpose is context, not blanket permission: transmitting sensitive data, creating consequential persistent state, accepting terms, and final submission remain individually classified commitment boundaries. Intake defaults the human-facing choice to research while the database default preserves existing sessions as application_execution. Updated CONTEXT.md, ADR 005, and the BPMN-lite flow.
+---
+
+author: Codex
+created: 2026-08-28 20:49
+---
+Chrome dogfood verified the new boundary end to end on localhost. The intake renders application research selected by default, preserves application execution as the alternate purpose, and created guided session #2 from the sandbox URL. The session page persisted “Application research” and states that the flow may be inspected and recorded without committing or submitting. No employer site was opened, no sensitive data was entered, and no application was submitted.
 ---
 <!-- COMMENTS:END -->

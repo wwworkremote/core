@@ -11,7 +11,7 @@ class GuidedSessionsController < ApplicationController
   end
 
   def new
-    @guided_session = GuidedSession.new
+    @guided_session = GuidedSession.new(purpose: "application_research")
   end
 
   def create
@@ -45,7 +45,7 @@ class GuidedSessionsController < ApplicationController
   end
 
   def guided_session_params
-    params.expect(guided_session: [:source_url])
+    params.expect(guided_session: %i[source_url purpose])
   end
 
   def invalid_position?(position)

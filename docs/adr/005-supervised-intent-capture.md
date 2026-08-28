@@ -35,6 +35,14 @@ steps, but it must pause at unknown, ambiguous, or irreversible transitions.
 Final application submission always requires explicit human approval. A
 successful run never silently promotes its behavior into the reference model.
 
+A session declares a purpose. **Application research** may enter an employer's
+flow, inspect its sequence and questions, and record reversible state without
+trying to submit. **Application execution** may prepare an application under
+supervision. Purpose does not grant blanket authority: transmitting sensitive
+data, creating consequential persistent provider state, accepting terms, and
+final submission are commitment boundaries classified and approved at the
+individual transition.
+
 The session transition is:
 
 `session_(n+1) = MikeDecision(Present(Record(Resolve(Intake(session_n)))))`

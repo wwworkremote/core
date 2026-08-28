@@ -12,7 +12,7 @@ modules must satisfy.
 flowchart LR
     subgraph Intake["Intake · drop-in"]
         I0((Start lap))
-        I1["User Task<br/>Paste posting URL<br/>state intent"]
+        I1["User Task<br/>Paste posting URL<br/>declare session purpose"]
         I2[["Service Task<br/>Create GuidedSession<br/>phase: intake"]]
         I3(("Intermediate Event<br/>Record page arrival"))
     end
@@ -74,6 +74,11 @@ form's final submit boundary and records a pending event; final application
 submission is always an approval-required move, even when the preceding run
 was deterministic. Approval currently records the human decision only; a
 separate execution slice must define how an approved provider action resumes.
+
+Application research and application execution share this flow. Research may
+open and inspect provider steps, producing a reusable map of pages, questions,
+and transitions, but it stops at a commitment boundary. A declared purpose is
+context for classification, not permission to transmit data or submit.
 
 ## State overlay
 

@@ -11,6 +11,7 @@
 #  phase             :string           default("intake"), not null
 #  playback_position :integer          default(0), not null
 #  provider          :string           not null
+#  purpose           :string           default("application_execution"), not null
 #  session_token     :string           not null
 #  source_url        :string           not null
 #  started_at        :datetime         not null
@@ -24,6 +25,7 @@
 #
 class GuidedSession < ApplicationRecord
   PHASES = %w[intake resolution response_construction reorientation].freeze
+  PURPOSES = %w[application_research application_execution].freeze
   STATUSES = %w[active paused completed stopped].freeze
 
   has_secure_token :session_token
@@ -31,6 +33,7 @@ class GuidedSession < ApplicationRecord
 
   validates :source_url, :provider, :phase, :status, :started_at, presence: true
   validates :phase, inclusion: { in: PHASES }
+  validates :purpose, inclusion: { in: PURPOSES }
   validates :status, inclusion: { in: STATUSES }
   validates :playback_position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :source_url_is_http

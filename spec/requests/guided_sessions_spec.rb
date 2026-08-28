@@ -10,6 +10,10 @@ RSpec.describe "GuidedSessions" do
       expect(response).to be_successful
       expect(response.body).to include("Start a guided application session")
       expect(response.body).to include("Job posting URL")
+      expect(response.body).to include("Research the application")
+      expect(response.body).to include("Work toward applying")
+      document = response.parsed_body
+      expect(document.at_css('input[value="application_research"]')["checked"]).to eq("checked")
     end
   end
 
@@ -17,7 +21,10 @@ RSpec.describe "GuidedSessions" do
     it "starts an intake session for a copied posting URL" do
       expect {
         post guided_sessions_path, params: {
-          guided_session: { source_url: "https://jobs.example.com/roles/42" }
+          guided_session: {
+            source_url: "https://jobs.example.com/roles/42",
+            purpose: "application_research"
+          }
         }
       }.to change(GuidedSession, :count).by(1)
 
@@ -26,7 +33,18 @@ RSpec.describe "GuidedSessions" do
       expect(session.provider).to eq("jobs.example.com")
       expect(session.phase).to eq("intake")
       expect(session.status).to eq("active")
+      expect(session.purpose).to eq("application_research")
       expect(response).to redirect_to(guided_session_path(session))
+    end
+
+    it "rejects an unknown session purpose" do
+      expect {
+        post guided_sessions_path, params: {
+          guided_session: { source_url: "https://jobs.example.com/roles/42", purpose: "auto_submit" }
+        }
+      }.not_to change(GuidedSession, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "rejects a non-http posting URL" do
@@ -42,13 +60,15 @@ RSpec.describe "GuidedSessions" do
 
   describe "GET /guided_sessions/:id" do
     it "shows the current pump-track phase and next move" do
-      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42")
+      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42", purpose: "application_research")
 
       get guided_session_path(session)
 
       expect(response).to be_successful
       expect(response.body).to include("Intake")
       expect(response.body).to include("Review the posting")
+      expect(response.body).to include("Research mode")
+      expect(response.body).to include("Application research")
     end
 
     it "renders the pump-track playback map and durable resume position" do

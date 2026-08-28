@@ -5,7 +5,7 @@
     <div>
       <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-4">Guided application session</div>
       <h1 class="text-4xl font-black text-white mb-3">Your lap is at Intake</h1>
-      <p class="text-slate-400 font-medium">The posting is queued for supervised review. No provider action has been taken.</p>
+      <p class="text-slate-400 font-medium"><%= @guided_session.purpose == "application_research" ? "Research mode: inspect and record the application flow without committing or submitting." : "Application mode: work toward applying under supervision; submission remains separately approval-gated." %></p>
     </div>
     <span class="badge badge-primary badge-outline font-bold"><%= @guided_session.status.humanize %></span>
   </div>
@@ -33,6 +33,10 @@
   </div>
 
   <div class="card-neural p-8 space-y-5">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Session purpose</div>
+      <div class="text-white font-black"><%= @guided_session.purpose.humanize %></div>
+    </div>
     <div>
       <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Source posting</div>
       <%= link_to @guided_session.source_url, @guided_session.source_url, target: "_blank", rel: "noreferrer", class: "text-primary break-all" %>
