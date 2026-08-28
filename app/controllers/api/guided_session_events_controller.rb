@@ -16,6 +16,7 @@ class Api::GuidedSessionEventsController < ApplicationController
     event = guided_session.guided_session_events.new(event_params)
     return render_validation_error(event) unless event.save
 
+    advance_session_phase(event)
     render json: event_response(event), status: :created
   end
 
@@ -24,12 +25,16 @@ class Api::GuidedSessionEventsController < ApplicationController
   end
 
   def event_params
-    fields = %i[kind action intent requirement reversibility approval_state page_url]
+    fields = %i[kind action intent requirement reversibility approval_state page_url phase]
     params.expect(event: fields + [{ evidence: {} }])
   end
 
   def render_validation_error(event)
     render json: { errors: event.errors.full_messages }, status: :unprocessable_content
+  end
+
+  def advance_session_phase(event)
+    guided_session.update!(phase: event.phase) if guided_session.phase != event.phase
   end
 
   def event_response(event)

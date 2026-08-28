@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-28 00:14'
+updated_date: '2026-08-28 17:19'
 labels:
   - architecture
   - application-workflow
@@ -24,14 +24,14 @@ documentation:
 modified_files:
   - extension/content.js
   - app/controllers/api/guided_session_events_controller.rb
+  - app/controllers/guided_sessions_controller.rb
   - app/models/guided_session_event.rb
   - app/views/guided_sessions/show.html.erb
-  - app/controllers/guided_sessions_controller.rb
-  - app/models/guided_session.rb
   - config/routes.rb
-  - db/migrate/20260827220000_create_guided_session_events.rb
-  - db/schema.rb
   - spec/requests/api/guided_session_events_spec.rb
+  - spec/requests/guided_sessions_spec.rb
+  - docs/architecture/guided-session-flow.md
+  - docs/adr/006-bpmn-lite-guided-session-validation.md
 priority: high
 type: feature
 ordinal: 118000
@@ -110,5 +110,10 @@ Added the visual playback/resume slice: the guided-session page now renders the 
 created: 2026-08-28 00:14
 ---
 Handoff verification found Rails CSRF blocked the playback cursor. Narrowed the playback action to local presentation state and verified in Chrome that playback position 1 survives reload and returns to the same event. No provider or application submission was performed.
+---
+
+created: 2026-08-28 17:19
+---
+Implemented the application-boundary vertical slice: the local extension records application-form arrival in Resolution, intercepts the guided sandbox form's final submit boundary, and records a pending irreversible submission_attempted event. The guided-session UI now exposes explicit Approve/Deny controls that record Mike's decision; approved execution remains a separate future seam. Focused suite: 15 examples, 0 failures; extension lint and focused RuboCop clean.
 ---
 <!-- COMMENTS:END -->

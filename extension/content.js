@@ -1000,7 +1000,27 @@
   // -- nothing else carries id="application-form".
   let submittedAnswers = null;
   document.addEventListener('submit', (e) => {
-    if (e.target && e.target.id === 'application-form') submittedAnswers = currentAnswers();
+    if (!e.target || e.target.id !== 'application-form') return;
+
+    submittedAnswers = currentAnswers();
+    if (!IS_LOCAL_BUILD || !guidedSessionToken) return;
+
+    // A guided session observes the irreversible boundary but does not cross
+    // it. Approval is recorded in the local session UI; a later execution
+    // slice will define how an approved provider action resumes.
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    recordGuidedEvent({
+      kind: 'submission_attempted',
+      action: 'Pause before final application submission',
+      intent: 'Ask Mike to approve sending the reviewed application',
+      requirement: 'required',
+      reversibility: 'irreversible',
+      approval_state: 'pending',
+      phase: 'reorientation',
+      evidence: { answer_count: submittedAnswers.length, form_id: e.target.id },
+    });
+    LOG_WARN('Guided session paused before irreversible application submission');
   }, true);
 
   async function fetchApplicationStatus(jobPostingId) {
@@ -1205,29 +1225,45 @@
 
   LOG('Provider detected:', provider ? provider.label : 'none — generic fallback');
 
+  async function recordGuidedEvent(event) {
+    if (!IS_LOCAL_BUILD || !guidedSessionToken) return null;
+
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json' };
+    if (authHeader) headers['Authorization'] = authHeader;
+    const res = await apiFetch(`${apiBase}/api/guided_sessions/${encodeURIComponent(guidedSessionToken)}/events`, {
+      method: 'POST', headers, body: JSON.stringify({ event: {
+        page_url: window.location.href,
+        ...event,
+      } }),
+    });
+    if (!res.ok || !res.data?.success) throw new Error(res.data?.error || `HTTP ${res.status}`);
+    return res.data;
+  }
+
   async function recordGuidedPageArrival() {
     if (!IS_LOCAL_BUILD || !guidedSessionToken) return;
 
     try {
-      const { base: apiBase, authHeader } = await getApiConfig();
-      const headers = { 'Content-Type': 'application/json' };
-      if (authHeader) headers['Authorization'] = authHeader;
-      const res = await apiFetch(`${apiBase}/api/guided_sessions/${encodeURIComponent(guidedSessionToken)}/events`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ event: {
-          kind: 'page_arrived',
-          action: 'Observe current page',
-          intent: 'Continue the supervised guided session from the copied posting URL',
-          requirement: 'recommended',
-          reversibility: 'reversible',
-          approval_state: 'not_required',
-          page_url: window.location.href,
-          evidence: { page_title: document.title, provider: provider?.key || 'unknown' },
-        } }),
+      const applicationPage = document.querySelector('#application-form');
+      const data = await recordGuidedEvent({
+        kind: applicationPage ? 'application_page_arrived' : 'page_arrived',
+        action: applicationPage ? 'Observe application form' : 'Observe current page',
+        intent: applicationPage
+          ? 'Understand the application questions before drafting a response'
+          : 'Continue the supervised guided session from the copied posting URL',
+        requirement: applicationPage ? 'required' : 'recommended',
+        reversibility: 'reversible',
+        approval_state: 'not_required',
+        phase: applicationPage ? 'resolution' : undefined,
+        evidence: {
+          page_title: document.title,
+          provider: provider?.key || 'unknown',
+          application_form: !!applicationPage,
+          field_count: applicationPage ? currentAnswers().length : undefined,
+        },
       });
-      if (!res.ok || !res.data?.success) throw new Error(res.data?.error || `HTTP ${res.status}`);
-      LOG_OK('Guided session page arrival recorded');
+      LOG_OK(`Guided session ${data.kind} recorded`);
     } catch (err) {
       LOG_WARN('Guided session page arrival failed:', err.message);
     }

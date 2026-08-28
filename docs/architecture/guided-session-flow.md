@@ -62,15 +62,18 @@ flowchart LR
 
 | BPMN-lite element | Domain contract | Current implementation seam |
 | --- | --- | --- |
-| User Task | Mike supplies intent or authorizes a consequential move | Guided-session UI; future approval controls |
+| User Task | Mike supplies intent or authorizes a consequential move | Guided-session UI; pending application submission controls |
 | Service Task | System proposes or records; it does not authorize itself | `GuidedSessionEvent` API and extension adapter |
 | Gateway | Classification determines whether work can proceed | `requirement`, `reversibility`, `approval_state` |
-| Intermediate Event | A meaningful transition is durable and reviewable | `GuidedSessionEvent` |
+| Intermediate Event | A meaningful transition is durable and reviewable | `GuidedSessionEvent`; application-form arrival and paused submission are captured by the local extension |
 | Loop | Reorientation may begin another lap or stop | `GuidedSession` status and durable `playback_position` |
 
 The safety invariant is simple: an unknown, ambiguous, or irreversible move
-must take the `User Task` path. Final application submission is always an
-approval-required move, even when the preceding run was deterministic.
+must take the `User Task` path. The guided extension pauses the application
+form's final submit boundary and records a pending event; final application
+submission is always an approval-required move, even when the preceding run
+was deterministic. Approval currently records the human decision only; a
+separate execution slice must define how an approved provider action resumes.
 
 ## State overlay
 

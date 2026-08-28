@@ -61,6 +61,16 @@
             </div>
             <div class="text-white font-bold"><%= event.action %></div>
             <p class="text-sm text-slate-400 mt-2"><%= event.intent %></p>
+            <% if event.approval_state == 'pending' %>
+              <div class="mt-5 rounded-lg border border-warning/30 bg-warning/10 p-4">
+                <div class="text-sm font-black text-warning">Approval required</div>
+                <p class="text-xs text-slate-400 mt-1">This transition is paused. Decide here before any irreversible provider action is considered.</p>
+                <div class="flex gap-3 mt-4">
+                  <%= button_to "Approve", approval_guided_session_path(@guided_session, event_id: event.id), method: :patch, params: { approval_state: "approved" }, class: "btn btn-sm btn-success rounded-lg font-bold" %>
+                  <%= button_to "Deny", approval_guided_session_path(@guided_session, event_id: event.id), method: :patch, params: { approval_state: "denied" }, class: "btn btn-sm btn-error btn-outline rounded-lg font-bold" %>
+                </div>
+              </div>
+            <% end %>
           </article>
         <% end %>
       </div>

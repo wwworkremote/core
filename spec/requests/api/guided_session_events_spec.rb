@@ -27,6 +27,31 @@ RSpec.describe "Guided session events API" do
       expect(response.parsed_body).to include("phase" => "intake", "kind" => "posting_reviewed")
     end
 
+    it "records an application transition in its declared pump-track phase" do
+      post api_guided_session_events_path(guided_session.session_token), params: {
+        event: event_params.fetch(:event).merge(
+          kind: "application_page_arrived",
+          action: "Observe application form",
+          intent: "Understand the application questions before drafting a response",
+          phase: "resolution"
+        )
+      }
+
+      expect(response).to have_http_status(:created)
+      expect(guided_session.reload.phase).to eq("resolution")
+      expect(guided_session.guided_session_events.last.phase).to eq("resolution")
+    end
+
+    it "requires an approval state for irreversible transitions" do
+      post api_guided_session_events_path(guided_session.session_token), params: {
+        event: event_params.fetch(:event).merge(reversibility: "irreversible", approval_state: "not_required")
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      errors = response.parsed_body.fetch("errors")
+      expect(errors).to include("Approval state must be pending, approved, or denied for irreversible transitions")
+    end
+
     it "rejects an event without intent or a valid classification" do
       post api_guided_session_events_path(guided_session.session_token), params: {
         event: { kind: "posting_reviewed", action: "review posting", reversibility: "unknown" }
@@ -60,6 +85,34 @@ RSpec.describe "Guided session events API" do
       expect(response).to be_successful
       expect(response.body).to include("Understand the opportunity")
       expect(response.body).to include("Required")
+    end
+
+    it "offers an explicit decision for a pending irreversible event" do
+      event = guided_session.guided_session_events.create!(
+        kind: "submission_attempted", action: "Submit application", intent: "Send the reviewed application",
+        requirement: "required", reversibility: "irreversible", approval_state: "pending",
+        phase: "reorientation", occurred_at: Time.current
+      )
+
+      get guided_session_path(guided_session)
+
+      expect(response.body).to include("Approval required")
+      expect(response.body).to include("Approve")
+      expect(response.body).to include("Deny")
+      expect(response.body).to include(approval_guided_session_path(guided_session, event_id: event.id))
+    end
+
+    it "records the actor's approval decision" do
+      event = guided_session.guided_session_events.create!(
+        kind: "submission_attempted", action: "Submit application", intent: "Send the reviewed application",
+        requirement: "required", reversibility: "irreversible", approval_state: "pending",
+        phase: "reorientation", occurred_at: Time.current
+      )
+
+      patch approval_guided_session_path(guided_session, event_id: event.id), params: { approval_state: "denied" }
+
+      expect(response).to redirect_to(guided_session_path(guided_session))
+      expect(event.reload.approval_state).to eq("denied")
     end
   end
 end

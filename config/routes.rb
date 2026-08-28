@@ -210,6 +210,7 @@ Rails.application.routes.draw do
   resources :guided_sessions, only: %i[new create show] do
     member do
       patch :playback
+      patch "events/:event_id/approval", to: "guided_sessions#approval", as: :approval
     end
   end
   namespace :admin do

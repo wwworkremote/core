@@ -43,6 +43,7 @@ class GuidedSessionEvent < ApplicationRecord
   validates :requirement, inclusion: { in: REQUIREMENTS }
   validates :reversibility, inclusion: { in: REVERSIBILITIES }
   validates :approval_state, inclusion: { in: APPROVAL_STATES }
+  validate :irreversible_transition_requires_approval
 
   before_validation :set_defaults, on: :create
 
@@ -52,5 +53,11 @@ class GuidedSessionEvent < ApplicationRecord
     self.phase ||= guided_session.phase
     self.occurred_at ||= Time.current
     self.evidence ||= {}
+  end
+
+  def irreversible_transition_requires_approval
+    return unless reversibility == "irreversible" && approval_state == "not_required"
+
+    errors.add(:approval_state, "must be pending, approved, or denied for irreversible transitions")
   end
 end
