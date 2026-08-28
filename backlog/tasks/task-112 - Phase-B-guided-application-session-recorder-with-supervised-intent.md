@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-28 22:50'
+updated_date: '2026-08-28 22:52'
 labels:
   - architecture
   - application-workflow
@@ -14,6 +14,7 @@ dependencies: []
 references:
   - TASK-105 (completed)
   - TASK-106 (completed)
+  - TASK-113
 documentation:
   - docs/adr/004-pump-track-job-application-loop.md
   - docs/architecture/pump-track.md
@@ -133,5 +134,11 @@ author: Codex
 created: 2026-08-28 22:50
 ---
 Implemented and verified the repeatable application-research observation slice. Guided-session pages now expose a tokenized “Open research flow” link. Extension v1.28.0 records a bounded, value-free application form structure (field key, label, control type, required state, identity/screening/demographic classification) and the local timeline renders it. Chrome opened the same tracked sandbox application twice from research session #2: both forms remained untouched, both observations recorded 6 fields and 2 screening questions, both field arrays produced one shared structure signature, and the session contained 0 submission_attempted events. Focused suite: 18 examples, 0 failures; extension lint, JS syntax, focused RuboCop, and diff checks passed.
+---
+
+author: Codex
+created: 2026-08-28 22:52
+---
+Follow-on learning requirement captured as TASK-113. Guided-session research observations must feed a cross-application question graph: preserve each exact occurrence and its application/company/industry/provider/persona/outcome context, then group occurrences into reviewable archetypes and attach versioned answer strategies. TASK-112 remains responsible for trustworthy observation; TASK-113 owns cross-application clustering, answer-catalog analytics, and graph visualization.
 ---
 <!-- COMMENTS:END -->

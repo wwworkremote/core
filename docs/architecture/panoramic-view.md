@@ -95,6 +95,8 @@ flowchart TD
     UJP -."job_posting_id + user_id".-> TE
     TE["Applications::TraceEvidence<br/>(read-only, assembles + sorts)"]
     TE --> PV["Panoramic View page<br/>one frame, one trace"]
+    OBS -."question occurrence".-> QG["Question Knowledge Graph<br/>cross-application read model"]
+    QG -."archetype + answer strategy context".-> PV
 ```
 
 **`Applications::TraceEvidence`** — a read-only service mirroring `Panoramic::RuntimeEvidence`'s
@@ -114,6 +116,12 @@ failures).
 (a "View full trace" link next to the existing pipeline timeline, appearing whenever
 `application_trace_id` is present) and from the `/admin/human_tasks` inbox. Read-only, no writes,
 cheap: this is a *view* over data that already exists, not a new write path.
+
+The [Application Question Knowledge Graph](application-question-knowledge-graph.md)
+is a second read perspective over observation history. Panoramic View answers
+“what happened in this application?”; the question graph answers “what repeats
+across applications, companies, industries, and outcomes?” Neither read model
+owns workflow state or silently promotes an observed answer into a template.
 
 ## Orchestration vs. choreography — answered, not just named
 

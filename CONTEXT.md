@@ -9,6 +9,10 @@
 - **Pump Track:** The recurring four-phase loop of Intake, Resolution, Response Construction, and Reorientation that describes one lap of the job-search game.
 - **Guided Session:** A supervised lap in which the system records what happened and why, while Mike retains authority at ambiguous or irreversible transitions.
 - **Session Purpose:** The declared intent for a Guided Session: application research observes and records an employer flow without commitment, while application execution works toward applying under supervision.
+- **Question Occurrence:** One question as observed in one application context, retaining its exact wording and links to the application, posting, company, industry, provider, persona, and outcome.
+- **Question Archetype:** A reviewable concept that groups semantically equivalent Question Occurrences without erasing their wording or provenance; archetypes may be merged, split, or corrected as evidence improves.
+- **Answer Strategy:** A provenance-bearing approach for responding to a Question Archetype, ranging from deterministic profile facts and authored templates to persona-aware synthesis requiring richer evidence.
+- **Answer Sophistication:** The degree of reasoning and contextual tailoring an Answer Strategy requires; frequency alone does not make an answer safe to reuse verbatim.
 
 ## Core Concepts
 - **Vector Search:** Using pgvector to find similarities between Resume versions and Job Postings.

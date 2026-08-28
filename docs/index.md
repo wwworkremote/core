@@ -24,6 +24,8 @@ diagrams, not just source. This file itself is best read there.
 - **[Business-Process Signals](architecture/business-process-signals.md)**: Truth seams and composite signals that prove the job-posting-to-application process is functioning.
 - **[Business-Process Health Signals ADR](adr/007-business-process-health-signals.md)**: Why functional health is interpreted from ordered business signal sets.
 - **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace-correlated, read-only evidence timeline and supervised application session.
+- **[Application Question Knowledge Graph](architecture/application-question-knowledge-graph.md)**: Cross-application map of observed question occurrences, archetypes, answer strategies, companies, industries, personas, and outcomes.
+- **[Question Occurrence Preservation ADR](adr/008-preserve-question-occurrences-before-archetype-clustering.md)**: Why exact contextual observations remain separate from curated archetypes and reusable answers.
 - **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, with capture and human-approved references built.
 - **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally for safe extension dogfooding and Reference Scenario capture.
 - **[Configuration](configuration.md)**: Environment variables and credentials.
