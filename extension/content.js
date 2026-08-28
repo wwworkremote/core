@@ -915,6 +915,32 @@
     return out;
   }
 
+  // Research evidence describes the form without collecting what the person
+  // typed. Keep this bounded and value-free so repeated observations can map
+  // provider flow shape without turning credentials or answers into telemetry.
+  function extractApplicationFormStructure(doc) {
+    const form = doc.querySelector('#application-form');
+    if (!form) return [];
+    const demoSection = doc.getElementById('demographic-section');
+
+    return Array.from(form.querySelectorAll('input, textarea, select'))
+      .filter(el => !['hidden', 'submit', 'button'].includes((el.type || '').toLowerCase()))
+      .slice(0, 100)
+      .map(el => {
+        const label = doc.getElementById(`${el.id}-label`) || form.querySelector(`label[for="${el.id}"]`);
+        const classification = demoSection?.contains(el)
+          ? 'demographic'
+          : el.id.startsWith('question_') ? 'screening_question' : 'identity';
+        return {
+          field_key: el.id || el.name || 'unnamed',
+          label: label?.textContent?.replace(/\*\s*$/, '').trim() || el.name || el.id || 'Unlabelled field',
+          type: el.tagName === 'SELECT' ? 'select' : (el.type || el.tagName.toLowerCase()),
+          classification,
+          required: el.required || el.getAttribute('aria-required') === 'true',
+        };
+      });
+  }
+
   function normalizeWords(str) {
     return new Set(String(str || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean));
   }
@@ -1246,6 +1272,8 @@
 
     try {
       const applicationPage = document.querySelector('#application-form');
+      const fields = applicationPage ? extractApplicationFormStructure(document) : [];
+      const questions = applicationPage ? extractApplicationQuestions(document) : [];
       const data = await recordGuidedEvent({
         kind: applicationPage ? 'application_page_arrived' : 'page_arrived',
         action: applicationPage ? 'Observe application form' : 'Observe current page',
@@ -1260,7 +1288,9 @@
           page_title: document.title,
           provider: provider?.key || 'unknown',
           application_form: !!applicationPage,
-          field_count: applicationPage ? currentAnswers().length : undefined,
+          field_count: applicationPage ? fields.length : undefined,
+          question_count: applicationPage ? questions.length : undefined,
+          fields: applicationPage ? fields : undefined,
         },
       });
       LOG_OK(`Guided session ${data.kind} recorded`);

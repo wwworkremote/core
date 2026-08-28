@@ -69,6 +69,18 @@ RSpec.describe "GuidedSessions" do
       expect(response.body).to include("Review the posting")
       expect(response.body).to include("Research mode")
       expect(response.body).to include("Application research")
+      expect(response.body).to include("Open research flow")
+      expect(response.body).to include("guided_session_token=#{session.session_token}")
+    end
+
+    it "preserves existing source parameters and replaces stale correlation" do
+      session = GuidedSession.create!(
+        source_url: "https://jobs.example.com/roles/42?source=board&guided_session_token=stale"
+      )
+
+      expect(session.tracked_source_url).to eq(
+        "https://jobs.example.com/roles/42?source=board&guided_session_token=#{session.session_token}"
+      )
     end
 
     it "renders the pump-track playback map and durable resume position" do

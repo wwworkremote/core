@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-28 20:49'
+updated_date: '2026-08-28 22:50'
 labels:
   - architecture
   - application-workflow
@@ -22,16 +22,16 @@ documentation:
   - docs/architecture/guided-session-flow.md
   - docs/adr/006-bpmn-lite-guided-session-validation.md
 modified_files:
-  - CONTEXT.md
-  - app/controllers/guided_sessions_controller.rb
   - app/models/guided_session.rb
-  - app/views/guided_sessions/new.html.erb
   - app/views/guided_sessions/show.html.erb
-  - db/migrate/20260828200000_add_purpose_to_guided_sessions.rb
-  - db/schema.rb
-  - docs/adr/005-supervised-intent-capture.md
+  - >-
+    backlog/tasks/task-112 -
+    Phase-B-guided-application-session-recorder-with-supervised-intent.md
   - docs/architecture/guided-session-flow.md
+  - extension/content.js
+  - extension/manifest.json
   - spec/requests/guided_sessions_spec.rb
+  - spec/requests/api/guided_session_events_spec.rb
 priority: high
 type: feature
 ordinal: 118000
@@ -127,5 +127,11 @@ author: Codex
 created: 2026-08-28 20:49
 ---
 Chrome dogfood verified the new boundary end to end on localhost. The intake renders application research selected by default, preserves application execution as the alternate purpose, and created guided session #2 from the sandbox URL. The session page persisted “Application research” and states that the flow may be inspected and recorded without committing or submitting. No employer site was opened, no sensitive data was entered, and no application was submitted.
+---
+
+author: Codex
+created: 2026-08-28 22:50
+---
+Implemented and verified the repeatable application-research observation slice. Guided-session pages now expose a tokenized “Open research flow” link. Extension v1.28.0 records a bounded, value-free application form structure (field key, label, control type, required state, identity/screening/demographic classification) and the local timeline renders it. Chrome opened the same tracked sandbox application twice from research session #2: both forms remained untouched, both observations recorded 6 fields and 2 screening questions, both field arrays produced one shared structure signature, and the session contained 0 submission_attempted events. Focused suite: 18 examples, 0 failures; extension lint, JS syntax, focused RuboCop, and diff checks passed.
 ---
 <!-- COMMENTS:END -->

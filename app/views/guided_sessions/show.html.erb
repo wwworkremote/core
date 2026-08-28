@@ -45,6 +45,10 @@
       <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Next move</div>
       <div class="text-xl font-black text-white">Review the posting</div>
       <p class="text-sm text-slate-400 mt-2">Confirm the opportunity and tell the system what matters before it proposes the next step.</p>
+      <%= link_to(@guided_session.purpose == "application_research" ? "Open research flow" : "Open supervised application",
+                  @guided_session.tracked_source_url,
+                  target: "_blank", rel: "noreferrer",
+                  class: "btn btn-primary rounded-xl font-bold mt-4") %>
     </div>
     <div class="border-t border-white/10 pt-5 text-sm text-slate-500">
       Session <code class="text-slate-300"><%= @guided_session.session_token %></code> · Provider <span class="text-slate-300"><%= @guided_session.provider %></span>
@@ -65,6 +69,20 @@
             </div>
             <div class="text-white font-bold"><%= event.action %></div>
             <p class="text-sm text-slate-400 mt-2"><%= event.intent %></p>
+            <% fields = event.evidence["fields"] %>
+            <% if fields.is_a?(Array) && fields.any? %>
+              <div class="mt-5 rounded-lg border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Observed form structure · <%= fields.length %> fields</div>
+                <div class="grid md:grid-cols-2 gap-2">
+                  <% fields.each do |field| %>
+                    <div class="rounded border border-white/10 px-3 py-2 text-xs">
+                      <span class="font-bold text-white"><%= field["label"] %></span>
+                      <span class="text-slate-500"> · <%= field["type"] %> · <%= field["classification"].to_s.humanize %> · <%= field["required"] ? "required" : "optional" %></span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
             <% if event.approval_state == 'pending' %>
               <div class="mt-5 rounded-lg border border-warning/30 bg-warning/10 p-4">
                 <div class="text-sm font-black text-warning">Approval required</div>

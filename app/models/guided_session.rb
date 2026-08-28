@@ -40,6 +40,12 @@ class GuidedSession < ApplicationRecord
 
   before_validation :set_intake_attributes, on: :create
 
+  def tracked_source_url
+    uri = parsed_source_url
+    uri.query = tracked_query(uri)
+    uri.to_s
+  end
+
   private
 
   def set_intake_attributes
@@ -64,6 +70,11 @@ class GuidedSession < ApplicationRecord
     URI.parse(source_url.to_s)
   rescue URI::InvalidURIError
     nil
+  end
+
+  def tracked_query(uri)
+    query = URI.decode_www_form(uri.query.to_s).to_h.except("guided_session_token")
+    URI.encode_www_form(query.merge("guided_session_token" => session_token))
   end
 
   def source_uri_host

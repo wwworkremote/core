@@ -18,7 +18,7 @@ flowchart LR
     end
 
     subgraph Resolution["Resolution · bottom"]
-        R1[["Service Task<br/>Observe posting/application"]]
+        R1[["Service Task<br/>Observe posting/application<br/>capture value-free structure"]]
         R2["Service Task<br/>Propose next move"]
         R3{"Gateway<br/>Known and reversible?"}
     end
@@ -79,6 +79,12 @@ Application research and application execution share this flow. Research may
 open and inspect provider steps, producing a reusable map of pages, questions,
 and transitions, but it stops at a commitment boundary. A declared purpose is
 context for classification, not permission to transmit data or submit.
+
+The tracked source URL carries the local guided-session correlation token. On
+an application page, the extension records a bounded, value-free structure:
+field key, label, control type, required state, and broad classification. It
+does not record entered values. Reopening the same page creates another
+observation so repeatability and provider drift can be compared explicitly.
 
 ## State overlay
 

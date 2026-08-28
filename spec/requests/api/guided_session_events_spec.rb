@@ -12,6 +12,17 @@ RSpec.describe "Guided session events API" do
       page_url: "https://jobs.example.com/roles/42", evidence: { title: "Staff Engineer" }
     } }
   end
+  let(:application_structure) do
+    {
+      field_count: 2,
+      question_count: 1,
+      fields: [
+        { field_key: "email", label: "Email", type: "email", classification: "identity", required: true },
+        { field_key: "question_1", label: "Why this role?", type: "textarea",
+          classification: "screening_question", required: false }
+      ]
+    }
+  end
 
   describe "POST /api/guided_sessions/:session_token/events" do
     it "records an annotated transition in the session timeline" do
@@ -33,13 +44,16 @@ RSpec.describe "Guided session events API" do
           kind: "application_page_arrived",
           action: "Observe application form",
           intent: "Understand the application questions before drafting a response",
-          phase: "resolution"
+          phase: "resolution",
+          evidence: application_structure
         )
-      }
+      }, as: :json
 
       expect(response).to have_http_status(:created)
       expect(guided_session.reload.phase).to eq("resolution")
-      expect(guided_session.guided_session_events.last.phase).to eq("resolution")
+      event = guided_session.guided_session_events.last
+      expect(event.phase).to eq("resolution")
+      expect(event.evidence.fetch("fields").second).to include("label" => "Why this role?", "required" => false)
     end
 
     it "requires an approval state for irreversible transitions" do
@@ -85,6 +99,22 @@ RSpec.describe "Guided session events API" do
       expect(response).to be_successful
       expect(response.body).to include("Understand the opportunity")
       expect(response.body).to include("Required")
+    end
+
+    it "shows value-free application structure evidence" do
+      guided_session.guided_session_events.create!(
+        kind: "application_page_arrived", action: "Observe application form",
+        intent: "Map the provider flow", requirement: "required", reversibility: "reversible",
+        approval_state: "not_required", phase: "resolution", occurred_at: Time.current,
+        evidence: { fields: [{ label: "Why this role?", type: "textarea",
+                               classification: "screening_question", required: false }] }
+      )
+
+      get guided_session_path(guided_session)
+
+      expect(response.body).to include("Observed form structure")
+      expect(response.body).to include("Why this role?")
+      expect(response.body).to include("Screening question")
     end
 
     it "offers an explicit decision for a pending irreversible event" do
