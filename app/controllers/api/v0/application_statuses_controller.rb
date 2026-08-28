@@ -12,11 +12,18 @@ class Api::V0::ApplicationStatusesController < ApiController
   def create
     record = tracked_record
     logged = record.record_status_event!(params[:event], link: params[:link])
+    emit_application_transition(logged, record)
 
     render json: transition_payload(record, logged)
   end
 
   private
+
+  def emit_application_transition(logged, record)
+    Wwwr::ProcessSignals.emit(:application_transitioned, process: "job_posting_to_application", stage: "application",
+                                                         outcome: logged.present? ? "success" : "rejected",
+                                                         phase: record.status)
+  end
 
   def transition_payload(record, logged)
     status_payload(record).merge(success: logged.present?, captured_answers: capture_answers)

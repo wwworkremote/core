@@ -30,6 +30,7 @@ class Leads::CaptureService
     company, source, job_posting = resolve_records
     link_lead(job_posting, company, source)
     enqueue_pipeline(job_posting)
+    emit_posting_promoted
     { success: true, job_posting: job_posting }
   end
 
@@ -101,5 +102,16 @@ class Leads::CaptureService
     JobBoards::AnalysisJob.perform_later(job_posting.id)
     LLM::ProfileMatchJob.perform_later(@user.id, job_posting.id)
     JobBoards::StrategyJob.perform_later(job_posting.id, @user.id)
+    emit_pipeline_handoff
+  end
+
+  def emit_posting_promoted
+    Wwwr::ProcessSignals.emit(:posting_promoted, process: "job_posting_to_application", stage: "resolution",
+                                                 outcome: "success", provider: @lead.provider)
+  end
+
+  def emit_pipeline_handoff
+    Wwwr::ProcessSignals.emit(:pipeline_handoff_enqueued, process: "job_posting_to_application", stage: "handoff",
+                                                          outcome: "success", provider: @lead.provider)
   end
 end

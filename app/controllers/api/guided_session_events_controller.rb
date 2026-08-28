@@ -16,7 +16,7 @@ class Api::GuidedSessionEventsController < ApplicationController
     event = guided_session.guided_session_events.new(event_params)
     return render_validation_error(event) unless event.save
 
-    advance_session_phase(event)
+    record_guided_transition(event)
     render json: event_response(event), status: :created
   end
 
@@ -31,6 +31,17 @@ class Api::GuidedSessionEventsController < ApplicationController
 
   def render_validation_error(event)
     render json: { errors: event.errors.full_messages }, status: :unprocessable_content
+  end
+
+  def emit_guided_transition(event)
+    Wwwr::ProcessSignals.emit(:guided_transition_recorded, process: "guided_application_session",
+                                                           stage: "supervised_browser", outcome: "success",
+                                                           phase: event.phase)
+  end
+
+  def record_guided_transition(event)
+    advance_session_phase(event)
+    emit_guided_transition(event)
   end
 
   def advance_session_phase(event)

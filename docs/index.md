@@ -21,6 +21,8 @@ diagrams, not just source. This file itself is best read there.
 - **[Job Application Pump Track](architecture/pump-track.md)**: The recurring actor-system loop behind discovery, evaluation, application, and what comes next.
 - **[Supervised Intent Capture ADR](adr/005-supervised-intent-capture.md)**: How guided sessions preserve Mike's intent while keeping automation bounded.
 - **[BPMN-lite Guided Session ADR](adr/006-bpmn-lite-guided-session-validation.md)**: Why Mermaid validates the flow while ActiveRecord/AASM remain the runtime state tools.
+- **[Business-Process Signals](architecture/business-process-signals.md)**: Truth seams and composite signals that prove the job-posting-to-application process is functioning.
+- **[Business-Process Health Signals ADR](adr/007-business-process-health-signals.md)**: Why functional health is interpreted from ordered business signal sets.
 - **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace-correlated, read-only evidence timeline and supervised application session.
 - **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, with capture and human-approved references built.
 - **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally for safe extension dogfooding and Reference Scenario capture.

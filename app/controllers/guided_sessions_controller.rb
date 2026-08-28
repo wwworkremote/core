@@ -65,10 +65,17 @@ class GuidedSessionsController < ApplicationController
 
   def record_approval(event, approval_state)
     event.update!(approval_state: approval_state)
+    emit_guided_approval(event, approval_state)
     redirect_to guided_session_path(@guided_session), notice: "Approval decision recorded: #{approval_state}."
   end
 
   def render_invalid_position
     render json: { errors: ["Position must be a non-negative integer"] }, status: :unprocessable_content
+  end
+
+  def emit_guided_approval(event, approval_state)
+    Wwwr::ProcessSignals.emit(:guided_approval_decided, process: "guided_application_session",
+                                                        stage: "reorientation", outcome: approval_state,
+                                                        phase: event.phase)
   end
 end

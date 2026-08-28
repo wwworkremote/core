@@ -33,11 +33,9 @@ class Api::LeadsController < ApplicationController
   private
 
   def respond_to_promote(lead, result)
-    if result[:success]
-      render json: { success: true, lead_id: lead.id, job_posting_id: result[:job_posting].id }
-    else
-      render json: { success: false, error: result[:error] }, status: :unprocessable_content
-    end
+    return render_promoted(lead, result) if result[:success]
+
+    render json: { success: false, error: result[:error] }, status: :unprocessable_content
   end
 
   def respond_with_save(lead)
@@ -54,10 +52,26 @@ class Api::LeadsController < ApplicationController
   # extraction quality degrading over time, not just a single field's
   # selector drift (that's what ExtractionRuleObservation is for).
   def track_capture(lead)
+    emit_lead_observed(lead)
     ahoy.track "Captured Lead", provider: lead.provider,
                                 extraction_method: lead.discovery["extraction_method"],
                                 extraction_confidence: lead.discovery["extraction_confidence"],
                                 field_count: lead.discovery["field_count"]
+  end
+
+  def emit_lead_observed(lead)
+    Wwwr::ProcessSignals.emit(:lead_observed, process: "job_posting_to_application", stage: "intake",
+                                              outcome: "success", provider: lead.provider)
+  end
+
+  def emit_posting_promoted(lead)
+    Wwwr::ProcessSignals.emit(:posting_promoted, process: "job_posting_to_application", stage: "resolution",
+                                                 outcome: "success", provider: lead.provider)
+  end
+
+  def render_promoted(lead, result)
+    emit_posting_promoted(lead)
+    render json: { success: true, lead_id: lead.id, job_posting_id: result[:job_posting].id }
   end
 
   def lead_params
