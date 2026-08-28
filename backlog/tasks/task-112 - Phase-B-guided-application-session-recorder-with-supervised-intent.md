@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-27 23:37'
+updated_date: '2026-08-28 00:14'
 labels:
   - architecture
   - application-workflow
@@ -100,5 +100,15 @@ Verified end to end after reloading Chrome extension v1.26.0: opening the tokeni
 created: 2026-08-27 23:37
 ---
 Added the canonical BPMN-lite Mermaid validation scheme in docs/architecture/guided-session-flow.md and ADR 006. It now shows the four pump-track phases, User Tasks, Service Tasks, gateways, intermediate timeline events, approval interruption, and continue/stop loop. Updated the application sequence, human-task pipeline, pump-track page, docs index, and architecture summary to stay aligned.
+---
+
+created: 2026-08-28 00:12
+---
+Added the visual playback/resume slice: the guided-session page now renders the four-phase pump-track map, plays recorded events step by step, highlights the active phase/event, and persists playback_position through a resume endpoint. Chrome dogfood confirmed position 1 survives reload and returns to the same event. Updated BPMN-lite validation docs to distinguish the viewing cursor from action authorization.
+---
+
+created: 2026-08-28 00:14
+---
+Handoff verification found Rails CSRF blocked the playback cursor. Narrowed the playback action to local presentation state and verified in Chrome that playback position 1 survives reload and returns to the same event. No provider or application submission was performed.
 ---
 <!-- COMMENTS:END -->

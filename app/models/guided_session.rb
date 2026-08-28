@@ -7,15 +7,16 @@
 #
 # Table name: guided_sessions
 #
-#  id            :bigint           not null, primary key
-#  phase         :string           default("intake"), not null
-#  provider      :string           not null
-#  session_token :string           not null
-#  source_url    :string           not null
-#  started_at    :datetime         not null
-#  status        :string           default("active"), not null
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
+#  id                :bigint           not null, primary key
+#  phase             :string           default("intake"), not null
+#  playback_position :integer          default(0), not null
+#  provider          :string           not null
+#  session_token     :string           not null
+#  source_url        :string           not null
+#  started_at        :datetime         not null
+#  status            :string           default("active"), not null
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
 #
 # Indexes
 #
@@ -31,6 +32,7 @@ class GuidedSession < ApplicationRecord
   validates :source_url, :provider, :phase, :status, :started_at, presence: true
   validates :phase, inclusion: { in: PHASES }
   validates :status, inclusion: { in: STATUSES }
+  validates :playback_position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :source_url_is_http
 
   before_validation :set_intake_attributes, on: :create

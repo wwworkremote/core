@@ -207,7 +207,11 @@ Rails.application.routes.draw do
     end
   end
   resources :job_searches
-  resources :guided_sessions, only: %i[new create show]
+  resources :guided_sessions, only: %i[new create show] do
+    member do
+      patch :playback
+    end
+  end
   namespace :admin do
     resources :skills
     resources :pipeline_prompts

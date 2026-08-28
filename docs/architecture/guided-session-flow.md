@@ -66,7 +66,7 @@ flowchart LR
 | Service Task | System proposes or records; it does not authorize itself | `GuidedSessionEvent` API and extension adapter |
 | Gateway | Classification determines whether work can proceed | `requirement`, `reversibility`, `approval_state` |
 | Intermediate Event | A meaningful transition is durable and reviewable | `GuidedSessionEvent` |
-| Loop | Reorientation may begin another lap or stop | `GuidedSession` status and future transition interface |
+| Loop | Reorientation may begin another lap or stop | `GuidedSession` status and durable `playback_position` |
 
 The safety invariant is simple: an unknown, ambiguous, or irreversible move
 must take the `User Task` path. Final application submission is always an
@@ -87,4 +87,5 @@ stateDiagram-v2
 
 This state overlay is deliberately smaller than the event vocabulary. A phase
 describes where the lap is; events explain what happened, why, and under what
-safety classification.
+safety classification. Playback position is a resumable viewing cursor, not a
+claim that the underlying application action has been authorized.

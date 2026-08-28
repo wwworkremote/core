@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -386,6 +386,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_220000) do
   create_table "guided_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "phase", default: "intake", null: false
+    t.integer "playback_position", default: 0, null: false
     t.string "provider", null: false
     t.string "session_token", null: false
     t.string "source_url", null: false

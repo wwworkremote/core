@@ -50,5 +50,37 @@ RSpec.describe "GuidedSessions" do
       expect(response.body).to include("Intake")
       expect(response.body).to include("Review the posting")
     end
+
+    it "renders the pump-track playback map and durable resume position" do
+      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42", playback_position: 2)
+
+      get guided_session_path(session)
+
+      expect(response).to be_successful
+      expect(response.body).to include('data-controller="guided-session-playback"')
+      expect(response.body).to include("Playback position: 2")
+      expect(response.body).to include("Play lap")
+    end
+  end
+
+  describe "PATCH /guided_sessions/:id/playback" do
+    it "persists the playback position for a later handoff" do
+      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42")
+
+      patch playback_guided_session_path(session), params: { position: 3 }
+
+      expect(response).to have_http_status(:ok)
+      expect(session.reload.playback_position).to eq(3)
+      expect(response.parsed_body).to include("position" => 3)
+    end
+
+    it "rejects a negative playback position" do
+      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42")
+
+      patch playback_guided_session_path(session), params: { position: -1 }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(session.reload.playback_position).to eq(0)
+    end
   end
 end

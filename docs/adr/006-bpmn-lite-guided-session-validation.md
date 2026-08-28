@@ -42,6 +42,8 @@ No Camunda, Temporal, or native AASM/BPMN runtime is introduced by this ADR.
   runtime or deployment concern.
 - The diagram is a validation scheme, not proof of runtime behavior; focused
   tests must still exercise the public interfaces represented by each seam.
+- Playback state is a durable viewing cursor so a session can be handed off
+  and resumed without implying that the next provider action is authorized.
 - If the diagram repeatedly requires engine semantics that ActiveRecord,
   `GuidedSessionEvent`, and AASM cannot express locally, that is evidence for a
   new architecture decision—not permission to smuggle in a workflow engine.

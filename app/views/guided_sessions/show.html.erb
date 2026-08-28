@@ -1,4 +1,6 @@
-<div class="max-w-4xl mx-auto py-16 px-6">
+<div class="max-w-5xl mx-auto py-16 px-6" data-controller="guided-session-playback"
+     data-guided-session-playback-playback-url-value="<%= playback_guided_session_path(@guided_session) %>"
+     data-guided-session-playback-position-value="<%= @guided_session.playback_position %>">
   <div class="flex items-start justify-between gap-6 mb-10">
     <div>
       <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-4">Guided application session</div>
@@ -8,9 +10,22 @@
     <span class="badge badge-primary badge-outline font-bold"><%= @guided_session.status.humanize %></span>
   </div>
 
+  <div class="flex flex-wrap items-center gap-3 mb-6" aria-label="Playback controls">
+    <button type="button" class="btn btn-primary rounded-xl font-bold" data-guided-session-playback-target="play" data-action="guided-session-playback#play">Play lap</button>
+    <button type="button" class="btn btn-ghost border-white/10 rounded-xl font-bold" data-guided-session-playback-target="pause" data-action="guided-session-playback#pause">Pause</button>
+    <button type="button" class="btn btn-ghost border-white/10 rounded-xl font-bold" data-action="guided-session-playback#previous">Previous</button>
+    <button type="button" class="btn btn-ghost border-white/10 rounded-xl font-bold" data-action="guided-session-playback#next">Next</button>
+    <span class="text-xs font-bold text-slate-400" data-guided-session-playback-target="position" aria-live="polite">Playback position: <%= @guided_session.playback_position %></span>
+  </div>
+
+  <div class="rounded-xl border border-primary/20 bg-primary/5 p-4 mb-10" aria-live="polite">
+    <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Now playing</div>
+    <div class="text-lg font-black text-white" data-guided-session-playback-target="current">Ready to begin the lap</div>
+  </div>
+
   <div class="grid md:grid-cols-4 gap-3 mb-10">
     <% %w[Intake Resolution Response\ Construction Reorientation].each_with_index do |phase, index| %>
-      <div class="rounded-xl border <%= index.zero? ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5' %> p-4">
+      <div class="rounded-xl border <%= index.zero? ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5' %> p-4" data-guided-session-playback-target="phase" data-phase="<%= phase.parameterize(separator: '_') %>">
         <div class="text-xs font-black text-slate-500 mb-2">0<%= index + 1 %></div>
         <div class="text-sm font-bold text-white"><%= phase %></div>
       </div>
@@ -36,8 +51,8 @@
     <div class="text-xs font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Recorded timeline</div>
     <% if @events.any? %>
       <div class="space-y-4">
-        <% @events.each do |event| %>
-          <article class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>">
+        <% @events.each_with_index do |event, index| %>
+          <article class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>" data-guided-session-playback-target="event" data-index="<%= index %>" data-phase="<%= event.phase %>">
             <div class="flex flex-wrap items-center gap-3 mb-3">
               <span class="text-xs font-black uppercase tracking-widest text-primary"><%= event.kind.humanize %></span>
               <span class="badge badge-ghost text-xs"><%= event.requirement.humanize %></span>
