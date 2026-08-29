@@ -44,13 +44,38 @@ RSpec.describe Scenarios::HandshakeCheck do
       expect(candidate_id).to include(status: "optional-and-present")
     end
 
-    it "checks required_after_submit as plain required for now (documented ceiling)" do
-      scenario = create(:scenario, provider: "greenhouse")
+    describe "step-aware required_after_submit (ADR 009)" do
+      def ats_status(scenario, purpose: nil)
+        described_class.call(scenario, purpose: purpose)
+                       .find { |r| r[:kind] == "ats_application_id" }[:status]
+      end
 
-      result = described_class.call(scenario)
+      it "is required-and-present when the post-submit signature was observed" do
+        scenario = create(:scenario, provider: "greenhouse")
+        create(:scenario_signature, scenario: scenario, kind: "commitment_boundary:submit", value: "pending")
+        create(:scenario_signature, scenario: scenario, kind: "ats_application_id", value: "app_1")
 
-      ats_application_id = result.find { |r| r[:kind] == "ats_application_id" }
-      expect(ats_application_id).to include(requirement: :required_after_submit, status: "required-and-missing")
+        expect(ats_status(scenario)).to eq("required-and-present")
+      end
+
+      it "is required-and-missing (drift) when a boundary was reached but the signature is absent" do
+        scenario = create(:scenario, provider: "greenhouse")
+        create(:scenario_signature, scenario: scenario, kind: "commitment_boundary:submit", value: "pending")
+
+        expect(ats_status(scenario)).to eq("required-and-missing")
+      end
+
+      it "is missing-step-not-reached (coverage info) when no boundary was reached" do
+        scenario = create(:scenario, provider: "greenhouse")
+
+        expect(ats_status(scenario)).to eq("missing-step-not-reached")
+      end
+
+      it "is not-applicable-to-purpose for a research session that stopped before the boundary" do
+        scenario = create(:scenario, provider: "greenhouse")
+
+        expect(ats_status(scenario, purpose: "application_research")).to eq("not-applicable-to-purpose")
+      end
     end
 
     it "returns no results for a provider with no configured expectations" do

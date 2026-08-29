@@ -233,7 +233,7 @@ currently have a mechanism for.
 | `Scenarios::SignatureKind` namespaced-kind value object (`field:` / `screening_question:` / `step:` / `commitment_boundary:`) | Built (2026-08-28, TASK-114) — the single kind-parsing boundary; additive, no consumer wired yet |
 | Coverage-vs-drift comparison engine (`Scenarios::ReferenceDiff` dimensions/value-diff, `Scenarios::Coverage`, `Scenarios::DriftAnalysis`, `Scenarios::ComparisonRules::VERSION`) | Built (2026-08-28, TASK-116) — plain-hash output; Reached-Scope-aware so a research run's early stop is coverage, not drift |
 | `ReferenceComparison` / `ComparisonFinding` / `FindingDisposition` (persistent runs, findings, dispositions) | Built (2026-08-28, TASK-117) — immutable runs (incl. `no_reference`/`failed`), immutable findings, append-only dispositions; `Scenarios::RecordComparison` maps a `DriftAnalysis` result to rows; `(dimension, locator)` carry-forward scoped by provider + reference is suggestion-only |
-| `HandshakeCheck` step-aware against Reference Scenario markers (the actual fix for the `:required_after_submit` ceiling) | **Not built** — ADR 009, TASK-107 |
+| `HandshakeCheck` step-aware for `:required_after_submit` (the actual fix for the ceiling) | Built (2026-08-28, TASK-107) — `call(scenario, purpose:)`; a missing post-submit signature is `required-and-missing` only if a `commitment_boundary:` was reached, else `missing-step-not-reached` (coverage) or `not-applicable-to-purpose` for a research run |
 
 ## Decided
 
