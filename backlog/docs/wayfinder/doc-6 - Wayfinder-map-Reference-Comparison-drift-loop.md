@@ -91,8 +91,20 @@ loop runs end to end: a guided session completes → materializes into a `Scenar
 `ReferenceComparison` with `ComparisonFinding`s → the review page renders the coverage
 phase/step map and a per-finding disposition control with suggestion-only carry-forward.
 `rake scenarios:build_sandbox_reference` produces the Greenhouse structural reference.
-TASK-112 AC#6 checked. Only open thread: the real-extension browser dogfood as final human
-confirmation of the marker shape (noted on TASK-118).
+TASK-112 AC#6 checked.
+
+**Real-extension browser dogfood — done 2026-08-29.** Mike ran a real guided
+`application_execution` session through the loaded Chrome extension against the sandbox
+posting (`rake scenarios:dogfood:start` / `:report`). The seam is validated: the
+extension's live form extraction produces byte-identical `field:` / `screening_question:v1:`
+/ `field:8` (demographic) / `commitment_boundary:` markers to `SandboxReferenceWalkthrough`.
+Three issues found and fixed (commit `c188d972`): a missing `step:` marker was
+double-reported as coverage_gap + drift/lost (`DriftAnalysis#lost_in_scope` now excludes
+the step dimension); the reference synthesised a phantom intake `page_arrived` the
+one-page sandbox can't produce (dropped from `SandboxReferenceWalkthrough`); the
+`dogfood:report` task materialized on read and froze a pre-approval state (now read-only).
+One gap remains → **TASK-120**: the extension does not capture `job_post_id` from the
+sandbox (hidden field skipped, URL doesn't match the greenhouse pattern).
 
 ## Not yet specified
 
