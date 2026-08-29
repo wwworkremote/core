@@ -78,15 +78,21 @@ whether the next session is Claude or Codex.
 | TASK-114 SignatureKind value object + namespace | — | ✅ Done (999474d4) | existing bare-kind behaviour unchanged; unknown namespace surfaced not hidden |
 | TASK-115 `Capture.from_guided_session` + `scenario_id` + `source` | 114 | ✅ Done (7d3d2e9c) | deterministic materialization from the same immutable event evidence; no sensitive values copied |
 | TASK-116 ReferenceDiff → coverage-vs-drift over markers | 114, 115 | ✅ Done (0a6cf384) | research truncation produces coverage info, not false drift |
-| TASK-107 step-aware HandshakeCheck (rewritten) | 114, 116 | To Do | the four outcomes; missing-step-not-reached is coverage not failure |
-| TASK-117 ReferenceComparison / ComparisonFinding / FindingDisposition | 116 | To Do | prior dispositions are suggestions with recorded lineage, never silently inherited |
-| TASK-118 rebuild sandbox Greenhouse reference via guided execution session | 115 | To Do | reference contains pre- and post-boundary checkpoints |
-| TASK-119 trigger + review-page findings/disposition UI (closes TASK-112 AC#6) | 116, 117, 118 | To Do | automatic comparison idempotent; manual creates a new run; neither advances or authorizes the application |
+| TASK-107 step-aware HandshakeCheck (rewritten) | 114, 116 | ✅ Done (9aa355d0) | the four outcomes; missing-step-not-reached is coverage not failure |
+| TASK-117 ReferenceComparison / ComparisonFinding / FindingDisposition | 116 | ✅ Done (87d391d6) | prior dispositions are suggestions with recorded lineage, never silently inherited |
+| TASK-118 rebuild sandbox Greenhouse reference via guided execution session | 115 | ✅ Done (601f0866) | reference contains pre- and post-boundary checkpoints |
+| TASK-119 trigger + review-page findings/disposition UI (closes TASK-112 AC#6) | 116, 117, 118 | ✅ Done (0e869fc6) | automatic comparison idempotent; manual creates a new run; neither advances or authorizes the application |
 
-Branch: `reference-comparison-drift-loop` (not pushed). Comparison engine primitives
-(`Scenarios::ReferenceDiff` / `Coverage` / `DriftAnalysis` / `ComparisonRules`) and the
-`Scenarios::GuidedCapture` materialization path are landed and green; nothing wired to the
-guided-session lifecycle or UI yet (TASK-119).
+## Status — map complete
+
+All seven tickets Done on branch `reference-comparison-drift-loop` (not pushed). The drift
+loop runs end to end: a guided session completes → materializes into a `Scenario` →
+`Scenarios::DriftAnalysis` (coverage vs drift, Reached-Scope aware) → a persistent
+`ReferenceComparison` with `ComparisonFinding`s → the review page renders the coverage
+phase/step map and a per-finding disposition control with suggestion-only carry-forward.
+`rake scenarios:build_sandbox_reference` produces the Greenhouse structural reference.
+TASK-112 AC#6 checked. Only open thread: the real-extension browser dogfood as final human
+confirmation of the marker shape (noted on TASK-118).
 
 ## Not yet specified
 
