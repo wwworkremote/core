@@ -36,6 +36,7 @@ class GuidedSession < ApplicationRecord
 
   has_secure_token :session_token
   has_many :guided_session_events, dependent: :destroy
+  has_many :reference_comparisons, dependent: :destroy
   # Set once the session is materialized for Reference Comparison (ADR 009).
   belongs_to :scenario, optional: true
 
@@ -48,6 +49,20 @@ class GuidedSession < ApplicationRecord
 
   before_validation :set_intake_attributes, on: :create
 
+  # First transition to completed triggers one automatic Reference Comparison
+  # (ADR 009). Advisory only -- a comparison failure never blocks completion,
+  # and this never touches phase or playback_position.
+  def complete!
+    return if status == "completed"
+
+    update!(status: "completed")
+    run_automatic_comparison
+  end
+
+  def latest_comparison
+    reference_comparisons.order(:ran_at, :id).last
+  end
+
   def tracked_source_url
     uri = parsed_source_url
     uri.query = tracked_query(uri)
@@ -55,6 +70,14 @@ class GuidedSession < ApplicationRecord
   end
 
   private
+
+  def run_automatic_comparison
+    return if reference_comparisons.exists?(trigger: "automatic")
+
+    Scenarios::RecordComparison.call(self, trigger: "automatic")
+  rescue StandardError => e
+    Rails.logger.warn "[GuidedSession] automatic comparison failed: #{e.class}: #{e.message}"
+  end
 
   def set_intake_attributes
     self.attributes = default_attributes.merge(provider: provider || source_uri_host)

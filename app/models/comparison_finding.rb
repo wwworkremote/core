@@ -49,8 +49,9 @@ class ComparisonFinding < ApplicationRecord
   def readonly? = persisted?
 
   # Latest applicable human judgment; history stays in #finding_dispositions.
+  # Ruby-side max so an eager-loaded association is reused by the review page.
   def current_disposition
-    finding_dispositions.order(:created_at, :id).last
+    finding_dispositions.max_by { |disposition| [disposition.created_at, disposition.id] }
   end
 
   def dispositioned?

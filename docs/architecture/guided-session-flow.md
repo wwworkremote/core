@@ -106,7 +106,8 @@ claim that the underlying application action has been authorized.
 
 ## Comparison against the Reference Scenario
 
-When a session reaches `completed` (or on an explicit review-page action) it
+When a session reaches `completed` (`GuidedSession#complete!`, one idempotent
+automatic run) or on the review page's explicit "Compare to reference" action, it
 materializes into an ordinary `Scenario` and is compared against its provider's
 [Reference Scenario](signature-registry.md#reference-scenario--the-golden-master-not-a-platonic-ideal).
 The comparison model — coverage versus drift, the `ReferenceComparison` /
