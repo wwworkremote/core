@@ -11,6 +11,9 @@ class Sandbox::PostingsController < Sandbox::ApplicationController
   # the moment the page renders, unlike ats_application_id which only
   # exists after a submit reaches the confirmation step.
   def show
-    @job_post_id = SecureRandom.hex(8)
+    # Numeric, like a real Greenhouse job post id -- so the capture patterns
+    # in Scenarios::Capture::PATTERNS["greenhouse"] (which expect \d+) match it
+    # whether it arrives via the posting URL or the form's hidden field.
+    @job_post_id = SecureRandom.random_number(10**10).to_s
   end
 end

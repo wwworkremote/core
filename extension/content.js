@@ -941,6 +941,17 @@
       });
   }
 
+  // The provider's own posting id, carried on the application form as a hidden
+  // field or a data attribute (Greenhouse and the sandbox both do this). Value
+  // only -- no host check, no scraping -- so a guided-session Scenario can
+  // record `job_post_id` the same way a capture-phase Scenario does.
+  function extractJobPostId(doc) {
+    const form = doc.querySelector('#application-form');
+    if (!form) return null;
+    const field = form.querySelector('input[name="job_post_id"], #job_post_id');
+    return (field?.value || form.dataset.jobPostId || '').trim() || null;
+  }
+
   function normalizeWords(str) {
     return new Set(String(str || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean));
   }
@@ -1274,6 +1285,7 @@
       const applicationPage = document.querySelector('#application-form');
       const fields = applicationPage ? extractApplicationFormStructure(document) : [];
       const questions = applicationPage ? extractApplicationQuestions(document) : [];
+      const jobPostId = applicationPage ? extractJobPostId(document) : null;
       const data = await recordGuidedEvent({
         kind: applicationPage ? 'application_page_arrived' : 'page_arrived',
         action: applicationPage ? 'Observe application form' : 'Observe current page',
@@ -1291,6 +1303,7 @@
           field_count: applicationPage ? fields.length : undefined,
           question_count: applicationPage ? questions.length : undefined,
           fields: applicationPage ? fields : undefined,
+          job_post_id: jobPostId || undefined,
         },
       });
       LOG_OK(`Guided session ${data.kind} recorded`);

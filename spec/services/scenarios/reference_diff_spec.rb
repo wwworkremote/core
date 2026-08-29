@@ -37,6 +37,18 @@ RSpec.describe Scenarios::ReferenceDiff do
     expect(result[:dimensions]["field"]).to eq(gained: [], lost: [], changed: ["field:email"])
   end
 
+  it "treats ATS identity signatures as presence-only, never a value change" do
+    reference = create(:scenario, provider: "greenhouse")
+    candidate = create(:scenario, provider: "greenhouse")
+    create(:scenario_signature, scenario: reference, kind: "job_post_id", value: "111", first_observed_at: 1.minute.ago)
+    create(:scenario_signature, scenario: candidate, kind: "job_post_id", value: "999", first_observed_at: 1.minute.ago)
+
+    result = described_class.call(candidate, reference: reference)
+
+    expect(result[:changed]).to eq([])
+    expect(result[:dimensions]["ats_identity"]).to eq(gained: [], lost: [], changed: [])
+  end
+
   def create_signature(scenario, kind, observed_at)
     create(:scenario_signature, scenario: scenario, kind: kind, first_observed_at: observed_at)
   end

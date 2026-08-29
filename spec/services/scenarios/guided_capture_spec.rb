@@ -68,6 +68,13 @@ RSpec.describe Scenarios::GuidedCapture do
     )
   end
 
+  it "captures job_post_id from application_page_arrived evidence when the URL does not carry it" do
+    form.update!(page_url: "https://wwworkremote.localhost/sandbox/postings/1",
+                 evidence: form.evidence.merge("job_post_id" => "9087654321"))
+
+    expect(kinds_and_values(materialize)).to include(%w[job_post_id 9087654321])
+  end
+
   it "records value-free provenance and the phase step on each signature" do
     field = materialize.scenario_signatures.find_by(kind: "field:email")
 

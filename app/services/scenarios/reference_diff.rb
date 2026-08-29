@@ -55,7 +55,15 @@ class Scenarios::ReferenceDiff
   def common_value_kinds = candidate_values.keys & reference_values.keys
 
   def changed
-    common_value_kinds.reject { |kind| candidate_values[kind] == reference_values[kind] }
+    comparable_value_kinds.reject { |kind| candidate_values[kind] == reference_values[kind] }
+  end
+
+  # ATS identity signatures (job_post_id, ats_application_id, ...) are
+  # presence-only: their value is a per-posting / per-application identifier
+  # that is never equal between a reference and a candidate, so a value diff
+  # here is always noise. Structural markers still compare by value.
+  def comparable_value_kinds
+    common_value_kinds.reject { |kind| Scenarios::SignatureKind.for(kind).dimension == "ats_identity" }
   end
 
   def dimensions
