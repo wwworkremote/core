@@ -73,15 +73,20 @@ whether the next session is Claude or Codex.
 
 ## Ticket set (execution — ordinary backlog, not decision tickets)
 
-| Ticket | Blocks on | Proves |
-|---|---|---|
-| TASK-114 SignatureKind value object + namespace | — | existing bare-kind behaviour unchanged; unknown namespace surfaced not hidden |
-| TASK-115 `Capture.from_guided_session` + `scenario_id` + `source` | 114 | deterministic materialization from the same immutable event evidence; no sensitive values copied |
-| TASK-116 ReferenceDiff → coverage-vs-drift over markers | 114, 115 | research truncation produces coverage info, not false drift |
-| TASK-107 step-aware HandshakeCheck (rewritten) | 114, 116 | the four outcomes; missing-step-not-reached is coverage not failure |
-| TASK-117 ReferenceComparison / ComparisonFinding / FindingDisposition | 116 | prior dispositions are suggestions with recorded lineage, never silently inherited |
-| TASK-118 rebuild sandbox Greenhouse reference via guided execution session | 115 | reference contains pre- and post-boundary checkpoints |
-| TASK-119 trigger + review-page findings/disposition UI (closes TASK-112 AC#6) | 116, 117, 118 | automatic comparison idempotent; manual creates a new run; neither advances or authorizes the application |
+| Ticket | Blocks on | Status | Proves |
+|---|---|---|---|
+| TASK-114 SignatureKind value object + namespace | — | ✅ Done (999474d4) | existing bare-kind behaviour unchanged; unknown namespace surfaced not hidden |
+| TASK-115 `Capture.from_guided_session` + `scenario_id` + `source` | 114 | ✅ Done (7d3d2e9c) | deterministic materialization from the same immutable event evidence; no sensitive values copied |
+| TASK-116 ReferenceDiff → coverage-vs-drift over markers | 114, 115 | ✅ Done (0a6cf384) | research truncation produces coverage info, not false drift |
+| TASK-107 step-aware HandshakeCheck (rewritten) | 114, 116 | To Do | the four outcomes; missing-step-not-reached is coverage not failure |
+| TASK-117 ReferenceComparison / ComparisonFinding / FindingDisposition | 116 | To Do | prior dispositions are suggestions with recorded lineage, never silently inherited |
+| TASK-118 rebuild sandbox Greenhouse reference via guided execution session | 115 | To Do | reference contains pre- and post-boundary checkpoints |
+| TASK-119 trigger + review-page findings/disposition UI (closes TASK-112 AC#6) | 116, 117, 118 | To Do | automatic comparison idempotent; manual creates a new run; neither advances or authorizes the application |
+
+Branch: `reference-comparison-drift-loop` (not pushed). Comparison engine primitives
+(`Scenarios::ReferenceDiff` / `Coverage` / `DriftAnalysis` / `ComparisonRules`) and the
+`Scenarios::GuidedCapture` materialization path are landed and green; nothing wired to the
+guided-session lifecycle or UI yet (TASK-119).
 
 ## Not yet specified
 
