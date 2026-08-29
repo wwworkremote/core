@@ -59,6 +59,14 @@ handoffs, and approval gates while ActiveRecord/AASM remain the runtime state
 tools. See [the full decision](adr/006-bpmn-lite-guided-session-validation.md)
 and the [flow sketch](architecture/guided-session-flow.md).
 
+### ADR 009: Reference Comparison — Drift and Coverage
+Materialize a completed guided session into an ordinary `Scenario`, compare it
+against the provider Reference Scenario, and separate *coverage* (how far a
+purpose-bounded run reached) from *drift* (differences within the overlap).
+Persist the run, its findings, and Mike's dispositions as three layers;
+comparison is advisory and never authorizes an application. See
+[the full decision](adr/009-reference-comparison-drift-and-coverage.md).
+
 ### ADR 001: Audit Strategy
 Remove Rails Event Store (RES) and utilize **PaperTrail** for field-level auditing.
 

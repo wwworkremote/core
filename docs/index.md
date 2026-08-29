@@ -26,6 +26,7 @@ diagrams, not just source. This file itself is best read there.
 - **[Panoramic View](architecture/panoramic-view.md)**: Design for a trace-correlated, read-only evidence timeline and supervised application session.
 - **[Application Question Knowledge Graph](architecture/application-question-knowledge-graph.md)**: Cross-application map of observed question occurrences, archetypes, answer strategies, companies, industries, personas, and outcomes.
 - **[Question Occurrence Preservation ADR](adr/008-preserve-question-occurrences-before-archetype-clustering.md)**: Why exact contextual observations remain separate from curated archetypes and reusable answers.
+- **[Reference Comparison ADR](adr/009-reference-comparison-drift-and-coverage.md)**: How a guided session is materialized and compared against its provider Reference Scenario, separating coverage from drift and recording findings and human dispositions.
 - **[Signature Registry](architecture/signature-registry.md)**: Mapping a scenario id against a remote site's own identifiers, with capture and human-approved references built.
 - **[Sandbox Provider](architecture/sandbox-provider.md)**: A fake Greenhouse-shaped ATS served locally for safe extension dogfooding and Reference Scenario capture.
 - **[Configuration](configuration.md)**: Environment variables and credentials.

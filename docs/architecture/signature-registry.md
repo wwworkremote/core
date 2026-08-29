@@ -112,6 +112,15 @@ Fields: `scenario_id`, `kind` (free string — `job_id`, `ats_application_id`, `
 (mirrors the `page_step` convention already on `ApplicationFieldObservation`/`Mapping`),
 `first_observed_at`. Unique on `(scenario_id, kind, value)`.
 
+`kind` is never split inline. **`Scenarios::SignatureKind` (`app/services/scenarios/signature_kind.rb`)
+is the single parsing boundary** — every consumer (`ReferenceDiff`, `HandshakeCheck`, coverage,
+presentation) classifies a kind through it. A bare kind is an `ats_identity`; the structural
+namespaces `field:` / `screening_question:` / `step:` / `commitment_boundary:` (ADR 009) parse to
+`:structural`; anything else is `:unknown_namespace`, logged and excluded from structural
+conclusions (and raised in dev/test). Screening-question kinds are `screening_question:v1:<sha256>`
+of the normalized question text — the `v1` is the normalization version, so a later move to
+TASK-113 archetype identity stays an explainable migration.
+
 ### Provider expectations
 
 Declarative, not a database table — a plain Ruby constant living on
@@ -187,6 +196,16 @@ sequence to be a position *in*.
    legitimate variation it never had (update the reference). Structuring "insights from a guided
    run" means deciding, each time, which of those two happened.
 
+**How that comparison and that decision are structured is [ADR 009](../adr/009-reference-comparison-drift-and-coverage.md).**
+A guided session materializes into an ordinary `Scenario` (`Scenarios::Capture.from_guided_session`);
+structural dimensions — fields, screening questions, step order, commitment boundaries — become
+namespaced `ScenarioSignature` kinds parsed through `Scenarios::SignatureKind`, so `ReferenceDiff`
+and `HandshakeCheck` extend rather than fork. Comparison separates **coverage** (how much of the
+reference a purpose-bounded run reached) from **drift** (differences within the observed overlap),
+and records three persistent layers: `ReferenceComparison` (the run), `ComparisonFinding` (what it
+inferred), `FindingDisposition` (what Mike decided). Comparison is advisory — it never authorizes,
+blocks, or advances an application.
+
 ## What this unblocks
 
 TASK-83's AC #6/#7/#11 are blocked on live access this repo doesn't have unsupervised — Greenhouse's
@@ -210,7 +229,10 @@ currently have a mechanism for.
 | Anything that actually records a HAR/DOM capture into a `Scenario` | Built (2026-08-27, TASK-102) — `Scenarios::Capture` (`app/services/scenarios/capture.rb`), a standalone capture path, not routed through Panoramic View |
 | Sandbox provider (a fake ATS served from `wwworkremote.localhost`, resembling a real one closely enough to exercise the harness against safely) | **Not built** — see [Sandbox Provider](sandbox-provider.md) |
 | Reference Scenario (golden-master baseline per provider) | Built (2026-08-27, TASK-106) — ReferenceScenario is an explicit one-row-per-provider pointer; promotion is preview-first and manual |
-| `HandshakeCheck` compared against a Reference Scenario rather than a flat requirement hash (the actual fix for the `:required_after_submit` ceiling) | **Not built** |
+| Guided session → `Scenario` materialization (`Scenarios::Capture.from_guided_session`) | **Not built** — see [ADR 009](../adr/009-reference-comparison-drift-and-coverage.md) |
+| `Scenarios::SignatureKind` namespaced-kind value object (`field:` / `screening_question:` / `step:` / `commitment_boundary:`) | Built (2026-08-28, TASK-114) — the single kind-parsing boundary; additive, no consumer wired yet |
+| `ReferenceComparison` / `ComparisonFinding` / `FindingDisposition` (coverage-vs-drift, dispositions) | **Not built** — ADR 009 |
+| `HandshakeCheck` step-aware against Reference Scenario markers (the actual fix for the `:required_after_submit` ceiling) | **Not built** — ADR 009, TASK-107 |
 
 ## Decided
 
