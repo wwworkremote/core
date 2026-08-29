@@ -36,9 +36,11 @@ class Scenarios::DriftAnalysis
 
   # A reference-only kind is drift only within Reached Scope -- a marker the run
   # should have produced by where it got. Past the last reached reference
-  # position it is a coverage gap, not drift.
+  # position it is a coverage gap, not drift. `step:` markers are excluded
+  # entirely: a missing step is what Coverage measures, so counting it here too
+  # double-reports the same gap.
   def lost_in_scope
-    diff[:lost] & reached_scope_kinds.to_a
+    (diff[:lost] & reached_scope_kinds.to_a).reject { |kind| Scenarios::SignatureKind.for(kind).dimension == "step" }
   end
 
   def reached_scope_kinds

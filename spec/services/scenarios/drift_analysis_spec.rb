@@ -39,6 +39,18 @@ RSpec.describe Scenarios::DriftAnalysis do
     expect(analyse(candidate, reference, "application_execution")[:drift][:lost]).to eq(["field:email"])
   end
 
+  it "leaves a missing step marker to Coverage, not drift" do
+    reference = scenario_with([
+                                ["step:intake.1", "x"], ["step:resolution.1", "x"], ["step:reorientation.1", "x"]
+                              ])
+    candidate = scenario_with([["step:resolution.1", "x"], ["step:reorientation.1", "x"]])
+
+    result = analyse(candidate, reference, "application_execution")
+
+    expect(result[:drift][:lost]).to eq([])
+    expect(result[:coverage][:reached]).to eq(2)
+  end
+
   it "treats a candidate-only marker as drift regardless of scope" do
     reference = scenario_with([["step:intake.1", "x"]])
     candidate = scenario_with([["step:intake.1", "x"], ["field:referral_source", "text|identity|optional"]])

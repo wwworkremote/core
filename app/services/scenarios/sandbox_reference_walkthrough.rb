@@ -38,10 +38,13 @@ class Scenarios::SandboxReferenceWalkthrough
 
   private
 
+  # The sandbox posting is a single page -- the form is on the posting itself,
+  # so a real guided capture emits one `application_page_arrived`, never a
+  # separate intake-phase `page_arrived`. The reference matches that.
   def build_session
     session = GuidedSession.create!(source_url: POSTING_URL, purpose: "application_execution")
     job_url = "https://job-boards.greenhouse.io/acmesandbox/jobs/#{SecureRandom.random_number(10**10)}"
-    [arrival_event(job_url), form_event(job_url), submission_event, confirmation_event(job_url)]
+    [form_event(job_url), submission_event, confirmation_event(job_url)]
       .each { |attrs| add_event(session, attrs) }
     session
   end
@@ -49,11 +52,6 @@ class Scenarios::SandboxReferenceWalkthrough
   def add_event(session, attrs)
     attrs = DEFAULT_EVENT.merge(action: attrs[:kind].to_s.humanize, **attrs)
     session.guided_session_events.create!(attrs)
-  end
-
-  def arrival_event(job_url)
-    { kind: "page_arrived", phase: "intake", occurred_at: 4.minutes.ago, page_url: job_url,
-      evidence: { provider: PROVIDER, page_title: "Senior Backend Engineer - Acme Sandbox Co" } }
   end
 
   def form_event(job_url)

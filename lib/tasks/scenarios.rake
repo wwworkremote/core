@@ -60,12 +60,15 @@ namespace :scenarios do
     desc "Report what a sandbox dogfood guided session captured vs the greenhouse reference"
     task :report, [:session_id] => :environment do |_, args|
       session = GuidedSession.find(args.fetch(:session_id))
-      if session.guided_session_events.empty?
-        abort "No events recorded yet — do the browser steps from scenarios:dogfood:start first."
+      # Read only -- never materialize here. The Scenario is built once, on
+      # complete!, after the approval decision is final; materializing early
+      # would freeze a stale approval_state into the signatures.
+      if session.scenario.nil?
+        abort "Not materialized yet — approve the pending event and click Complete session first."
       end
 
       reference = ReferenceScenario.find_by(provider: "greenhouse")&.scenario
-      scenario = session.scenario || Scenarios::Capture.from_guided_session(session)
+      scenario = session.scenario
       comparison = session.latest_comparison
 
       puts "── Events (#{session.guided_session_events.count}) ─────────────────────────────"
