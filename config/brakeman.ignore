@@ -68,7 +68,75 @@
         470
       ],
       "note": "Task ID is whitelisted against recurring.yml keys before constantize is called."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "c765ac8f4578e2aa732286bf987c4478c724a6498a4297cdb34174a7c2f72a03",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/guided_sessions/show.html.erb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "link_to(GuidedSession.find(params.expect(:id)).source_url, GuidedSession.find(params.expect(:id)).source_url, :target => \"_blank\", :rel => \"noreferrer\", :class => \"text-primary break-all\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "GuidedSessionsController",
+          "method": "show",
+          "line": 13,
+          "file": "app/controllers/guided_sessions_controller.rb",
+          "rendered": {
+            "name": "guided_sessions/show",
+            "file": "app/views/guided_sessions/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "guided_sessions/show"
+      },
+      "user_input": "GuidedSession.find(params.expect(:id)).source_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "GuidedSession#source_url_is_http rejects any non-http(s) scheme at write time, so a persisted source_url can never carry a javascript: payload."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "5030733e73ab4cad55438e447966c24725146b37d1584eadf167ddb1acabd3ee",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/guided_sessions/show.html.erb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "link_to((if (GuidedSession.find(params.expect(:id)).purpose == \"application_research\") then\n  \"Open research flow\"\nelse\n  \"Open supervised application\"\nend), GuidedSession.find(params.expect(:id)).tracked_source_url, :target => \"_blank\", :rel => \"noreferrer\", :class => \"btn btn-primary rounded-xl font-bold mt-4\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "GuidedSessionsController",
+          "method": "show",
+          "line": 13,
+          "file": "app/controllers/guided_sessions_controller.rb",
+          "rendered": {
+            "name": "guided_sessions/show",
+            "file": "app/views/guided_sessions/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "guided_sessions/show"
+      },
+      "user_input": "GuidedSession.find(params.expect(:id)).tracked_source_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "tracked_source_url is derived from source_url, which GuidedSession#source_url_is_http constrains to http(s) at write time."
     }
   ],
-  "brakeman_version": "8.0.4"
+  "brakeman_version": "8.0.6"
 }
