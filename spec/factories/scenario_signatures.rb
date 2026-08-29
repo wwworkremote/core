@@ -7,6 +7,7 @@
 #  id                :bigint           not null, primary key
 #  first_observed_at :datetime         not null
 #  kind              :string           not null
+#  source            :jsonb
 #  step              :string
 #  value             :string           not null
 #  created_at        :datetime         not null

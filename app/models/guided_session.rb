@@ -18,10 +18,16 @@
 #  status            :string           default("active"), not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  scenario_id       :bigint
 #
 # Indexes
 #
+#  index_guided_sessions_on_scenario_id    (scenario_id)
 #  index_guided_sessions_on_session_token  (session_token) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (scenario_id => scenarios.id)
 #
 class GuidedSession < ApplicationRecord
   PHASES = %w[intake resolution response_construction reorientation].freeze
@@ -30,6 +36,8 @@ class GuidedSession < ApplicationRecord
 
   has_secure_token :session_token
   has_many :guided_session_events, dependent: :destroy
+  # Set once the session is materialized for Reference Comparison (ADR 009).
+  belongs_to :scenario, optional: true
 
   validates :source_url, :provider, :phase, :status, :started_at, presence: true
   validates :phase, inclusion: { in: PHASES }

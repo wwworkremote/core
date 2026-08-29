@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_29_000100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -389,11 +389,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.integer "playback_position", default: 0, null: false
     t.string "provider", null: false
     t.string "purpose", default: "application_execution", null: false
+    t.bigint "scenario_id"
     t.string "session_token", null: false
     t.string "source_url", null: false
     t.datetime "started_at", null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["scenario_id"], name: "index_guided_sessions_on_scenario_id"
     t.index ["session_token"], name: "index_guided_sessions_on_session_token", unique: true
   end
 
@@ -784,6 +786,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.datetime "first_observed_at", null: false
     t.string "kind", null: false
     t.bigint "scenario_id", null: false
+    t.jsonb "source"
     t.string "step"
     t.datetime "updated_at", null: false
     t.string "value", null: false
@@ -1107,6 +1110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
   add_foreign_key "contacts", "users"
   add_foreign_key "experience_highlights", "work_experiences"
   add_foreign_key "guided_session_events", "guided_sessions"
+  add_foreign_key "guided_sessions", "scenarios"
   add_foreign_key "human_tasks", "job_postings"
   add_foreign_key "human_tasks", "users"
   add_foreign_key "interview_questions", "interview_sessions"
