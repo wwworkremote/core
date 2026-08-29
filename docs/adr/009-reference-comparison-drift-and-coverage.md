@@ -74,7 +74,10 @@ as a bare ATS identity: it emits an observable diagnostic and is excluded from
 structural conclusions. Development and test raise.
 
 `Scenarios::ReferenceDiff` extends to these namespaced signatures using its
-existing gained / lost / reordered logic.
+existing gained / lost / reordered logic. Value comparison (`changed`) applies
+only to the structural namespaces: `ats_identity` signatures are presence-only,
+since `job_post_id` / `ats_application_id` values are per-posting / per-application
+identifiers that are never equal between a reference and a candidate.
 
 ### Coverage versus Drift
 

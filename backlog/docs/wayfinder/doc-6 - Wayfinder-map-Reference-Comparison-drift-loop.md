@@ -98,13 +98,21 @@ TASK-112 AC#6 checked.
 posting (`rake scenarios:dogfood:start` / `:report`). The seam is validated: the
 extension's live form extraction produces byte-identical `field:` / `screening_question:v1:`
 / `field:8` (demographic) / `commitment_boundary:` markers to `SandboxReferenceWalkthrough`.
-Three issues found and fixed (commit `c188d972`): a missing `step:` marker was
-double-reported as coverage_gap + drift/lost (`DriftAnalysis#lost_in_scope` now excludes
-the step dimension); the reference synthesised a phantom intake `page_arrived` the
-one-page sandbox can't produce (dropped from `SandboxReferenceWalkthrough`); the
-`dogfood:report` task materialized on read and froze a pre-approval state (now read-only).
-One gap remains → **TASK-120**: the extension does not capture `job_post_id` from the
-sandbox (hidden field skipped, URL doesn't match the greenhouse pattern).
+Four issues found, all fixed:
+
+- `c188d972` — a missing `step:` marker was double-reported as coverage_gap + drift/lost
+  (`DriftAnalysis#lost_in_scope` now excludes the step dimension); the reference
+  synthesised a phantom intake `page_arrived` the one-page sandbox can't produce (dropped
+  from `SandboxReferenceWalkthrough`); the `dogfood:report` task materialized on read and
+  froze a pre-approval state (now read-only).
+- `96fc00bf` (**TASK-120**, Done) — the extension now surfaces `job_post_id` from the
+  application form into `application_page_arrived` evidence; the sandbox mints a numeric
+  id like real Greenhouse; and `ReferenceDiff` treats ATS identity signatures as
+  presence-only (their per-posting value is never comparable), so `job_post_id` /
+  `ats_application_id` no longer generate spurious `changed` drift.
+
+A clean sandbox guided session now compares with exactly one finding —
+`coverage_gap step:reorientation.2`, the correct "did not submit" signal.
 
 ## Not yet specified
 
