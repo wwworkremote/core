@@ -112,10 +112,27 @@ itself a real fact about that application.
 `pipeline` (status/outcome) → `human` (HumanTask proposals + decisions) → `error` (capture
 failures).
 
+**Datalake contract (wayfinder map doc-7, TASK-123).** When a `UserJobPosting`'s trace came
+from a guided session there is also a machine-local raw-asset bundle
+(`data/datalake/sessions/<session_token>/` + `manifest.json`; DOM / HAR / screenshots).
+`TraceEvidence` reads that bundle **only through `Datalake::Bundle`** (never `File.read` on
+the path), stays a live computed view (~10s `Rails.cache`, no write path), and adds no second
+correlation key — `session_token` is the spine, `application_trace_id` keeps its existing
+non-guided meaning. Any heavy manifest-parsing extractor `TraceEvidence` needs is a
+`Datalake::Extractor` subclass so the version-stamp and "still extracting" state work
+uniformly. The four `trace_id`-scoped capture tables are consumed directly, unchanged.
+
 **The page** — one frame per tracked application, entered from `job_postings/show.html.erb`
 (a "View full trace" link next to the existing pipeline timeline, appearing whenever
 `application_trace_id` is present) and from the `/admin/human_tasks` inbox. Read-only, no writes,
 cheap: this is a *view* over data that already exists, not a new write path.
+
+**Guided runs (wayfinder map doc-7, TASK-125 / TASK-128).** When the application went through
+the harness — a `GuidedSession` linked to the `UserJobPosting` — the canonical per-run view is
+`guided_sessions#show`, not a separate Panoramic page. "View full trace" resolves *there* for
+guided runs, and `guided_sessions#show` grows the trace/datalake detail over time (reading raw
+assets through `Datalake::Bundle`, TASK-123). Non-guided applications keep the Panoramic page
+as designed. One run view, entered from the posting badge or from "View full trace".
 
 The [Application Question Knowledge Graph](application-question-knowledge-graph.md)
 is a second read perspective over observation history. Panoramic View answers

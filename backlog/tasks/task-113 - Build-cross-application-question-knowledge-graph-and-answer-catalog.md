@@ -4,7 +4,7 @@ title: Build cross-application question knowledge graph and answer catalog
 status: To Do
 assignee: []
 created_date: '2026-08-28 22:51'
-updated_date: '2026-08-28 22:52'
+updated_date: '2026-08-29 18:45'
 labels:
   - application-workflow
   - knowledge-graph
@@ -56,5 +56,29 @@ author: Codex
 created: 2026-08-28 22:52
 ---
 Domain and architecture captured. Canonical split: Question Occurrence preserves exact per-application evidence; Question Archetype is a reviewable semantic cluster; Answer Strategy is versioned, persona-aware, and provenance-bearing; Answer Sophistication separates deterministic/profile facts, stable authored responses, and contextual synthesis. Relational tables remain the source of truth, with a graph-shaped read model first; no graph database until traversal or scale evidence justifies it.
+---
+
+author: wayfinder
+created: 2026-08-29 17:33
+---
+Wayfinder map doc-7 (link-to-application capture and the datalake), TASK-123 resolved the datalake <-> operational read-model contract. Constraints on this task's implementation:
+
+- The question graph's occurrence/archetype extraction reads raw guided-session assets (DOM bundle) **only through `Datalake::Bundle`** -- never `File.read` on `data/datalake/sessions/<token>/`. The bundle exists only for guided sessions; the four `trace_id`-keyed capture tables (`ApplicationFieldObservation` etc.) stay the primary input and are consumed directly, unchanged.
+- Any heavy DOM-parsing extractor is a `Datalake::Extractor` subclass (defines `key` + `version` + `extract(bundle)`).
+- Question occurrences persist into this task's own tables, each stamped with a `datalake_extractor_version`; a mismatch on read triggers re-extraction (ADR-009 `comparison_rules_version` discipline). No shared `datalake_extractions` cache table.
+- Cadence: cheap structural signatures already come from `Scenarios::GuidedCapture` on `complete!` (value-free event evidence). Richer occurrence extraction that needs the DOM is enqueued on first read, with a 'still extracting' state on the view -- not synchronous in-request, not an eager job on `complete!`.
+- No second correlation key: `session_token` is the spine for guided-session-derived data; `trace_id` / `application_trace_id` keep their existing non-guided meaning.
+
+Separately: TASK-124 (map doc-7) will attach the per-archetype automation-readiness class (`deterministic` / `generatable` / `needs-human`) and the accept/edit/decline verdict corpus to the archetype model built here.
+---
+
+author: wayfinder
+created: 2026-08-29 18:45
+---
+Wayfinder map doc-7, TASK-124 resolved the automation-readiness loop that attaches to the archetype model this task builds. Implementation is TASK-127 (depends on this task). What TASK-127 adds on top of the archetype:
+- append-only `archetype_readiness_assessments` (archetype_id, readiness_class [deterministic|generatable|needs_human], rationale, assessed_by, assessed_at, source_assessment_id) -- FindingDisposition-style; latest applicable wins; merge/split carries forward as a suggestion.
+- value-free `answer_proposal_verdicts` (archetype_id, occurrence_id, persona_id, provider, strategy_source, proposed_text_sha256, final_text_sha256, edit_distance, verdict, decided_at).
+- the archetype review UI (this task's AC#4/#5) shows a suggested readiness class per archetype; TASK-127 owns that suggestion's inputs (frequency, winning strategy source, median edit distance, sample-size floor).
+Keep the archetype merge/split operations (this task's AC#2) aware that a readiness assessment may need to carry forward as a suggestion when they run.
 ---
 <!-- COMMENTS:END -->

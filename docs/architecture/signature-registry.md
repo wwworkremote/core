@@ -263,6 +263,21 @@ currently have a mechanism for.
 - **`Scenario` carries `resume_persona_id`, nullable.** A persona-driven divergence (different
   answer content, possibly a different ATS branch) must not be misread as provider drift or an
   incomplete reference. Mirrors `UserJobPosting#resume_persona_id`. (2026-08-27)
+- **The Signature Registry *is* the ATS topology — build `TenantIdentity`, add a
+  "context-gathering opportunity" finding category.** ([wayfinder map doc-7](../../backlog/docs/wayfinder/doc-7%20-%20Wayfinder-map-link-to-application-capture-and-the-datalake.md) /
+  [ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md), 2026-08-29; implementation
+  TASK-130.) "Map the topology of a system I can't change" needs no new subsystem:
+  `SIGNATURE_EXPECTATIONS` (per-provider) + `TenantIdentity` (per-employer instance —
+  finally built, the shape sketched in the bullet above) + the per-provider Reference Scenario
+  together are the topology. "Opportunities to gather more context" become a **new finding
+  category** on `HandshakeCheck` / comparison output: `optional-and-missing` signatures and
+  un-mapped observed fields surface as ranked, reviewable "could capture this" items — the
+  greedy-but-curated capture loop made legible instead of implicit.
+- **A guided run's `GuidedSession#session_token` is the correlation spine.** ([ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md) §2.)
+  For a *guided* lap, the propagation gap this doc opens with is closed: the extension stamps
+  `session_token` onto the four `trace_id`-scoped capture tables and the materialized `Scenario`,
+  so one identifier holds the whole coordinated run. `scenario_token` / `application_trace_id` are
+  unchanged for non-guided paths; no backfill. (2026-08-29)
 
 ## Open questions
 
