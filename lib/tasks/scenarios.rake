@@ -13,4 +13,15 @@ namespace :scenarios do
     Scenarios::PromoteReference.call(candidate)
     puts "Promoted #{candidate.scenario_token} as #{candidate.provider} reference."
   end
+
+  desc "Rebuild the Greenhouse sandbox Reference Scenario from a full execution guided session (ADR 009, TASK-118)"
+  task build_sandbox_reference: :environment do
+    abort "Refusing: sandbox reference is dev/test only (Rails.env.local?)." unless Rails.env.local?
+
+    scenario = Scenarios::SandboxReferenceWalkthrough.call
+    puts "Promoted #{scenario.scenario_token} as the greenhouse reference."
+    scenario.scenario_signatures.order(:first_observed_at, :id).each do |signature|
+      puts "  #{signature.kind} = #{signature.value}"
+    end
+  end
 end
