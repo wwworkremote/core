@@ -93,6 +93,37 @@ flowchart TD
 - Drift: new archetypes or wording variants appearing in a provider flow.
 - Outcome overlays with explicit sample sizes and non-causal language.
 
+## Automation readiness
+
+*(wayfinder map doc-7 / [ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md);
+full contract on
+[Automation-readiness corpus and eval-harness shape](../../backlog/tasks/task-124%20-%20Wayfinder-decision-automation-readiness-corpus-and-eval-harness-shape.md);
+implementation TASK-127.)*
+
+The **Question Archetype is the unit of automation readiness.** "Adapt the system toward
+automating these applications" means building a decision corpus and an eval loop — not a
+training run.
+
+- **`archetype_readiness_assessments`** — append-only, FindingDisposition-style. One
+  archetype's readiness class is `deterministic` / `generatable` / `needs-human`, assigned
+  by Mike during archetype review with an evidence-based **suggested default** (inputs:
+  occurrence frequency, historically-winning strategy source, median edit distance,
+  sample-size floor). Latest applicable assessment wins for presentation; a merge or split
+  carries the prior assessment forward as a *suggestion*, never silently.
+- **`answer_proposal_verdicts`** — **value-free**. sha256 hashes + `edit_distance` +
+  `strategy_source` (`canned` / `template` / `ai`) + `verdict`
+  (`accepted` / `edited` / `declined`). One row per proposal shown in the sidepanel
+  answer flow (TASK-78), declines included. No answer text.
+- **The eval harness replays the real path** — `LLM::AnswerGenerator.call` (`CannedAnswers`
+  + `ApplicationAnswerTemplate` + `PromptBuilder` / prompt constants + the configured
+  `answer_generation` model) — and reports verbatim-acceptance rate + median edit distance,
+  split by strategy. Corpus is per-archetype JSONL under `data/datalake/corpus/`
+  (git-ignored). `rake automation_readiness:corpus` + `automation_readiness:eval`.
+- **Advisory only, hard guardrail** (invariant 8 extended): nothing the readiness loop
+  produces flips an archetype to auto-fill or auto-submit. It only ever changes whether a
+  proposal is offered *without* a review prompt — never whether an answer is entered or
+  sent.
+
 ## Delivery boundary
 
 The first implementation should use the relational database as the source of

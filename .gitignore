@@ -35,6 +35,10 @@ data/*.xml
 data/backups/*.dump
 database_consistency_*.txt
 
+# Datalake: raw guided-session assets + automation-readiness corpus.
+# Machine-local, PII-bearing, never synced or committed (ADR 010).
+data/datalake/
+
 .wwworkremote/
 
 /app/assets/builds/*
