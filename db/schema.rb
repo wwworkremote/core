@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -238,6 +238,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.index ["user_id"], name: "index_company_pipeline_steps_on_user_id"
   end
 
+  create_table "comparison_findings", force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "detail", default: {}, null: false
+    t.string "dimension", null: false
+    t.string "locator", null: false
+    t.bigint "reference_comparison_id", null: false
+    t.bigint "suggested_disposition_id"
+    t.datetime "updated_at", null: false
+    t.index ["dimension", "locator"], name: "index_comparison_findings_on_dimension_and_locator"
+    t.index ["reference_comparison_id"], name: "index_comparison_findings_on_reference_comparison_id"
+  end
+
   create_table "contacts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
@@ -365,6 +378,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.index ["provider", "field_name"], name: "index_extraction_rules_on_provider_and_field_name", unique: true
   end
 
+  create_table "finding_dispositions", force: :cascade do |t|
+    t.bigint "comparison_finding_id", null: false
+    t.datetime "created_at", null: false
+    t.text "rationale"
+    t.string "resume_persona_id"
+    t.string "reviewer", null: false
+    t.string "reviewer_label"
+    t.bigint "source_disposition_id"
+    t.datetime "updated_at", null: false
+    t.string "value", null: false
+    t.index ["comparison_finding_id", "created_at"], name: "idx_on_comparison_finding_id_created_at_e63111e63f"
+    t.index ["comparison_finding_id"], name: "index_finding_dispositions_on_comparison_finding_id"
+  end
+
   create_table "guided_session_events", force: :cascade do |t|
     t.string "action", null: false
     t.string "approval_state", null: false
@@ -389,11 +416,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.integer "playback_position", default: 0, null: false
     t.string "provider", null: false
     t.string "purpose", default: "application_execution", null: false
+    t.bigint "scenario_id"
     t.string "session_token", null: false
     t.string "source_url", null: false
     t.datetime "started_at", null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["scenario_id"], name: "index_guided_sessions_on_scenario_id"
     t.index ["session_token"], name: "index_guided_sessions_on_session_token", unique: true
   end
 
@@ -743,6 +772,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.index ["user_id"], name: "index_pipeline_steps_on_user_id"
   end
 
+  create_table "reference_comparisons", force: :cascade do |t|
+    t.string "comparison_rules_version", null: false
+    t.jsonb "coverage", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "error"
+    t.bigint "guided_session_id", null: false
+    t.string "outcome", null: false
+    t.string "provider", null: false
+    t.datetime "ran_at", null: false
+    t.bigint "reference_scenario_id"
+    t.bigint "scenario_id", null: false
+    t.string "trigger", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guided_session_id"], name: "index_reference_comparisons_on_guided_session_id"
+    t.index ["provider", "reference_scenario_id"], name: "idx_on_provider_reference_scenario_id_e9d8e683d2"
+    t.index ["reference_scenario_id"], name: "index_reference_comparisons_on_reference_scenario_id"
+    t.index ["scenario_id"], name: "index_reference_comparisons_on_scenario_id"
+  end
+
   create_table "reference_scenarios", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "provider", null: false
@@ -784,6 +832,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
     t.datetime "first_observed_at", null: false
     t.string "kind", null: false
     t.bigint "scenario_id", null: false
+    t.jsonb "source"
     t.string "step"
     t.datetime "updated_at", null: false
     t.string "value", null: false
@@ -1103,10 +1152,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
   add_foreign_key "career_profiles", "users"
   add_foreign_key "company_pipeline_steps", "companies"
   add_foreign_key "company_pipeline_steps", "users"
+  add_foreign_key "comparison_findings", "reference_comparisons"
   add_foreign_key "contacts", "job_postings"
   add_foreign_key "contacts", "users"
   add_foreign_key "experience_highlights", "work_experiences"
+  add_foreign_key "finding_dispositions", "comparison_findings"
   add_foreign_key "guided_session_events", "guided_sessions"
+  add_foreign_key "guided_sessions", "scenarios"
   add_foreign_key "human_tasks", "job_postings"
   add_foreign_key "human_tasks", "users"
   add_foreign_key "interview_questions", "interview_sessions"
@@ -1128,6 +1180,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_200000) do
   add_foreign_key "llm_messages", "tool_calls"
   add_foreign_key "pipeline_steps", "job_postings"
   add_foreign_key "pipeline_steps", "users"
+  add_foreign_key "reference_comparisons", "guided_sessions"
+  add_foreign_key "reference_comparisons", "reference_scenarios"
+  add_foreign_key "reference_comparisons", "scenarios"
   add_foreign_key "reference_scenarios", "scenarios"
   add_foreign_key "resume_skills", "resumes"
   add_foreign_key "resume_skills", "skills"

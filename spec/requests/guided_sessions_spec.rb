@@ -115,4 +115,101 @@ RSpec.describe "GuidedSessions" do
       expect(session.reload.playback_position).to eq(0)
     end
   end
+
+  describe "reference comparison" do
+    let(:session) do
+      s = GuidedSession.create!(source_url: "https://wwworkremote.localhost/sandbox/postings/1",
+                                purpose: "application_execution")
+      s.guided_session_events.create!(kind: "application_page_arrived", phase: "resolution", action: "observe",
+                                      intent: "map the flow", requirement: "recommended", reversibility: "reversible",
+                                      approval_state: "not_required", occurred_at: 1.minute.ago,
+                                      evidence: { provider: "greenhouse", fields: [
+                                        { field_key: "email", label: "Email", type: "email",
+                                          classification: "identity", required: true }
+                                      ] })
+      s
+    end
+
+    def build_reference
+      # field:phone before the step the candidate reaches, so it lands inside
+      # Reached Scope and registers as drift (a field the run should have seen).
+      ref = scenario_with([["field:phone", "tel|identity|required"],
+                           ["step:resolution.1", "application_page_arrived"]], provider: "greenhouse")
+      create(:reference_scenario, scenario: ref)
+    end
+
+    it "runs exactly one automatic comparison on the first completion and none on a repeat" do
+      build_reference
+
+      expect { post complete_guided_session_path(session) }
+        .to change { session.reference_comparisons.where(trigger: "automatic").count }.from(0).to(1)
+      post complete_guided_session_path(session)
+
+      expect(session.reference_comparisons.where(trigger: "automatic").count).to eq(1)
+      expect(session.reload.status).to eq("completed")
+    end
+
+    it "creates a new manual run on each compare and never advances the session" do
+      build_reference
+      original = session.attributes.slice("phase", "status", "playback_position")
+
+      expect { post compare_guided_session_path(session) }
+        .to change { session.reference_comparisons.where(trigger: "manual").count }.by(1)
+      post compare_guided_session_path(session)
+
+      expect(session.reference_comparisons.where(trigger: "manual").count).to eq(2)
+      expect(session.reload.attributes.slice("phase", "status", "playback_position")).to eq(original)
+    end
+
+    it "renders the coverage map, a drift finding, and a disposition control" do
+      build_reference
+      post compare_guided_session_path(session)
+
+      get guided_session_path(session)
+
+      expect(response.body).to include("Reference comparison")
+      expect(response.body).to include("Coverage")
+      expect(response.body).to include("field:phone")
+      expect(response.body).to include("Reference incomplete or stale")
+    end
+
+    it "shows a carried-forward suggestion without dispositioning the new finding" do
+      reference = build_reference
+      prior = create(:reference_comparison, provider: "greenhouse", reference_scenario: reference)
+      prior_finding = prior.comparison_findings.create!(category: "drift", dimension: "field", locator: "field:phone")
+      prior_finding.finding_dispositions.create!(value: "expected_persona_variation", reviewer: "mike")
+
+      post compare_guided_session_path(session)
+      finding = session.reference_comparisons.order(:id).last.comparison_findings.find_by(locator: "field:phone")
+
+      expect(finding.suggested_disposition).to eq(prior_finding.finding_dispositions.last)
+      expect(finding.dispositioned?).to be(false)
+
+      get guided_session_path(session)
+      expect(response.body).to include("Suggested from an earlier run")
+    end
+
+    it "records a disposition from the review page" do
+      build_reference
+      post compare_guided_session_path(session)
+      finding = session.reference_comparisons.order(:id).last.comparison_findings.find_by(locator: "field:phone")
+
+      expect {
+        post finding_dispositions_guided_session_path(session, finding_id: finding.id),
+             params: { value: "provider_site_drift", rationale: "greenhouse dropped the phone field" }
+      }.to change(FindingDisposition, :count).by(1)
+      expect(finding.reload.current_disposition.value).to eq("provider_site_drift")
+    end
+
+    it "says so when no reference exists, without raising" do
+      get guided_session_path(session)
+      expect(response).to be_successful
+
+      post compare_guided_session_path(session)
+      get guided_session_path(session)
+
+      expect(response).to be_successful
+      expect(response.body).to include("No reference scenario exists for").and include("greenhouse")
+    end
+  end
 end

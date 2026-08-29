@@ -46,8 +46,19 @@ class GuidedSessionEvent < ApplicationRecord
   validate :irreversible_transition_requires_approval
 
   before_validation :set_defaults, on: :create
+  # An event that a materialized ScenarioSignature points at is provenance --
+  # it cannot be pruned while the reference exists (ADR 009). This also blocks
+  # the GuidedSession dependent: :destroy cascade for such a session.
+  before_destroy :protect_materialized_provenance
 
   private
+
+  def protect_materialized_provenance
+    return unless ScenarioSignature.exists?(["source ->> 'guided_session_event_id' = ?", id.to_s])
+
+    errors.add(:base, "referenced by a materialized ScenarioSignature")
+    throw :abort
+  end
 
   def set_defaults
     self.phase ||= guided_session.phase

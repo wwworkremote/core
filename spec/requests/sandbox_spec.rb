@@ -11,7 +11,7 @@ RSpec.describe "Sandbox provider" do
 
       expect(response).to be_successful
       expect(response.body).to include('id="application-form"')
-      expect(response.body).to match(/data-job-post-id="[a-f0-9]+"/)
+      expect(response.body).to match(/data-job-post-id="\d+"/)
       expect(response.body).not_to include("ats_application_id")
     end
 

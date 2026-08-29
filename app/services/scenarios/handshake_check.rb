@@ -5,16 +5,15 @@
 # TASK-83 AC #7 ("every selector verified against a live capture") checkable
 # instead of eyeballed: a captured session either produced what the provider
 # requires, or this names exactly what's missing.
+#
+# Step-aware for :required_after_submit (ADR 009): a post-submit signature that
+# is absent is only a failure if the run actually reached a commitment
+# boundary. If it never did, that is coverage information (the run stopped
+# early) or -- for an application_research session -- not applicable at all.
 class Scenarios::HandshakeCheck
   # Per-provider signature kinds and whether each is required. A kind absent
   # from a provider's hash is simply not expected -- neither required nor
   # optional, just unrelated to that provider.
-  #
-  # ponytail: :required_after_submit is tracked as a distinct requirement
-  # level but checked as plain :required for now -- this doesn't yet know
-  # which step a scenario reached, only which kinds it observed. Upgrade to
-  # step-aware once a scenario with a real pre-submit/post-submit split
-  # shows the plain check giving a false "missing."
   SIGNATURE_EXPECTATIONS = {
     "linkedin" => { "job_id" => :required },
     "greenhouse" => { "job_post_id" => :required, "ats_application_id" => :required_after_submit },
@@ -22,12 +21,15 @@ class Scenarios::HandshakeCheck
     "workday" => { "tenant_id" => :required, "candidate_id" => :optional }
   }.freeze
 
-  def self.call(scenario)
-    new(scenario).call
+  RESEARCH = "application_research"
+
+  def self.call(scenario, purpose: nil)
+    new(scenario, purpose: purpose).call
   end
 
-  def initialize(scenario)
+  def initialize(scenario, purpose: nil)
     @scenario = scenario
+    @purpose = purpose
   end
 
   def call
@@ -51,7 +53,20 @@ class Scenarios::HandshakeCheck
 
   def status_for(requirement, present)
     return present ? "optional-and-present" : "optional-and-missing" if requirement == :optional
+    return after_submit_status(present) if requirement == :required_after_submit
 
     present ? "required-and-present" : "required-and-missing"
+  end
+
+  def after_submit_status(present)
+    return "required-and-present" if present
+    return "required-and-missing" if commitment_boundary_reached?
+    return "not-applicable-to-purpose" if @purpose.to_s == RESEARCH
+
+    "missing-step-not-reached"
+  end
+
+  def commitment_boundary_reached?
+    observed_kinds.any? { |kind| Scenarios::SignatureKind.for(kind).namespace == "commitment_boundary" }
   end
 end

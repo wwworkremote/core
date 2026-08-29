@@ -89,6 +89,18 @@ on-device inference instead, specifically:
 Not a commitment to build — a real capability worth evaluating once the harness has something
 concrete to point it at, not designed in the abstract. See TASK-108.
 
+## The canonical structural reference
+
+Since ADR 009 the Greenhouse sandbox **Reference Scenario** is built by
+`Scenarios::SandboxReferenceWalkthrough` (`rake scenarios:build_sandbox_reference`) from a full
+`application_execution` guided session run through `Scenarios::Capture.from_guided_session` — the
+same path a real guided capture uses, so the reference and the candidates diffed against it share
+one shape (`step:` / `commitment_boundary:` / `field:` / `screening_question:` markers plus
+`job_post_id` / `ats_application_id`). It is reproducible: re-run it whenever the sandbox form
+(`app/views/sandbox/postings/show.html.erb`) changes. The Phase A extension walkthrough (TASK-105)
+stays as a lighter smoke check of provider recognition + capture, not the definition of the
+reference. The real-extension browser dogfood is the final human confirmation.
+
 ## What this unblocks
 
 - **Phase A** of the Reference Scenario plan (automatic walkthroughs, safe and repeatable) has

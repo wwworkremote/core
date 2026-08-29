@@ -211,6 +211,9 @@ Rails.application.routes.draw do
     member do
       patch :playback
       patch "events/:event_id/approval", to: "guided_sessions#approval", as: :approval
+      post :complete
+      post :compare
+      post "findings/:finding_id/dispositions", to: "guided_sessions#create_disposition", as: :finding_dispositions
     end
   end
   namespace :admin do

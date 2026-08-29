@@ -64,6 +64,12 @@ class Scenarios::Capture
     new(source, provider: provider, scenario: scenario, scenario_attrs: scenario_attrs).call
   end
 
+  # Materialize a guided session into a Scenario -- the value-free entry path
+  # for Reference Comparison (ADR 009). Delegates to Scenarios::GuidedCapture.
+  def self.from_guided_session(guided_session)
+    Scenarios::GuidedCapture.call(guided_session)
+  end
+
   def initialize(source, provider:, scenario: nil, scenario_attrs: {})
     @source = source
     @provider = provider

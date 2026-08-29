@@ -9,6 +9,7 @@ require "rails_helper"
 #  id                :bigint           not null, primary key
 #  first_observed_at :datetime         not null
 #  kind              :string           not null
+#  source            :jsonb
 #  step              :string
 #  value             :string           not null
 #  created_at        :datetime         not null
@@ -60,5 +61,28 @@ RSpec.describe ScenarioSignature do
     other_scenario_signature = build(:scenario_signature, kind: "job_id", value: "12345")
 
     expect(other_scenario_signature).to be_valid
+  end
+
+  describe "#source" do
+    it "accepts the value-free breadcrumb shape" do
+      signature = build(:scenario_signature,
+                        source: { "guided_session_event_id" => 7, "extracted_from" => "evidence.fields[2]" })
+
+      expect(signature).to be_valid
+    end
+
+    it "rejects a key outside the permitted set" do
+      signature = build(:scenario_signature, source: { "answer" => "secret@example.com" })
+
+      expect(signature).not_to be_valid
+      expect(signature.errors[:source].join).to include("keys outside")
+    end
+
+    it "rejects an extracted_from that is not a plain path" do
+      signature = build(:scenario_signature, source: { "extracted_from" => "evidence; DROP TABLE" })
+
+      expect(signature).not_to be_valid
+      expect(signature.errors[:source].join).to include("not a plain path")
+    end
   end
 end

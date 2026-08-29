@@ -103,3 +103,17 @@ This state overlay is deliberately smaller than the event vocabulary. A phase
 describes where the lap is; events explain what happened, why, and under what
 safety classification. Playback position is a resumable viewing cursor, not a
 claim that the underlying application action has been authorized.
+
+## Comparison against the Reference Scenario
+
+When a session reaches `completed` (`GuidedSession#complete!`, one idempotent
+automatic run) or on the review page's explicit "Compare to reference" action, it
+materializes into an ordinary `Scenario` and is compared against its provider's
+[Reference Scenario](signature-registry.md#reference-scenario--the-golden-master-not-a-platonic-ideal).
+The comparison model — coverage versus drift, the `ReferenceComparison` /
+`ComparisonFinding` / `FindingDisposition` layers, and the rule that comparison
+is advisory and never authorizes or advances an application — is
+[ADR 009](../adr/009-reference-comparison-drift-and-coverage.md). A research
+session stopping at the first commitment boundary is *incomplete coverage by
+design*, distinct from drift, and the first commitment boundary itself stays a
+visible, applicable checkpoint.

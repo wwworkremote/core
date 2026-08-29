@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-28 22:52'
+updated_date: '2026-08-29 03:09'
 labels:
   - architecture
   - application-workflow
@@ -15,6 +15,8 @@ references:
   - TASK-105 (completed)
   - TASK-106 (completed)
   - TASK-113
+  - docs/adr/009-reference-comparison-drift-and-coverage.md
+  - TASK-119
 documentation:
   - docs/adr/004-pump-track-job-application-loop.md
   - docs/architecture/pump-track.md
@@ -51,7 +53,7 @@ Build the supervised real-browser workflow that starts from a pasted job-posting
 - [ ] #3 The actor can annotate intent and classify actions as required, optional, recommended, reversible, irreversible, or approval-gated.
 - [ ] #4 Irreversible actions, especially final application submission, require explicit Mike approval; no clean run auto-promotes or auto-submits.
 - [ ] #5 A later run can replay deterministic steps while pausing for Mike at unknown, ambiguous, or approval-gated transitions.
-- [ ] #6 The recorded session is visible in the local app and can be compared with the provider Reference Scenario.
+- [x] #6 The recorded session is visible in the local app and can be compared with the provider Reference Scenario.
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -140,5 +142,17 @@ author: Codex
 created: 2026-08-28 22:52
 ---
 Follow-on learning requirement captured as TASK-113. Guided-session research observations must feed a cross-application question graph: preserve each exact occurrence and its application/company/industry/provider/persona/outcome context, then group occurrences into reviewable archetypes and attach versioned answer strategies. TASK-112 remains responsible for trustworthy observation; TASK-113 owns cross-application clustering, answer-catalog analytics, and graph visualization.
+---
+
+author: wayfinder
+created: 2026-08-29 00:22
+---
+AC#6 ('recorded session ... can be compared with the provider Reference Scenario') is now specced in ADR 009 and delivered by TASK-119, which depends on TASK-114..TASK-118. See the wayfinder map 'Reference Comparison drift loop'. The remaining TASK-112 slices (AC#2-5: full phase/transition/field recording, intent classification, approval gating, deterministic replay) are unaffected and stay here.
+---
+
+author: claude
+created: 2026-08-29 03:09
+---
+AC#6 delivered by TASK-119 (Done): GuidedSession#complete! runs one idempotent automatic ReferenceComparison; a review-page 'Compare to reference' button runs a manual one; the page renders the coverage phase/step map, drift findings, and a per-finding disposition control. Advisory only. AC#2-5 (full extension recording, intent classification, approval gating, deterministic replay) remain open here.
 ---
 <!-- COMMENTS:END -->

@@ -3,8 +3,10 @@
 class GuidedSessionsController < ApplicationController
   # Playback position is local presentation state; it cannot submit, alter,
   # or transmit a provider/application action.
+  REVIEWER = ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")
+
   skip_before_action :verify_authenticity_token, only: :playback
-  before_action :set_guided_session, only: %i[show playback approval]
+  before_action :set_guided_session, only: %i[show playback approval complete compare create_disposition]
 
   def show
     @events = @guided_session.guided_session_events.order(:occurred_at, :id)
@@ -38,7 +40,33 @@ class GuidedSessionsController < ApplicationController
     record_approval(event, approval_state)
   end
 
+  def complete
+    @guided_session.complete!
+    redirect_to guided_session_path(@guided_session), notice: "Session completed; a reference comparison ran."
+  end
+
+  def compare
+    Scenarios::RecordComparison.call(@guided_session, trigger: "manual")
+    redirect_to guided_session_path(@guided_session), notice: "Compared against the provider reference."
+  end
+
+  def create_disposition
+    finding = session_finding(params.expect(:finding_id))
+    finding.finding_dispositions.create!(disposition_attrs(finding))
+    redirect_to guided_session_path(@guided_session), notice: "Disposition recorded."
+  end
+
   private
+
+  def session_finding(finding_id)
+    ComparisonFinding.where(reference_comparison_id: @guided_session.reference_comparisons.select(:id)).find(finding_id)
+  end
+
+  def disposition_attrs(finding)
+    value = params.expect(:value)
+    { value: value, rationale: params[:rationale].presence, reviewer: REVIEWER, reviewer_label: "Mike",
+      source_disposition_id: (finding.suggested_disposition_id if finding.suggested_disposition&.value == value) }
+  end
 
   def set_guided_session
     @guided_session = GuidedSession.find(params.expect(:id))
