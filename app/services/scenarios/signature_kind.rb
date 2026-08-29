@@ -37,6 +37,11 @@ class Scenarios::SignatureKind
     def ats_identity? = classification == :ats_identity
     def unknown_namespace? = classification == :unknown_namespace
 
+    # The comparison dimension this kind belongs to: the namespace for a
+    # structural kind ("field", "step", ...), else "ats_identity" /
+    # "unknown_namespace".
+    def dimension = structural? ? namespace : classification.to_s
+
     # Only meaningful for the screening_question namespace, whose identifier is
     # itself "<version>:<hash>".
     def screening_question_version = screening_question_parts&.first

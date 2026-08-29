@@ -21,6 +21,22 @@ RSpec.describe Scenarios::ReferenceDiff do
     )
   end
 
+  it "reports a same-kind value change and buckets the diff by dimension" do
+    reference = scenario_with([["step:intake.1", "x"], ["field:email", "email|identity|required"]])
+    candidate = scenario_with([
+                                ["step:intake.1", "x"],
+                                ["field:email", "text|identity|optional"],
+                                ["screening_question:v1:abc", "textarea|screening_question|optional"]
+                              ])
+
+    result = described_class.call(candidate, reference: reference)
+
+    expect(result[:changed]).to eq(["field:email"])
+    expect(result[:dimensions]["screening_question"]).to eq(gained: ["screening_question:v1:abc"], lost: [],
+                                                            changed: [])
+    expect(result[:dimensions]["field"]).to eq(gained: [], lost: [], changed: ["field:email"])
+  end
+
   def create_signature(scenario, kind, observed_at)
     create(:scenario_signature, scenario: scenario, kind: kind, first_observed_at: observed_at)
   end

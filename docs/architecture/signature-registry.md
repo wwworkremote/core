@@ -231,7 +231,8 @@ currently have a mechanism for.
 | Reference Scenario (golden-master baseline per provider) | Built (2026-08-27, TASK-106) — ReferenceScenario is an explicit one-row-per-provider pointer; promotion is preview-first and manual |
 | Guided session → `Scenario` materialization (`Scenarios::Capture.from_guided_session`) | Built (2026-08-28, TASK-115) — `Scenarios::GuidedCapture`; emits `step:` / `commitment_boundary:` / `field:` / `screening_question:` markers + ATS ids from value-free event evidence; `GuidedSession#scenario_id` + `ScenarioSignature#source` breadcrumb; deterministic + idempotent. See [ADR 009](../adr/009-reference-comparison-drift-and-coverage.md) |
 | `Scenarios::SignatureKind` namespaced-kind value object (`field:` / `screening_question:` / `step:` / `commitment_boundary:`) | Built (2026-08-28, TASK-114) — the single kind-parsing boundary; additive, no consumer wired yet |
-| `ReferenceComparison` / `ComparisonFinding` / `FindingDisposition` (coverage-vs-drift, dispositions) | **Not built** — ADR 009 |
+| Coverage-vs-drift comparison engine (`Scenarios::ReferenceDiff` dimensions/value-diff, `Scenarios::Coverage`, `Scenarios::DriftAnalysis`, `Scenarios::ComparisonRules::VERSION`) | Built (2026-08-28, TASK-116) — plain-hash output; Reached-Scope-aware so a research run's early stop is coverage, not drift |
+| `ReferenceComparison` / `ComparisonFinding` / `FindingDisposition` (persistent runs, findings, dispositions) | **Not built** — ADR 009, TASK-117 |
 | `HandshakeCheck` step-aware against Reference Scenario markers (the actual fix for the `:required_after_submit` ceiling) | **Not built** — ADR 009, TASK-107 |
 
 ## Decided
