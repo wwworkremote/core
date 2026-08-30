@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_040000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -90,6 +90,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_040000) do
     t.string "visitor_token"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "answer_proposal_verdicts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "decided_at", null: false
+    t.integer "edit_distance"
+    t.string "final_text_sha256"
+    t.string "persona_id"
+    t.string "proposed_text_sha256", null: false
+    t.string "provider"
+    t.bigint "question_archetype_id", null: false
+    t.bigint "question_occurrence_id"
+    t.string "strategy_source", null: false
+    t.datetime "updated_at", null: false
+    t.string "verdict", null: false
+    t.index ["question_archetype_id", "strategy_source", "verdict"], name: "idx_on_question_archetype_id_strategy_source_verdic_589ef49dee"
+    t.index ["question_archetype_id"], name: "index_answer_proposal_verdicts_on_question_archetype_id"
+    t.index ["question_occurrence_id"], name: "index_answer_proposal_verdicts_on_question_occurrence_id"
   end
 
   create_table "answer_strategies", force: :cascade do |t|
@@ -202,6 +220,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_040000) do
     t.bigint "user_id", null: false
     t.index ["job_posting_id"], name: "index_application_questions_on_job_posting_id"
     t.index ["user_id"], name: "index_application_questions_on_user_id"
+  end
+
+  create_table "archetype_readiness_assessments", force: :cascade do |t|
+    t.datetime "assessed_at", null: false
+    t.string "assessed_by", null: false
+    t.datetime "created_at", null: false
+    t.bigint "question_archetype_id", null: false
+    t.text "rationale"
+    t.string "readiness_class", null: false
+    t.bigint "source_assessment_id"
+    t.datetime "updated_at", null: false
+    t.index ["question_archetype_id", "assessed_at"], name: "idx_on_question_archetype_id_assessed_at_f44acfd079"
+    t.index ["question_archetype_id"], name: "index_archetype_readiness_assessments_on_question_archetype_id"
+    t.index ["source_assessment_id"], name: "index_archetype_readiness_assessments_on_source_assessment_id"
   end
 
   create_table "board_queries", force: :cascade do |t|
@@ -1222,6 +1254,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_040000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "answer_proposal_verdicts", "question_archetypes"
+  add_foreign_key "answer_proposal_verdicts", "question_occurrences"
   add_foreign_key "answer_strategies", "question_archetypes"
   add_foreign_key "application_answer_templates", "users"
   add_foreign_key "application_field_answers", "user_job_postings"
@@ -1230,6 +1264,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_040000) do
   add_foreign_key "application_field_observations", "user_job_postings"
   add_foreign_key "application_questions", "job_postings"
   add_foreign_key "application_questions", "users"
+  add_foreign_key "archetype_readiness_assessments", "archetype_readiness_assessments", column: "source_assessment_id"
+  add_foreign_key "archetype_readiness_assessments", "question_archetypes"
   add_foreign_key "career_profiles", "users"
   add_foreign_key "company_pipeline_steps", "companies"
   add_foreign_key "company_pipeline_steps", "users"

@@ -33,4 +33,16 @@ RSpec.describe QuestionArchetypes::Merge do
     archetype = create(:question_archetype)
     expect { described_class.call(source: archetype, target: archetype) }.to raise_error(ArgumentError)
   end
+
+  it "carries the source's readiness assessment onto the target as a labelled suggestion (TASK-127)" do
+    source = create(:question_archetype)
+    target = create(:question_archetype)
+    source.readiness_assessments.create!(readiness_class: "deterministic", assessed_by: "mike")
+
+    described_class.call(source: source, target: target)
+
+    carried = target.current_readiness
+    expect(carried.readiness_class).to eq("deterministic")
+    expect(carried).to be_carried_forward
+  end
 end

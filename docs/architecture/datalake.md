@@ -140,6 +140,27 @@ the **prune** step, not a capture filter:
 The prune job itself and the curation report are TASK-126-out-of-scope follow-ups; the
 policy is fixed here.
 
+## Automation-readiness corpus (TASK-127, built 2026-08-30)
+
+`data/datalake/corpus/` (git-ignored, same posture as `sessions/`) holds one JSONL file
+per Question Archetype — one line per `AnswerProposalVerdict` plus the strategy that
+produced the proposal. `rake automation_readiness:corpus` writes it; two consumers read
+it: a human/LLM prompt-authoring session, and `rake automation_readiness:eval`.
+
+The eval harness replays the **same** `LLM::AnswerGenerator.call` path (`CannedAnswers` +
+`ApplicationAnswerTemplate` + `PromptBuilder` / `SYSTEM_RULES` / `TASK_INSTRUCTIONS` + the
+configured `answer_generation` model) against a representative occurrence per archetype
+that has ≥ N verdicts, and reports **verbatim-acceptance rate + median edit distance,
+split by `strategy_source`**. Advisory report only — no DB write, no answer filled or
+submitted.
+
+`ArchetypeReadinessAssessment` (append-only, `latest applicable wins`, carried forward as
+a *suggestion* after a merge/split) records the class Mike sets;
+`QuestionArchetypes::SuggestedReadiness` computes the evidence-based default he starts
+from. **Hard guardrail:** no code path consumes a readiness class or eval score to fill or
+submit an answer — `deterministic` / `generatable` only ever mean "propose without a
+review prompt".
+
 ## What this is not
 
 - Not encrypted at rest, not redacted — machine-local + aggressive prune is the chosen

@@ -5,8 +5,9 @@
 # and answer strategies move to the target. Occurrence *wording* is never
 # touched -- only the archetype pointer.
 #
-# TASK-127 will hook here to carry a readiness assessment forward as a
-# suggestion on the target.
+# The source's latest readiness assessment carries forward onto the target as
+# a *suggestion* (assessed_by "merge:carry_forward"), never silently as fact
+# (TASK-127).
 class QuestionArchetypes::Merge
   def self.call(source:, target:) = new(source, target).call
 
@@ -27,7 +28,19 @@ class QuestionArchetypes::Merge
   def merge_and_tombstone
     move_occurrences
     move_strategies
+    carry_readiness_forward
     @source.update!(merged_into: @target)
+  end
+
+  def carry_readiness_forward
+    prior = @source.current_readiness
+    @target.readiness_assessments.create!(carry_forward_attrs(prior)) if prior
+  end
+
+  def carry_forward_attrs(prior)
+    { readiness_class: prior.readiness_class, source_assessment: prior,
+      assessed_by: ArchetypeReadinessAssessment::CARRIED_FORWARD_BY,
+      rationale: "Carried from merged archetype ##{@source.id} -- confirm or replace." }
   end
 
   def move_occurrences

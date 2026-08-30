@@ -1,11 +1,11 @@
 ---
 id: TASK-113
 title: Build cross-application question knowledge graph and answer catalog
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-08-28 22:51'
-updated_date: '2026-08-30 13:59'
+updated_date: '2026-08-30 14:23'
 labels:
   - application-workflow
   - knowledge-graph
@@ -41,13 +41,13 @@ Turn value-free application question observations into a provenance-preserving l
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Every observed application question occurrence remains durable and traceable to the guided session or application, job posting, company, industry, provider, persona, page step, and observed wording
-- [ ] #2 Question occurrences can be grouped into reviewable Question Archetypes while preserving wording variants and supporting explicit merge, split, and correction decisions
-- [ ] #3 Answer candidates and reusable templates attach to archetypes with persona, provenance, source, version, confidence, and deterministic-versus-sophisticated classification
-- [ ] #4 A graph/map view shows the most common archetypes and their relationships to applications, companies, industries, providers, personas, answers, and outcomes
-- [ ] #5 The system recommends canned or more sophisticated answer handling from evidence and confidence but does not silently promote, overwrite, fill, or submit answers
-- [ ] #6 Existing ApplicationQuestion, ApplicationFieldObservation, and ApplicationAnswerTemplate data has an explicit migration/backfill and compatibility plan
-- [ ] #7 Focused tests and a repeatable sandbox walkthrough prove duplicate observations aggregate without losing per-application provenance
+- [x] #1 Every observed application question occurrence remains durable and traceable to the guided session or application, job posting, company, industry, provider, persona, page step, and observed wording
+- [x] #2 Question occurrences can be grouped into reviewable Question Archetypes while preserving wording variants and supporting explicit merge, split, and correction decisions
+- [x] #3 Answer candidates and reusable templates attach to archetypes with persona, provenance, source, version, confidence, and deterministic-versus-sophisticated classification
+- [x] #4 A graph/map view shows the most common archetypes and their relationships to applications, companies, industries, providers, personas, answers, and outcomes
+- [x] #5 The system recommends canned or more sophisticated answer handling from evidence and confidence but does not silently promote, overwrite, fill, or submit answers
+- [x] #6 Existing ApplicationQuestion, ApplicationFieldObservation, and ApplicationAnswerTemplate data has an explicit migration/backfill and compatibility plan
+- [x] #7 Focused tests and a repeatable sandbox walkthrough prove duplicate observations aggregate without losing per-application provenance
 <!-- AC:END -->
 
 ## Comments
@@ -83,3 +83,28 @@ Wayfinder map doc-7, TASK-124 resolved the automation-readiness loop that attach
 Keep the archetype merge/split operations (this task's AC#2) aware that a readiness assessment may need to carry forward as a suggestion when they run.
 ---
 <!-- COMMENTS:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Built the first implementation of the cross-application question knowledge graph — relational tables + a computed graph-shaped read model, deterministic exact-normalized-prompt clustering, human merge/split (ADR 008 delivery boundary). Merged to main `045194bd`, pushed. Full suite 1072 examples / 0 failures.
+
+**Schema** (`CreateQuestionKnowledgeGraph`)
+- `question_occurrences` — immutable per-application evidence. `raw_prompt` + provenance FKs (job_posting, user, user_job_posting, guided_session) + provider/persona/page_step/context; industry via the posting's `data['ai_category']`, outcome via the application. An `on: :update` guard rejects any change to the wording/provenance columns — only the archetype pointer is mutable (AC#1).
+- `question_archetypes` — `label` / `canonical_prompt` / `question_kind` / `merged_into` tombstone; `active`/`merged` scopes; `wording_variants` (AC#2).
+- `answer_strategies` — `persona_id`, `source` (deterministic/authored/learned/submitted/ai), `sophistication` (deterministic/authored/synthesized), `version`, `confidence`, `enabled`, `provenance` (AC#3).
+
+**Ingest** — `QuestionOccurrences::Record`: an `ApplicationFieldObservation` or a manual `ApplicationQuestion` → a deduped occurrence + exact-prompt archetype assignment (`auto:exact_prompt`, confidence 100). Wired non-blocking into the observations API and `ApplicationQuestion` after_create.
+
+**Backfill** (AC#6) — `QuestionGraph::Backfill` + `rake question_graph:backfill` (re-runnable): backfills history + seeds answer strategies from `ApplicationAnswerTemplate` and submitted `ApplicationQuestion` answers. Existing tables untouched; ran clean on dev data (43 occurrences, 20 archetypes).
+
+**Merge/split** (AC#2) — `QuestionArchetypes::Merge` (repoint occurrences + deduped strategies, tombstone source; TASK-127 hook point noted for readiness carry-forward) and `::Split` (move a strict subset to a fresh archetype). Wording never touched.
+
+**Review surface** (AC#4/#5) — `/question_archetypes` (linked from the profile menu): `QuestionGraph::Overview` ranks archetypes with company/provider spread + coverage gaps; the show page renders occurrences with full provenance, wording variants, strategies, an advisory `QuestionArchetypes::Recommendation` (deterministic/generatable/needs_human from question kind + evidence spread — a sentence, never a switch), and explicit merge/split forms. Request spec asserts the surface never touches `ApplicationFieldAnswer`.
+
+**AC#7** — `spec/services/question_occurrences/record_spec.rb` (aggregation + provenance) + `QuestionGraph::SandboxWalkthrough` / `rake question_graph:sandbox_walkthrough` (records the same 2 questions across 2 throwaway applications, asserts shared archetypes with per-application provenance intact; idempotent).
+
+**Docs** — `application-question-knowledge-graph.md` "Built (TASK-113)" section (component map + deferred: DOM-derived extraction via `Datalake::Bundle`, richer NLP clustering, the readiness/verdict tables which are TASK-127).
+
+**Unblocks TASK-127** (automation-readiness corpus + eval harness), which attaches `archetype_readiness_assessments` + `answer_proposal_verdicts` to the archetype model built here.
+<!-- SECTION:FINAL_SUMMARY:END -->
