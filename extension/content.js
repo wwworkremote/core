@@ -30,6 +30,10 @@
   // supplied by the localhost intake flow; normal extension browsing remains
   // unchanged when it is absent.
   const guidedSessionToken = urlParams.get('guided_session_token');
+  // TASK-134: the session purpose rides along on the tracked URL. Only
+  // 'application_execution' runs the chrome.debugger HAR / full-page path.
+  const guidedSessionPurpose = urlParams.get('guided_session_purpose');
+  const isGuidedExecution = guidedSessionPurpose === 'application_execution';
 
   // Set by popup.js's "Scan This Page" button immediately before injecting
   // this file, via a separate executeScript call -- allows generic capture
@@ -1300,19 +1304,56 @@
     catch (_) { return el.outerHTML; }
   }
 
-  // Light path (both purposes): content-script DOM + a viewport screenshot.
-  // The chrome.debugger HAR / full-page path for application_execution is a
-  // separate, individually-optional capture (see captureExecutionArtifacts).
+  // DOM snapshot on both purposes. The screenshot slot is a full-page CDP
+  // capture for application_execution sessions (via captureExecutionArtifacts,
+  // which also lands the HAR), and a viewport screenshot otherwise -- or when
+  // the debugger path is unavailable / has detached.
   async function captureGuidedAssets(eventId) {
     try {
       await datalakeAsset(eventId, 'dom', btoa(unescape(encodeURIComponent(guidedDomSnapshot()))));
     } catch (err) { datalakeGap(eventId, 'dom', err.message); }
+
+    if (isGuidedExecution && await captureExecutionArtifacts(eventId)) return;
+    await captureViewportScreenshot(eventId);
+  }
+
+  async function captureViewportScreenshot(eventId) {
     try {
       const shot = await new Promise((resolve) =>
         chrome.runtime.sendMessage({ type: 'CAPTURE_VISIBLE_TAB' }, resolve));
       if (shot?.dataUrl) await datalakeAsset(eventId, 'screenshot', shot.dataUrl.split(',')[1]);
       else datalakeGap(eventId, 'screenshot', shot?.error || 'no image returned');
     } catch (err) { datalakeGap(eventId, 'screenshot', err.message); }
+  }
+
+  // TASK-134: the chrome.debugger HAR + full-page screenshot, driven by
+  // background.js. Returns true when it has filled the screenshot slot (so the
+  // viewport fallback is skipped): either a real full-page shot landed, or the
+  // debugger detached mid-session and the transition is recorded as gaps.
+  function sendBg(type) {
+    return new Promise((resolve) => {
+      try { chrome.runtime.sendMessage({ type }, (r) => resolve(chrome.runtime.lastError ? null : r)); }
+      catch (e) { resolve({ error: e.message }); }
+    });
+  }
+
+  async function captureExecutionArtifacts(eventId) {
+    await sendBg('GUIDED_DEBUGGER_ATTACH');
+    const res = await sendBg('GUIDED_EXECUTION_CAPTURE');
+
+    if (!res || res.unavailable || res.error) {
+      datalakeGap(eventId, 'har', res?.reason || res?.error || 'debugger unavailable');
+      return false;
+    }
+    if (res.detached) {
+      datalakeGap(eventId, 'har', res.reason);
+      datalakeGap(eventId, 'screenshot', res.reason);
+      return true;
+    }
+    if (res.har) { try { await datalakeAsset(eventId, 'har', res.har); } catch (e) { datalakeGap(eventId, 'har', e.message); } }
+    else datalakeGap(eventId, 'har', res.harError || 'no HAR produced');
+    if (res.screenshot) await datalakeAsset(eventId, 'screenshot', res.screenshot).catch((e) => datalakeGap(eventId, 'screenshot', e.message));
+    return Boolean(res.screenshot);
   }
 
   async function recordGuidedPageArrival() {
@@ -1347,6 +1388,13 @@
     } catch (err) {
       LOG_WARN('Guided session page arrival failed:', err.message);
     }
+  }
+
+  // TASK-134: attach the debugger at session start for execution sessions so
+  // the first transition's HAR already has network. captureExecutionArtifacts
+  // re-sends this before every capture too (idempotent; covers SW restarts).
+  if (IS_LOCAL_BUILD && guidedSessionToken && isGuidedExecution) {
+    chrome.runtime.sendMessage({ type: 'GUIDED_DEBUGGER_ATTACH' }, () => void chrome.runtime.lastError);
   }
 
   recordGuidedPageArrival();

@@ -42,6 +42,17 @@ class Datalake::AssetStore
     default_manifest
   end
 
+  # Shape of this bundle without reading the asset bytes -- for the sandbox
+  # walkthrough and the (future) curation report.
+  def summary
+    data = manifest
+    { asset_types: asset_types(data), assets: data["assets"].size, gaps: data["gaps"].size }
+  end
+
+  def asset_types(data = manifest)
+    data["assets"].filter_map { |a| a["type"] }.uniq.sort
+  end
+
   # Delete this session's whole raw bundle. The prune step (ADR 010) once it
   # is built; used now by tests and the sandbox walkthrough for cleanup.
   def purge!

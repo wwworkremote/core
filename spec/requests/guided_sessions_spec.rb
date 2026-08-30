@@ -115,8 +115,16 @@ RSpec.describe "GuidedSessions" do
       )
 
       expect(session.tracked_source_url).to eq(
-        "https://jobs.example.com/roles/42?source=board&guided_session_token=#{session.session_token}"
+        "https://jobs.example.com/roles/42?source=board&guided_session_token=#{session.session_token}" \
+        "&guided_session_purpose=application_execution"
       )
+    end
+
+    it "carries the session purpose so content.js can pick the capture path (TASK-134 AC#3)" do
+      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42",
+                                      purpose: "application_research")
+
+      expect(session.tracked_source_url).to include("guided_session_purpose=application_research")
     end
 
     it "renders the pump-track playback map and durable resume position" do
