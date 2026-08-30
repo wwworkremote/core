@@ -72,8 +72,9 @@ The safety invariant is simple: an unknown, ambiguous, or irreversible move
 must take the `User Task` path. The guided extension pauses the application
 form's final submit boundary and records a pending event; final application
 submission is always an approval-required move, even when the preceding run
-was deterministic. Approval currently records the human decision only; a
-separate execution slice must define how an approved provider action resumes.
+was deterministic. Approval records the human decision; for a running replay
+(TASK-133) approving a gate **ends the replay** and hands control back — an
+approved provider action past a commitment boundary is always driven by hand.
 
 **Built (TASK-112, 2026-08-30):**
 
@@ -90,10 +91,19 @@ separate execution slice must define how an approved provider action resumes.
 - `GuidedSessions::ReplayPlan` produces the **plan** a later replay would
   follow — which steps are deterministically auto-advanceable and which are
   gates (irreversible / approval-gated / commitment boundary). Read-only,
-  rendered on the review page. **Replay *execution* — actually re-driving a
-  browser — is deliberately not built (TASK-133); it is a Bounded Agency
-  decision, and nothing in this system fills or submits without Mike's
-  explicit action.**
+  rendered on the review page.
+- **Replay execution (TASK-133), scoped with Mike:** `GuidedSessionReplay` +
+  `GuidedSessions::Replay` drive a completed session's `ReplayPlan` one
+  confirmed step at a time. A replay is **fill-only** — it re-types the
+  recorded answers into fields matched by label and **never clicks Next,
+  Continue, or Submit**; every navigation or transmission is a human action.
+  It starts from an explicit button on the review page (real employer sites
+  need a per-run opt-in checkbox; the sandbox is always allowed), shows a
+  fixed **REPLAY banner** in the page with a per-step "Do it" confirm, stops
+  at every gate, and **ends the moment a gate is approved** — it never
+  resumes provider action past a commitment boundary. Final application
+  submission is never auto-executed; a guardrail spec asserts no replay code
+  path clicks, navigates, or submits.
 
 Application research and application execution share this flow. Research may
 open and inspect provider steps, producing a reusable map of pages, questions,
