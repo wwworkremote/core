@@ -368,6 +368,8 @@ Rails.application.routes.draw do
   namespace :api do
     resources :scenarios, only: [:create]
     post "guided_sessions/:session_token/events" => "guided_session_events#create", as: :guided_session_events
+    post "guided_sessions/:session_token/datalake_assets" => "datalake_assets#create",
+         as: :guided_session_datalake_assets
     resources :job_postings, only: [] do
       member do
         post :enrich

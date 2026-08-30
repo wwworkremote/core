@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-29 03:09'
+updated_date: '2026-08-30 15:13'
 labels:
   - architecture
   - application-workflow
@@ -154,5 +154,26 @@ author: claude
 created: 2026-08-29 03:09
 ---
 AC#6 delivered by TASK-119 (Done): GuidedSession#complete! runs one idempotent automatic ReferenceComparison; a review-page 'Compare to reference' button runs a manual one; the page renders the coverage phase/step map, drift findings, and a per-finding disposition control. Advisory only. AC#2-5 (full extension recording, intent classification, approval gating, deterministic replay) remain open here.
+---
+
+author: @claude
+created: 2026-08-30 15:13
+---
+## Session 2026-08-30: AC#3 done, AC#4 reinforced, AC#5 planning half, AC#2 advanced
+
+Merged to main `b8771de6` (branch `task-112-guided-recorder`). Full suite 1099 examples / 0 failures. Left **In Progress** — AC#2 wants a real-Chrome confirmation and AC#5's execution half is deliberately deferred (see below).
+
+**AC#3 (annotate + classify) — done.** A "Reclassify" form on each timeline card (`PATCH guided_sessions/:id/events/:event_id` → new `GuidedSessions::EventsController#update`) lets the actor edit `intent` / `requirement` / `reversibility` / `approval_state`. The model still rejects an ungated `irreversible`. Also split `GuidedSessions::EventsController` + `GuidedSessions::DispositionsController` out of the oversized `GuidedSessionsController` (route helpers unchanged).
+
+**AC#4 (irreversible ⇒ approval) — reinforced.** `GuidedSessionEvent#irreversible_transition_requires_approval` already enforces it model-side; added guardrail specs: `complete!` never auto-approves a pending `submission_attempted`; only `EventsController` mutates an event's `approval_state`.
+
+**AC#5 (deterministic replay) — planning half built.** `GuidedSessions::ReplayPlan` classifies each recorded transition as auto-advanceable (deterministic, reversible, ungated) vs a pause gate (irreversible / approval-gated / commitment boundary), rendered read-only on the review page. **Execution — actually re-driving a browser — is [TASK-133](task-133), scoped as a Bounded Agency decision, not built.**
+
+**AC#2 (real Chrome run records phases/transitions/field-actions/signatures into a reviewable timeline) — advanced, needs browser confirmation.**
+- `content.js`: an SPA / hash step change during a guided session now records a page-arrival event, so multi-step ATS wizards produce a whole timeline (not only full-page reloads). `manifest.json` → **1.33.0**.
+- The review page now summarises the fields filled during the session (label + source + time, never the value, joined by `session_token`) and surfaces captured provider signatures (`job_post_id`, `ats_application_id`) on each timeline card.
+- Still open: a real dogfood pass through the loaded extension against a multi-step flow to confirm the wizard-step capture fires and the timeline reads whole.
+
+**Unblocks [TASK-126](task-126)** — the guided-session `GuidedSessionEvent` stream is now rich enough (arrival + wizard steps + submission boundary) for per-event datalake asset capture.
 ---
 <!-- COMMENTS:END -->
