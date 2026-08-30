@@ -1,10 +1,11 @@
 ---
 id: TASK-113
 title: Build cross-application question knowledge graph and answer catalog
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-08-28 22:51'
-updated_date: '2026-08-29 18:45'
+updated_date: '2026-08-30 13:59'
 labels:
   - application-workflow
   - knowledge-graph

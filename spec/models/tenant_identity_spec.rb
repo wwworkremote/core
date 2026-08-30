@@ -2,6 +2,20 @@
 
 require "rails_helper"
 
+# == Schema Information
+#
+# Table name: tenant_identities
+#
+#  id         :bigint           not null, primary key
+#  identifier :string           not null
+#  provider   :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_tenant_identities_on_provider_and_identifier  (provider,identifier) UNIQUE
+#
 RSpec.describe TenantIdentity do
   describe ".for" do
     it "creates one row per (provider, identifier) and returns the same row on repeat" do

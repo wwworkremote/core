@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -90,6 +90,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_030000) do
     t.string "visitor_token"
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+  end
+
+  create_table "answer_strategies", force: :cascade do |t|
+    t.text "answer_text", null: false
+    t.integer "confidence"
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.string "persona_id"
+    t.jsonb "provenance", default: {}, null: false
+    t.bigint "question_archetype_id", null: false
+    t.string "sophistication", null: false
+    t.string "source", null: false
+    t.datetime "updated_at", null: false
+    t.integer "version", default: 1, null: false
+    t.index ["question_archetype_id", "persona_id", "source"], name: "idx_on_question_archetype_id_persona_id_source_b87f092534"
+    t.index ["question_archetype_id"], name: "index_answer_strategies_on_question_archetype_id"
   end
 
   create_table "application_answer_templates", force: :cascade do |t|
@@ -782,6 +798,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_030000) do
     t.index ["user_id"], name: "index_pipeline_steps_on_user_id"
   end
 
+  create_table "question_archetypes", force: :cascade do |t|
+    t.string "canonical_prompt", null: false
+    t.datetime "created_at", null: false
+    t.string "label", null: false
+    t.bigint "merged_into_id"
+    t.text "notes"
+    t.string "question_kind", null: false
+    t.datetime "updated_at", null: false
+    t.index ["merged_into_id"], name: "index_question_archetypes_on_merged_into_id"
+    t.index ["question_kind"], name: "index_question_archetypes_on_question_kind"
+  end
+
+  create_table "question_occurrences", force: :cascade do |t|
+    t.string "archetype_assigned_by"
+    t.integer "archetype_confidence"
+    t.jsonb "context", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "datalake_extractor_version"
+    t.string "field_key"
+    t.bigint "guided_session_id"
+    t.bigint "job_posting_id", null: false
+    t.string "normalized_prompt", null: false
+    t.datetime "observed_at", null: false
+    t.string "page_step"
+    t.string "persona_id"
+    t.string "provider"
+    t.bigint "question_archetype_id"
+    t.string "question_kind", null: false
+    t.text "raw_prompt", null: false
+    t.string "source_kind", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "user_job_posting_id"
+    t.index ["guided_session_id"], name: "index_question_occurrences_on_guided_session_id"
+    t.index ["job_posting_id"], name: "index_question_occurrences_on_job_posting_id"
+    t.index ["normalized_prompt"], name: "index_question_occurrences_on_normalized_prompt"
+    t.index ["question_archetype_id"], name: "index_question_occurrences_on_question_archetype_id"
+    t.index ["user_id"], name: "index_question_occurrences_on_user_id"
+    t.index ["user_job_posting_id", "field_key", "normalized_prompt", "source_kind"], name: "idx_question_occurrences_dedupe", unique: true
+    t.index ["user_job_posting_id"], name: "index_question_occurrences_on_user_job_posting_id"
+  end
+
   create_table "reference_comparisons", force: :cascade do |t|
     t.string "comparison_rules_version", null: false
     t.jsonb "coverage", default: {}, null: false
@@ -1164,6 +1222,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_030000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "answer_strategies", "question_archetypes"
   add_foreign_key "application_answer_templates", "users"
   add_foreign_key "application_field_answers", "user_job_postings"
   add_foreign_key "application_field_mappings", "application_field_answers"
@@ -1203,6 +1262,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_030000) do
   add_foreign_key "llm_messages", "tool_calls"
   add_foreign_key "pipeline_steps", "job_postings"
   add_foreign_key "pipeline_steps", "users"
+  add_foreign_key "question_archetypes", "question_archetypes", column: "merged_into_id"
+  add_foreign_key "question_occurrences", "guided_sessions"
+  add_foreign_key "question_occurrences", "job_postings"
+  add_foreign_key "question_occurrences", "question_archetypes"
+  add_foreign_key "question_occurrences", "user_job_postings"
+  add_foreign_key "question_occurrences", "users"
   add_foreign_key "reference_comparisons", "guided_sessions"
   add_foreign_key "reference_comparisons", "reference_scenarios"
   add_foreign_key "reference_comparisons", "scenarios"
