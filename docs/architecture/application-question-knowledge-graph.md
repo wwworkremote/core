@@ -96,9 +96,9 @@ flowchart TD
 ## Automation readiness
 
 *(wayfinder map doc-7 / [ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md);
-full contract on
-[Automation-readiness corpus and eval-harness shape](../../backlog/tasks/task-124%20-%20Wayfinder-decision-automation-readiness-corpus-and-eval-harness-shape.md);
-implementation TASK-127.)*
+shape from
+[Automation-readiness corpus and eval-harness shape](../../backlog/tasks/task-124%20-%20Wayfinder-decision-automation-readiness-corpus-and-eval-harness-shape.md).
+**Built TASK-127, 2026-08-30.**)*
 
 The **Question Archetype is the unit of automation readiness.** "Adapt the system toward
 automating these applications" means building a decision corpus and an eval loop — not a
@@ -114,11 +114,20 @@ training run.
   `strategy_source` (`canned` / `template` / `ai`) + `verdict`
   (`accepted` / `edited` / `declined`). One row per proposal shown in the sidepanel
   answer flow (TASK-78), declines included. No answer text.
-- **The eval harness replays the real path** — `LLM::AnswerGenerator.call` (`CannedAnswers`
-  + `ApplicationAnswerTemplate` + `PromptBuilder` / prompt constants + the configured
-  `answer_generation` model) — and reports verbatim-acceptance rate + median edit distance,
-  split by strategy. Corpus is per-archetype JSONL under `data/datalake/corpus/`
-  (git-ignored). `rake automation_readiness:corpus` + `automation_readiness:eval`.
+- **Verdict capture:** `LLM::AnswerGenerator#apply_answer` writes a `declined` row the
+  moment a proposal is shown; `Api::V0::ApplicationStatusesController#capture_answers`
+  flips it to `accepted` / `edited` with a real Levenshtein distance when the submitted
+  answers arrive; the sidepanel template-fill path posts to
+  `POST /api/v0/answer_proposal_verdicts` (`AnswerProposalVerdicts::Record`), which hashes
+  the text server-side and keeps only the numbers.
+- **The eval harness** (`AutomationReadiness::Eval`, `rake automation_readiness:eval`)
+  reports verbatim-acceptance rate + median edit distance split by `strategy_source` per
+  archetype over the sample floor, and replays `LLM::AnswerGenerator.call` against a
+  representative occurrence **in a rolled-back transaction** — advisory report to
+  `data/datalake/corpus/eval_report.json`, no DB write, no answer filled or submitted.
+  `AutomationReadiness::CorpusExporter` (`rake automation_readiness:corpus`) writes the
+  per-archetype JSONL. `QuestionArchetypes::SuggestedReadiness` computes the default Mike
+  starts from on the archetype review page.
 - **Advisory only, hard guardrail** (invariant 8 extended): nothing the readiness loop
   produces flips an archetype to auto-fill or auto-submit. It only ever changes whether a
   proposal is offered *without* a review prompt — never whether an answer is entered or

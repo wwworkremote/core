@@ -106,6 +106,32 @@
       <% end %>
     </div>
 
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-6 shadow-2xl">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Automation readiness</div>
+      <% current = @archetype.current_readiness %>
+      <% suggested = @archetype.suggested_readiness %>
+      <% if current %>
+        <div class="text-sm font-black text-white"><%= current.readiness_class.tr('_', ' ') %></div>
+        <div class="text-[10px] text-slate-500 mb-3">
+          set <%= current.assessed_by %> · <%= current.assessed_at.strftime("%b %-d, %Y") %>
+          <% if current.carried_forward? %><span class="text-warning">· carried forward, confirm</span><% end %>
+        </div>
+      <% else %>
+        <div class="text-sm text-slate-500 mb-3">Not assessed yet.</div>
+      <% end %>
+      <p class="text-[10px] text-slate-500 mb-4">Suggested: <span class="text-slate-300 font-bold"><%= suggested.readiness_class.tr('_', ' ') %></span> &mdash; <%= suggested.rationale %></p>
+      <%= form_with url: set_readiness_question_archetype_path(@archetype), method: :post, class: "space-y-2" do %>
+        <%= select_tag :readiness_class,
+              options_for_select(ArchetypeReadinessAssessment::CLASSES.map { |c| [c.tr('_', ' '), c] },
+                                 current&.readiness_class || suggested.readiness_class),
+              class: "select select-sm select-bordered bg-black/20 text-xs w-full" %>
+        <%= text_field_tag :rationale, nil, autocomplete: "off", placeholder: "why (optional)",
+              class: "input input-sm input-bordered bg-black/20 text-xs w-full" %>
+        <%= submit_tag "Record readiness", class: "btn btn-sm btn-ghost border-white/10 rounded-lg font-bold w-full" %>
+      <% end %>
+      <p class="text-[10px] text-slate-600 mt-2">Advisory. A readiness class only ever means "propose without a review prompt" &mdash; never "fill without showing me".</p>
+    </div>
+
     <div class="card-neural p-6 border-l-4 border-l-warning/50">
       <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Merge into another archetype</div>
       <p class="text-xs text-slate-500 mb-4">Occurrences and answer strategies move; wording is preserved. The current archetype becomes a tombstone.</p>

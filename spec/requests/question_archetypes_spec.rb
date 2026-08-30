@@ -51,4 +51,15 @@ RSpec.describe "QuestionArchetypes" do
   it "never fills or submits an answer -- the surface is read-only apart from merge/split" do
     expect { get question_archetypes_path }.not_to change(ApplicationFieldAnswer, :count)
   end
+
+  it "records an appended readiness assessment when Mike sets one (TASK-127)" do
+    archetype = create(:question_archetype)
+
+    expect do
+      post set_readiness_question_archetype_path(archetype),
+           params: { readiness_class: "generatable", rationale: "usually close" }
+    end.to change(ArchetypeReadinessAssessment, :count).by(1)
+
+    expect(archetype.current_readiness).to have_attributes(readiness_class: "generatable", assessed_by: "mike")
+  end
 end

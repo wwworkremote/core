@@ -211,6 +211,7 @@ Rails.application.routes.draw do
     member do
       post :merge
       post :split
+      post :set_readiness
     end
   end
   resources :guided_sessions, only: %i[index new create show] do

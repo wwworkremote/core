@@ -4,7 +4,7 @@
 # Read-only except for the explicit human merge/split decisions -- nothing
 # here fills or submits an answer.
 class QuestionArchetypesController < ApplicationController
-  before_action :set_archetype, only: %i[show merge split]
+  before_action :set_archetype, only: %i[show merge split set_readiness]
   helper_method :archetype_occurrences, :archetype_strategies, :merge_targets
 
   def index
@@ -29,6 +29,15 @@ class QuestionArchetypesController < ApplicationController
     redirect_to question_archetype_path(@archetype), alert: e.message
   end
 
+  # TASK-127 AC#4: Mike sets the readiness class (advisory only -- never a
+  # switch that fills or submits). Append-only, so this always adds a row.
+  def set_readiness
+    @archetype.readiness_assessments.create!(readiness_attrs)
+    redirect_to question_archetype_path(@archetype), notice: "Readiness recorded."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to question_archetype_path(@archetype), alert: e.message
+  end
+
   private
 
   def run_split
@@ -38,6 +47,10 @@ class QuestionArchetypesController < ApplicationController
 
   def merge_target
     QuestionArchetype.find(params.expect(:target_id))
+  end
+
+  def readiness_attrs
+    { readiness_class: params.expect(:readiness_class), rationale: params[:rationale].presence, assessed_by: "mike" }
   end
 
   def set_archetype
