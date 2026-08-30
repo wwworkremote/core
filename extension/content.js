@@ -1390,6 +1390,13 @@
     }
   }
 
+  // TASK-134: attach the debugger at session start for execution sessions so
+  // the first transition's HAR already has network. captureExecutionArtifacts
+  // re-sends this before every capture too (idempotent; covers SW restarts).
+  if (IS_LOCAL_BUILD && guidedSessionToken && isGuidedExecution) {
+    chrome.runtime.sendMessage({ type: 'GUIDED_DEBUGGER_ATTACH' }, () => void chrome.runtime.lastError);
+  }
+
   recordGuidedPageArrival();
 
   // ── TASK-133: supervised replay banner ────────────────────────────────────
