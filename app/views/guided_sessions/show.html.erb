@@ -68,12 +68,32 @@
     </div>
   </div>
 
+  <% if @field_answers.any? || @field_mappings.positive? %>
+    <div class="card-neural p-6 mt-6">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">
+        Field activity this session &mdash; <%= pluralize(@field_answers.size, "field filled") %>,
+        <%= pluralize(@field_mappings, "mapping") %>
+      </div>
+      <% if @field_answers.any? %>
+        <div class="grid md:grid-cols-2 gap-2">
+          <% @field_answers.each do |answer| %>
+            <div class="rounded border border-white/10 px-3 py-2 text-xs flex justify-between gap-2">
+              <span class="font-bold text-white"><%= answer.field_label.presence || answer.field_key %></span>
+              <span class="text-slate-500 shrink-0"><%= answer.answer_source %> · <%= answer.provided_at&.strftime("%H:%M") %></span>
+            </div>
+          <% end %>
+        </div>
+        <p class="text-[10px] text-slate-600 mt-2">Values are not shown here &mdash; the timeline records that a field was filled and from which source, never what was typed.</p>
+      <% end %>
+    </div>
+  <% end %>
+
   <div class="mt-10">
     <div class="text-xs font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Recorded timeline</div>
     <% if @events.any? %>
       <div class="space-y-4">
         <% @events.each_with_index do |event, index| %>
-          <article class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>" data-guided-session-playback-target="event" data-index="<%= index %>" data-phase="<%= event.phase %>">
+          <article id="event-<%= event.id %>" class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>" data-guided-session-playback-target="event" data-index="<%= index %>" data-phase="<%= event.phase %>">
             <div class="flex flex-wrap items-center gap-3 mb-3">
               <span class="text-xs font-black uppercase tracking-widest text-primary"><%= event.kind.humanize %></span>
               <span class="badge badge-ghost text-xs"><%= event.requirement.humanize %></span>
@@ -82,6 +102,32 @@
             </div>
             <div class="text-white font-bold"><%= event.action %></div>
             <p class="text-sm text-slate-400 mt-2"><%= event.intent %></p>
+
+            <% sig = event.evidence.slice("job_post_id", "ats_application_id", "provider").compact_blank %>
+            <% if sig.any? %>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <% sig.each do |key, value| %>
+                  <span class="badge badge-outline border-accent/30 text-accent text-[10px] font-mono"><%= key %>: <%= value %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%# AC#3: the actor re-classifies what this move required and how
+                reversible it was. Evidence and the extension's own reading stay
+                on the record; this adds Mike's. %>
+            <details class="mt-4">
+              <summary class="text-[10px] font-bold uppercase tracking-widest text-slate-500 cursor-pointer hover:text-white">Reclassify</summary>
+              <%= form_with url: event_guided_session_path(@guided_session, event_id: event.id), method: :patch,
+                            class: "mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" do |f| %>
+                <%= f.fields_for :guided_session_event, event do |ef| %>
+                  <%= ef.text_field :intent, autocomplete: "off", class: "input input-sm input-bordered bg-black/20 sm:col-span-2" %>
+                  <%= ef.select :requirement, GuidedSessionEvent::REQUIREMENTS.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= ef.select :reversibility, GuidedSessionEvent::REVERSIBILITIES.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= ef.select :approval_state, GuidedSessionEvent::APPROVAL_STATES.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= f.submit "Save classification", class: "btn btn-sm btn-ghost border-white/10 rounded-lg font-bold" %>
+                <% end %>
+              <% end %>
+            </details>
             <% fields = event.evidence["fields"] %>
             <% if fields.is_a?(Array) && fields.any? %>
               <div class="mt-5 rounded-lg border border-white/10 bg-black/20 p-4">
@@ -113,6 +159,28 @@
       <div class="rounded-xl border border-dashed border-white/10 p-6 text-sm text-slate-500">No meaningful transitions recorded yet.</div>
     <% end %>
   </div>
+
+  <% if @replay_plan[:steps].any? %>
+    <div class="card-neural p-6 mt-10">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Replay plan &mdash; what a later run would do</div>
+      <p class="text-sm text-slate-400 mb-4">
+        A later replay would advance <span class="text-success font-bold"><%= pluralize(@replay_plan[:replayable], "deterministic step") %></span>
+        and pause for you at <span class="text-warning font-bold"><%= pluralize(@replay_plan[:gates], "gate") %></span>.
+        This is a plan, not an action &mdash; replay execution is not built, and nothing here fills or submits.
+      </p>
+      <ol class="space-y-1 text-xs">
+        <% @replay_plan[:steps].each do |step| %>
+          <li class="flex items-center gap-2">
+            <span class="badge badge-outline text-[10px] <%= step.disposition == :replay ? 'border-success/40 text-success' : 'border-warning/40 text-warning' %>">
+              <%= step.disposition == :replay ? "auto" : "pause" %>
+            </span>
+            <span class="text-slate-300"><%= step.event.kind.humanize %></span>
+            <span class="text-slate-600">&mdash; <%= step.reason %></span>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% end %>
 
   <%= render "reference_comparison", guided_session: @guided_session %>
 </div>

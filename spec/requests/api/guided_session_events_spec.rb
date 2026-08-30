@@ -141,8 +141,58 @@ RSpec.describe "Guided session events API" do
 
       patch approval_guided_session_path(guided_session, event_id: event.id), params: { approval_state: "denied" }
 
-      expect(response).to redirect_to(guided_session_path(guided_session))
+      expect(response).to redirect_to(guided_session_path(guided_session, anchor: "event-#{event.id}"))
       expect(event.reload.approval_state).to eq("denied")
+    end
+
+    it "lets the actor reclassify a transition's intent and safety (AC#3)" do
+      event = guided_session.guided_session_events.create!(
+        kind: "page_arrived", action: "Observe page", intent: "look around", requirement: "recommended",
+        reversibility: "reversible", approval_state: "not_required", phase: "resolution", occurred_at: Time.current
+      )
+
+      patch event_guided_session_path(guided_session, event_id: event.id),
+            params: { guided_session_event: { intent: "confirm this is the right role before proceeding",
+                                              requirement: "required" } }
+
+      expect(event.reload).to have_attributes(intent: "confirm this is the right role before proceeding",
+                                              requirement: "required")
+    end
+
+    it "still refuses an irreversible reclassification without a gate (AC#4)" do
+      event = guided_session.guided_session_events.create!(
+        kind: "page_arrived", action: "Observe", intent: "x", requirement: "recommended", reversibility: "reversible",
+        approval_state: "not_required", phase: "resolution", occurred_at: Time.current
+      )
+
+      patch event_guided_session_path(guided_session, event_id: event.id),
+            params: { guided_session_event: { reversibility: "irreversible", approval_state: "not_required" } }
+
+      expect(event.reload.reversibility).to eq("reversible")
+      expect(flash[:alert]).to be_present
+    end
+  end
+
+  # AC#4 / Bounded Agency: no path approves a pending irreversible move or
+  # submits an application on the actor's behalf.
+  describe "Bounded Agency guardrail" do
+    it "never auto-approves a pending submission when the session completes" do
+      allow(Scenarios::RecordComparison).to receive(:call)
+      event = guided_session.guided_session_events.create!(
+        kind: "submission_attempted", action: "submit", intent: "send", requirement: "required",
+        reversibility: "irreversible", approval_state: "pending", phase: "reorientation", occurred_at: Time.current
+      )
+
+      guided_session.complete!
+
+      expect(event.reload.approval_state).to eq("pending")
+    end
+
+    it "has only the events controller mutating a recorded event's approval state" do
+      mutators = Rails.root.glob("app/**/*.rb").select do |path|
+        path.read.match?(/\.update!?\([^)]*approval_state/)
+      end
+      expect(mutators.map { |p| p.basename.to_s }).to contain_exactly("events_controller.rb")
     end
   end
 end

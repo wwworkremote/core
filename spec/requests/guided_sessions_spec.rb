@@ -96,6 +96,19 @@ RSpec.describe "GuidedSessions" do
       expect(response.body).to include("guided_session_token=#{session.session_token}")
     end
 
+    it "summarises the fields filled during the session without showing values (AC#2)" do
+      session = GuidedSession.create!(source_url: "https://jobs.example.com/roles/42")
+      application = create(:user_job_posting)
+      create(:application_field_answer, user_job_posting: application, field_key: "phone", field_label: "Phone number",
+                                        answer: "555-0100", answer_source: "profile",
+                                        guided_session_token: session.session_token)
+
+      get guided_session_path(session)
+
+      expect(response.body).to include("Field activity this session").and include("Phone number")
+      expect(response.body).not_to include("555-0100")
+    end
+
     it "preserves existing source parameters and replaces stale correlation" do
       session = GuidedSession.create!(
         source_url: "https://jobs.example.com/roles/42?source=board&guided_session_token=stale"
