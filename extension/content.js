@@ -2471,6 +2471,10 @@
     if (window.location.href !== _lastHref) {
       _lastHref = window.location.href;
       markPanelStale();
+      // A guided session treats each in-app step as a meaningful transition:
+      // multi-page ATS wizards reload (content.js re-injects), but SPA/hash
+      // steps don't -- record the arrival here so the timeline stays whole.
+      if (guidedSessionToken) recordGuidedPageArrival();
     }
   }, 750);
 

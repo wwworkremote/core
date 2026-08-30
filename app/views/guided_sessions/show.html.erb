@@ -68,6 +68,26 @@
     </div>
   </div>
 
+  <% if @field_answers.any? || @field_mappings.positive? %>
+    <div class="card-neural p-6 mt-6">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">
+        Field activity this session &mdash; <%= pluralize(@field_answers.size, "field filled") %>,
+        <%= pluralize(@field_mappings, "mapping") %>
+      </div>
+      <% if @field_answers.any? %>
+        <div class="grid md:grid-cols-2 gap-2">
+          <% @field_answers.each do |answer| %>
+            <div class="rounded border border-white/10 px-3 py-2 text-xs flex justify-between gap-2">
+              <span class="font-bold text-white"><%= answer.field_label.presence || answer.field_key %></span>
+              <span class="text-slate-500 shrink-0"><%= answer.answer_source %> · <%= answer.provided_at&.strftime("%H:%M") %></span>
+            </div>
+          <% end %>
+        </div>
+        <p class="text-[10px] text-slate-600 mt-2">Values are not shown here &mdash; the timeline records that a field was filled and from which source, never what was typed.</p>
+      <% end %>
+    </div>
+  <% end %>
+
   <div class="mt-10">
     <div class="text-xs font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Recorded timeline</div>
     <% if @events.any? %>

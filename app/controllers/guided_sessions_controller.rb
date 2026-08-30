@@ -16,6 +16,9 @@ class GuidedSessionsController < ApplicationController
 
   def show
     @events = @guided_session.guided_session_events.order(:occurred_at, :id)
+    token = @guided_session.session_token
+    @field_answers = ApplicationFieldAnswer.where(guided_session_token: token).order(:provided_at)
+    @field_mappings = ApplicationFieldMapping.where(guided_session_token: token).count
   end
 
   def new
