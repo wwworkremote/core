@@ -217,10 +217,11 @@ Rails.application.routes.draw do
   resources :guided_sessions, only: %i[index new create show] do
     member do
       patch :playback
-      patch "events/:event_id/approval", to: "guided_sessions#approval", as: :approval
+      patch "events/:event_id/approval", to: "guided_sessions/events#approval", as: :approval
+      patch "events/:event_id", to: "guided_sessions/events#update", as: :event
       post :complete
       post :compare
-      post "findings/:finding_id/dispositions", to: "guided_sessions#create_disposition", as: :finding_dispositions
+      post "findings/:finding_id/dispositions", to: "guided_sessions/dispositions#create", as: :finding_dispositions
     end
   end
   namespace :admin do

@@ -141,8 +141,35 @@ RSpec.describe "Guided session events API" do
 
       patch approval_guided_session_path(guided_session, event_id: event.id), params: { approval_state: "denied" }
 
-      expect(response).to redirect_to(guided_session_path(guided_session))
+      expect(response).to redirect_to(guided_session_path(guided_session, anchor: "event-#{event.id}"))
       expect(event.reload.approval_state).to eq("denied")
+    end
+
+    it "lets the actor reclassify a transition's intent and safety (AC#3)" do
+      event = guided_session.guided_session_events.create!(
+        kind: "page_arrived", action: "Observe page", intent: "look around", requirement: "recommended",
+        reversibility: "reversible", approval_state: "not_required", phase: "resolution", occurred_at: Time.current
+      )
+
+      patch event_guided_session_path(guided_session, event_id: event.id),
+            params: { guided_session_event: { intent: "confirm this is the right role before proceeding",
+                                              requirement: "required" } }
+
+      expect(event.reload).to have_attributes(intent: "confirm this is the right role before proceeding",
+                                              requirement: "required")
+    end
+
+    it "still refuses an irreversible reclassification without a gate (AC#4)" do
+      event = guided_session.guided_session_events.create!(
+        kind: "page_arrived", action: "Observe", intent: "x", requirement: "recommended", reversibility: "reversible",
+        approval_state: "not_required", phase: "resolution", occurred_at: Time.current
+      )
+
+      patch event_guided_session_path(guided_session, event_id: event.id),
+            params: { guided_session_event: { reversibility: "irreversible", approval_state: "not_required" } }
+
+      expect(event.reload.reversibility).to eq("reversible")
+      expect(flash[:alert]).to be_present
     end
   end
 end

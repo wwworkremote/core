@@ -73,7 +73,7 @@
     <% if @events.any? %>
       <div class="space-y-4">
         <% @events.each_with_index do |event, index| %>
-          <article class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>" data-guided-session-playback-target="event" data-index="<%= index %>" data-phase="<%= event.phase %>">
+          <article id="event-<%= event.id %>" class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>" data-guided-session-playback-target="event" data-index="<%= index %>" data-phase="<%= event.phase %>">
             <div class="flex flex-wrap items-center gap-3 mb-3">
               <span class="text-xs font-black uppercase tracking-widest text-primary"><%= event.kind.humanize %></span>
               <span class="badge badge-ghost text-xs"><%= event.requirement.humanize %></span>
@@ -82,6 +82,32 @@
             </div>
             <div class="text-white font-bold"><%= event.action %></div>
             <p class="text-sm text-slate-400 mt-2"><%= event.intent %></p>
+
+            <% sig = event.evidence.slice("job_post_id", "ats_application_id", "provider").compact_blank %>
+            <% if sig.any? %>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <% sig.each do |key, value| %>
+                  <span class="badge badge-outline border-accent/30 text-accent text-[10px] font-mono"><%= key %>: <%= value %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%# AC#3: the actor re-classifies what this move required and how
+                reversible it was. Evidence and the extension's own reading stay
+                on the record; this adds Mike's. %>
+            <details class="mt-4">
+              <summary class="text-[10px] font-bold uppercase tracking-widest text-slate-500 cursor-pointer hover:text-white">Reclassify</summary>
+              <%= form_with url: event_guided_session_path(@guided_session, event_id: event.id), method: :patch,
+                            class: "mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" do |f| %>
+                <%= f.fields_for :guided_session_event, event do |ef| %>
+                  <%= ef.text_field :intent, autocomplete: "off", class: "input input-sm input-bordered bg-black/20 sm:col-span-2" %>
+                  <%= ef.select :requirement, GuidedSessionEvent::REQUIREMENTS.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= ef.select :reversibility, GuidedSessionEvent::REVERSIBILITIES.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= ef.select :approval_state, GuidedSessionEvent::APPROVAL_STATES.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= f.submit "Save classification", class: "btn btn-sm btn-ghost border-white/10 rounded-lg font-bold" %>
+                <% end %>
+              <% end %>
+            </details>
             <% fields = event.evidence["fields"] %>
             <% if fields.is_a?(Array) && fields.any? %>
               <div class="mt-5 rounded-lg border border-white/10 bg-black/20 p-4">
