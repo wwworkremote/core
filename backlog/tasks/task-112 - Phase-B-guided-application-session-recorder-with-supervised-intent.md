@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mike'
 created_date: '2026-08-27 22:17'
-updated_date: '2026-08-30 15:13'
+updated_date: '2026-08-30 23:38'
 labels:
   - architecture
   - application-workflow
@@ -175,5 +175,23 @@ Merged to main `b8771de6` (branch `task-112-guided-recorder`). Full suite 1099 e
 - Still open: a real dogfood pass through the loaded extension against a multi-step flow to confirm the wizard-step capture fires and the timeline reads whole.
 
 **Unblocks [TASK-126](task-126)** — the guided-session `GuidedSessionEvent` stream is now rich enough (arrival + wizard steps + submission boundary) for per-event datalake asset capture.
+---
+
+author: claude
+created: 2026-08-30 23:38
+---
+## Dogfood 2026-08-30 — machinery verified against the local /sandbox ATS (extension 1.36.0)
+
+First real-browser guided session ever recorded (prior sessions were all `rake datalake:sandbox_walkthrough` sims). Claude drove; Mike's HITL ACs (#3 intent annotation, #4 approval, #5 replay-with-pause) still need a hands-on pass, but the surrounding machinery now has real evidence:
+
+- **AC#1** — tracked_source_url + `?guided_session_token=&guided_session_purpose=` param flow works; content.js picks it up and records.
+- **AC#2** — real recording works: `application_page_arrived` (with full form-structure extraction) and `submission_attempted` recorded, both visible in the `/guided_sessions/:id` RECORDED TIMELINE with classification chips. See TASK-126 comment #2 for detail.
+- **AC#4** — Bounded Agency confirmed *in code*: content.js `submit` listener does `e.preventDefault(); e.stopImmediatePropagation()` and only records `submission_attempted`; the page did not navigate/submit on either the research or execution session. The timeline shows an Approve/Deny gate on that event.
+- **AC#5** — the REPLAY PLAN panel renders ("pre-fill 1 step, pause for you at 1 gate"); the replay itself not exercised.
+- **AC#6** — session visible in the local app; REFERENCE COMPARISON present with Complete session / Compare to reference.
+
+Bugs found, filed separately: TASK-138 (research-mode screenshot permission gap, High), TASK-139 (execution debugger doesn't survive to the 2nd capture, Medium/confounded).
+
+Still needs Mike: a hands-on pass doing real intent annotation + an Approve on the gate + a replay, ideally against a real ATS (the sandbox can't exercise HAR-with-bodies or multi-page transitions).
 ---
 <!-- COMMENTS:END -->

@@ -4,7 +4,7 @@ title: Guided session raw-asset capture into the datalake
 status: To Do
 assignee: []
 created_date: '2026-08-29 17:40'
-updated_date: '2026-08-30 18:52'
+updated_date: '2026-08-30 23:37'
 labels:
   - application-workflow
   - extension
@@ -82,5 +82,30 @@ Merged to main `95e8ec00` (+ `5f29521e` brakeman fix). Full suite 1107 examples 
 **Deferred to [TASK-134](task-134) (AC#4, #7):** the `chrome.debugger` + CDP path for `application_execution` — HAR-with-response-bodies + full-page screenshots, and the `onDetach` → partially-captured handling. Split because the debugger attach shows a persistent banner, dies when DevTools opens, and genuinely needs a real dogfood pass against a live site (TASK-121 research §5-7 is the reference). The task's own DECIDED note ("debugger-sourced captures must be individually optional") supports the split.
 
 **Still open (real-browser):** a dogfood pass confirming the light-path capture fires per event in the loaded extension and the manifest fills in against a real multi-step flow.
+---
+
+author: claude
+created: 2026-08-30 23:37
+---
+## First real-browser dogfood 2026-08-30 (extension 1.36.0, local /sandbox ATS)
+
+The capture loop ran end-to-end in a real Chrome for the first time (every prior GuidedSession in the dev DB was from the `rake datalake:sandbox_walkthrough` Rails sim). Both purposes exercised against `https://wwworkremote.localhost/sandbox/postings/1`.
+
+**Working (AC #1, #3, #5, #6, #8, #9):**
+- `application_page_arrived` event recorded with full field extraction — 6 fields classified (identity / screening_question / demographic), question_count, job_post_id, provider. `submission_attempted` recorded with req=required / rev=irreversible / appr=pending.
+- Datalake POSTs go through the background API_FETCH relay to the default `http://localhost:31000` (no extension config needed — the endpoints are Rails.env.local? gated, no auth) and land on disk. `manifest.json` schema exactly as designed: seq / guided_session_event_id / type / path / sha256 / bytes / captured_at; gaps[] with reason.
+- `evidence.datalake_asset_seqs` pointer back on every event.
+- Bounded Agency enforced in code: `submission_attempted` fires, `e.preventDefault()` blocks the real submit, page does not navigate. Verified on both research and execution sessions.
+- Session timeline UI (`/guided_sessions/:id`) is genuinely good: RECORDED TIMELINE with per-event classification + observed form structure, REPLAY PLAN (auto/pause per step), Approve/Deny gate, REFERENCE COMPARISON.
+
+**AC #4 — partial.** `application_execution` 1st capture: DOM + HAR + full-page CDP screenshot (3420x1904 PNG), zero gaps, debugger attached cleanly. But: (a) `application_research` viewport screenshot fails every time — `captureVisibleTab` permission gap → **TASK-138** (High); (b) execution debugger doesn't survive to the 2nd capture, `target_closed` → **TASK-139** (Medium, confounded by the automation harness also using CDP).
+
+**AC #7 — holds.** When the execution captures failed they became gaps, the session continued, DOM still captured.
+
+**HAR is empty (`entries:[]`) on both execution captures** — expected: Network.enable after page load sees no traffic, and the only would-be XHR (submit) is blocked by Bounded Agency. The sandbox cannot exercise HAR-with-bodies fidelity; that needs a real multi-request ATS or a richer sandbox.
+
+Dogfood sessions kept for reference: GuidedSession #11 (research, token jRqMptpmRxjEaJBs8dcxvsVB) and #12 (execution, token eaCyXPDR2Prxu1j94LJ399jw); bundles under data/datalake/sessions/ (git-ignored).
+
+Recommend: close this task once TASK-138 lands (it carries the remaining real AC#4 gap); TASK-139 tracks the rest.
 ---
 <!-- COMMENTS:END -->
