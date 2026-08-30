@@ -136,6 +136,40 @@
         79
       ],
       "note": "tracked_source_url is derived from source_url, which GuidedSession#source_url_is_http constrains to http(s) at write time."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "1fcacec87b50b699e92038bf4dd386156544786e9225195c6ff69d1746dde71b",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/guided_sessions/show.html.erb",
+      "line": 178,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(\"Open the application\", GuidedSession.find(params.expect(:id)).tracked_source_url, :target => \"_blank\", :rel => \"noreferrer\", :class => \"btn btn-xs btn-primary rounded-lg font-bold\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "GuidedSessionsController",
+          "method": "show",
+          "line": 22,
+          "file": "app/controllers/guided_sessions_controller.rb",
+          "rendered": {
+            "name": "guided_sessions/show",
+            "file": "app/views/guided_sessions/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "guided_sessions/show"
+      },
+      "user_input": "GuidedSession.find(params.expect(:id)).tracked_source_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "tracked_source_url is derived from source_url, which GuidedSession#source_url_is_http constrains to http(s) at write time (same as the other two entries on this template)."
     }
   ],
   "brakeman_version": "8.0.6"
