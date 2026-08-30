@@ -18,8 +18,7 @@ RSpec.describe "Api::V0::ApplicationFieldMappings" do
            semantic_label: "Personal email", source_kind: "profile", provider: "workday",
            page_step: "My Information", page_url: "https://example.workday.com/apply",
            page_title: "Application", element_fingerprint: "email-input-v1",
-           element_descriptor: { tag: "input", label: "Email" },
-           context: { required: true, question_text: "Email" }
+           element_descriptor: { tag: "input", label: "Email" }, context: { required: true, question_text: "Email" }
          } }
 
     expect(response).to have_http_status(:ok)
@@ -27,6 +26,16 @@ RSpec.describe "Api::V0::ApplicationFieldMappings" do
       field_key: "workday:email:0", semantic_key: "profile.email", source_kind: "profile",
       application_field_answer_id: application.application_field_answers.sole.id
     )
+  end
+
+  it "stamps the guided_session_token when the mapping came from a guided session" do
+    post "/api/v0/job_postings/#{job_posting.id}/application_field_mappings",
+         params: { guided_session_token: "gs_map99", application_field_mapping: {
+           field_key: "workday:phone:0", field_label: "Phone", semantic_key: "profile.phone",
+           source_kind: "profile", element_descriptor: {}, context: {}
+         } }
+
+    expect(ApplicationFieldMapping.last.guided_session_token).to eq("gs_map99")
   end
 
   it "keeps remapping history instead of overwriting the prior association" do

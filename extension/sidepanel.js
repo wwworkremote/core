@@ -646,10 +646,11 @@ async function recordApplicationFieldObservations(state) {
   const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
   await fetch(`${apiBase}/api/v0/job_postings/${state.wwrId}/application_field_observations`, {
     method: 'POST', headers,
-    body: JSON.stringify({ observations: state.applicationFields.map(field => ({
-      field_key: field.key, field_label: field.label, field_type: field.type,
-      page_url: state.pageUrl, context: { required: field.required, current_value: !!field.currentValue },
-    })) }),
+    body: JSON.stringify({ guided_session_token: state.guidedSessionToken || undefined,
+      observations: state.applicationFields.map(field => ({
+        field_key: field.key, field_label: field.label, field_type: field.type,
+        page_url: state.pageUrl, context: { required: field.required, current_value: !!field.currentValue },
+      })) }),
   });
 }
 
@@ -1520,14 +1521,15 @@ async function saveApplicationMapping(row, result, descriptor) {
   const fieldLabel = row.querySelector('.app-field-label span')?.textContent || result.fieldName;
   const response = await fetch(`${apiBase}/api/v0/job_postings/${currentState.wwrId}/application_field_mappings`, {
     method: 'POST', headers,
-    body: JSON.stringify({ application_field_mapping: {
-      field_key: result.fieldName, field_label: fieldLabel, semantic_key: semanticKey,
-      semantic_label: semanticKey, source_kind: sourceKind, provider: currentState.provider,
-      page_step: result.pageStep, page_url: currentState.pageUrl, page_title: result.pageTitle,
-      element_fingerprint: descriptor.selector || result.candidateSelector,
-      element_descriptor: descriptor,
-      context: { required: row.querySelector('.app-field-label b') !== null, clicked_label: descriptor.label || fieldLabel },
-    } }),
+    body: JSON.stringify({ guided_session_token: currentState.guidedSessionToken || undefined,
+      application_field_mapping: {
+        field_key: result.fieldName, field_label: fieldLabel, semantic_key: semanticKey,
+        semantic_label: semanticKey, source_kind: sourceKind, provider: currentState.provider,
+        page_step: result.pageStep, page_url: currentState.pageUrl, page_title: result.pageTitle,
+        element_fingerprint: descriptor.selector || result.candidateSelector,
+        element_descriptor: descriptor,
+        context: { required: row.querySelector('.app-field-label b') !== null, clicked_label: descriptor.label || fieldLabel },
+      } }),
   });
   const data = await response.json();
   if (!response.ok || !data.success) throw new Error(data.error || `HTTP ${response.status}`);

@@ -107,6 +107,9 @@ function buildPanelState(msg, tabId, priorState = null) {
     provider:  msg.provider,
     pageUrl:   msg.pageUrl,
     pageTitle: msg.pageTitle,
+    // Correlation spine (ADR 010): the guided session token, if this tab is
+    // a guided lap. Sticky across UPDATE_PANEL_DATA once set.
+    guidedSessionToken: msg.guidedSessionToken || priorState?.guidedSessionToken || null,
     stale:     false,
   };
 }
@@ -167,7 +170,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const prior = tabStates[tabId] || current;
       if (!prior) return;
       const patched = { ...prior, tabId, applicationFields: msg.applicationFields || [],
-        pageUrl: msg.pageUrl || prior.pageUrl, pageTitle: msg.pageTitle || prior.pageTitle, stale: false };
+        pageUrl: msg.pageUrl || prior.pageUrl, pageTitle: msg.pageTitle || prior.pageTitle,
+        guidedSessionToken: msg.guidedSessionToken || prior.guidedSessionToken || null, stale: false };
       chrome.storage.session.set({ [SESSION_KEY]: patched,
         [TAB_STATES_KEY]: { ...tabStates, [tabId]: patched } });
     });
@@ -401,10 +405,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const entry = { level: 'error', text: `${msg.event_name}: ${msg.error_message}`, ts: Date.now(), detail: msg };
         chrome.storage.session.set({ [SESSION_KEY]: { ...state, diagnostics: [...(state.diagnostics || []), entry].slice(-200) } });
       }
+      // Correlation spine (ADR 010): stamp the guided session token from the
+      // panel state when the error happened during a guided lap.
+      const token = msg.guided_session_token || state?.guidedSessionToken || null;
+      fetch('http://localhost:31000/api/v0/extension_error_events', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extension_error_event: msg, guided_session_token: token }),
+      }).catch(() => {});
     });
-    fetch('http://localhost:31000/api/v0/extension_error_events', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ extension_error_event: msg }),
-    }).catch(() => {});
   }
 });
