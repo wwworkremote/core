@@ -223,6 +223,7 @@ Rails.application.routes.draw do
       post :compare
       post "findings/:finding_id/dispositions", to: "guided_sessions/dispositions#create", as: :finding_dispositions
     end
+    resources :replays, only: %i[create show update], controller: "guided_sessions/replays"
   end
   namespace :admin do
     resources :skills

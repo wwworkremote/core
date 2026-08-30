@@ -20,9 +20,10 @@ class GuidedSessions::Replay
     @session = guided_session
   end
 
-  def start(allow_real_site:)
-    guard_startable!(allow_real_site)
-    @session.guided_session_replays.create!(allow_real_site: allow_real_site)
+  def start(allow_real_site: false)
+    real = allow_real_site == true
+    guard_startable!(real)
+    @session.guided_session_replays.create!(allow_real_site: real)
   end
 
   def guard_startable!(allow_real_site)
