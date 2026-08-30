@@ -42,6 +42,12 @@ class Datalake::AssetStore
     default_manifest
   end
 
+  # Delete this session's whole raw bundle. The prune step (ADR 010) once it
+  # is built; used now by tests and the sandbox walkthrough for cleanup.
+  def purge!
+    FileUtils.rm_rf(@dir)
+  end
+
   private
 
   def manifest_path = @dir.join("manifest.json")

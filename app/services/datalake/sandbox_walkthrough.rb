@@ -19,7 +19,7 @@ class Datalake::SandboxWalkthrough
     walk
     report
   ensure
-    FileUtils.rm_rf(Datalake::AssetStore::ROOT.join(@session.session_token))
+    @store.purge!
   end
 
   private
