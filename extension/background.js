@@ -59,6 +59,130 @@ function summarizeCdpSnapshot(accessibility, domSnapshot) {
   };
 }
 
+// ── TASK-134: chrome.debugger HAR + full-page screenshot ────────────────────
+// The heavy-fidelity datalake path, application_execution guided sessions
+// only. One attach per guided tab for its lifetime; Network events buffer per
+// requestId; each GuidedSessionEvent drains the buffer into a HAR (with
+// response bodies) and grabs a full-page screenshot in the same CDP session.
+// Opening DevTools on the tab detaches us -- from then on the recorder gets
+// har/screenshot gaps and falls back to the content-script light path.
+//
+// ponytail: guidedDebugger is in-memory. If MV3 kills the service worker
+// mid-session Chrome drops the attachment; content.js re-sends ATTACH before
+// each capture so it re-attaches (re-showing the banner once). getResponseBody
+// (not streamResourceContent) means a body evicted from the DevTools buffer
+// before capture lands as a per-entry _bodyError -- acceptable for a
+// single-operator dogfood tool; revisit if losses are frequent.
+const guidedDebugger = new Map(); // tabId -> { detached, detachReason, attachError, net: Map }
+const MAX_HAR_ENTRIES = 60;
+const MAX_BODY_BYTES = 512 * 1024;
+
+async function guidedDebuggerAttach(tabId) {
+  if (!IS_LOCAL_BUILD || !tabId || guidedDebugger.has(tabId)) return;
+  guidedDebugger.set(tabId, { detached: false, net: new Map() });
+  try {
+    await chrome.debugger.attach({ tabId }, '1.3');
+    await chrome.debugger.sendCommand({ tabId }, 'Network.enable',
+      { maxResourceBufferSize: 32 * 1024 * 1024, maxTotalBufferSize: 128 * 1024 * 1024 });
+    await chrome.debugger.sendCommand({ tabId }, 'Page.enable');
+  } catch (err) {
+    const entry = guidedDebugger.get(tabId);
+    if (entry) entry.attachError = err.message;
+  }
+}
+
+chrome.debugger.onEvent.addListener((source, method, params) => {
+  const entry = guidedDebugger.get(source.tabId);
+  if (!entry) return;
+  const net = entry.net;
+  if (method === 'Network.requestWillBeSent') {
+    net.set(params.requestId, { request: params.request, wallTime: params.wallTime, type: params.type });
+  } else if (method === 'Network.responseReceived') {
+    const e = net.get(params.requestId);
+    if (e) { e.response = params.response; e.type = params.type; }
+  } else if (method === 'Network.loadingFinished') {
+    const e = net.get(params.requestId);
+    if (e) e.encodedDataLength = params.encodedDataLength;
+  } else if (method === 'Network.loadingFailed') {
+    const e = net.get(params.requestId);
+    if (e) e.errorText = params.errorText;
+  }
+});
+
+chrome.debugger.onDetach.addListener((source, reason) => {
+  const entry = guidedDebugger.get(source.tabId);
+  if (entry) { entry.detached = true; entry.detachReason = reason; }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  if (!guidedDebugger.has(tabId)) return;
+  chrome.debugger.detach({ tabId }).catch(() => {});
+  guidedDebugger.delete(tabId);
+});
+
+async function guidedExecutionCapture(tabId) {
+  const entry = guidedDebugger.get(tabId);
+  if (!entry) return { unavailable: true, reason: 'debugger not attached' };
+  if (entry.attachError) return { unavailable: true, reason: entry.attachError };
+  if (entry.detached) return { detached: true, reason: entry.detachReason || 'canceled_by_user' };
+
+  const har = await buildHar(tabId, entry).catch(err => ({ error: err.message }));
+  const screenshot = await fullPageScreenshot(tabId).catch(() => null);
+  entry.net.clear();
+  return typeof har === 'string' ? { har, screenshot } : { screenshot, harError: har.error };
+}
+
+async function buildHar(tabId, entry) {
+  const recent = [...entry.net.entries()].slice(-MAX_HAR_ENTRIES);
+  const entries = [];
+  for (const [requestId, e] of recent) entries.push(await harEntry(tabId, requestId, e));
+  const log = { log: { version: '1.2', creator: { name: 'wwworkremote', version: '1' }, entries } };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(log))));
+}
+
+async function harEntry(tabId, requestId, e) {
+  const out = {
+    startedDateTime: e.wallTime ? new Date(e.wallTime * 1000).toISOString() : null,
+    _resourceType: e.type || null,
+    request: { method: e.request?.method || null, url: e.request?.url || null,
+      headers: headerList(e.request?.headers) },
+    response: { status: e.response?.status ?? 0, statusText: e.response?.statusText || '',
+      headers: headerList(e.response?.headers),
+      content: { mimeType: e.response?.mimeType || '' } },
+  };
+  if (e.errorText) { out._error = e.errorText; return out; }
+  if (e.response) await attachBody(tabId, requestId, out.response.content);
+  return out;
+}
+
+async function attachBody(tabId, requestId, content) {
+  try {
+    const body = await chrome.debugger.sendCommand({ tabId }, 'Network.getResponseBody', { requestId });
+    if (body.body && body.body.length <= MAX_BODY_BYTES) {
+      content.text = body.body;
+      if (body.base64Encoded) content.encoding = 'base64';
+    } else if (body.body) {
+      content._bodyError = `body exceeds ${MAX_BODY_BYTES}b cap`;
+    }
+  } catch (err) {
+    content._bodyError = err.message; // evicted, never buffered, or a 204/redirect
+  }
+}
+
+function headerList(headers) {
+  return Object.entries(headers || {}).map(([name, value]) => ({ name, value: String(value) }));
+}
+
+async function fullPageScreenshot(tabId) {
+  const metrics = await chrome.debugger.sendCommand({ tabId }, 'Page.getLayoutMetrics');
+  const size = metrics.cssContentSize || metrics.contentSize || {};
+  const clip = { x: 0, y: 0, width: Math.ceil(size.width || 0), height: Math.ceil(size.height || 0), scale: 1 };
+  if (!clip.width || !clip.height) return null;
+  const shot = await chrome.debugger.sendCommand({ tabId }, 'Page.captureScreenshot',
+    { format: 'png', captureBeyondViewport: true, clip });
+  return shot.data || null;
+}
+
 // Chrome will not permit an unsolicited page-load open, but it does support
 // opening from an explicit toolbar/keyboard action. Keep the panel one action
 // away and let the content script update its state as pages settle.
@@ -129,6 +253,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.tabs.captureVisibleTab(chrome.windows.WINDOW_ID_CURRENT, { format: 'png' })
       .then(dataUrl => sendResponse({ dataUrl }))
       .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  // TASK-134: application_execution guided sessions attach chrome.debugger for
+  // HAR bodies + full-page screenshots. content.js calls ATTACH before each
+  // capture (idempotent, re-attaches after a service-worker restart).
+  if (msg.type === 'GUIDED_DEBUGGER_ATTACH') {
+    guidedDebuggerAttach(sender.tab?.id).then(() => sendResponse({ ok: true }));
+    return true;
+  }
+
+  if (msg.type === 'GUIDED_EXECUTION_CAPTURE') {
+    guidedExecutionCapture(sender.tab?.id).then(sendResponse);
     return true;
   }
 

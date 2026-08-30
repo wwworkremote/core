@@ -1,6 +1,6 @@
 # The Datalake: Raw Guided-Session Assets, Schema-on-Read
 
-**Status: write side built (TASK-126, 2026-08-30); heavy-fidelity capture + read side pending.**
+**Status: write side + heavy-fidelity capture built (TASK-126 / TASK-134, 2026-08-30); read side pending.**
 Charted as
 [wayfinder map doc-7](../../backlog/docs/wayfinder/doc-7%20-%20Wayfinder-map-link-to-application-capture-and-the-datalake.md);
 the decision record is [ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md).
@@ -10,12 +10,18 @@ the decision record is [ADR 010](../adr/010-link-to-application-capture-and-the-
 Rails-owned `manifest.json`, per-asset seq / event id / sha256 / bytes, gap entries). The extension
 captures a content-script **DOM snapshot + viewport screenshot per emitted `GuidedSessionEvent`**
 (fire-and-forget; a failure records a manifest gap, never breaks the session); each event carries a
-`datalake_asset_seqs` pointer back. `rake datalake:sandbox_walkthrough` proves the manifest shape.
+`datalake_asset_seqs` pointer back. For `application_execution` sessions (the purpose rides the
+tracked URL as `guided_session_purpose`) `background.js` also attaches `chrome.debugger` and, per
+event, POSTs a **HAR with response bodies** and a **full-page screenshot** (`Page.captureScreenshot`
+`captureBeyondViewport`) in place of the viewport shot — TASK-134. `chrome.debugger` `onDetach`
+(DevTools opened) marks the remaining transitions as `har` / `screenshot` gaps and the session
+finishes on the light path. `rake datalake:sandbox_walkthrough` proves both bundle shapes.
 
-**Pending:** the `chrome.debugger` HAR-with-bodies + full-page screenshot path for
-`application_execution` sessions ([TASK-134](../../backlog/tasks/task-134%20-%20Datalake-capture-chrome.debugger-HAR-bodies-full-page-screenshots-for-application_execution.md));
-the prune job + curation report; the `Datalake::Bundle` / `Datalake::Extractor` read side (TASK-123
-contract) which TASK-127's corpus and the question graph will consume.
+**Pending:** the prune job + curation report; the `Datalake::Bundle` / `Datalake::Extractor` read
+side (TASK-123 contract) which TASK-127's corpus and the question graph will consume. Known ceilings
+carried into the dogfood pass: `Network.getResponseBody` (not `streamResourceContent`) can miss a
+body evicted before capture (lands as a per-entry `_bodyError`); closed shadow roots and
+cross-origin frames stay uncaptured (needs a `document_start` MAIN-world shim).
 
 ## What "datalake" means here
 
@@ -84,7 +90,7 @@ data/datalake/                      # git-ignored, machine-local, never synced
   post-`onDetach` transition — each is a `gaps[]` entry so a reader knows the absence is
   known, not an oversight (the same discipline as Panoramic View's `noop_trace`).
 
-## Capture (write side) — TASK-126
+## Capture (write side) — TASK-126 (light path) / TASK-134 (debugger path)
 
 - **Trigger**: one capture per emitted `GuidedSessionEvent`. The recorder already judges
   which transitions are meaningful (TASK-112); the datalake piggybacks on that judgement,
