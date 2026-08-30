@@ -160,5 +160,27 @@
     <% end %>
   </div>
 
+  <% if @replay_plan[:steps].any? %>
+    <div class="card-neural p-6 mt-10">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Replay plan &mdash; what a later run would do</div>
+      <p class="text-sm text-slate-400 mb-4">
+        A later replay would advance <span class="text-success font-bold"><%= pluralize(@replay_plan[:replayable], "deterministic step") %></span>
+        and pause for you at <span class="text-warning font-bold"><%= pluralize(@replay_plan[:gates], "gate") %></span>.
+        This is a plan, not an action &mdash; replay execution is not built, and nothing here fills or submits.
+      </p>
+      <ol class="space-y-1 text-xs">
+        <% @replay_plan[:steps].each do |step| %>
+          <li class="flex items-center gap-2">
+            <span class="badge badge-outline text-[10px] <%= step.disposition == :replay ? 'border-success/40 text-success' : 'border-warning/40 text-warning' %>">
+              <%= step.disposition == :replay ? "auto" : "pause" %>
+            </span>
+            <span class="text-slate-300"><%= step.event.kind.humanize %></span>
+            <span class="text-slate-600">&mdash; <%= step.reason %></span>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% end %>
+
   <%= render "reference_comparison", guided_session: @guided_session %>
 </div>

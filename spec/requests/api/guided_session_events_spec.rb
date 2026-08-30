@@ -172,4 +172,27 @@ RSpec.describe "Guided session events API" do
       expect(flash[:alert]).to be_present
     end
   end
+
+  # AC#4 / Bounded Agency: no path approves a pending irreversible move or
+  # submits an application on the actor's behalf.
+  describe "Bounded Agency guardrail" do
+    it "never auto-approves a pending submission when the session completes" do
+      allow(Scenarios::RecordComparison).to receive(:call)
+      event = guided_session.guided_session_events.create!(
+        kind: "submission_attempted", action: "submit", intent: "send", requirement: "required",
+        reversibility: "irreversible", approval_state: "pending", phase: "reorientation", occurred_at: Time.current
+      )
+
+      guided_session.complete!
+
+      expect(event.reload.approval_state).to eq("pending")
+    end
+
+    it "has only the events controller mutating a recorded event's approval state" do
+      mutators = Rails.root.glob("app/**/*.rb").select do |path|
+        path.read.match?(/\.update!?\([^)]*approval_state/)
+      end
+      expect(mutators.map { |p| p.basename.to_s }).to contain_exactly("events_controller.rb")
+    end
+  end
 end

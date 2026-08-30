@@ -19,6 +19,7 @@ class GuidedSessionsController < ApplicationController
     token = @guided_session.session_token
     @field_answers = ApplicationFieldAnswer.where(guided_session_token: token).order(:provided_at)
     @field_mappings = ApplicationFieldMapping.where(guided_session_token: token).count
+    @replay_plan = GuidedSessions::ReplayPlan.call(@guided_session)
   end
 
   def new

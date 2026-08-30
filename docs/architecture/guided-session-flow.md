@@ -75,6 +75,26 @@ submission is always an approval-required move, even when the preceding run
 was deterministic. Approval currently records the human decision only; a
 separate execution slice must define how an approved provider action resumes.
 
+**Built (TASK-112, 2026-08-30):**
+
+- The actor re-classifies any recorded transition (intent, requirement,
+  reversibility, approval_state) from the review page — `PATCH
+  guided_sessions/:id/events/:event_id`, `GuidedSessions::EventsController#update`.
+  The model still rejects an ungated `irreversible` classification.
+- An SPA / hash step change during a guided session records a page-arrival
+  event, so a multi-step ATS wizard produces a whole timeline (not just the
+  full-page reloads).
+- The review page summarises the fields filled during the session (label +
+  source + time, never the value, joined by `session_token`) and captured
+  provider signatures (`job_post_id`, `ats_application_id`).
+- `GuidedSessions::ReplayPlan` produces the **plan** a later replay would
+  follow — which steps are deterministically auto-advanceable and which are
+  gates (irreversible / approval-gated / commitment boundary). Read-only,
+  rendered on the review page. **Replay *execution* — actually re-driving a
+  browser — is deliberately not built (TASK-133); it is a Bounded Agency
+  decision, and nothing in this system fills or submits without Mike's
+  explicit action.**
+
 Application research and application execution share this flow. Research may
 open and inspect provider steps, producing a reusable map of pages, questions,
 and transitions, but it stops at a commitment boundary. A declared purpose is
