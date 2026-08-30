@@ -86,6 +86,25 @@
     <% end %>
   <% end %>
 
+  <% if guided_session.scenario %>
+    <% opportunities = Scenarios::ContextOpportunities.call(guided_session.scenario, purpose: guided_session.purpose) %>
+    <% if opportunities.any? %>
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mt-8 mb-3">Opportunities to gather more context</div>
+      <div class="space-y-2">
+        <% opportunities.each do |opportunity| %>
+          <div class="card-neural p-4 flex items-start gap-3">
+            <span class="badge badge-ghost text-[10px] mt-0.5">#<%= opportunity.rank %></span>
+            <div>
+              <code class="text-xs text-slate-300"><%= opportunity.kind %></code>
+              <p class="text-xs text-slate-500 mt-1"><%= opportunity.reason %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <p class="text-[10px] text-slate-600 mt-2">Advisory &mdash; a checklist of what one more selector or recorded step could add. Nothing here is acted on automatically.</p>
+    <% end %>
+  <% end %>
+
   <% history = guided_session.reference_comparisons.includes(:comparison_findings).order(ran_at: :desc, id: :desc) %>
   <% if history.size > 1 %>
     <details class="mt-5 text-xs text-slate-500">
