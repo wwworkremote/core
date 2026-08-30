@@ -1,0 +1,120 @@
+<% content_for :title, "#{@archetype.label} | Question graph" %>
+
+<div class="mb-8 text-xs font-bold opacity-60">
+  <%= link_to "Question graph", question_archetypes_path, class: "hover:text-primary" %>
+  <span class="mx-2">/</span><span class="text-white"><%= truncate(@archetype.label, length: 60) %></span>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+  <article class="lg:col-span-2 space-y-8">
+    <header class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <h1 class="text-2xl font-black text-white tracking-tight mb-2"><%= @archetype.label %></h1>
+      <div class="flex flex-wrap gap-2 text-xs font-bold text-slate-500">
+        <span class="badge badge-ghost"><%= @archetype.question_kind.humanize %></span>
+        <span>canonical: <code class="text-slate-300"><%= @archetype.canonical_prompt %></code></span>
+      </div>
+      <% if @archetype.merged? %>
+        <p class="mt-4 text-xs text-warning font-bold">Merged into
+          <%= link_to @archetype.merged_into.label, question_archetype_path(@archetype.merged_into), class: "underline" %>.</p>
+      <% end %>
+    </header>
+
+    <div class="card-neural p-6">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Suggested handling &mdash; advisory</div>
+      <div class="flex items-center gap-3">
+        <span class="badge badge-outline border-primary/40 text-primary font-bold text-sm"><%= @recommendation.handling.tr('_', ' ') %></span>
+        <span class="text-xs text-slate-500">confidence <%= @recommendation.confidence %>%</span>
+      </div>
+      <p class="text-xs text-slate-400 mt-3 leading-relaxed"><%= @recommendation.rationale %></p>
+      <p class="text-[10px] text-slate-600 mt-2">This is a sentence, not a switch. Nothing is filled or submitted from here.</p>
+    </div>
+
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-6 shadow-2xl">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Wording variants (<%= @archetype.wording_variants.size %>)</div>
+      <ul class="space-y-2">
+        <% @archetype.wording_variants.each do |prompt, count| %>
+          <li class="text-sm text-slate-300 flex justify-between gap-4">
+            <span class="italic">"<%= prompt %>"</span><span class="text-slate-600 font-bold shrink-0"><%= count %>&times;</span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div class="bg-base-200 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-500 border-b border-white/5">
+        Occurrences (<%= archetype_occurrences.size %>) &mdash; per-application evidence
+      </div>
+      <%= form_with url: split_question_archetype_path(@archetype), method: :post, class: "text-sm" do %>
+        <table class="w-full">
+          <thead class="bg-white/5 text-[10px] font-bold text-base-content/50 uppercase tracking-wider">
+            <tr>
+              <th class="px-4 py-3"></th>
+              <th class="text-left px-4 py-3">Posting / company</th>
+              <th class="text-left px-4 py-3">Provider</th>
+              <th class="text-left px-4 py-3">Persona</th>
+              <th class="text-left px-4 py-3">Step</th>
+              <th class="text-left px-4 py-3">Outcome</th>
+              <th class="text-left px-4 py-3">Seen</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <% archetype_occurrences.each do |occ| %>
+              <tr>
+                <td class="px-4 py-3"><%= check_box_tag "occurrence_ids[]", occ.id, false, class: "checkbox checkbox-xs" %></td>
+                <td class="px-4 py-3">
+                  <%= link_to truncate(occ.job_posting.title, length: 40), job_posting_path(occ.job_posting), class: "text-primary hover:underline font-bold" %>
+                  <div class="text-xs text-slate-600"><%= occ.job_posting.company_name %></div>
+                  <div class="text-xs text-slate-500 italic">"<%= truncate(occ.raw_prompt, length: 70) %>"</div>
+                </td>
+                <td class="px-4 py-3 text-slate-400"><%= occ.provider || "&mdash;".html_safe %></td>
+                <td class="px-4 py-3 text-slate-400"><%= occ.persona_id || "&mdash;".html_safe %></td>
+                <td class="px-4 py-3 text-slate-400"><%= occ.page_step || "&mdash;".html_safe %></td>
+                <td class="px-4 py-3 text-slate-400"><%= occ.outcome || "&mdash;".html_safe %></td>
+                <td class="px-4 py-3 text-xs text-slate-500"><%= occ.observed_at.strftime("%b %-d, %Y") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <div class="p-4 flex flex-wrap items-center gap-2 border-t border-white/5">
+          <%= text_field_tag :label, nil, placeholder: "New archetype label", autocomplete: "off", class: "input input-sm input-bordered bg-black/20 text-xs" %>
+          <%= submit_tag "Split checked into a new archetype", class: "btn btn-sm btn-ghost border-white/10 rounded-lg font-bold" %>
+        </div>
+      <% end %>
+    </div>
+  </article>
+
+  <aside class="space-y-8">
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-6 shadow-2xl">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Answer strategies (<%= archetype_strategies.size %>)</div>
+      <% if archetype_strategies.any? %>
+        <div class="space-y-4">
+          <% archetype_strategies.each do |strategy| %>
+            <div class="rounded-lg border border-white/10 bg-black/20 p-4">
+              <div class="flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                <span class="text-primary"><%= strategy.source %></span>
+                <span><%= strategy.sophistication %></span>
+                <span>v<%= strategy.version %></span>
+                <% if strategy.persona_id %><span><%= strategy.persona_id %></span><% end %>
+                <% unless strategy.enabled %><span class="text-warning">disabled</span><% end %>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed"><%= strategy.answer_text %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-xs text-slate-500">No answer strategy yet. Add one from the per-posting Q&amp;A on a job posting, or seed via <code>rake question_graph:backfill</code>.</p>
+      <% end %>
+    </div>
+
+    <div class="card-neural p-6 border-l-4 border-l-warning/50">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Merge into another archetype</div>
+      <p class="text-xs text-slate-500 mb-4">Occurrences and answer strategies move; wording is preserved. The current archetype becomes a tombstone.</p>
+      <%= form_with url: merge_question_archetype_path(@archetype), method: :post, class: "space-y-3" do %>
+        <%= select_tag :target_id, options_from_collection_for_select(merge_targets, :id, :label),
+              class: "select select-sm select-bordered bg-black/20 text-xs w-full", prompt: "Choose target archetype" %>
+        <%= submit_tag "Merge", class: "btn btn-sm btn-warning btn-outline rounded-lg font-bold w-full",
+              data: { turbo_confirm: "Merge this archetype into the selected one?" } %>
+      <% end %>
+    </div>
+  </aside>
+</div>

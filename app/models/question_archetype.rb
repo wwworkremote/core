@@ -22,4 +22,8 @@ class QuestionArchetype < ApplicationRecord
   end
 
   def enabled_strategies = answer_strategies.where(enabled: true)
+
+  # Advisory only (ADR 008 AC#5) -- a sentence for the review page, never a
+  # switch. TASK-127 persists the human's decision on top of this.
+  def recommended_handling = QuestionArchetypes::Recommendation.call(self)
 end

@@ -380,6 +380,7 @@ en:
         extraction_rules: "Extraction Rules"
         tools_section_label: "Tools"
         guided_sessions: "Guided Sessions"
+        question_graph: "Question Graph"
         pghero: "PgHero"
         job_queue: "Job Queue"
         analytics: "Analytics"

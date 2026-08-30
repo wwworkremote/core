@@ -207,6 +207,12 @@ Rails.application.routes.draw do
     end
   end
   resources :job_searches
+  resources :question_archetypes, only: %i[index show] do
+    member do
+      post :merge
+      post :split
+    end
+  end
   resources :guided_sessions, only: %i[index new create show] do
     member do
       patch :playback
