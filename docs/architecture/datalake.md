@@ -1,6 +1,8 @@
 # The Datalake: Raw Guided-Session Assets, Schema-on-Read
 
-**Status: write side + heavy-fidelity capture built (TASK-126 / TASK-134, 2026-08-30); read side pending.**
+**Status: write side, heavy-fidelity capture, prune, and the `Datalake::Bundle` read seam all
+built (TASK-126 / TASK-134 / TASK-135 / TASK-123, 2026-08-30); the first concrete extractor is
+the only piece left.**
 Charted as
 [wayfinder map doc-7](../../backlog/docs/wayfinder/doc-7%20-%20Wayfinder-map-link-to-application-capture-and-the-datalake.md);
 the decision record is [ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md).
@@ -17,8 +19,9 @@ event, POSTs a **HAR with response bodies** and a **full-page screenshot** (`Pag
 (DevTools opened) marks the remaining transitions as `har` / `screenshot` gaps and the session
 finishes on the light path. `rake datalake:sandbox_walkthrough` proves both bundle shapes.
 
-**Pending:** the prune job + curation report; the `Datalake::Bundle` / `Datalake::Extractor` read
-side (TASK-123 contract) which TASK-127's corpus and the question graph will consume. Known ceilings
+**Pending:** the first concrete `Datalake::Extractor` subclass (a question-graph DOM
+extractor) and its enqueue-on-read + "still extracting" wiring — the `Datalake::Bundle`
+read seam it plugs into is built. Known ceilings
 carried into the dogfood pass: `Network.getResponseBody` (not `streamResourceContent`) can miss a
 body evicted before capture (lands as a per-entry `_bodyError`); closed shadow roots and
 cross-origin frames stay uncaptured (needs a `document_start` MAIN-world shim).
@@ -120,9 +123,18 @@ data/datalake/                      # git-ignored, machine-local, never synced
 
 ```
 Datalake::Bundle          # manifest + asset bytes for one session_token, READ-ONLY
-Datalake::Extractor       # base: key / version / extract(bundle)
-  Datalake::Extractors::…  # one subclass per consumer
+Datalake::Extractor       # base: key / version / extract(bundle) / stale?(stamp)
+  Datalake::Extractors::…  # one subclass per consumer (none yet)
 ```
+
+**Built (the contract surface):** `Datalake::Bundle` (`GuidedSession#datalake_bundle`,
+`Datalake::Bundle.for(token)`) — `present?`, `pruned?` (reads the prune ledger, so a
+consumer tells "pruned" from "never captured"), `assets(type:, event_id:)` → `Bundle::Asset`
+structs, `gaps`, and `read(seq)` which returns **sha256-verified** bytes and raises on a
+manifest/file mismatch. `Datalake::Extractor` — base class: a subclass declares `version`,
+implements `extract`, and `Extractor.stale?(stamped_version)` drives re-extraction.
+No concrete extractor exists yet; the enqueue-on-first-read + "still extracting" machinery
+lands with the first one (a question-graph DOM extractor is the likely first consumer).
 
 - **Consumers read raw assets only through `Datalake::Bundle`** — never `File.read` on
   the path. `Bundle` is the seam that lets the storage layout change later without
@@ -155,8 +167,18 @@ the **prune** step, not a capture filter:
 3. A **curation report** flags bundles that produced no new archetype, signature, or
    drift finding as *prune-first*.
 
-The prune job itself and the curation report are TASK-126-out-of-scope follow-ups; the
-policy is fixed here.
+**Built (`Datalake::Prune`, `rake datalake:prune`):** the report walks every bundle dir
+and classifies it — `keep` (session not completed / not curated / inside the `GRACE`
+window, 7 days), `prune_eligible` (curated + grace elapsed), `prune_first` (also had a
+clean reference match with no comparison findings — nothing new learned), `orphan` (a
+dir with no `GuidedSession`). "Reviewed" is satisfied at prune time: `rake datalake:prune`
+is a **dry run** that prints the report; `PRUNE=1` deletes the non-`keep` bundles via
+`Datalake::AssetStore#purge!` and appends each to `data/datalake/pruned.json` (git-ignored
+ledger). No schedule — a human reads the report and chooses to run it.
+
+*ponytail:* low-value detection is just the clean-reference-match signal for now; "founded
+no new archetype / signature" can be added to `Datalake::Prune#low_value?` if the report
+proves noisy.
 
 ## Automation-readiness corpus (TASK-127, built 2026-08-30)
 

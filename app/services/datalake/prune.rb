@@ -20,6 +20,12 @@ class Datalake::Prune
 
   def self.call(prune: false) = new(prune: prune).call
 
+  # Was this session's bundle deleted by a prune run? Lets Datalake::Bundle
+  # tell "pruned" apart from "never captured".
+  def self.pruned?(session_token)
+    LEDGER.exist? && JSON.parse(LEDGER.read).any? { |entry| entry["session_token"] == session_token }
+  end
+
   def initialize(prune:)
     @prune = prune
   end

@@ -74,6 +74,12 @@ class GuidedSession < ApplicationRecord
     reference_comparisons.order(:ran_at, :id).last
   end
 
+  # ADR 010 / TASK-123: the read-only view of this session's raw datalake
+  # bundle. Consumers read raw assets through this, never File.read.
+  def datalake_bundle
+    Datalake::Bundle.for(session_token)
+  end
+
   def tracked_source_url
     uri = parsed_source_url
     uri.query = tracked_query(uri)

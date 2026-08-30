@@ -16,4 +16,23 @@ namespace :datalake do
                                               report[:research][:every_event_pointed]
     puts "OK: execution bundle has har + full-page screenshot + 1 detach gap; research bundle is dom + screenshot only"
   end
+
+  # ADR 010 curation report + prune. Dry run by default -- reads the report,
+  # then re-run with PRUNE=1 to delete the prune_first / prune_eligible /
+  # orphan bundles (the raw PII-bearing layer, value already extracted).
+  desc "Curation report for the datalake raw layer; PRUNE=1 to actually delete eligible bundles"
+  task prune: :environment do
+    abort "local only" unless Rails.env.local?
+
+    prune = ENV["PRUNE"] == "1"
+    rows = Datalake::Prune.call(prune: prune)
+    rows.group_by(&:verdict).sort.each do |verdict, group|
+      mb = (group.sum(&:bytes).to_f / 1.megabyte).round(1)
+      puts "#{verdict} (#{group.size} bundle(s), #{mb} MB)"
+      group.each { |row| puts "  #{row.session_token}  #{row.assets} asset(s)  -- #{row.reason}" }
+    end
+    puts prune ? "PRUNED #{rows.count { |r|
+      Datalake::Prune::PRUNABLE.include?(r.verdict)
+    }} bundle(s)" : "dry run -- re-run with PRUNE=1 to delete the prune_first / prune_eligible / orphan bundles"
+  end
 end
