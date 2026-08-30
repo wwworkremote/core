@@ -273,13 +273,13 @@ currently have a mechanism for.
   `SIGNATURE_EXPECTATIONS` (per-provider) + `TenantIdentity` (per-employer instance —
   finally built, the shape sketched in the bullet above) + the per-provider Reference Scenario
   together are the topology. "Opportunities to gather more context" are surfaced by
-  **`Scenarios::ContextOpportunities`** (built 2026-08-30) — a *computed*, ranked list, not a
-  persisted `ComparisonFinding` category: opportunities are advisory, recomputable from the
-  scenario, and carry no disposition workflow, unlike the immutable drift/coverage findings.
-  v1 flags `optional-and-missing` signatures from `HandshakeCheck`; **un-mapped observed
-  fields are a follow-up** (they need the `ApplicationFieldMapping` join, which is
-  `UserJobPosting`-scoped, not on the `Scenario`). Rendered read-only on the guided-session
-  review page.
+  **`Scenarios::ContextOpportunities`** (built 2026-08-30, TASK-130 + TASK-132) — a *computed*,
+  ranked list, not a persisted `ComparisonFinding` category: opportunities are advisory,
+  recomputable, and carry no disposition workflow, unlike the immutable drift/coverage
+  findings. It flags `optional-and-missing` signatures from `HandshakeCheck` and, when the
+  session has a `user_job_posting`, each observed application field with no
+  `ApplicationFieldMapping` (an employer question we have no answer strategy for). Rendered
+  read-only on the guided-session review page.
 - **A guided run's `GuidedSession#session_token` is the correlation spine.** ([ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md) §2.)
   For a *guided* lap, the propagation gap this doc opens with is closed: the extension stamps
   `session_token` onto the four `trace_id`-scoped capture tables and the materialized `Scenario`,
