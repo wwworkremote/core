@@ -12,9 +12,9 @@ This has independently recurred twice (see TASK-35):
 - `bin/verify_ingestion` (invoked by `bin/smoke` under `RAILS_ENV=test`) left `Source` rows
   behind, breaking `spec/requests/charts/data/sources_spec.rb`.
 - `rake quality`'s `Quality::InsightIngester` calls left `SystemInsight` rows behind, breaking
-  `spec/jobs/quality/insight_embedding_job_spec.rb` — this one is live in CI too, since
-  `.github/workflows/quality.yml` runs `bundle exec rake quality` immediately before
-  `bundle exec rspec` against the same database.
+  `spec/jobs/quality/insight_embedding_job_spec.rb`. `rake quality` is a local-only tool now
+  (it no longer runs in CI — the `quality.yml` workflow was removed to cut Actions cost), but
+  running it against the `wwworkremote_test` DB still leaves rows behind.
 
 **When writing or reviewing a `bin/*` script or rake task that touches the database and can
 run under `RAILS_ENV=test`:**
