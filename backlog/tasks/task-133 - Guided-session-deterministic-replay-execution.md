@@ -1,9 +1,11 @@
 ---
 id: TASK-133
 title: Guided-session deterministic replay execution
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-08-30 15:08'
+updated_date: '2026-08-30 19:23'
 labels:
   - application-workflow
   - human-in-the-loop
