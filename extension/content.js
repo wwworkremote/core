@@ -1132,7 +1132,7 @@
     if (!wwrId || !isWorkdayApplicationPage()) return;
     const fields = discoverApplicationFields();
     chrome.runtime.sendMessage({ type: 'APPLICATION_FIELDS_UPDATED', wwrId,
-      applicationFields: fields, pageUrl: window.location.href, pageTitle: document.title });
+      applicationFields: fields, pageUrl: window.location.href, pageTitle: document.title, guidedSessionToken });
   }
 
   function startApplicationFieldObserver() {
@@ -2202,6 +2202,7 @@
       provider:   provider ? provider.key : 'generic',
       pageUrl:    window.location.href,
       pageTitle:  document.title,
+      guidedSessionToken,
     }, response => {
       if (chrome.runtime.lastError || !response?.ok) {
         const err = chrome.runtime.lastError?.message || response?.error || 'Could not open panel';
