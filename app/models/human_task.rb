@@ -82,6 +82,23 @@ class HumanTask < ApplicationRecord
   scope :open, -> { where(status: "pending") }
   scope :stale, -> { open.where(created_at: ..STALE_AFTER.ago) }
 
+  APPLY_PROPOSAL_REASON = "Guided supervised application session completed."
+
+  # Proposes (never applies) the `apply` AASM transition on a UserJobPosting
+  # after a guided supervised session completes -- ADR 010 §1. Idempotent on
+  # (job_posting, user, kind, pending).
+  def self.propose_apply(user_job_posting, guided_session_token)
+    find_or_create_by!(job_posting_id: user_job_posting.job_posting_id, user_id: user_job_posting.user_id,
+                       kind: "submit_approval", status: "pending") do |task|
+      task.proposed_by = "ai"
+      task.payload = apply_proposal_payload(guided_session_token)
+    end
+  end
+
+  def self.apply_proposal_payload(guided_session_token)
+    { "proposed_event" => "apply", "guided_session_token" => guided_session_token, "reason" => APPLY_PROPOSAL_REASON }
+  end
+
   def stale?
     pending? && created_at <= STALE_AFTER.ago
   end

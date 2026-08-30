@@ -7,27 +7,30 @@
 #
 # Table name: guided_sessions
 #
-#  id                :bigint           not null, primary key
-#  phase             :string           default("intake"), not null
-#  playback_position :integer          default(0), not null
-#  provider          :string           not null
-#  purpose           :string           default("application_execution"), not null
-#  session_token     :string           not null
-#  source_url        :string           not null
-#  started_at        :datetime         not null
-#  status            :string           default("active"), not null
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  scenario_id       :bigint
+#  id                  :bigint           not null, primary key
+#  phase               :string           default("intake"), not null
+#  playback_position   :integer          default(0), not null
+#  provider            :string           not null
+#  purpose             :string           default("application_execution"), not null
+#  session_token       :string           not null
+#  source_url          :string           not null
+#  started_at          :datetime         not null
+#  status              :string           default("active"), not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  scenario_id         :bigint
+#  user_job_posting_id :bigint
 #
 # Indexes
 #
-#  index_guided_sessions_on_scenario_id    (scenario_id)
-#  index_guided_sessions_on_session_token  (session_token) UNIQUE
+#  index_guided_sessions_on_scenario_id          (scenario_id)
+#  index_guided_sessions_on_session_token        (session_token) UNIQUE
+#  index_guided_sessions_on_user_job_posting_id  (user_job_posting_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (scenario_id => scenarios.id)
+#  fk_rails_...  (user_job_posting_id => user_job_postings.id)
 #
 class GuidedSession < ApplicationRecord
   PHASES = %w[intake resolution response_construction reorientation].freeze
@@ -39,6 +42,9 @@ class GuidedSession < ApplicationRecord
   has_many :reference_comparisons, dependent: :destroy
   # Set once the session is materialized for Reference Comparison (ADR 009).
   belongs_to :scenario, optional: true
+  # Entry seam (ADR 010): set when the session was started from a job posting.
+  # Nullable -- a verification-only or ad-hoc session has none.
+  belongs_to :user_job_posting, optional: true
 
   validates :source_url, :provider, :phase, :status, :started_at, presence: true
   validates :phase, inclusion: { in: PHASES }
@@ -56,6 +62,7 @@ class GuidedSession < ApplicationRecord
     return if status == "completed"
 
     update!(status: "completed")
+    propose_application_transition
     run_automatic_comparison
   end
 
@@ -77,6 +84,17 @@ class GuidedSession < ApplicationRecord
     Scenarios::RecordComparison.call(self, trigger: "automatic")
   rescue StandardError => e
     Rails.logger.warn "[GuidedSession] automatic comparison failed: #{e.class}: #{e.message}"
+  end
+
+  # Completion may *propose* the implied UserJobPosting transition as a
+  # HumanTask -- it never applies it (Bounded Agency, ADR 010 §1). Idempotent
+  # on (job_posting, user, kind, pending) so a re-complete raises nothing new.
+  def propose_application_transition
+    return unless user_job_posting&.may_apply?
+
+    HumanTask.propose_apply(user_job_posting, session_token)
+  rescue StandardError => e
+    Rails.logger.warn "[GuidedSession] transition proposal failed: #{e.class}: #{e.message}"
   end
 
   def set_intake_attributes

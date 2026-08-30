@@ -212,4 +212,55 @@ RSpec.describe "GuidedSessions" do
       expect(response.body).to include("No reference scenario exists for").and include("greenhouse")
     end
   end
+
+  describe "POST /job_postings/:id/start_supervised_application" do
+    let(:job_posting) { create(:job_posting, target_url: "https://boards.greenhouse.io/acme/jobs/42") }
+
+    it "creates the tracked application when none exists and links a session to it" do
+      expect {
+        post start_supervised_application_job_posting_path(job_posting)
+      }.to change(GuidedSession, :count).by(1).and change(UserJobPosting, :count).by(1)
+
+      session = GuidedSession.order(:id).last
+      expect(session.user_job_posting.job_posting).to eq(job_posting)
+      expect(session.purpose).to eq("application_execution")
+      expect(session.source_url).to eq("https://boards.greenhouse.io/acme/jobs/42")
+      expect(response).to redirect_to(guided_session_path(session))
+    end
+
+    it "reuses an existing tracked application" do
+      existing = current_user.user_job_postings.create!(job_posting: job_posting)
+
+      expect {
+        post start_supervised_application_job_posting_path(job_posting)
+      }.to change(GuidedSession, :count).by(1)
+
+      expect(UserJobPosting.count).to eq(1)
+      expect(GuidedSession.order(:id).last.user_job_posting).to eq(existing)
+    end
+
+    it "does not advance the tracked application's pipeline state" do
+      post start_supervised_application_job_posting_path(job_posting)
+
+      expect(GuidedSession.order(:id).last.user_job_posting.status).not_to eq("applied")
+    end
+
+    it "redirects back with an alert when the posting has no application URL" do
+      urlless = create(:job_posting, target_url: nil)
+
+      expect {
+        post start_supervised_application_job_posting_path(urlless)
+      }.not_to change(GuidedSession, :count)
+
+      expect(response).to redirect_to(job_posting_path(urlless))
+      expect(flash[:alert]).to match(/no application URL/i)
+    end
+
+    def current_user
+      @current_user ||= User.find_or_create_by!(email: "mike@just3ws.com") do |u|
+        u.name = "mike"
+        u.password = "password"
+      end
+    end
+  end
 end

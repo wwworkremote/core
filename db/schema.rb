@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_020100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -114,11 +114,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.string "field_key", null: false
     t.string "field_label", null: false
     t.string "field_type", null: false
+    t.string "guided_session_token"
     t.string "page_url"
     t.datetime "provided_at", null: false
     t.string "trace_id"
     t.datetime "updated_at", null: false
     t.bigint "user_job_posting_id", null: false
+    t.index ["guided_session_token"], name: "index_application_field_answers_on_guided_session_token"
     t.index ["trace_id"], name: "index_application_field_answers_on_trace_id"
     t.index ["user_job_posting_id", "field_key"], name: "idx_app_fields_on_app_and_key", unique: true
     t.index ["user_job_posting_id"], name: "index_application_field_answers_on_user_job_posting_id"
@@ -132,6 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.string "element_fingerprint"
     t.string "field_key", null: false
     t.string "field_label", null: false
+    t.string "guided_session_token"
     t.datetime "mapped_at", null: false
     t.string "page_step"
     t.string "page_title"
@@ -144,6 +147,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.datetime "updated_at", null: false
     t.bigint "user_job_posting_id", null: false
     t.index ["application_field_answer_id"], name: "idx_on_application_field_answer_id_bd595d0770"
+    t.index ["guided_session_token"], name: "index_application_field_mappings_on_guided_session_token"
     t.index ["trace_id"], name: "index_application_field_mappings_on_trace_id"
     t.index ["user_job_posting_id", "field_key", "semantic_key"], name: "idx_app_field_mappings_on_application_field_semantic"
     t.index ["user_job_posting_id"], name: "index_application_field_mappings_on_user_job_posting_id"
@@ -155,6 +159,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.string "field_key", null: false
     t.string "field_label", null: false
     t.string "field_type", null: false
+    t.string "guided_session_token"
     t.string "normalized_prompt", null: false
     t.datetime "observed_at", null: false
     t.string "page_step"
@@ -164,6 +169,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.string "trace_id"
     t.datetime "updated_at", null: false
     t.bigint "user_job_posting_id", null: false
+    t.index ["guided_session_token"], name: "index_application_field_observations_on_guided_session_token"
     t.index ["question_kind", "normalized_prompt"], name: "idx_app_observations_on_kind_and_prompt"
     t.index ["trace_id"], name: "index_application_field_observations_on_trace_id"
     t.index ["user_job_posting_id", "field_key"], name: "idx_app_observations_on_app_and_key", unique: true
@@ -344,6 +350,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.text "error_message"
     t.string "error_name"
     t.string "event_name", null: false
+    t.string "guided_session_token"
     t.datetime "occurred_at", null: false
     t.string "page_host"
     t.string "phase"
@@ -352,6 +359,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.string "trace_id"
     t.datetime "updated_at", null: false
     t.index ["event_name", "occurred_at"], name: "index_extension_error_events_on_event_name_and_occurred_at"
+    t.index ["guided_session_token"], name: "index_extension_error_events_on_guided_session_token"
     t.index ["trace_id"], name: "index_extension_error_events_on_trace_id"
   end
 
@@ -422,8 +430,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
     t.datetime "started_at", null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_job_posting_id"
     t.index ["scenario_id"], name: "index_guided_sessions_on_scenario_id"
     t.index ["session_token"], name: "index_guided_sessions_on_session_token", unique: true
+    t.index ["user_job_posting_id"], name: "index_guided_sessions_on_user_job_posting_id"
   end
 
   create_table "hacker_news_items", id: false, force: :cascade do |t|
@@ -842,12 +852,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
 
   create_table "scenarios", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "guided_session_token"
     t.string "provider", null: false
     t.string "resume_persona_id"
     t.string "scenario_token", null: false
     t.datetime "started_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_job_posting_id"
+    t.index ["guided_session_token"], name: "index_scenarios_on_guided_session_token"
     t.index ["scenario_token"], name: "index_scenarios_on_scenario_token", unique: true
     t.index ["user_job_posting_id"], name: "index_scenarios_on_user_job_posting_id"
   end
@@ -1159,6 +1171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_29_010200) do
   add_foreign_key "finding_dispositions", "comparison_findings"
   add_foreign_key "guided_session_events", "guided_sessions"
   add_foreign_key "guided_sessions", "scenarios"
+  add_foreign_key "guided_sessions", "user_job_postings"
   add_foreign_key "human_tasks", "job_postings"
   add_foreign_key "human_tasks", "users"
   add_foreign_key "interview_questions", "interview_sessions"

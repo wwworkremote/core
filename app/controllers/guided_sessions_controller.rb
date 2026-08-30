@@ -4,6 +4,8 @@ class GuidedSessionsController < ApplicationController
   # Playback position is local presentation state; it cannot submit, alter,
   # or transmit a provider/application action.
   REVIEWER = ENV.fetch("ADMIN_EMAIL", "mike@just3ws.com")
+  NO_URL_ALERT = "This posting has no application URL to record."
+  SESSION_STARTED_NOTICE = "Supervised application session started."
 
   skip_before_action :verify_authenticity_token, only: :playback
   before_action :set_guided_session, only: %i[show playback approval complete compare create_disposition]
@@ -22,6 +24,15 @@ class GuidedSessionsController < ApplicationController
     return redirect_to guided_session_path(@guided_session), notice: "Guided session started." if @guided_session.save
 
     render :new, status: :unprocessable_content
+  end
+
+  # Entry seam (ADR 010 §1): start a supervised application from a job posting.
+  # Creates the tracked UserJobPosting if none exists, links the session to it.
+  # Advisory -- never advances the UserJobPosting's own AASM state.
+  def create_from_posting
+    return redirect_to(job_posting_path(posting), alert: NO_URL_ALERT) if posting.target_url.blank?
+
+    redirect_to guided_session_path(start_supervised_session), notice: SESSION_STARTED_NOTICE
   end
 
   def playback
@@ -70,6 +81,15 @@ class GuidedSessionsController < ApplicationController
 
   def set_guided_session
     @guided_session = GuidedSession.find(params.expect(:id))
+  end
+
+  def posting
+    @posting ||= JobPosting.find(params.expect(:id))
+  end
+
+  def start_supervised_session
+    user_job = current_user.user_job_postings.find_or_create_by!(job_posting: posting)
+    GuidedSession.create!(source_url: posting.target_url, purpose: "application_execution", user_job_posting: user_job)
   end
 
   def guided_session_params

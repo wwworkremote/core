@@ -102,6 +102,11 @@
           <%= link_to outbound_link_path(url: "#{@job_posting.target_url}#{ @job_posting.target_url.include?('?') ? '&' : '?' }wwwr_id=#{@job_posting.id}", job_posting_id: @job_posting.id), target: "_blank", class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold text-base-content/60 hover:text-white" do %>
             <%= t('.open_source_listing') %>
           <% end %>
+
+          <%# ADR 010 entry seam: record a supervised lap through the application
+              flow. Advisory -- never advances Mike's pipeline state on its own. %>
+          <%= button_to "Start supervised application", start_supervised_application_job_posting_path(@job_posting),
+                        class: "btn btn-ghost border-primary/30 text-primary rounded-xl px-10 font-bold hover:bg-primary hover:text-white" %>
         </div>
       <% end %>
     </div>

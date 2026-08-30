@@ -46,7 +46,9 @@ class Scenarios::GuidedCapture
   end
 
   def create_scenario
-    Scenario.create!(provider: canonical_provider, started_at: @guided_session.started_at).tap do |record|
+    Scenario.create!(provider: canonical_provider, started_at: @guided_session.started_at,
+                     guided_session_token: @guided_session.session_token,
+                     user_job_posting: @guided_session.user_job_posting).tap do |record|
       @guided_session.update!(scenario: record)
     end
   end

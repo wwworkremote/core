@@ -53,5 +53,18 @@ RSpec.describe "Api::V0::ApplicationFieldAnswers" do
 
       expect(ApplicationFieldAnswer.sole.answer).to eq("updated@example.com")
     end
+
+    it "stamps the guided_session_token when the capture came from a guided session" do
+      post "/api/v0/job_postings/#{job_posting.id}/application_field_answers",
+           params: payload.merge(guided_session_token: "gs_abc123")
+
+      expect(ApplicationFieldAnswer.sole.guided_session_token).to eq("gs_abc123")
+    end
+
+    it "leaves guided_session_token nil for a non-guided capture" do
+      post "/api/v0/job_postings/#{job_posting.id}/application_field_answers", params: payload
+
+      expect(ApplicationFieldAnswer.sole.guided_session_token).to be_nil
+    end
   end
 end
