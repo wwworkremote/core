@@ -51,8 +51,7 @@ RSpec.describe GuidedSessions::Replay do
       instruction = driver.next_step(replay)
 
       expect(instruction[:action]).to eq("fill")
-      expect(instruction[:fields].sole).to include(field_key: "email", field_label: "Email")
-      expect(instruction[:fields].sole).not_to have_key(:answer)
+      expect(instruction[:fields].sole).to include(field_key: "email", field_label: "Email", answer: "x@y.z")
     end
 
     it "stops at a gate and cannot be advanced past it" do

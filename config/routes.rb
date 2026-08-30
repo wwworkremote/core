@@ -371,6 +371,8 @@ Rails.application.routes.draw do
     post "guided_sessions/:session_token/events" => "guided_session_events#create", as: :guided_session_events
     post "guided_sessions/:session_token/datalake_assets" => "datalake_assets#create",
          as: :guided_session_datalake_assets
+    get "guided_sessions/:session_token/replay" => "guided_session_replays#show", as: :guided_session_replay
+    patch "guided_sessions/:session_token/replay" => "guided_session_replays#update"
     resources :job_postings, only: [] do
       member do
         post :enrich

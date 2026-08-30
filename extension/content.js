@@ -1351,6 +1351,104 @@
 
   recordGuidedPageArrival();
 
+  // ── TASK-133: supervised replay banner ────────────────────────────────────
+  // Fill-only. Never clicks Next / Continue / Submit. Every step waits for a
+  // "Do it" click; every gate hands control back to the human.
+  let replayState = null;
+
+  async function replayApi(method, body) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    const res = await apiFetch(`${apiBase}/api/guided_sessions/${encodeURIComponent(guidedSessionToken)}/replay`,
+      body ? { method, headers, body: JSON.stringify(body) } : { method, headers });
+    return res.data;
+  }
+
+  async function refreshReplay() {
+    if (!IS_LOCAL_BUILD || !guidedSessionToken) return;
+    try {
+      replayState = await replayApi('GET');
+      replayState?.active ? renderReplayBanner() : removeReplayBanner();
+    } catch (_) { /* replay is optional */ }
+  }
+
+  function removeReplayBanner() {
+    document.getElementById('wwr-replay-banner')?.remove();
+  }
+
+  function replayBannerEl() {
+    let el = document.getElementById('wwr-replay-banner');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'wwr-replay-banner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483646;background:#25194d;color:#fff;' +
+      'font:600 13px system-ui;padding:10px 16px;display:flex;gap:12px;align-items:center;' +
+      'box-shadow:0 2px 12px rgba(0,0,0,.4);border-bottom:2px solid #9580ff';
+    document.documentElement.appendChild(el);
+    return el;
+  }
+
+  function renderReplayBanner() {
+    const inst = replayState.instruction || {};
+    const step = (replayState.replay?.current_step ?? 0) + 1;
+    const el = replayBannerEl();
+    el.innerHTML = `<span>⏺ REPLAY · step ${step} · ${replayLabel(inst)}</span>`;
+    replayButtons(inst).forEach(b => el.appendChild(b));
+  }
+
+  function replayLabel(inst) {
+    if (inst.action === 'fill') return `next: fill ${inst.fields?.length || 0} field(s)`;
+    if (inst.action === 'gate') return `PAUSE — ${inst.reason || 'a gate'}`;
+    if (inst.action === 'done') return 'done — nothing left to replay';
+    return 'next: move to the next step';
+  }
+
+  function replayButton(text, danger, fn) {
+    const b = document.createElement('button');
+    b.textContent = text;
+    b.style.cssText = `border:1px solid ${danger ? '#ff9580' : '#9580ff'};background:transparent;color:#fff;` +
+      'border-radius:6px;padding:4px 10px;font:600 12px system-ui;cursor:pointer';
+    b.onclick = fn;
+    return b;
+  }
+
+  function replayButtons(inst) {
+    if (inst.action === 'gate') {
+      return [replayButton('Approve & end', false, () => replayCommand('approve_gate')),
+        replayButton('Stop replay', true, () => replayCommand('stop'))];
+    }
+    if (inst.action === 'done') return [replayButton('Stop replay', true, () => replayCommand('stop'))];
+    return [replayButton('Do it', false, () => replayDoStep(false)),
+      replayButton('Run to next gate', false, () => replayDoStep(true)),
+      replayButton('Stop replay', true, () => replayCommand('stop'))];
+  }
+
+  async function replayCommand(command) {
+    replayState = await replayApi('PATCH', { command });
+    replayState?.active ? renderReplayBanner() : removeReplayBanner();
+  }
+
+  function fillRecordedField(field) {
+    const target = [...document.querySelectorAll('input, textarea, select')].find(el => {
+      if (el.type === 'hidden' || el.disabled || el.offsetParent === null) return false;
+      return applicationFieldLabel(el).toLowerCase() === String(field.field_label || '').toLowerCase();
+    });
+    if (target) setNativeValue(target, field.answer);
+    return !!target;
+  }
+
+  async function replayDoStep(runToGate) {
+    const inst = replayState?.instruction;
+    if (!inst || inst.action === 'gate' || inst.action === 'done') return;
+    (inst.fields || []).forEach(fillRecordedField);
+    await replayCommand('advance');
+    if (runToGate && replayState?.instruction?.action && !['gate', 'done'].includes(replayState.instruction.action)) {
+      replayDoStep(true);
+    }
+  }
+
+  refreshReplay();
+
   function detectWorkdayCompletion() {
     if (provider?.key !== 'workday') return null;
     const text = document.body?.innerText || '';

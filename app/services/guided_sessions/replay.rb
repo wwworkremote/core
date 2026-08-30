@@ -43,6 +43,8 @@ class GuidedSessions::Replay
   #   { action: "gate", step: n, reason: }    (stop; approve to end)
   #   { action: "done" }
   def next_step(replay)
+    return { action: "done" } if replay.ended?
+
     step = plan[:steps][replay.current_step]
     return { action: "done" } unless step
     return gate_instruction(replay, step) if step.disposition == :pause
@@ -94,12 +96,16 @@ class GuidedSessions::Replay
     { action: "fill", step: replay.current_step, fields: fields }
   end
 
+  # The recorded answers this step should re-fill. `answer` is the value the
+  # extension types back into the form (it already lives in ApplicationFieldAnswer
+  # -- this just hands it to the local page); nothing new is persisted.
   def recorded_fields
     ujp = @session.user_job_posting
-    return [] unless ujp
+    ujp ? ujp.application_field_answers.order(:provided_at).map { |answer| field_hash(answer) } : []
+  end
 
-    ujp.application_field_answers.order(:provided_at).map do |answer|
-      { field_key: answer.field_key, field_label: answer.field_label, source: answer.answer_source }
-    end
+  def field_hash(answer)
+    { field_key: answer.field_key, field_label: answer.field_label,
+      source: answer.answer_source, answer: answer.answer }
   end
 end
