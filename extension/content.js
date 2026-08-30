@@ -1203,7 +1203,7 @@
       body: JSON.stringify({ application_field_answer: {
         field_key: field.key, field_label: field.label, field_type: field.type,
         answer: String(value), answer_source: source || 'manual', page_url: window.location.href,
-      } }),
+      }, guided_session_token: guidedSessionToken || undefined }),
     });
     return res.ok && res.data?.success ? { ok: true, field } : { ok: false, error: res.data?.error || `HTTP ${res.status}` };
   }

@@ -52,6 +52,16 @@ RSpec.describe Scenarios::GuidedCapture do
     expect(guided_session.reload.scenario_id).to eq(scenario.id)
   end
 
+  it "stamps the correlation spine onto the materialized Scenario" do
+    user_job = create(:user_job_posting)
+    guided_session.update!(user_job_posting: user_job)
+
+    scenario = materialize
+
+    expect(scenario.guided_session_token).to eq(guided_session.session_token)
+    expect(scenario.user_job_posting).to eq(user_job)
+  end
+
   it "emits step, commitment_boundary, field, screening_question, and ATS identity signatures" do
     kinds = kinds_and_values(materialize)
     screening_kind = Scenarios::SignatureKind.screening_question("Why do you want this role?")

@@ -13,6 +13,7 @@
 #  element_fingerprint         :string
 #  field_key                   :string           not null
 #  field_label                 :string           not null
+#  guided_session_token        :string
 #  mapped_at                   :datetime         not null
 #  page_step                   :string
 #  page_title                  :string
@@ -29,10 +30,11 @@
 #
 # Indexes
 #
-#  idx_app_field_mappings_on_application_field_semantic     (user_job_posting_id,field_key,semantic_key)
-#  idx_on_application_field_answer_id_bd595d0770            (application_field_answer_id)
-#  index_application_field_mappings_on_trace_id             (trace_id)
-#  index_application_field_mappings_on_user_job_posting_id  (user_job_posting_id)
+#  idx_app_field_mappings_on_application_field_semantic      (user_job_posting_id,field_key,semantic_key)
+#  idx_on_application_field_answer_id_bd595d0770             (application_field_answer_id)
+#  index_application_field_mappings_on_guided_session_token  (guided_session_token)
+#  index_application_field_mappings_on_trace_id              (trace_id)
+#  index_application_field_mappings_on_user_job_posting_id   (user_job_posting_id)
 #
 # Foreign Keys
 #

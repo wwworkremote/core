@@ -6,19 +6,21 @@ require "rails_helper"
 #
 # Table name: scenarios
 #
-#  id                  :bigint           not null, primary key
-#  provider            :string           not null
-#  scenario_token      :string           not null
-#  started_at          :datetime         not null
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  resume_persona_id   :string
-#  user_job_posting_id :bigint
+#  id                   :bigint           not null, primary key
+#  guided_session_token :string
+#  provider             :string           not null
+#  scenario_token       :string           not null
+#  started_at           :datetime         not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  resume_persona_id    :string
+#  user_job_posting_id  :bigint
 #
 # Indexes
 #
-#  index_scenarios_on_scenario_token       (scenario_token) UNIQUE
-#  index_scenarios_on_user_job_posting_id  (user_job_posting_id)
+#  index_scenarios_on_guided_session_token  (guided_session_token)
+#  index_scenarios_on_scenario_token        (scenario_token) UNIQUE
+#  index_scenarios_on_user_job_posting_id   (user_job_posting_id)
 #
 # Foreign Keys
 #

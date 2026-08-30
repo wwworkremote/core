@@ -9,7 +9,7 @@ class Api::V0::ApplicationFieldMappingsController < ApiController
   end
 
   def create
-    mapping = tracked_record.application_field_mappings.new(mapping_params.merge(mapped_at: Time.current, trace_id: params[:trace_id]))
+    mapping = tracked_record.application_field_mappings.new(mapping_attrs)
     mapping.application_field_answer = answer_for(mapping)
 
     mapping.save ? render(json: { success: true, mapping: mapping }) : render_errors(mapping)
@@ -19,15 +19,24 @@ class Api::V0::ApplicationFieldMappingsController < ApiController
 
   def tracked_record
     record = current_api_user.user_job_postings.find_or_create_by!(job_posting: job_posting)
-    record.update!(application_trace_id: params[:trace_id]) if params[:trace_id].present? && record.application_trace_id != params[:trace_id]
+    record.update!(application_trace_id: params[:trace_id]) if stale_trace_id?(record)
     record
+  end
+
+  def stale_trace_id?(record)
+    params[:trace_id].present? && record.application_trace_id != params[:trace_id]
+  end
+
+  def mapping_attrs
+    mapping_params.merge(mapped_at: Time.current, trace_id: params[:trace_id],
+                         guided_session_token: params[:guided_session_token])
   end
 
   def mapping_params
     params.expect(application_field_mapping: %i[
-      field_key field_label semantic_key semantic_label source_kind provider
-      page_step page_url page_title element_fingerprint element_descriptor context
-    ])
+                    field_key field_label semantic_key semantic_label source_kind provider
+                    page_step page_url page_title element_fingerprint element_descriptor context
+                  ])
   end
 
   def answer_for(mapping)

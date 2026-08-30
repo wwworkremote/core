@@ -4,28 +4,30 @@
 #
 # Table name: application_field_observations
 #
-#  id                  :bigint           not null, primary key
-#  context             :jsonb            not null
-#  field_key           :string           not null
-#  field_label         :string           not null
-#  field_type          :string           not null
-#  normalized_prompt   :string           not null
-#  observed_at         :datetime         not null
-#  page_step           :string
-#  page_url            :string
-#  question_kind       :string           not null
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  persona_id          :string
-#  trace_id            :string
-#  user_job_posting_id :bigint           not null
+#  id                   :bigint           not null, primary key
+#  context              :jsonb            not null
+#  field_key            :string           not null
+#  field_label          :string           not null
+#  field_type           :string           not null
+#  guided_session_token :string
+#  normalized_prompt    :string           not null
+#  observed_at          :datetime         not null
+#  page_step            :string
+#  page_url             :string
+#  question_kind        :string           not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  persona_id           :string
+#  trace_id             :string
+#  user_job_posting_id  :bigint           not null
 #
 # Indexes
 #
-#  idx_app_observations_on_app_and_key                          (user_job_posting_id,field_key) UNIQUE
-#  idx_app_observations_on_kind_and_prompt                      (question_kind,normalized_prompt)
-#  index_application_field_observations_on_trace_id             (trace_id)
-#  index_application_field_observations_on_user_job_posting_id  (user_job_posting_id)
+#  idx_app_observations_on_app_and_key                           (user_job_posting_id,field_key) UNIQUE
+#  idx_app_observations_on_kind_and_prompt                       (question_kind,normalized_prompt)
+#  index_application_field_observations_on_guided_session_token  (guided_session_token)
+#  index_application_field_observations_on_trace_id              (trace_id)
+#  index_application_field_observations_on_user_job_posting_id   (user_job_posting_id)
 #
 # Foreign Keys
 #

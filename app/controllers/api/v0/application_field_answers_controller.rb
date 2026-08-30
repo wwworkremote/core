@@ -8,22 +8,32 @@ class Api::V0::ApplicationFieldAnswersController < ApiController
     render json: tracked_record.application_field_answers.order(provided_at: :desc)
   end
 
-  # The action intentionally coordinates lookup, upsert, and JSON response.
-  # rubocop:disable Metrics/AbcSize
   def create
-    answer = tracked_record.application_field_answers.find_or_initialize_by(field_key: field_params[:field_key])
-    answer.assign_attributes(field_params.merge(provided_at: Time.current, trace_id: params[:trace_id]))
-
+    answer = upsert_answer
     answer.save ? render_success(answer) : render_errors(answer)
   end
-  # rubocop:enable Metrics/AbcSize
 
   private
 
+  def upsert_answer
+    answer = tracked_record.application_field_answers.find_or_initialize_by(field_key: field_params[:field_key])
+    answer.assign_attributes(answer_attrs)
+    answer
+  end
+
+  def answer_attrs
+    field_params.merge(provided_at: Time.current, trace_id: params[:trace_id],
+                       guided_session_token: params[:guided_session_token])
+  end
+
   def tracked_record
     record = current_api_user.user_job_postings.find_or_create_by!(job_posting: job_posting)
-    record.update!(application_trace_id: params[:trace_id]) if params[:trace_id].present? && record.application_trace_id != params[:trace_id]
+    record.update!(application_trace_id: params[:trace_id]) if stale_trace_id?(record)
     record
+  end
+
+  def stale_trace_id?(record)
+    params[:trace_id].present? && record.application_trace_id != params[:trace_id]
   end
 
   def field_params

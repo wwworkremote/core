@@ -303,6 +303,7 @@ Rails.application.routes.draw do
     member do
       post :reformat
       post :apply_on_site
+      post :start_supervised_application, to: "guided_sessions#create_from_posting"
     end
   end
 

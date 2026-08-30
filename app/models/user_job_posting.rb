@@ -65,6 +65,11 @@ class UserJobPosting < ApplicationRecord
   has_many :application_field_mappings, dependent: :destroy
   has_many :application_field_observations, dependent: :destroy
 
+  # Guided supervised laps started from this posting (ADR 010 entry seam).
+  # nullify, not destroy -- a session's recorded evidence outlives the
+  # UserJobPosting, same as scenarios above.
+  has_many :guided_sessions, dependent: :nullify
+
   # `offered` deliberately isn't a status here -- it's the employer's
   # decision, the same kind of fact as outcome's `rejected`, not a stage
   # Mike walks through like `applied`/`interview` are (TASK-82/TASK-94).
