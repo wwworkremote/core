@@ -46,6 +46,13 @@ class GuidedSessionEvent < ApplicationRecord
   validate :irreversible_transition_requires_approval
 
   before_validation :set_defaults, on: :create
+
+  # TASK-126: a pointer from the timeline event to its raw datalake manifest
+  # entries (by seq). Evidence-only, additive, value-free.
+  def note_datalake_asset(seq)
+    seqs = (evidence["datalake_asset_seqs"] || []) | [seq]
+    update_column(:evidence, evidence.merge("datalake_asset_seqs" => seqs)) # rubocop:disable Rails/SkipsModelValidations
+  end
   # An event that a materialized ScenarioSignature points at is provenance --
   # it cannot be pruned while the reference exists (ADR 009). This also blocks
   # the GuidedSession dependent: :destroy cascade for such a session.

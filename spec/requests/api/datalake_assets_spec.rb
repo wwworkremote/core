@@ -23,6 +23,7 @@ RSpec.describe "Api::DatalakeAssets" do
     entry = response.parsed_body["asset"]
     expect(entry).to include("type" => "dom", "guided_session_event_id" => event.id)
     expect(Datalake::AssetStore::ROOT.join(session.session_token, entry["path"]).read).to eq("<html>x</html>")
+    expect(event.reload.evidence["datalake_asset_seqs"]).to eq([entry["seq"]])
   end
 
   it "records a capture gap" do

@@ -27,7 +27,9 @@ class Api::DatalakeAssetsController < ApplicationController
   def record_asset
     return render(json: { error: "unknown asset type" }, status: :unprocessable_content) unless known_type?
 
-    render json: { success: true, asset: written_asset }, status: :created
+    entry = written_asset
+    point_event_at(entry)
+    render json: { success: true, asset: entry }, status: :created
   end
 
   def known_type? = Datalake::AssetStore::TYPES.include?(asset_params[:type])
@@ -38,6 +40,11 @@ class Api::DatalakeAssetsController < ApplicationController
   end
 
   def decoded(content_base64) = Base64.decode64(content_base64.to_s)
+
+  # AC#3: the event carries a pointer back to its manifest entries.
+  def point_event_at(entry)
+    session.guided_session_events.find_by(id: asset_params[:guided_session_event_id])&.note_datalake_asset(entry["seq"])
+  end
 
   def record_gap
     render json: { success: true, gap: written_gap }, status: :created

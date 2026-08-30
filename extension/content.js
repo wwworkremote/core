@@ -1275,7 +1275,44 @@
       } }),
     });
     if (!res.ok || !res.data?.success) throw new Error(res.data?.error || `HTTP ${res.status}`);
+    // TASK-126: one raw asset set per emitted GuidedSessionEvent. Fire-and-forget --
+    // a capture failure records a manifest gap, it never breaks the session.
+    if (res.data.id) captureGuidedAssets(res.data.id);
     return res.data;
+  }
+
+  async function postDatalake(payload) {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    return apiFetch(`${apiBase}/api/guided_sessions/${encodeURIComponent(guidedSessionToken)}/datalake_assets`, {
+      method: 'POST', headers, body: JSON.stringify(payload),
+    });
+  }
+
+  const datalakeAsset = (eventId, type, base64) =>
+    postDatalake({ asset: { type, guided_session_event_id: eventId, content_base64: base64 } });
+  const datalakeGap = (eventId, type, reason) =>
+    postDatalake({ gap: { type, guided_session_event_id: eventId, reason: String(reason).slice(0, 200) } });
+
+  function guidedDomSnapshot() {
+    const el = document.documentElement;
+    try { return el.getHTML ? el.getHTML({ serializableShadowRoots: true }) : el.outerHTML; }
+    catch (_) { return el.outerHTML; }
+  }
+
+  // Light path (both purposes): content-script DOM + a viewport screenshot.
+  // The chrome.debugger HAR / full-page path for application_execution is a
+  // separate, individually-optional capture (see captureExecutionArtifacts).
+  async function captureGuidedAssets(eventId) {
+    try {
+      await datalakeAsset(eventId, 'dom', btoa(unescape(encodeURIComponent(guidedDomSnapshot()))));
+    } catch (err) { datalakeGap(eventId, 'dom', err.message); }
+    try {
+      const shot = await new Promise((resolve) =>
+        chrome.runtime.sendMessage({ type: 'CAPTURE_VISIBLE_TAB' }, resolve));
+      if (shot?.dataUrl) await datalakeAsset(eventId, 'screenshot', shot.dataUrl.split(',')[1]);
+      else datalakeGap(eventId, 'screenshot', shot?.error || 'no image returned');
+    } catch (err) { datalakeGap(eventId, 'screenshot', err.message); }
   }
 
   async function recordGuidedPageArrival() {
