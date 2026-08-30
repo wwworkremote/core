@@ -161,6 +161,20 @@ RSpec.describe "GuidedSessions" do
       create(:reference_scenario, scenario: ref)
     end
 
+    it "lists context-gathering opportunities for a provider with unobserved optional signatures" do
+      workday = GuidedSession.create!(source_url: "https://acme.wd5.myworkdayjobs.com/careers/job/1",
+                                      purpose: "application_execution")
+      workday.guided_session_events.create!(kind: "application_page_arrived", phase: "resolution", action: "observe",
+                                            intent: "map", requirement: "recommended", reversibility: "reversible",
+                                            approval_state: "not_required", occurred_at: 1.minute.ago,
+                                            evidence: { provider: "workday" })
+      Scenarios::GuidedCapture.call(workday)
+
+      get guided_session_path(workday)
+
+      expect(response.body).to include("Opportunities to gather more context").and include("candidate_id")
+    end
+
     it "runs exactly one automatic comparison on the first completion and none on a repeat" do
       build_reference
 

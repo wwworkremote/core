@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_020100) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -857,10 +857,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_020100) do
     t.string "resume_persona_id"
     t.string "scenario_token", null: false
     t.datetime "started_at", null: false
+    t.bigint "tenant_identity_id"
     t.datetime "updated_at", null: false
     t.bigint "user_job_posting_id"
     t.index ["guided_session_token"], name: "index_scenarios_on_guided_session_token"
     t.index ["scenario_token"], name: "index_scenarios_on_scenario_token", unique: true
+    t.index ["tenant_identity_id"], name: "index_scenarios_on_tenant_identity_id"
     t.index ["user_job_posting_id"], name: "index_scenarios_on_user_job_posting_id"
   end
 
@@ -1061,6 +1063,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_020100) do
     t.index ["job_posting_id", "domain_id"], name: "index_target_domains_on_job_posting_id_and_domain_id", unique: true
   end
 
+  create_table "tenant_identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "identifier", null: false
+    t.string "provider", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "identifier"], name: "index_tenant_identities_on_provider_and_identifier", unique: true
+  end
+
   create_table "tool_calls", force: :cascade do |t|
     t.jsonb "arguments", default: {}
     t.datetime "created_at", null: false
@@ -1201,6 +1211,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_020100) do
   add_foreign_key "resume_skills", "skills"
   add_foreign_key "resumes", "users"
   add_foreign_key "scenario_signatures", "scenarios"
+  add_foreign_key "scenarios", "tenant_identities"
   add_foreign_key "scenarios", "user_job_postings"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

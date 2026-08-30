@@ -28,22 +28,28 @@
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  resume_persona_id    :string
+#  tenant_identity_id   :bigint
 #  user_job_posting_id  :bigint
 #
 # Indexes
 #
 #  index_scenarios_on_guided_session_token  (guided_session_token)
 #  index_scenarios_on_scenario_token        (scenario_token) UNIQUE
+#  index_scenarios_on_tenant_identity_id    (tenant_identity_id)
 #  index_scenarios_on_user_job_posting_id   (user_job_posting_id)
 #
 # Foreign Keys
 #
+#  fk_rails_...  (tenant_identity_id => tenant_identities.id)
 #  fk_rails_...  (user_job_posting_id => user_job_postings.id)
 #
 class Scenario < ApplicationRecord
   has_secure_token :scenario_token
 
   belongs_to :user_job_posting, optional: true
+  # Per-employer instance this capture belongs to (ADR 010 §4). Optional --
+  # a verification-only capture may not be attributable to an employer.
+  belongs_to :tenant_identity, optional: true
   has_many :scenario_signatures, dependent: :destroy
   has_one :reference_scenario, dependent: :restrict_with_error
 

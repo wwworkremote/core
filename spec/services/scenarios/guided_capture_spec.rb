@@ -62,6 +62,14 @@ RSpec.describe Scenarios::GuidedCapture do
     expect(scenario.user_job_posting).to eq(user_job)
   end
 
+  it "attributes the Scenario to a TenantIdentity derived from the source URL" do
+    guided_session.update!(source_url: "https://boards.greenhouse.io/acme/jobs/4567890")
+
+    tenant = materialize.tenant_identity
+
+    expect(tenant).to have_attributes(provider: "greenhouse", identifier: "acme")
+  end
+
   it "emits step, commitment_boundary, field, screening_question, and ATS identity signatures" do
     kinds = kinds_and_values(materialize)
     screening_kind = Scenarios::SignatureKind.screening_question("Why do you want this role?")

@@ -252,10 +252,13 @@ currently have a mechanism for.
 - **"Reference Scenario," not "platonic ideal."** Same intent, more actionable name — a literal,
   inspectable `Scenario` row (golden-master testing), not an abstract target. (2026-08-27)
 - **Tenant-level identity gets its own record, referenced by `Scenario`.** Not just another
-  `ScenarioSignature`. A likely shape: `TenantIdentity` — `provider`, an employer/tenant
-  identifier, `created_at` — never credentials, just "an account exists here." `Scenario` gets an
-  optional `belongs_to :tenant_identity`. The next application at the same employer looks this up
-  before assuming sense-making from zero. Model/migration not yet built. (2026-08-27)
+  `ScenarioSignature`. `TenantIdentity` — `provider` + `identifier` (unique together), timestamps
+  — never credentials, just "an account exists here." `Scenario belongs_to :tenant_identity`
+  (optional). The next application at the same employer looks this up before assuming
+  sense-making from zero. **Built 2026-08-30 (TASK-130):** `TenantIdentity.for(provider:,
+  identifier:)` find-or-creates; `Scenarios::TenantIdentifier.call(provider, source_url)` derives
+  the identifier from the board slug / Workday subdomain already in the URL;
+  `Scenarios::GuidedCapture` attributes each materialized `Scenario`. (2026-08-27, built 2026-08-30)
 - **Reference Scenario promotion always requires Mike to look at the diff first.** No auto-promote
   on a clean guided run. Sense-making shouldn't self-approve — a divergence is always a deliberate
   call between "the real site drifted, fix the selector" and "the reference was incomplete, update
@@ -269,10 +272,14 @@ currently have a mechanism for.
   TASK-130.) "Map the topology of a system I can't change" needs no new subsystem:
   `SIGNATURE_EXPECTATIONS` (per-provider) + `TenantIdentity` (per-employer instance —
   finally built, the shape sketched in the bullet above) + the per-provider Reference Scenario
-  together are the topology. "Opportunities to gather more context" become a **new finding
-  category** on `HandshakeCheck` / comparison output: `optional-and-missing` signatures and
-  un-mapped observed fields surface as ranked, reviewable "could capture this" items — the
-  greedy-but-curated capture loop made legible instead of implicit.
+  together are the topology. "Opportunities to gather more context" are surfaced by
+  **`Scenarios::ContextOpportunities`** (built 2026-08-30) — a *computed*, ranked list, not a
+  persisted `ComparisonFinding` category: opportunities are advisory, recomputable from the
+  scenario, and carry no disposition workflow, unlike the immutable drift/coverage findings.
+  v1 flags `optional-and-missing` signatures from `HandshakeCheck`; **un-mapped observed
+  fields are a follow-up** (they need the `ApplicationFieldMapping` join, which is
+  `UserJobPosting`-scoped, not on the `Scenario`). Rendered read-only on the guided-session
+  review page.
 - **A guided run's `GuidedSession#session_token` is the correlation spine.** ([ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md) §2.)
   For a *guided* lap, the propagation gap this doc opens with is closed: the extension stamps
   `session_token` onto the four `trace_id`-scoped capture tables and the materialized `Scenario`,

@@ -46,11 +46,18 @@ class Scenarios::GuidedCapture
   end
 
   def create_scenario
-    Scenario.create!(provider: canonical_provider, started_at: @guided_session.started_at,
-                     guided_session_token: @guided_session.session_token,
-                     user_job_posting: @guided_session.user_job_posting).tap do |record|
-      @guided_session.update!(scenario: record)
-    end
+    Scenario.create!(scenario_attrs).tap { |record| @guided_session.update!(scenario: record) }
+  end
+
+  def scenario_attrs
+    { provider: canonical_provider, started_at: @guided_session.started_at,
+      guided_session_token: @guided_session.session_token,
+      user_job_posting: @guided_session.user_job_posting, tenant_identity: tenant_identity }
+  end
+
+  def tenant_identity
+    identifier = Scenarios::TenantIdentifier.call(canonical_provider, @guided_session.source_url)
+    TenantIdentity.for(provider: canonical_provider, identifier: identifier)
   end
 
   def events
