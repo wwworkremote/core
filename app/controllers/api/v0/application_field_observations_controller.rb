@@ -11,8 +11,18 @@ class Api::V0::ApplicationFieldObservationsController < ApiController
 
   def upsert_observation(raw)
     attrs = to_hash(raw)
-    scope = tracked_record.application_field_observations
-    scope.find_or_initialize_by(field_key: attrs["field_key"]).tap { |o| o.update(observation_attrs(attrs)) }
+    observation = tracked_record.application_field_observations.find_or_initialize_by(field_key: attrs["field_key"])
+    observation.update(observation_attrs(attrs))
+    record_question_occurrence(observation)
+    observation
+  end
+
+  # TASK-113: feed the cross-application question graph. Advisory/derived --
+  # a graph write must never break the capture path.
+  def record_question_occurrence(observation)
+    QuestionOccurrences::Record.call(observation) if observation.persisted?
+  rescue StandardError => e
+    Rails.logger.warn "[QuestionOccurrences] #{e.class}: #{e.message}"
   end
 
   def to_hash(raw)

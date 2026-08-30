@@ -1,0 +1,68 @@
+<% content_for :title, "Question graph | WWWorkRemote" %>
+
+<div class="mb-10">
+  <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-3">Knowledge graph</div>
+  <h1 class="text-3xl font-black text-white tracking-tight">Application questions</h1>
+  <p class="text-slate-400 font-medium mt-2 text-sm max-w-2xl">
+    Every question seen across applications, clustered into archetypes. Advisory only &mdash; the
+    graph never fills or submits an answer. <%= link_to "How answers are recommended", "#coverage", class: "text-primary hover:underline" %>.
+  </p>
+  <div class="flex gap-6 mt-5 text-xs font-bold text-slate-500">
+    <span><span class="text-white text-lg"><%= @overview[:totals][:archetypes] %></span> archetypes</span>
+    <span><span class="text-white text-lg"><%= @overview[:totals][:occurrences] %></span> occurrences</span>
+    <span><span class="text-white text-lg"><%= @overview[:totals][:strategies] %></span> answer strategies</span>
+  </div>
+</div>
+
+<div class="bg-base-200 border border-white/5 rounded-2xl overflow-hidden shadow-2xl mb-10">
+  <table class="w-full text-sm">
+    <thead class="bg-white/5 text-xs font-bold text-base-content/50 uppercase tracking-wider">
+      <tr>
+        <th class="text-left px-6 py-4">Archetype</th>
+        <th class="text-left px-4 py-4">Kind</th>
+        <th class="text-right px-4 py-4">Seen</th>
+        <th class="text-right px-4 py-4">Companies</th>
+        <th class="text-right px-4 py-4">Providers</th>
+        <th class="text-right px-4 py-4">Strategies</th>
+        <th class="text-left px-4 py-4">Suggested handling</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-white/5">
+      <% @overview[:rows].each do |row| %>
+        <% rec = row.archetype.recommended_handling %>
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="px-6 py-4 font-bold text-white">
+            <%= link_to row.archetype.label, question_archetype_path(row.archetype), class: "hover:text-primary" %>
+          </td>
+          <td class="px-4 py-4 text-slate-400"><%= row.archetype.question_kind.humanize %></td>
+          <td class="px-4 py-4 text-right text-white font-bold"><%= row.occurrences %></td>
+          <td class="px-4 py-4 text-right text-slate-400"><%= row.companies %></td>
+          <td class="px-4 py-4 text-right text-slate-400"><%= row.providers %></td>
+          <td class="px-4 py-4 text-right <%= row.strategies.zero? ? 'text-warning' : 'text-slate-400' %>"><%= row.strategies %></td>
+          <td class="px-4 py-4">
+            <span class="badge badge-outline text-xs font-bold border-white/20 text-slate-300"><%= rec.handling.tr('_', ' ') %></span>
+          </td>
+        </tr>
+      <% end %>
+      <% if @overview[:rows].empty? %>
+        <tr><td colspan="7" class="px-6 py-16 text-center text-sm font-bold italic text-slate-500">No questions recorded yet. Run <code>rake question_graph:backfill</code> or record a guided session.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div id="coverage" class="card-neural p-8">
+  <h2 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Coverage gaps &mdash; recurring, no answer strategy</h2>
+  <% if @overview[:coverage_gaps].any? %>
+    <ul class="space-y-2">
+      <% @overview[:coverage_gaps].each do |archetype| %>
+        <li class="text-sm">
+          <%= link_to archetype.label, question_archetype_path(archetype), class: "text-primary hover:underline font-bold" %>
+          <span class="text-slate-500">&mdash; <%= pluralize(archetype.question_occurrences.count, "occurrence") %>, no strategy yet</span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-sm text-slate-500">Every recurring archetype has at least one answer strategy.</p>
+  <% end %>
+</div>

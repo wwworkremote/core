@@ -130,3 +130,24 @@ The first implementation should use the relational database as the source of
 truth and project a graph-shaped read model for visualization. A dedicated
 graph database is not justified until real traversal or scale evidence shows
 the relational joins and aggregates are insufficient.
+
+## Built (TASK-113, 2026-08-30)
+
+The first implementation, per the delivery boundary above — relational tables +
+a computed read model, deterministic exact-normalized-prompt clustering, human
+merge/split.
+
+| Piece | What |
+|---|---|
+| `QuestionOccurrence` | Immutable per-application evidence. `raw_prompt` + full provenance (job posting, application, guided session, provider, persona, page step; industry via the posting's AI category, outcome via the application). An `on: :update` guard rejects any change to the wording/provenance columns — only the archetype pointer is mutable. |
+| `QuestionArchetype` | Reviewable cluster. `merged_into` self-reference is the merge tombstone; `active` / `merged` scopes. `wording_variants`, `recommended_handling`. |
+| `AnswerStrategy` | `question_archetype` + nullable `persona_id`, `source` (`deterministic`/`authored`/`learned`/`submitted`/`ai`), `sophistication` (`deterministic`/`authored`/`synthesized`), `version`, `confidence`, `enabled`, `provenance` jsonb. Advisory — never auto-filled. |
+| `QuestionOccurrences::Record` | Ingest: an `ApplicationFieldObservation` or a manual `ApplicationQuestion` → a deduped occurrence + exact-prompt archetype assignment (`archetype_assigned_by: "auto:exact_prompt"`, confidence 100). Wired non-blocking into the observations API and `ApplicationQuestion` create. |
+| `QuestionGraph::Backfill` / `rake question_graph:backfill` | Re-runnable backfill of existing observations + questions, plus answer-strategy seeding from `ApplicationAnswerTemplate` and submitted `ApplicationQuestion` answers. |
+| `QuestionArchetypes::Merge` / `::Split` | Explicit human corrections. Merge repoints occurrences + deduped strategies and tombstones the source; split moves a strict subset to a fresh archetype. Wording is never touched. TASK-127 hooks Merge for readiness carry-forward. |
+| `QuestionGraph::Overview` + `QuestionArchetypes::Recommendation` | The `/question_archetypes` review surface: ranked archetypes with company/provider spread, coverage gaps, per-archetype occurrences/variants/strategies, and an advisory handling recommendation. Read-only apart from merge/split. |
+
+**Deferred:** DOM-derived occurrence extraction through `Datalake::Bundle` (the value-free
+`ApplicationFieldObservation` stream is the primary input today — wayfinder doc-7 comment #2);
+richer NLP/embedding clustering beyond exact normalized-prompt match; the readiness-assessment
+and verdict tables (TASK-127).

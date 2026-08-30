@@ -29,6 +29,16 @@ class ApplicationQuestion < ApplicationRecord
 
   validates :question_text, presence: true
 
+  # TASK-113: every manual question is also a durable QuestionOccurrence in the
+  # cross-application graph. Non-blocking -- a graph failure never breaks Q&A.
+  after_create_commit :record_question_occurrence
+
+  def record_question_occurrence
+    QuestionOccurrences::Record.call(self)
+  rescue StandardError => e
+    Rails.logger.warn "[QuestionOccurrences] #{e.class}: #{e.message}"
+  end
+
   # `submitted` is what the user actually typed into the ATS form, captured by
   # the extension when they mark the application applied. It outranks the
   # other two as future reference material: it's the answer that really went
