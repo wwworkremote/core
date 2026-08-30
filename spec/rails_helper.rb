@@ -102,6 +102,15 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :solid_queue
   end
 
+  # LLM::Registry memoizes the default model id in a class instance variable.
+  # registry_spec stubs YAML.load_file and triggers that memoization with a
+  # fixture value ("llama3.2:latest") that then outlives the example and makes
+  # every later LLM spec resolve the wrong model. Clear it between examples so
+  # run order can't poison other specs (same hazard as the queue_adapter leak).
+  config.before do
+    LLM::Registry.instance_variable_set(:@default_model_id, nil)
+  end
+
   config.before do
     # Global stub for Vector Intelligence to prevent connection errors in tests
     allow(VectorIntelligence).to receive(:embed)
