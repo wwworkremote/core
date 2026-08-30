@@ -6,7 +6,7 @@ title: >-
 status: Done
 assignee: []
 created_date: '2026-08-30 22:48'
-updated_date: '2026-08-30 22:48'
+updated_date: '2026-08-30 23:21'
 labels:
   - testing
   - flake
@@ -38,6 +38,16 @@ The platform is healthy — this is purely a test-isolation defect on the wwwork
 - [x] #3 Full RSpec suite passes with the local inference server both up and down
 - [x] #4 Orphan/misleading LLM cassettes removed
 <!-- AC:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+author: claude
+created: 2026-08-30 23:21
+---
+Follow-up: the net guard added here is defense-in-depth, not the flake's fix. Making unstubbed :11500 calls fail loudly turned the intermittent `llama3.2:latest` flake into a deterministic 5/5 failure on seed 39256, which exposed the real cause — `LLM::Registry` memoizing `@default_model_id` with no test-isolation, poisoned by `registry_spec` stubbing `YAML.load_file`. Fixed in TASK-111 (merged 359290cc) with a global `@default_model_id` reset in `spec/rails_helper.rb`. Both changes stay.
+---
+<!-- COMMENTS:END -->
 
 ## Final Summary
 
