@@ -125,9 +125,19 @@ class GuidedSession < ApplicationRecord
     nil
   end
 
+  # Carries the correlation token and the session purpose onto the employer
+  # URL. content.js reads guided_session_purpose to decide whether to run the
+  # chrome.debugger HAR / full-page path (TASK-134) or just the light path.
   def tracked_query(uri)
-    query = URI.decode_www_form(uri.query.to_s).to_h.except("guided_session_token")
-    URI.encode_www_form(query.merge("guided_session_token" => session_token))
+    URI.encode_www_form(existing_params(uri).merge(carried_params))
+  end
+
+  def existing_params(uri)
+    URI.decode_www_form(uri.query.to_s).to_h.except(*carried_params.keys)
+  end
+
+  def carried_params
+    @carried_params ||= { "guided_session_token" => session_token, "guided_session_purpose" => purpose }
   end
 
   def source_uri_host
