@@ -1,9 +1,21 @@
 # The Datalake: Raw Guided-Session Assets, Schema-on-Read
 
-**Status: spec-locked, not yet built.** Charted as
+**Status: write side built (TASK-126, 2026-08-30); heavy-fidelity capture + read side pending.**
+Charted as
 [wayfinder map doc-7](../../backlog/docs/wayfinder/doc-7%20-%20Wayfinder-map-link-to-application-capture-and-the-datalake.md);
 the decision record is [ADR 010](../adr/010-link-to-application-capture-and-the-datalake.md).
-Implementation: TASK-126 (capture), TASK-127 (readiness corpus), TASK-128 (legibility).
+
+**Built:** `POST /api/guided_sessions/:session_token/datalake_assets` (`Api::DatalakeAssetsController`,
+`Rails.env.local?` only) + `Datalake::AssetStore` (files under `data/datalake/sessions/<token>/`,
+Rails-owned `manifest.json`, per-asset seq / event id / sha256 / bytes, gap entries). The extension
+captures a content-script **DOM snapshot + viewport screenshot per emitted `GuidedSessionEvent`**
+(fire-and-forget; a failure records a manifest gap, never breaks the session); each event carries a
+`datalake_asset_seqs` pointer back. `rake datalake:sandbox_walkthrough` proves the manifest shape.
+
+**Pending:** the `chrome.debugger` HAR-with-bodies + full-page screenshot path for
+`application_execution` sessions ([TASK-134](../../backlog/tasks/task-134%20-%20Datalake-capture-chrome.debugger-HAR-bodies-full-page-screenshots-for-application_execution.md));
+the prune job + curation report; the `Datalake::Bundle` / `Datalake::Extractor` read side (TASK-123
+contract) which TASK-127's corpus and the question graph will consume.
 
 ## What "datalake" means here
 
