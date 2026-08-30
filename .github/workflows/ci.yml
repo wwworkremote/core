@@ -1,18 +1,29 @@
 name: CI
 
+# Solo project -- run the whole suite once, on main, after work lands.
+# The fast feedback loop is already covered locally by overcommit:
+#   pre-commit : RuboCop (-a) + working-tree-scoped RSpec + ESLint
+#   pre-push   : Brakeman
+# CI does the one thing local hooks don't: the *entire* test suite, plus a
+# belt-and-braces RuboCop / Brakeman / bundler-audit in case something was
+# pushed with --no-verify.
+#
+# To check a branch before merging, hit "Run workflow" (workflow_dispatch)
+# or run `bin/ci` locally.
+
 on:
-  pull_request:
   push:
-    branches:
-      - "**"
+    branches: [main]
+  workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -42,8 +53,16 @@ jobs:
           ruby-version: 4.0.6
           bundler-cache: true
 
-      # tailwindcss:build resolves plugins (daisyui) via Node module
-      # resolution, not RubyGems -- needs node_modules present first.
+      # Cheap gates first -- fail before paying for Node / DB / asset build.
+      - name: RuboCop
+        run: bundle exec rubocop
+
+      - name: Brakeman
+        run: bundle exec brakeman -q -n -w2
+
+      - name: Bundler audit
+        run: bundle exec bundle-audit check --update
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -53,89 +72,20 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
-      # db:prepare would also run db/seeds.rb -- the RSpec suite builds its
-      # own data via factories and doesn't expect seeded rows (e.g. sources
-      # with slugs the same as job_boards_source factory defaults), so this
-      # mirrors quality.yml's create+schema:load instead.
-      - name: Create database
+      # create + schema:load (not db:prepare) -- the suite builds its own
+      # data via factories and doesn't expect seeded rows.
+      - name: Prepare database
         run: |
           bin/rails db:create
           bin/rails db:schema:load
 
-      # app/assets/builds/* is gitignored (build output, not source) -- any
-      # spec that renders a layout needs this present or Propshaft 404s on
-      # the tailwind stylesheet_link_tag.
+      # app/assets/builds/* is gitignored -- any spec that renders a layout
+      # needs the compiled stylesheet present or Propshaft 404s.
       - name: Build Tailwind CSS
         run: bin/rails tailwindcss:build
 
-      - name: Run test suite
-        run: bundle exec rspec spec packages/ingestion/spec
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 4.0.6
-          bundler-cache: true
-
-      - name: Run RuboCop
-        run: bundle exec rubocop
-
-  security:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 4.0.6
-          bundler-cache: true
-
-      - name: Run Brakeman
-        run: bundle exec brakeman -q -n -w2
-
-      - name: Run bundler-audit
-        run: bundle exec bundle-audit check --update
-
-  boot:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: wwworkremote_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      RAILS_ENV: test
-      TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 4.0.6
-          bundler-cache: true
-
-      - name: Verify app boots
+      - name: Boot check
         run: bundle exec rails runner 'puts :ok'
+
+      - name: Test suite
+        run: bundle exec rspec spec packages/ingestion/spec
