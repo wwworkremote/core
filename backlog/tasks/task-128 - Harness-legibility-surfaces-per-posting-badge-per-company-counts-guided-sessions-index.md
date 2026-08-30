@@ -3,10 +3,11 @@ id: TASK-128
 title: >-
   Harness-legibility surfaces: per-posting badge, per-company counts,
   guided-sessions index
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - '@claude'
 created_date: '2026-08-29 20:37'
-updated_date: '2026-08-29 20:45'
+updated_date: '2026-08-30 13:32'
 labels:
   - application-capture-datalake
   - 'wayfinder-map:doc-7'
@@ -63,13 +64,35 @@ One helper computes a posting's furthest-reached harness state from the `GuidedS
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 A shared helper returns a posting's furthest harness state (none / in_progress / recorded / compared) from the GuidedSessions linked to its UserJobPosting, with a spec covering each transition and the none case
-- [ ] #2 job_postings/show renders a harness-state badge with the existing title badges when state is not none, and the 'Start supervised application' affordance is an aside card showing state + linked session link(s) + last activity + 'Start another'
-- [ ] #3 companies/show shows 'N supervised applications - M recorded sessions' where N = distinct UserJobPostings for that company with >=1 completed GuidedSession, and each posting row in the list carries the same badge
-- [ ] #4 The 'processed through the harness' count uses one definition (UserJobPosting with >=1 completed GuidedSession) in the helper, reused by both the company stat and any other caller; a spec asserts an in-progress-only posting is excluded from the count
-- [ ] #5 GET /guided_sessions lists recent sessions (posting, company, purpose, state, last activity) and is linked from the Admin/Tools menu group in the layout, not primary nav
-- [ ] #6 guided_sessions#show back-links to its posting and company when user_job_posting is present, and degrades cleanly when it is nil
-- [ ] #7 docs/architecture/panoramic-view.md updated: 'View full trace' for a guided run points at guided_sessions#show
-- [ ] #8 No surface added here writes UserJobPosting/JobPosting state or calls a provider; request specs confirm all new endpoints are read-only
-- [ ] #9 brakeman + rubocop -a clean; extension/manifest.json untouched (no extension change in this task)
+- [x] #1 A shared helper returns a posting's furthest harness state (none / in_progress / recorded / compared) from the GuidedSessions linked to its UserJobPosting, with a spec covering each transition and the none case
+- [x] #2 job_postings/show renders a harness-state badge with the existing title badges when state is not none, and the 'Start supervised application' affordance is an aside card showing state + linked session link(s) + last activity + 'Start another'
+- [x] #3 companies/show shows 'N supervised applications - M recorded sessions' where N = distinct UserJobPostings for that company with >=1 completed GuidedSession, and each posting row in the list carries the same badge
+- [x] #4 The 'processed through the harness' count uses one definition (UserJobPosting with >=1 completed GuidedSession) in the helper, reused by both the company stat and any other caller; a spec asserts an in-progress-only posting is excluded from the count
+- [x] #5 GET /guided_sessions lists recent sessions (posting, company, purpose, state, last activity) and is linked from the Admin/Tools menu group in the layout, not primary nav
+- [x] #6 guided_sessions#show back-links to its posting and company when user_job_posting is present, and degrades cleanly when it is nil
+- [x] #7 docs/architecture/panoramic-view.md updated: 'View full trace' for a guided run points at guided_sessions#show
+- [x] #8 No surface added here writes UserJobPosting/JobPosting state or calls a provider; request specs confirm all new endpoints are read-only
+- [x] #9 brakeman + rubocop -a clean; extension/manifest.json untouched (no extension change in this task)
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Implemented the TASK-125 harness-legibility surfaces.
+
+**Shared state (no new column)**
+- `UserJobPosting#harness_state` → `:none` / `:in_progress` / `:recorded` / `:compared`, derived from the linked `GuidedSession`s (`GuidedSession.completed` / `.in_flight` scopes + `reference_comparisons`).
+- `UserJobPosting.processed_through_harness` scope — the one definition of "processed through the harness" (≥1 completed guided session), reused by the company stat.
+- `HarnessHelper#harness_badge(user_job)` → `[css, label]` or nil (matches `pipeline_status_badge` shape).
+
+**Surfaces**
+- `job_postings/show`: harness badge alongside the title badges; the "Start supervised application" affordance moved into a dedicated aside card showing state, linked session(s), last activity, and "Start another" (or the start button + explainer when never used).
+- `companies/show`: "Harness activity: N supervised applications · M recorded sessions" (via `CompaniesController#load_harness_summary`), plus the per-posting badge on each row in the postings list.
+- `GET /guided_sessions` index (added `:index` to the route + action + view) — posting, company, purpose, state, last activity. Linked from the **Tools** group of the Admin menu (desktop + mobile), not primary nav.
+- `guided_sessions#show`: "Tracked in WWWorkRemote" back-links to the posting and company when `user_job_posting` is present; absent cleanly when nil.
+- `docs/architecture/panoramic-view.md` already carries the "View full trace → guided_sessions#show for guided runs" paragraph (landed with the spec-lock commit).
+
+**Read-only**: no new endpoint writes `UserJobPosting`/`JobPosting` state or calls a provider. `extension/` untouched.
+
+**Tests**: `spec/helpers/harness_helper_spec.rb` (new); additions to `spec/models/user_job_posting_spec.rb` (state transitions + scope + in-progress-excluded), `spec/requests/guided_sessions_spec.rb` (index), `spec/requests/companies_spec.rb` (stat block). Full sweep of `spec/requests` + `spec/models` + `spec/helpers` + `spec/services/scenarios` = 690 examples, 0 failures. rubocop + erb_lint + brakeman clean.
+<!-- SECTION:FINAL_SUMMARY:END -->

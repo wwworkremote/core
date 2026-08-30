@@ -151,6 +151,51 @@ RSpec.describe UserJobPosting do
     end
   end
 
+  describe "harness legibility (ADR 010 / TASK-125)" do
+    subject(:application) { create(:user_job_posting) }
+
+    def session_for(application, **attrs)
+      GuidedSession.create!({ source_url: "https://boards.greenhouse.io/acme/jobs/1",
+                              purpose: "application_execution", user_job_posting: application }.merge(attrs))
+    end
+
+    describe "#harness_state" do
+      it "is :none with no linked guided session" do
+        expect(application.harness_state).to eq(:none)
+      end
+
+      it "is :in_progress while a linked session is active or paused" do
+        session_for(application, status: "active")
+        expect(application.harness_state).to eq(:in_progress)
+      end
+
+      it "is :recorded once a linked session has completed and materialized a Scenario" do
+        session_for(application, status: "completed", scenario: create(:scenario))
+        expect(application.harness_state).to eq(:recorded)
+      end
+
+      it "is :compared once a linked session has a ReferenceComparison" do
+        session = session_for(application, status: "completed", scenario: create(:scenario))
+        ReferenceComparison.create!(guided_session: session, scenario: session.scenario, provider: "greenhouse",
+                                    comparison_rules_version: "1", outcome: "no_reference", trigger: "automatic",
+                                    ran_at: Time.current)
+        expect(application.harness_state).to eq(:compared)
+      end
+    end
+
+    describe ".processed_through_harness" do
+      it "counts an application with a completed guided session and excludes an in-progress-only one" do
+        processed = create(:user_job_posting)
+        session_for(processed, status: "completed")
+        in_progress = create(:user_job_posting)
+        session_for(in_progress, status: "active")
+
+        expect(described_class.processed_through_harness).to include(processed)
+        expect(described_class.processed_through_harness).not_to include(in_progress)
+      end
+    end
+  end
+
   describe "#last_pipeline_activity_at" do
     it "returns the most recent PipelineStep's created_at for this user+posting" do
       ujp = create(:user_job_posting, status: "applied")

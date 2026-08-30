@@ -40,5 +40,17 @@ RSpec.describe "Companies" do
       get company_path(company)
       expect(response.body).to include("cooldown until")
     end
+
+    it "shows harness activity once an application for the company has been processed" do
+      posting = create(:job_posting, company: company)
+      application = User.find_or_create_by!(email: "mike@just3ws.com") { |u| u.name = "mike"; u.password = "password" }
+                        .user_job_postings.create!(job_posting: posting)
+      GuidedSession.create!(source_url: "https://boards.greenhouse.io/acme/jobs/1", purpose: "application_execution",
+                            user_job_posting: application, status: "completed")
+
+      get company_path(company)
+
+      expect(response.body).to include("Harness activity").and include("1 supervised application")
+    end
   end
 end

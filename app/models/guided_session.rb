@@ -53,6 +53,9 @@ class GuidedSession < ApplicationRecord
   validates :playback_position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :source_url_is_http
 
+  scope :completed, -> { where(status: "completed") }
+  scope :in_flight, -> { where(status: %w[active paused]) }
+
   before_validation :set_intake_attributes, on: :create
 
   # First transition to completed triggers one automatic Reference Comparison

@@ -207,7 +207,7 @@ Rails.application.routes.draw do
     end
   end
   resources :job_searches
-  resources :guided_sessions, only: %i[new create show] do
+  resources :guided_sessions, only: %i[index new create show] do
     member do
       patch :playback
       patch "events/:event_id/approval", to: "guided_sessions#approval", as: :approval
