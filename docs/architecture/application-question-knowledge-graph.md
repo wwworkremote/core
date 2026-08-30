@@ -131,7 +131,11 @@ training run.
 - **Advisory only, hard guardrail** (invariant 8 extended): nothing the readiness loop
   produces flips an archetype to auto-fill or auto-submit. It only ever changes whether a
   proposal is offered *without* a review prompt — never whether an answer is entered or
-  sent.
+  sent. A model spec asserts no app file both writes an answer and reads a readiness signal.
+- **No backfill of historical `ai` → `submitted` answers** (AC#2, declined). Once an
+  `ApplicationQuestion` was submitted the proposal text was overwritten by the final
+  answer, so no value-free verdict (which needs both texts to measure the edit distance)
+  can be reconstructed. The loop starts fresh from proposals shown after this ships.
 
 ## Delivery boundary
 

@@ -24,7 +24,21 @@ class QuestionArchetypes::Split
     # rubocop:disable-next Rails/SkipsModelValidations -- archetype pointer only
     @occurrences.update_all(question_archetype_id: new_archetype.id,
                             archetype_assigned_by: "split:from_#{@archetype.id}")
+    carry_readiness_forward(new_archetype)
     new_archetype
+  end
+
+  # The parent's readiness is a starting suggestion for the split-off cluster
+  # (TASK-127) -- advisory, assessed_by "merge:carry_forward", never a fact.
+  def carry_readiness_forward(new_archetype)
+    prior = @archetype.current_readiness
+    new_archetype.readiness_assessments.create!(carry_forward_attrs(prior)) if prior
+  end
+
+  def carry_forward_attrs(prior)
+    { readiness_class: prior.readiness_class, source_assessment: prior,
+      assessed_by: ArchetypeReadinessAssessment::CARRIED_FORWARD_BY,
+      rationale: "Carried from parent archetype ##{@archetype.id} on split -- confirm or replace." }
   end
 
   def validate!

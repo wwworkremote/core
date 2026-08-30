@@ -18,6 +18,19 @@ RSpec.describe QuestionArchetypes::Split do
     expect(stay.reload.question_archetype).to eq(archetype)
   end
 
+  it "carries the parent's readiness onto the split-off archetype as a suggestion (TASK-127)" do
+    archetype = create(:question_archetype)
+    keep = create(:question_occurrence, question_archetype: archetype)
+    move = create(:question_occurrence, question_archetype: archetype, raw_prompt: "Other?")
+    archetype.readiness_assessments.create!(readiness_class: "generatable", assessed_by: "mike")
+
+    new_archetype = described_class.call(archetype: archetype, occurrence_ids: [move.id])
+
+    expect(new_archetype.current_readiness).to have_attributes(readiness_class: "generatable")
+    expect(new_archetype.current_readiness).to be_carried_forward
+    expect(keep.reload.question_archetype).to eq(archetype)
+  end
+
   it "refuses to split off nothing or everything" do
     archetype = create(:question_archetype)
     only = create(:question_occurrence, question_archetype: archetype)
