@@ -106,6 +106,27 @@ class UserJobPosting < ApplicationRecord
 
   STATUS_EVENTS = %w[favorite apply interview archive].freeze
 
+  # "Processed through the harness" (ADR 010 / TASK-125): a tracked
+  # application with at least one completed guided session. One definition,
+  # reused wherever the count appears.
+  scope :processed_through_harness, -> { where(id: GuidedSession.completed.select(:user_job_posting_id)) }
+
+  HARNESS_STATES = %i[none in_progress recorded compared].freeze
+
+  # Furthest-reached harness state across this application's guided sessions.
+  # Advisory/read-only -- never affects pipeline status.
+  def harness_state
+    return :compared if guided_sessions.joins(:reference_comparisons).exists?
+    return :recorded if harness_recorded?
+    return :in_progress if guided_sessions.in_flight.exists?
+
+    :none
+  end
+
+  def harness_recorded?
+    guided_sessions.completed.where.not(scenario_id: nil).exists?
+  end
+
   # TASK-93: "actively pursuing, gone quiet." archived/none excluded --
   # archived means Mike stopped, none means he never started.
   ACTIVE_STATUSES = %w[favorited applied interview].freeze

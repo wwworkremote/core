@@ -40,11 +40,25 @@
     <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
       <h2 class="text-xs font-bold text-base-content/50 mb-10 pb-4 border-b border-white/5"><%= t('.postings_heading') %></h2>
 
+      <% if @harness_processed_count.positive? %>
+        <p class="text-xs font-bold text-base-content/50 mb-6 -mt-6">
+          Harness activity:
+          <span class="text-white"><%= pluralize(@harness_processed_count, "supervised application") %></span> ·
+          <span class="text-white"><%= pluralize(@harness_recorded_sessions, "recorded session") %></span>
+        </p>
+      <% end %>
+
       <div class="grid grid-cols-1 gap-4">
         <% @company.job_postings.order(published_at: :desc).each do |job| %>
           <div class="card-neural p-6 hover:border-primary/50 transition-all group flex items-center justify-between">
             <div>
-              <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors"><%= link_to job.title, job_posting_path(job) %></h4>
+              <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors">
+                <%= link_to job.title, job_posting_path(job) %>
+                <% _, harness_label = harness_badge(@harness_by_posting[job.id]) %>
+                <% if harness_label %>
+                  <span class="badge badge-outline border-accent/40 text-accent text-xs font-bold align-middle ml-1"><%= harness_label %></span>
+                <% end %>
+              </h4>
               <div class="text-xs font-bold text-slate-500 mt-1">
                 <%= job.location.presence || t('job_postings.show.remote_fallback') %> · <%= job.published_at&.to_date || job.created_at.to_date %>
               </div>

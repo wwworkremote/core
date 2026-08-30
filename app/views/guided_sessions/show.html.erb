@@ -41,6 +41,19 @@
       <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Source posting</div>
       <%= link_to @guided_session.source_url, @guided_session.source_url, target: "_blank", rel: "noreferrer", class: "text-primary break-all" %>
     </div>
+    <% if (tracked = @guided_session.user_job_posting) %>
+      <div>
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tracked in WWWorkRemote</div>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 text-sm font-bold">
+          <%= link_to tracked.job_posting.title, job_posting_path(tracked.job_posting), class: "text-primary hover:underline" %>
+          <% posting_company = tracked.job_posting.company_record %>
+          <% if posting_company %>
+            <span class="text-slate-600">·</span>
+            <%= link_to posting_company.name, company_path(posting_company), class: "text-primary hover:underline" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
     <div>
       <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Next move</div>
       <div class="text-xl font-black text-white">Review the posting</div>

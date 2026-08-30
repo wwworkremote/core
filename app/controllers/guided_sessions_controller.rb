@@ -10,6 +10,11 @@ class GuidedSessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: :playback
   before_action :set_guided_session, only: %i[show playback approval complete compare create_disposition]
 
+  def index
+    @guided_sessions = GuidedSession.includes(user_job_posting: { job_posting: :company })
+                                    .order(started_at: :desc).limit(100)
+  end
+
   def show
     @events = @guided_session.guided_session_events.order(:occurred_at, :id)
   end

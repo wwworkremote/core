@@ -3,6 +3,29 @@
 require "rails_helper"
 
 RSpec.describe "GuidedSessions" do
+  # Mirrors Authenticatable#current_user: the one admin account the app resolves to.
+  def current_user
+    @current_user ||= User.find_or_create_by!(email: "mike@just3ws.com") do |u|
+      u.name = "mike"
+      u.password = "password"
+    end
+  end
+
+  describe "GET /guided_sessions" do
+    it "lists recent sessions with their posting, company, purpose and state" do
+      company = create(:company, name: "Acme Co")
+      posting = create(:job_posting, company: company, title: "Staff Engineer")
+      application = current_user.user_job_postings.create!(job_posting: posting)
+      GuidedSession.create!(source_url: "https://boards.greenhouse.io/acme/jobs/1", purpose: "application_execution",
+                            user_job_posting: application, status: "completed")
+
+      get guided_sessions_path
+
+      expect(response).to be_successful
+      expect(response.body).to include("Staff Engineer").and include("Acme Co").and include("Application execution")
+    end
+  end
+
   describe "GET /guided_sessions/new" do
     it "renders the copied posting URL intake" do
       get new_guided_session_path
@@ -254,13 +277,6 @@ RSpec.describe "GuidedSessions" do
 
       expect(response).to redirect_to(job_posting_path(urlless))
       expect(flash[:alert]).to match(/no application URL/i)
-    end
-
-    def current_user
-      @current_user ||= User.find_or_create_by!(email: "mike@just3ws.com") do |u|
-        u.name = "mike"
-        u.password = "password"
-      end
     end
   end
 end
