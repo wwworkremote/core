@@ -1,9 +1,11 @@
 ---
 id: TASK-132
 title: 'Context opportunities: flag un-mapped observed application fields'
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - '@claude'
 created_date: '2026-08-30 13:45'
+updated_date: '2026-08-30 13:51'
 labels:
   - application-capture-datalake
   - 'wayfinder-map:doc-7'
@@ -35,7 +37,15 @@ Follow-up to TASK-130. ADR 010 §4 lists two opportunity sources: `optional-and-
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Scenarios::ContextOpportunities emits an opportunity for each ApplicationFieldObservation on the session's UserJobPosting that has no corresponding ApplicationFieldMapping; a spec covers the mapped vs un-mapped split
-- [ ] #2 The opportunities are ranked together with the signature opportunities and rendered on the guided-session review page
-- [ ] #3 Sessions with no user_job_posting still work (signature opportunities only); rubocop + brakeman clean
+- [x] #1 Scenarios::ContextOpportunities emits an opportunity for each ApplicationFieldObservation on the session's UserJobPosting that has no corresponding ApplicationFieldMapping; a spec covers the mapped vs un-mapped split
+- [x] #2 The opportunities are ranked together with the signature opportunities and rendered on the guided-session review page
+- [x] #3 Sessions with no user_job_posting still work (signature opportunities only); rubocop + brakeman clean
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+`Scenarios::ContextOpportunities.call` now takes an optional `user_job_posting:` kwarg. When present, it emits a `field:<key>` opportunity for every `ApplicationFieldObservation` on that application whose `field_key` has no `ApplicationFieldMapping` ("this employer asks X and we have no answer strategy"). Ranked together with the signature opportunities. The review-page partial passes `guided_session.user_job_posting`; sessions without one keep working (signature opportunities only).
+
+New: `spec/factories/application_field_observations.rb`. Spec added for the mapped-vs-unmapped split. `signature-registry.md` note updated (follow-up folded in). rubocop + brakeman clean. No extension change.
+<!-- SECTION:FINAL_SUMMARY:END -->

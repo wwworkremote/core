@@ -87,7 +87,8 @@
   <% end %>
 
   <% if guided_session.scenario %>
-    <% opportunities = Scenarios::ContextOpportunities.call(guided_session.scenario, purpose: guided_session.purpose) %>
+    <% opportunities = Scenarios::ContextOpportunities.call(guided_session.scenario, purpose: guided_session.purpose,
+                                                           user_job_posting: guided_session.user_job_posting) %>
     <% if opportunities.any? %>
       <div class="text-xs font-black uppercase tracking-widest text-slate-500 mt-8 mb-3">Opportunities to gather more context</div>
       <div class="space-y-2">
