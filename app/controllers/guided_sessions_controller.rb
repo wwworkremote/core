@@ -16,10 +16,9 @@ class GuidedSessionsController < ApplicationController
 
   def show
     @events = @guided_session.guided_session_events.order(:occurred_at, :id)
-    token = @guided_session.session_token
-    @field_answers = ApplicationFieldAnswer.where(guided_session_token: token).order(:provided_at)
-    @field_mappings = ApplicationFieldMapping.where(guided_session_token: token).count
+    load_session_field_activity
     @replay_plan = GuidedSessions::ReplayPlan.call(@guided_session)
+    @replay = @guided_session.guided_session_replays.active.first
   end
 
   def new
@@ -62,6 +61,12 @@ class GuidedSessionsController < ApplicationController
   end
 
   private
+
+  def load_session_field_activity
+    token = @guided_session.session_token
+    @field_answers = ApplicationFieldAnswer.where(guided_session_token: token).order(:provided_at)
+    @field_mappings = ApplicationFieldMapping.where(guided_session_token: token).count
+  end
 
   def set_guided_session
     @guided_session = GuidedSession.find(params.expect(:id))

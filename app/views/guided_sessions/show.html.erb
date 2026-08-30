@@ -164,10 +164,32 @@
     <div class="card-neural p-6 mt-10">
       <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Replay plan &mdash; what a later run would do</div>
       <p class="text-sm text-slate-400 mb-4">
-        A later replay would advance <span class="text-success font-bold"><%= pluralize(@replay_plan[:replayable], "deterministic step") %></span>
-        and pause for you at <span class="text-warning font-bold"><%= pluralize(@replay_plan[:gates], "gate") %></span>.
-        This is a plan, not an action &mdash; replay execution is not built, and nothing here fills or submits.
+        A replay would <span class="text-success font-bold">pre-fill <%= pluralize(@replay_plan[:replayable], "step") %></span>
+        from the recorded answers and <span class="text-warning font-bold">pause for you at <%= pluralize(@replay_plan[:gates], "gate") %></span>.
+        Replay only ever fills fields &mdash; it never clicks Next, Continue, or Submit, and every gate hands control back to you.
       </p>
+
+      <% if @guided_session.status == "completed" %>
+        <% if @replay %>
+          <div class="rounded-lg border border-primary/30 bg-primary/5 p-4 mb-4">
+            <div class="text-sm font-black text-white">Replay <%= @replay.status.humanize %> &mdash; step <%= @replay.current_step + 1 %> of <%= @replay_plan[:steps].size %></div>
+            <p class="text-xs text-slate-400 mt-1">Open the application to continue &mdash; the extension walks you through each fill.</p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <%= link_to "Open the application", @guided_session.tracked_source_url, target: "_blank", rel: "noreferrer", class: "btn btn-xs btn-primary rounded-lg font-bold" %>
+              <%= button_to "Stop replay", guided_session_replay_path(@guided_session, @replay), method: :patch, params: { command: "stop" }, class: "btn btn-xs btn-ghost border-error/30 text-error rounded-lg font-bold" %>
+            </div>
+          </div>
+        <% else %>
+          <%= form_with url: guided_session_replays_path(@guided_session), method: :post, class: "flex flex-wrap items-center gap-3 mb-2" do %>
+            <label class="flex items-center gap-2 text-xs text-slate-400">
+              <%= check_box_tag :allow_real_site, "1", false, class: "checkbox checkbox-xs" %>
+              Let this replay drive a real employer site
+            </label>
+            <%= submit_tag "Start replay", class: "btn btn-xs btn-primary rounded-lg font-bold" %>
+          <% end %>
+          <p class="text-[10px] text-slate-600">Sandbox always allowed. A real site needs the box above.</p>
+        <% end %>
+      <% end %>
       <ol class="space-y-1 text-xs">
         <% @replay_plan[:steps].each do |step| %>
           <li class="flex items-center gap-2">

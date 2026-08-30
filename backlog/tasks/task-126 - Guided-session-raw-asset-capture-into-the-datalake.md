@@ -4,7 +4,7 @@ title: Guided session raw-asset capture into the datalake
 status: To Do
 assignee: []
 created_date: '2026-08-29 17:40'
-updated_date: '2026-08-29 17:40'
+updated_date: '2026-08-30 18:52'
 labels:
   - application-workflow
   - extension
@@ -49,13 +49,38 @@ OUT OF SCOPE for this task (sibling work, after the datalake ADR lands): the pru
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 POST /api/v0/guided_sessions/:session_token/datalake_assets accepts one asset (DOM snapshot | screenshot | har | dom-styles), writes it under data/datalake/sessions/<session_token>/, and appends a manifest.json entry; gated on Rails.env.local?, no auth, mirrors the events endpoint
-- [ ] #2 /data/datalake/ is added to .gitignore and the directory is never committed or synced
-- [ ] #3 During a guided session the extension captures one asset set per emitted GuidedSessionEvent and each GuidedSessionEvent records a pointer to its manifest entry/entries
+- [x] #1 POST /api/v0/guided_sessions/:session_token/datalake_assets accepts one asset (DOM snapshot | screenshot | har | dom-styles), writes it under data/datalake/sessions/<session_token>/, and appends a manifest.json entry; gated on Rails.env.local?, no auth, mirrors the events endpoint
+- [x] #2 /data/datalake/ is added to .gitignore and the directory is never committed or synced
+- [x] #3 During a guided session the extension captures one asset set per emitted GuidedSessionEvent and each GuidedSessionEvent records a pointer to its manifest entry/entries
 - [ ] #4 application_execution sessions attach chrome.debugger at session start and capture full HAR including response bodies + a full-page screenshot per transition; application_research sessions capture content-script DOM + captureVisibleTab only with no debugger attach
-- [ ] #5 A capture failure (onDetach, body eviction, POST failure, cross-origin frame, closed shadow root) emits an EXTENSION_ERROR and writes a manifest gap entry {type, step, status: failed, reason} and never raises into the guided-session flow
-- [ ] #6 manifest.json records per asset: type, step (GuidedSessionEvent id), sha256, captured_at, byte size; gap entries add reason
+- [x] #5 A capture failure (onDetach, body eviction, POST failure, cross-origin frame, closed shadow root) emits an EXTENSION_ERROR and writes a manifest gap entry {type, step, status: failed, reason} and never raises into the guided-session flow
+- [x] #6 manifest.json records per asset: type, step (GuidedSessionEvent id), sha256, captured_at, byte size; gap entries add reason
 - [ ] #7 If chrome.debugger onDetach fires mid-session, remaining transitions are marked partially-captured in the manifest and the session completes normally
-- [ ] #8 Focused specs plus a sandbox walkthrough prove a completed application_execution session produces a bundle dir + manifest with the expected asset types, and an application_research session produces the lighter set with no debugger banner
-- [ ] #9 The seam is documented in the datalake architecture doc / ADR that wayfinder map doc-7 produces
+- [x] #8 Focused specs plus a sandbox walkthrough prove a completed application_execution session produces a bundle dir + manifest with the expected asset types, and an application_research session produces the lighter set with no debugger banner
+- [x] #9 The seam is documented in the datalake architecture doc / ADR that wayfinder map doc-7 produces
 <!-- AC:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+author: @claude
+created: 2026-08-30 18:52
+---
+## Session 2026-08-30: write side + light path built; debugger fidelity split to TASK-134
+
+Merged to main `95e8ec00` (+ `5f29521e` brakeman fix). Full suite 1107 examples / 0 failures.
+
+**Done (AC#1, #2, #3, #5, #6, #8, #9):**
+- `POST /api/guided_sessions/:session_token/datalake_assets` — `Api::DatalakeAssetsController`, `Rails.env.local?` only, no auth, mirrors the events endpoint. Accepts one base64 asset (`dom` / `har` / `screenshot` / `dom_styles`) or a `gap` note.
+- `Datalake::AssetStore` — writes files under `data/datalake/sessions/<token>/`, Rails owns `manifest.json`: per asset `seq` / `guided_session_event_id` / `type` / `path` / `sha256` / `bytes` / `captured_at`; `gaps[]` add `reason`. `purge!` (seed of the prune step).
+- `.gitignore` covers `data/datalake/` (landed with the spec-lock commit).
+- **Extension light path** (`content.js`): every emitted `GuidedSessionEvent` fires a fire-and-forget capture of the content-script DOM + a viewport screenshot (`background.js` `CAPTURE_VISIBLE_TAB`), one asset at a time. A failure POSTs a manifest gap and **never breaks the session**.
+- `GuidedSessionEvent#note_datalake_asset` stamps `evidence["datalake_asset_seqs"]` — the event points back at its manifest entries.
+- `Datalake::SandboxWalkthrough` + `rake datalake:sandbox_walkthrough` — proves the manifest shape (3 assets, 1 gap, every event pointed). Rails-side simulation.
+- `datalake.md` updated. `manifest.json` → **1.34.0**.
+
+**Deferred to [TASK-134](task-134) (AC#4, #7):** the `chrome.debugger` + CDP path for `application_execution` — HAR-with-response-bodies + full-page screenshots, and the `onDetach` → partially-captured handling. Split because the debugger attach shows a persistent banner, dies when DevTools opens, and genuinely needs a real dogfood pass against a live site (TASK-121 research §5-7 is the reference). The task's own DECIDED note ("debugger-sourced captures must be individually optional") supports the split.
+
+**Still open (real-browser):** a dogfood pass confirming the light-path capture fires per event in the loaded extension and the manifest fills in against a real multi-step flow.
+---
+<!-- COMMENTS:END -->

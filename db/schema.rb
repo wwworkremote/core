@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_050000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_060000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -464,6 +464,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_050000) do
     t.datetime "updated_at", null: false
     t.index ["guided_session_id", "occurred_at"], name: "idx_on_guided_session_id_occurred_at_296f9f4e6b"
     t.index ["guided_session_id"], name: "index_guided_session_events_on_guided_session_id"
+  end
+
+  create_table "guided_session_replays", force: :cascade do |t|
+    t.boolean "allow_real_site", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "current_step", default: 0, null: false
+    t.datetime "ended_at"
+    t.string "ended_reason"
+    t.bigint "guided_session_id", null: false
+    t.datetime "started_at", null: false
+    t.string "status", default: "running", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guided_session_id", "status"], name: "index_guided_session_replays_on_guided_session_id_and_status"
+    t.index ["guided_session_id"], name: "index_guided_session_replays_on_guided_session_id"
   end
 
   create_table "guided_sessions", force: :cascade do |t|
@@ -1275,6 +1289,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_050000) do
   add_foreign_key "experience_highlights", "work_experiences"
   add_foreign_key "finding_dispositions", "comparison_findings"
   add_foreign_key "guided_session_events", "guided_sessions"
+  add_foreign_key "guided_session_replays", "guided_sessions"
   add_foreign_key "guided_sessions", "scenarios"
   add_foreign_key "guided_sessions", "user_job_postings"
   add_foreign_key "human_tasks", "job_postings"

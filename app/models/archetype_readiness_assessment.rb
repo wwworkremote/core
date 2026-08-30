@@ -8,6 +8,31 @@
 #
 # HARD GUARDRAIL (Bounded Agency): a readiness_class is never consumed to fill
 # or submit an answer. It only ever means "propose without a review prompt".
+# == Schema Information
+#
+# Table name: archetype_readiness_assessments
+#
+#  id                    :bigint           not null, primary key
+#  assessed_at           :datetime         not null
+#  assessed_by           :string           not null
+#  rationale             :text
+#  readiness_class       :string           not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  question_archetype_id :bigint           not null
+#  source_assessment_id  :bigint
+#
+# Indexes
+#
+#  idx_on_question_archetype_id_assessed_at_f44acfd079             (question_archetype_id,assessed_at)
+#  index_archetype_readiness_assessments_on_question_archetype_id  (question_archetype_id)
+#  index_archetype_readiness_assessments_on_source_assessment_id   (source_assessment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (question_archetype_id => question_archetypes.id)
+#  fk_rails_...  (source_assessment_id => archetype_readiness_assessments.id)
+#
 class ArchetypeReadinessAssessment < ApplicationRecord
   CLASSES = %w[deterministic generatable needs_human].freeze
   CARRIED_FORWARD_BY = "merge:carry_forward"

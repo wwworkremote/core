@@ -7,6 +7,35 @@
 #
 # One row per proposal shown, declines included (proposal generated, panel or
 # page closed without using it).
+# == Schema Information
+#
+# Table name: answer_proposal_verdicts
+#
+#  id                     :bigint           not null, primary key
+#  decided_at             :datetime         not null
+#  edit_distance          :integer
+#  final_text_sha256      :string
+#  proposed_text_sha256   :string           not null
+#  provider               :string
+#  strategy_source        :string           not null
+#  verdict                :string           not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  persona_id             :string
+#  question_archetype_id  :bigint           not null
+#  question_occurrence_id :bigint
+#
+# Indexes
+#
+#  idx_on_question_archetype_id_strategy_source_verdic_589ef49dee  (question_archetype_id,strategy_source,verdict)
+#  index_answer_proposal_verdicts_on_question_archetype_id         (question_archetype_id)
+#  index_answer_proposal_verdicts_on_question_occurrence_id        (question_occurrence_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (question_archetype_id => question_archetypes.id)
+#  fk_rails_...  (question_occurrence_id => question_occurrences.id)
+#
 class AnswerProposalVerdict < ApplicationRecord
   VERDICTS = %w[accepted edited declined].freeze
   STRATEGY_SOURCES = %w[canned template ai].freeze

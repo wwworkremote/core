@@ -40,6 +40,7 @@ class GuidedSession < ApplicationRecord
   has_secure_token :session_token
   has_many :guided_session_events, dependent: :destroy
   has_many :reference_comparisons, dependent: :destroy
+  has_many :guided_session_replays, dependent: :destroy
   # Set once the session is materialized for Reference Comparison (ADR 009).
   belongs_to :scenario, optional: true
   # Entry seam (ADR 010): set when the session was started from a job posting.
