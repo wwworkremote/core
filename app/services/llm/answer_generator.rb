@@ -74,6 +74,15 @@ class LLM::AnswerGenerator
 
   def apply_answer(answer, source)
     @question.update!(answer_text: answer, answer_source: source)
+    record_proposal_verdict(answer, source)
     { success: true, answer: answer, source: source }
+  end
+
+  # TASK-127 AC#3: one value-free verdict per proposal shown. Non-blocking --
+  # analytics must never break answer generation.
+  def record_proposal_verdict(answer, source)
+    AnswerProposalVerdicts::Record.for_generated(@question, answer, source)
+  rescue StandardError => e
+    Rails.logger.warn "[AnswerProposalVerdicts] #{e.class}: #{e.message}"
   end
 end

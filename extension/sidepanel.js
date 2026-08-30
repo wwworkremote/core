@@ -568,7 +568,8 @@ function renderApplicationContext(context, fields) {
     const value = saved?.answer || suggestion.value || field.currentValue || '';
     const source = saved?.answer_source || suggestion.source;
     const answerId = `app-field-answer-${index}`;
-    return `<div class="app-field-row" data-field-key="${escapeHtml(field.key)}">
+    const proposed = suggestion.source === 'template' ? (suggestion.value || '') : '';
+    return `<div class="app-field-row" data-field-key="${escapeHtml(field.key)}" data-label="${escapeHtml(field.label)}" data-proposed="${escapeHtml(proposed)}">
       <div class="app-field-label"><label for="${answerId}"><span>${escapeHtml(field.label)}</span></label>${field.required ? '<b>*</b>' : ''}</div>
       <textarea class="app-field-answer" id="${answerId}" rows="2">${escapeHtml(value)}</textarea>
       <div class="app-field-actions"><span class="app-field-source">${mapping ? `mapped → ${escapeHtml(mapping.semantic_key)}` : (saved ? 'provided' : source)}</span>
@@ -616,6 +617,10 @@ function renderApplicationContext(context, fields) {
         btn.textContent = 'Filled ✓';
         row.querySelector('.app-field-source').textContent = 'provided';
         setStatus(`${response.field.label} provided and tracked`, 'var(--green)');
+        // TASK-127: record what happened to a template proposal (fire-and-forget).
+        if (row.dataset.proposed && btn.dataset.source === 'template') {
+          recordAnswerProposalVerdict(row.dataset.label, row.dataset.proposed, value);
+        }
         setTimeout(() => { btn.textContent = 'Fill'; }, 1500);
       });
     });
@@ -652,6 +657,22 @@ async function recordApplicationFieldObservations(state) {
         page_url: state.pageUrl, context: { required: field.required, current_value: !!field.currentValue },
       })) }),
   });
+}
+
+// TASK-127 AC#3: value-free record of what happened to a template proposal.
+// Fire-and-forget; the server hashes the text and keeps only sha256 + distance.
+async function recordAnswerProposalVerdict(questionText, proposedText, finalText) {
+  try {
+    const { base: apiBase, authHeader } = await getApiConfig();
+    const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+    await fetch(`${apiBase}/api/v0/answer_proposal_verdicts`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ answer_proposal_verdict: {
+        question_text: questionText, strategy_source: 'template',
+        proposed_text: proposedText, final_text: finalText,
+      } }),
+    });
+  } catch (_) { /* analytics must never break the fill */ }
 }
 
 // ── Application lifecycle (TASK-78) ─────────────────────────────────────────

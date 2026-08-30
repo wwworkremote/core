@@ -329,6 +329,7 @@ Rails.application.routes.draw do
       resource :profile, only: %i[show update], controller: "profile"
       get "application_insights" => "application_insights#index"
       resources :extension_error_events, only: [:create]
+      resources :answer_proposal_verdicts, only: [:create]
       resources :application_answer_templates, only: %i[index create update]
       resource :outcomes, only: [], controller: "outcomes" do
         post :indeed

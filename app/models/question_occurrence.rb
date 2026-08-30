@@ -60,6 +60,7 @@ class QuestionOccurrence < ApplicationRecord
   belongs_to :user_job_posting, optional: true
   belongs_to :guided_session, optional: true
   belongs_to :question_archetype, optional: true
+  has_many :answer_proposal_verdicts, dependent: :nullify
 
   validates :raw_prompt, :normalized_prompt, :question_kind, :source_kind, :observed_at, presence: true
   validates :source_kind, inclusion: { in: SOURCE_KINDS }

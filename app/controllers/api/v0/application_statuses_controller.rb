@@ -53,11 +53,31 @@ class Api::V0::ApplicationStatusesController < ApiController
   # answers are left alone so re-marking doesn't relabel a `canned` answer the
   # user copied verbatim as if they'd written it themselves.
   def store_answer(answer)
-    question = job_posting.application_questions
-                          .find_or_initialize_by(user: current_api_user, question_text: answer[:question])
-    return false if question.answer_text == answer[:answer]
+    question = find_question(answer[:question])
+    return if question.answer_text == answer[:answer]
 
-    question.update!(answer_text: answer[:answer], answer_source: "submitted")
+    submit_answer(question, answer[:answer])
+  end
+
+  def submit_answer(question, final)
+    proposed = question.answer_text
+    question.update!(answer_text: final, answer_source: "submitted")
+    resolve_proposal_verdict(question, proposed, final)
+    question
+  end
+
+  def find_question(text)
+    job_posting.application_questions.find_or_initialize_by(user: current_api_user, question_text: text)
+  end
+
+  # TASK-127: the submitted answer vs the proposal that preceded it -- both in
+  # hand only here, so edit distance is measured now. Non-blocking.
+  def resolve_proposal_verdict(question, proposed, final)
+    return if proposed.blank?
+
+    AnswerProposalVerdicts::Record.resolve(question, proposed_text: proposed, final_text: final)
+  rescue StandardError => e
+    Rails.logger.warn "[AnswerProposalVerdicts] #{e.class}: #{e.message}"
   end
 
   def status_payload(record)
