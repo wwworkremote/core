@@ -5,7 +5,20 @@
     <h1 class="text-3xl font-black tracking-tight text-white mb-1"><%= @lead.title.presence || "(untitled)" %></h1>
     <p class="text-slate-500 font-bold text-sm"><%= @lead.company_name %></p>
   </div>
-  <div>
+  <div class="flex items-center gap-3">
+    <% posting = @lead.job_posting %>
+    <% if posting&.target_url.present? %>
+      <% user_job = current_user.user_job_postings.find_by(job_posting: posting) %>
+      <% sessions = user_job ? user_job.guided_sessions.order(started_at: :desc) : [] %>
+      <% if sessions.any? %>
+        <%= link_to guided_session_path(sessions.first), class: "text-xs font-bold text-primary hover:underline" do %>
+          <%= pluralize(sessions.size, "guided session") %> · resume latest
+        <% end %>
+      <% end %>
+      <%= button_to "Start supervised application",
+                    start_supervised_application_job_posting_path(posting),
+                    class: "btn-neural text-sm bg-primary/20 text-primary border border-primary/20" %>
+    <% end %>
     <%= link_to admin_leads_path, class: "btn-neural text-sm" do %>
       Back
     <% end %>
