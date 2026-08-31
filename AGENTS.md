@@ -19,13 +19,15 @@
               (target_closed); needs a hands-on retest without Claude-in-
               Chrome attached, then likely a SW-state-persistence fix.
 
-  Operational state (checked 2026-08-31): job-finding half stable + running —
-  dev server up, ingestion live (~49 postings/day), 12 recurring jobs
-  scheduled, AI matching hourly, dashboard renders. Queue clean: 0 failed /
-  0 ready (TASK-84 closed — cleared 445 macOS-sleep-pruned failed jobs).
+  Operational state (verified 2026-08-31): job-finding half stable + running —
+  dev server up (200), ingestion live (~49 postings/day, 259 untriaged waiting),
+  12 recurring jobs scheduled, AI matching hourly, dashboard renders. Queue
+  FULLY clean: 0 failed / 0 ready / 0 pending, 8 workers alive.
 
   Done 2026-08-31: TASK-138 (research mode DOM-only, ext 1.36.1); TASK-126
-  closed; TASK-84 closed.
+  closed; TASK-84 closed (cleared 445 sleep-pruned failed jobs + 2 April
+  orphans); TASK-140 filed (Low — bin/wwwr status "Pending documents" is a
+  dead counter, not a real backlog).
   Done 2026-08-30: first real-browser dogfood (works); llama3.2 RSpec flake
   root-fixed (TASK-111/137); GHA cut to one job on main; handoff mechanism
   moved to AGENTS.md.
