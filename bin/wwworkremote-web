@@ -12,8 +12,17 @@ APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$APP_ROOT"
 
 export PATH="$HOME/.local/share/mise/shims:$PATH"
-export RUBY_DEBUG_OPEN="true"
-export RUBY_DEBUG_LAZY="true"
 export PORT="${PORT:-31000}"
 
+# This is a non-interactive launchd service: no TTY to attach rdbg to, and a
+# stray `debugger`/`binding.break` would suspend the whole process forever with
+# nobody to connect (silent wedge, KeepAlive never fires). Skip it here; use
+# `bin/dev` for a debuggable server. Likewise SKIP_OTEL — the OTLP exporter's
+# background thread + fork-safety mutexes are a hang surface not worth carrying
+# for a dev web process. See TASK-141.
+export SKIP_OTEL="1"
+
+# ponytail: env-only mitigation for the recurring silent Puma wedge; if the
+# server still wedges with these gone, the cause is elsewhere (cable/thread
+# exhaustion, a blocking gem) — see TASK-141.
 exec bundle exec puma -C config/puma.rb
