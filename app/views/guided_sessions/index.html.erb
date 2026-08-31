@@ -7,6 +7,17 @@
     Supervised laps through employer application flows. Read-only &mdash; starting or completing
     a session never advances a posting's pipeline state on its own.
   </p>
+
+  <%= form_with model: GuidedSession.new(purpose: "application_research"),
+                class: "mt-6 flex flex-col sm:flex-row gap-3 sm:items-center" do |form| %>
+    <%= form.url_field :source_url, required: true, autofocus: true,
+          placeholder: "Paste a job posting URL to start a lap…",
+          class: "input input-bordered flex-1 bg-white/5 border-white/10 text-white" %>
+    <%= form.select :purpose,
+          [["Research the flow", "application_research"], ["Work toward applying", "application_execution"]],
+          {}, class: "select select-bordered bg-white/5 border-white/10 text-white" %>
+    <%= form.submit "Start", class: "btn btn-primary rounded-xl font-bold shrink-0" %>
+  <% end %>
 </div>
 
 <div class="bg-base-200 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
