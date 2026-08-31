@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-08-31
+     CURRENT FOCUS  —  last updated 2026-08-31 (session 2)
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -9,32 +9,51 @@
 
   In flight: guided-session → datalake capture loop. Architecture is
   spec-locked (wayfinder doc-7 / ADR 010 / docs/architecture/datalake.md).
-  Engine is built; needs one real supervised-application run.
+  Engine is built; entry points now wired (top-nav + inline URL form, this
+  session). Still needs one real supervised-application run.
 
   Live tasks (Backlog MCP):
     TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay)
               need Mike at the keyboard, ideally vs a real ATS. In Progress.
-              THE blocker between "built" and "useful".
+              THE blocker between "built" and "useful". Mike attempted a
+              dogfood this session; blocked by TASK-141 (server wedge).
+    TASK-141  (High, In Progress) dev web service com.wwworkremote.web wedges
+              silently — puma holds the socket but stops answering; launchd
+              KeepAlive + puma worker_timeout both blind to it. MITIGATED:
+              cluster mode (8f76b536) + WebHealthWatchdogJob every-minute
+              recovery (fb6825a1). Root cause still open (nio4r / ActionCable-
+              in-puma / Ruby 4.0; a 60s malformed GET /cable; why the debug
+              gem session is active at all). Full trail: task comments.
     TASK-139  (Med) execution chrome.debugger dies before the 2nd capture
               (target_closed); needs a hands-on retest without Claude-in-
               Chrome attached, then likely a SW-state-persistence fix.
 
-  Operational state (verified 2026-08-31): job-finding half stable + running —
-  dev server up (200), ingestion live (~49 postings/day, 259 untriaged waiting),
-  12 recurring jobs scheduled, AI matching hourly, dashboard renders. Queue
-  FULLY clean: 0 failed / 0 ready / 0 pending, 8 workers alive.
+  Operational state (verified 2026-08-31 session 2): dev server up (200),
+  now runs puma cluster mode (master + 1 worker) via bin/wwworkremote-web,
+  with the watchdog recurring job self-healing wedges in ~2-3 min. Ingestion
+  live, 13 recurring jobs scheduled (watchdog added), AI matching hourly,
+  dashboard renders. Build fingerprint now visible in the page footer.
 
-  Done 2026-08-31: TASK-138 (research mode DOM-only, ext 1.36.1); TASK-126
-  closed; TASK-84 closed (cleared 445 sleep-pruned failed jobs + 2 April
-  orphans); TASK-140 filed (Low — bin/wwwr status "Pending documents" is a
-  dead counter, not a real backlog).
-  Done 2026-08-30: first real-browser dogfood (works); llama3.2 RSpec flake
-  root-fixed (TASK-111/137); GHA cut to one job on main; handoff mechanism
-  moved to AGENTS.md.
+  Done 2026-08-31 session 2 (8 commits, unpushed — ee80b9bb, 28d01514,
+  f540efb5, 7fa74b34, 6a82e4ed, 8f76b536, 57261744, fb6825a1):
+    - guided sessions: promoted to top nav + inline paste-URL start form
+    - build stamp (git SHA + date + env) in every page footer
+    - docs/applying-with-the-harness.md — operator runbook, posting link →
+      submitted application, marks automated vs by-hand vs not-built
+    - TASK-141 filed, diagnosed (thread dump), mitigated (cluster + watchdog)
+  Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140
+  filed.
+
+  External (NOT repo work, no artifact here): Indeed profile cleanup via
+  Claude-in-Chrome — deduped work history (4 dupes), fixed titles to canonical,
+  set $180k/yr salary floor, fixed work-area categories, added GitHub/site
+  links. Mike still owes: upload the right archetype resume PDF, trim the
+  200+ auto-skill tags, add ActiveCampaign (Sep-Dec 2018), reconcile the
+  EMR-Bear entry vs canonical.
 
   Blocked on Mike: GitHub Actions billing (Settings → Billing & plans) —
-  nothing runs in CI until cleared. No deploy mechanism exists (kamal
-  unconfigured); deploy is out of scope.
+  nothing runs in CI until cleared. Push decision on the 8 local commits.
+  No deploy mechanism exists (kamal unconfigured); deploy is out of scope.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
@@ -42,7 +61,8 @@
   content in the public just3ws.github.io). See memory feedback_stay_in_this_repo.
 
   Deep handoff: ~/.config/adots/handoffs/2026-08-30-wwworkremote-guided-session.md
-  (local-only, never commit).
+  (local-only, never commit) — NOT yet updated for session 2; this block is
+  the current truth.
 -->
 
 # WWWorkRemote: Agent Configuration
