@@ -159,6 +159,9 @@
           <p class="text-xs opacity-50 text-right font-bold">
             &copy; <%= Time.current.year %> &mdash; <%= t('.footer.tagline') %>
           </p>
+          <p class="text-[10px] opacity-40 text-right font-mono" title="Running build">
+            build <%= app_build_info %> &middot; <%= Rails.env %>
+          </p>
         </aside>
       </footer>
     <% end %>
