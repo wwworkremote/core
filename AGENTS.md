@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-08-30
+     CURRENT FOCUS  —  last updated 2026-08-31
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -8,26 +8,28 @@
      ═══════════════════════════════════════════════════════════════════════
 
   In flight: guided-session → datalake capture loop. Architecture is
-  spec-locked (wayfinder doc-7 / ADR 010 / docs/architecture/datalake.md);
-  remaining work is implementation + validation.
+  spec-locked (wayfinder doc-7 / ADR 010 / docs/architecture/datalake.md).
+  Engine is built; needs one real supervised-application run.
 
   Live tasks (Backlog MCP):
     TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay)
               need Mike at the keyboard, ideally vs a real ATS. In Progress.
-    TASK-138  (High) application_research screenshot always fails —
-              captureVisibleTab needs <all_urls>/activeTab. Decide the fix.
-    TASK-139  (Med) execution chrome.debugger dies before the 2nd capture;
-              needs a hands-on retest without Claude-in-Chrome attached.
-    TASK-126  raw-asset capture — AC#4 gap tracked by 138/139; else done.
+              THE blocker between "built" and "useful".
+    TASK-139  (Med) execution chrome.debugger dies before the 2nd capture
+              (target_closed); needs a hands-on retest without Claude-in-
+              Chrome attached, then likely a SW-state-persistence fix.
 
-  Done 2026-08-30: first real-browser dogfood of the loop (works — see
-  TASK-126 comment #2); llama3.2 RSpec flake root-fixed (TASK-111/137);
-  GitHub Actions cut to one job on main (ci.yml); handoff mechanism moved
-  here from CLAUDE.md so every tool sees it.
+  Done 2026-08-31: TASK-138 — research mode is now DOM-only (dropped the
+  always-failing captureVisibleTab path); TASK-126 closed. ext 1.36.1.
+  Done 2026-08-30: first real-browser dogfood (works); llama3.2 RSpec flake
+  root-fixed (TASK-111/137); GHA cut to one job on main; handoff mechanism
+  moved to AGENTS.md.
 
   Blocked on Mike: GitHub Actions billing (Settings → Billing & plans) —
   nothing runs in CI until cleared. No deploy mechanism exists (kamal
   unconfigured); deploy is out of scope.
+
+  Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
   Deep handoff: ~/.config/adots/handoffs/2026-08-30-wwworkremote-guided-session.md
   (local-only, never commit).

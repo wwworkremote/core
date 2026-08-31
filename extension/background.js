@@ -247,15 +247,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 
-  // TASK-126: content scripts can't call chrome.tabs.captureVisibleTab; the
-  // guided-session recorder asks the worker for a viewport screenshot here.
-  if (msg.type === 'CAPTURE_VISIBLE_TAB') {
-    chrome.tabs.captureVisibleTab(chrome.windows.WINDOW_ID_CURRENT, { format: 'png' })
-      .then(dataUrl => sendResponse({ dataUrl }))
-      .catch(error => sendResponse({ error: error.message }));
-    return true;
-  }
-
   // TASK-134: application_execution guided sessions attach chrome.debugger for
   // HAR bodies + full-page screenshots. content.js calls ATTACH before each
   // capture (idempotent, re-attaches after a service-worker restart).

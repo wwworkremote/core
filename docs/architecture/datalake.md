@@ -10,14 +10,16 @@ the decision record is [ADR 010](../adr/010-link-to-application-capture-and-the-
 **Built:** `POST /api/guided_sessions/:session_token/datalake_assets` (`Api::DatalakeAssetsController`,
 `Rails.env.local?` only) + `Datalake::AssetStore` (files under `data/datalake/sessions/<token>/`,
 Rails-owned `manifest.json`, per-asset seq / event id / sha256 / bytes, gap entries). The extension
-captures a content-script **DOM snapshot + viewport screenshot per emitted `GuidedSessionEvent`**
+captures a content-script **DOM snapshot per emitted `GuidedSessionEvent`**
 (fire-and-forget; a failure records a manifest gap, never breaks the session); each event carries a
-`datalake_asset_seqs` pointer back. For `application_execution` sessions (the purpose rides the
+`datalake_asset_seqs` pointer back. `application_research` sessions are **DOM only** — a viewport
+screenshot needs `<all_urls>`/`activeTab`, which the web-UI-launched guided flow never grants
+(TASK-138). For `application_execution` sessions (the purpose rides the
 tracked URL as `guided_session_purpose`) `background.js` also attaches `chrome.debugger` and, per
 event, POSTs a **HAR with response bodies** and a **full-page screenshot** (`Page.captureScreenshot`
-`captureBeyondViewport`) in place of the viewport shot — TASK-134. `chrome.debugger` `onDetach`
+`captureBeyondViewport`) — TASK-134. `chrome.debugger` `onDetach`
 (DevTools opened) marks the remaining transitions as `har` / `screenshot` gaps and the session
-finishes on the light path. `rake datalake:sandbox_walkthrough` proves both bundle shapes.
+finishes DOM-only. `rake datalake:sandbox_walkthrough` proves both bundle shapes.
 
 **Pending:** the first concrete `Datalake::Extractor` subclass (a question-graph DOM
 extractor) and its enqueue-on-read + "still extracting" wiring — the `Datalake::Bundle`
@@ -110,12 +112,21 @@ data/datalake/                      # git-ignored, machine-local, never synced
   |---|---|---|
   | DOM | content-script `Element.getHTML` (open shadow roots + same-origin frames) | same |
   | Network | — | full HAR incl. response bodies, via `chrome.debugger` + CDP |
-  | Screenshot | `captureVisibleTab` (viewport) | full-page, via CDP `Page.captureScreenshot` |
+  | Screenshot | — (see below) | full-page, via CDP `Page.captureScreenshot` |
   | Banner | none | per-tab "started debugging this browser" banner |
 
-  `chrome.debugger` yields when DevTools opens on the tab (`onDetach`); the session
-  degrades to the light path and records the gap. Mike can override the per-purpose
-  default. The extension needs **no new permissions**.
+  `chrome.debugger` yields when DevTools opens on the tab (`onDetach`); the execution
+  session then records `har` / `screenshot` gaps for the remaining transitions and
+  finishes DOM-only. Mike can override the per-purpose default. The extension needs
+  **no new permissions**.
+
+  **Research mode is DOM-only (TASK-138).** `chrome.tabs.captureVisibleTab` requires
+  `<all_urls>` or an `activeTab` grant; a guided session starts from the localhost
+  web UI and the user navigates directly, so the extension action is never invoked
+  and `activeTab` is never granted. Rather than record a guaranteed screenshot gap on
+  every event, research mode simply doesn't attempt one — the DOM snapshot is the
+  value. Adding `<all_urls>` was rejected: it widens passive exposure on every site
+  for a capture the execution path already covers via CDP.
 - **Failure is never fatal**: a capture error emits an `EXTENSION_ERROR` event and a
   `gaps[]` entry; the guided session continues.
 

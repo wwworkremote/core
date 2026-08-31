@@ -5,13 +5,13 @@
 # GuidedSessionEvent, a failed capture landing as a gap, every event pointed
 # back at its assets. Runs both purposes: an application_execution bundle
 # carries har + full-page screenshot asset types (the chrome.debugger path),
-# an application_research bundle carries only the light set (no har, no
-# debugger banner). Rails-side simulation; the real extension path is
-# dogfooded separately.
+# an application_research bundle is DOM only (TASK-138: a viewport screenshot
+# needs <all_urls>/activeTab, which the guided flow never grants). Rails-side
+# simulation; the real extension path is dogfooded separately.
 class Datalake::SandboxWalkthrough
   SANDBOX_URL = "https://boards.greenhouse.io/dl-sandbox/jobs/1"
   KINDS = %w[page_arrived application_page_arrived submission_attempted].freeze
-  LIGHT = %w[dom screenshot].freeze
+  LIGHT = %w[dom].freeze
   HEAVY = %w[dom har screenshot].freeze
 
   def self.call = new.call
