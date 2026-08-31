@@ -34,13 +34,14 @@
   live, 13 recurring jobs scheduled (watchdog added), AI matching hourly,
   dashboard renders. Build fingerprint now visible in the page footer.
 
-  Done 2026-08-31 session 2 (8 commits, unpushed — ee80b9bb, 28d01514,
-  f540efb5, 7fa74b34, 6a82e4ed, 8f76b536, 57261744, fb6825a1):
+  Done 2026-08-31 session 2 (pushed, main @ 36365d81):
     - guided sessions: promoted to top nav + inline paste-URL start form
     - build stamp (git SHA + date + env) in every page footer
     - docs/applying-with-the-harness.md — operator runbook, posting link →
       submitted application, marks automated vs by-hand vs not-built
     - TASK-141 filed, diagnosed (thread dump), mitigated (cluster + watchdog)
+    - CI now MANUAL ONLY (workflow_dispatch) — no auto runs while GHA billing
+      is disabled; hit "Run workflow" for a full-suite check when needed
   Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140
   filed.
 
@@ -52,8 +53,9 @@
   EMR-Bear entry vs canonical.
 
   Blocked on Mike: GitHub Actions billing (Settings → Billing & plans) —
-  nothing runs in CI until cleared. Push decision on the 8 local commits.
-  No deploy mechanism exists (kamal unconfigured); deploy is out of scope.
+  CI is manual-only now so this blocks nothing day-to-day, but a "Run
+  workflow" click still won't execute until billing is restored. No deploy
+  mechanism exists (kamal unconfigured); deploy is out of scope.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
