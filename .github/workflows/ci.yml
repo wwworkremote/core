@@ -1,19 +1,19 @@
 name: CI
 
-# Solo project -- run the whole suite once, on main, after work lands.
-# The fast feedback loop is already covered locally by overcommit:
-#   pre-commit : RuboCop (-a) + working-tree-scoped RSpec + ESLint
-#   pre-push   : Brakeman
-# CI does the one thing local hooks don't: the *entire* test suite, plus a
-# belt-and-braces RuboCop / Brakeman / bundler-audit in case something was
-# pushed with --no-verify.
+# Solo project, and GitHub Actions billing is disabled on this account
+# (Settings -> Billing & plans) -- automatic runs just fail in 4s with a
+# billing error and cost nothing but noise. So CI is MANUAL ONLY: it runs
+# only when someone hits "Run workflow" (workflow_dispatch).
 #
-# To check a branch before merging, hit "Run workflow" (workflow_dispatch)
-# or run `bin/ci` locally.
+# Everyday coverage is local:
+#   overcommit pre-commit : RuboCop (-a) + working-tree-scoped RSpec + ESLint
+#   overcommit pre-push   : Brakeman
+#   bin/ci                : full suite via act (needs Docker)
+# This workflow is the one thing those don't give cheaply: the *entire* test
+# suite on a clean machine. Trigger it before a risky merge, or after billing
+# is restored, or delete the file if CI is never coming back.
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
