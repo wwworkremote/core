@@ -1,3 +1,35 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CURRENT FOCUS  —  last updated 2026-08-30, main @ b8ba49d8
+     This block is the cold-start resume state. Whoever closes a session
+     updates it (the whole block, in place) before wrapping up. If it
+     contradicts reality, trust `git log` + Backlog and fix the block.
+     ═══════════════════════════════════════════════════════════════════════
+
+  In flight: guided-session → datalake capture loop. Architecture is
+  spec-locked (wayfinder doc-7 / ADR 010 / docs/architecture/datalake.md);
+  remaining work is implementation + validation.
+
+  Live tasks (Backlog MCP):
+    TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay)
+              need Mike at the keyboard, ideally vs a real ATS. In Progress.
+    TASK-138  (High) application_research screenshot always fails —
+              captureVisibleTab needs <all_urls>/activeTab. Decide the fix.
+    TASK-139  (Med) execution chrome.debugger dies before the 2nd capture;
+              needs a hands-on retest without Claude-in-Chrome attached.
+    TASK-126  raw-asset capture — AC#4 gap tracked by 138/139; else done.
+
+  Done 2026-08-30: first real-browser dogfood of the loop (works — see
+  TASK-126 comment #2); llama3.2 RSpec flake root-fixed (TASK-111/137);
+  GitHub Actions cut to one job on main (ci.yml).
+
+  Blocked on Mike: GitHub Actions billing (Settings → Billing & plans) —
+  nothing runs in CI until cleared. No deploy mechanism exists (kamal
+  unconfigured); deploy is out of scope.
+
+  Full detail: ~/.config/adots/handoffs/2026-08-30-wwworkremote-guided-session.md
+  (local-only, never commit). How-to-resume: docs/agents/session-handoff.md.
+-->
+
 ## System identity
 
 This is `wwworkremote/core` — the private job-market-intelligence and application-automation
@@ -34,8 +66,9 @@ job-fit scoring via `bin/wwwr match`, never by re-implementing it.
 ## Agent skills
 
 ### Resuming a session
-Newest file in `~/.config/adots/handoffs/` is the cross-session handoff (local-only,
-never commit). See `docs/agents/session-handoff.md` for how to pick up in-flight work.
+The **CURRENT FOCUS** block at the top of this file is the cold-start state — read it first.
+`docs/agents/session-handoff.md` has the full resume procedure; the deep handoff is a
+local-only file it names. Closing a session = update the CURRENT FOCUS block before wrapping.
 
 ### Issue tracker
 GitHub Issues via `gh` CLI. See `docs/agents/issue-tracker.md`.
