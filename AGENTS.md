@@ -60,6 +60,9 @@
   canonical (it's on Indeed, not in the resume); contact location shows
   Crystal Lake IL vs resume's Chicago IL. Do NOT click Indeed's "Review
   suggestions" / "Sync to profile" — it re-adds duplicate work experience.
+  Workflow codified: `indeed-profile-sync` skill + `indeed-profile-auditor`
+  subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
+  resume changes or Mike takes/leaves a role.
 
   Blocked on Mike: nothing outstanding. (GHA billing is moot now — CI removed.)
   No deploy mechanism exists (kamal unconfigured); deploy is out of scope.

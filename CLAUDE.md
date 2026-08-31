@@ -67,6 +67,9 @@ Use the `backlog-audit` skill (or the `backlog-audit-agent` subagent for a conte
 ### Onboarding a new direct-hiring company board
 Use the `direct-hiring-board-verify` skill and `bin/verify_board` to confirm a new ADP/Workday/Greenhouse/Lever tenant slug actually works before adding it to `db/seeds.rb` or a Query's boards list.
 
+### Keeping the Indeed profile current
+Use the `indeed-profile-sync` skill to reconcile Mike's `profile.indeed.com` profile against the canonical resume data (`Resume::Source`, from just3ws) — when his resume changes, he starts/leaves a role, or for a periodic refresh. It carries the browser-automation gotchas (Indeed's React date `<select>`s need a JS native-setter; never click "Approve all" on the "Review suggestions" sync flow — it re-adds duplicate work experience). For a context-isolated gap analysis, the `indeed-profile-auditor` subagent diffs a saved profile snapshot against canonical and returns a punch list.
+
 ### Local interop with other on-box tools/agents
 Other local tools (e.g. the just3ws CLI) that need job-fit scoring should call `bin/wwwr match <job_posting_id> --source=<name> [--escalate]` rather than re-implementing scoring against a separate resume copy — reads are unrestricted, `--escalate` gates the one write path (an LLM call). See `docs/agents/interop.md`.
 
