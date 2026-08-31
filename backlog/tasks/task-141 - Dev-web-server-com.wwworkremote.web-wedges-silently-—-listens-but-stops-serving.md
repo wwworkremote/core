@@ -3,10 +3,10 @@ id: TASK-141
 title: >-
   Dev web server (com.wwworkremote.web) wedges silently — listens but stops
   serving
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-08-31 14:58'
-updated_date: '2026-08-31 15:08'
+updated_date: '2026-08-31 16:38'
 labels:
   - infra
   - dev-env
@@ -74,5 +74,29 @@ created: 2026-08-31 15:08
 **Recommended mitigation (not yet applied — needs Mike's ok):** run `com.wwworkremote.web` in puma **cluster mode** (`WEB_CONCURRENCY=1`, `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`) with a short `worker_timeout` (~120s) via a new `PUMA_WORKER_TIMEOUT` env knob in `config/puma.rb`. The master then SIGKILLs + respawns a wedged worker in ~2 min instead of a permanent hang. `bin/dev` stays single-mode (unaffected; keeps the 3600s timeout for breakpoints). Doesn't fix root cause but bounds the outage to ~2 min and makes the box usable for the job search. Root cause (nio4r/cable/Ruby 4.0) stays open under this task.
 
 Manual recovery meanwhile: `launchctl kickstart -k gui/$(id -u)/com.wwworkremote.web`
+---
+
+author: claude (session_01WGSW36NJ)
+created: 2026-08-31 15:42
+---
+**Cluster-mode mitigation applied — commit 8f76b536.** `com.wwworkremote.web` now runs puma master + 1 worker, `PUMA_WORKER_TIMEOUT=120`, `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`. `bin/dev` untouched.
+
+**30-min soak: no wedge.** Monitor hit `/guided_sessions` every 45s for 30 min — zero failures, worker never reaped (uptime == master). Previous config wedged within ~7-15 min. Not conclusive (soak load was light — unclear how much LLM-chat / Turbo-broadcast traffic ran), but a clear improvement.
+
+Plausible that the fork genuinely helps, not just bounds the outage: the forked worker does NOT inherit the 3 app-boot threads that live in the master (`DEBUGGER__::SESSION@server`, `sshkit` connection-pool eviction loop, `rack-mini-profiler` cleanup) — puma logs them as `WARNING: Detected 3 Thread(s) started in app boot`. If one of those was part of the wedge, the worker is now clean of it.
+
+**Still open:** confirm under real dogfooding load; identify the 60s malformed `GET /cable`; decide whether to chase the `debug` gem session (why is it activated at all?) and the sshkit-in-web-boot (kamal) as cleanups worth doing regardless.
+---
+
+author: claude (session_01WGSW36NJ)
+created: 2026-08-31 16:38
+---
+**Cluster-mode `worker_timeout` confirmed insufficient.** Wedged again ~1h16m after the 8f76b536 restart; master never reaped the worker (worker uptime == master uptime). The wedge doesn't stop the worker's heartbeat pipe write, so puma's master never times it out. Cluster mode stays (harmless, and the fork does drop the 3 stray boot threads) but it is not the recovery mechanism.
+
+**Watchdog shipped — commit fb6825a1.** `WebHealthWatchdogJob`, recurring `every minute` in the jobs process (unaffected by the web wedge). HEADs `http://127.0.0.1:31000/robots.txt` through puma's full accept path; after 2 consecutive misses (tracked in `tmp/web_watchdog_consecutive_failures`) runs `launchctl kickstart -k gui/<uid>/com.wwworkremote.web`. Guards: `Rails.env.local?` + `launchctl list com.wwworkremote.web` succeeds, so it no-ops in CI and never fights a `bin/dev` puma. 4 specs. Verified live: registered in the scheduler, runs on schedule, 0 failures, no-ops against a healthy server.
+
+**Net effect:** a wedge now self-recovers in ~2–3 min (2 missed probes + ~20s cluster boot) instead of hanging until someone notices. Root cause (native selector / ActionCable-in-puma / Ruby 4.0; the 60s malformed `GET /cable`; why the `debug` gem session is even active) still unidentified — task stays open for that, but the box is usable for the job search now.
+
+Files: `app/jobs/web_health_watchdog_job.rb`, `spec/jobs/web_health_watchdog_job_spec.rb`, `config/recurring.yml`, `config/puma.rb`, `bin/wwworkremote-web`.
 ---
 <!-- COMMENTS:END -->
