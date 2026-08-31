@@ -15,6 +15,7 @@ diagrams, not just source. This file itself is best read there.
 - **[Architecture](architecture.md)**: Subsystems, data flow, and "Solid" stack.
 - **[Component Overview](architecture/component-overview.md)**: Diagram of how the major pieces collaborate.
 - **[Pipeline Statechart](architecture/pipeline-statechart.md)**: The three independent state machines behind "what happened to this posting."
+- **[Applying with the Harness](applying-with-the-harness.md)**: Operator runbook — one job link to a submitted application, step by step, marking what's automated vs by-hand vs not-built.
 - **[Application Sequence](architecture/application-sequence.md)**: One posting's journey, start to finish, as a sequence diagram.
 - **[Human Task Pipeline](architecture/human-task-pipeline.md)**: BPMN-lite Service Task/User Task split for AI-proposed, human-approved decisions (persona picks, drafted answers).
 - **[Guided Session Flow](architecture/guided-session-flow.md)**: BPMN-lite Mermaid validation scheme for supervised posting-to-application laps, approval gates, and loop-back.

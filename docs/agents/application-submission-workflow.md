@@ -1,5 +1,9 @@
 # Agent playbook: URL to submitted application
 
+> For the **human-at-the-keyboard** version of this pipeline — using the guided-session UI
+> and the extension rather than API calls and browser automation — see
+> [`../applying-with-the-harness.md`](../applying-with-the-harness.md).
+
 Repeatable, human-gated procedure for taking a real job posting URL through to a
 submitted application. Live-tested end-to-end 2026-08-27 against
 `https://www.linkedin.com/jobs/view/4454299285/` (Karias Health, JobPosting #6828) —
