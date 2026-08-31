@@ -1,4 +1,10 @@
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     COLD-START RESUME STATE lives in the CURRENT FOCUS block at the top of
+     >>> AGENTS.md <<<  — canonical for every agent tool. Read it first.
+     Closing a session = rewrite that block in AGENTS.md, then commit.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
 <!-- BACKLOG.MD MCP GUIDELINES START -->
 
 <CRITICAL_INSTRUCTION>
