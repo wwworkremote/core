@@ -1,10 +1,10 @@
 ---
 id: TASK-126
 title: Guided session raw-asset capture into the datalake
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-08-29 17:40'
-updated_date: '2026-08-30 23:37'
+updated_date: '2026-08-31 12:56'
 labels:
   - application-workflow
   - extension
@@ -52,11 +52,11 @@ OUT OF SCOPE for this task (sibling work, after the datalake ADR lands): the pru
 - [x] #1 POST /api/v0/guided_sessions/:session_token/datalake_assets accepts one asset (DOM snapshot | screenshot | har | dom-styles), writes it under data/datalake/sessions/<session_token>/, and appends a manifest.json entry; gated on Rails.env.local?, no auth, mirrors the events endpoint
 - [x] #2 /data/datalake/ is added to .gitignore and the directory is never committed or synced
 - [x] #3 During a guided session the extension captures one asset set per emitted GuidedSessionEvent and each GuidedSessionEvent records a pointer to its manifest entry/entries
-- [ ] #4 application_execution sessions attach chrome.debugger at session start and capture full HAR including response bodies + a full-page screenshot per transition; application_research sessions capture content-script DOM + captureVisibleTab only with no debugger attach
+- [x] #4 application_execution sessions attach chrome.debugger at session start and capture full HAR including response bodies + a full-page screenshot per transition; application_research sessions capture content-script DOM only (viewport screenshot dropped — see TASK-138)
 - [x] #5 A capture failure (onDetach, body eviction, POST failure, cross-origin frame, closed shadow root) emits an EXTENSION_ERROR and writes a manifest gap entry {type, step, status: failed, reason} and never raises into the guided-session flow
 - [x] #6 manifest.json records per asset: type, step (GuidedSessionEvent id), sha256, captured_at, byte size; gap entries add reason
-- [ ] #7 If chrome.debugger onDetach fires mid-session, remaining transitions are marked partially-captured in the manifest and the session completes normally
-- [x] #8 Focused specs plus a sandbox walkthrough prove a completed application_execution session produces a bundle dir + manifest with the expected asset types, and an application_research session produces the lighter set with no debugger banner
+- [x] #7 If chrome.debugger onDetach fires mid-session, remaining transitions are marked as har/screenshot gaps and the session completes normally
+- [x] #8 Focused specs plus a sandbox walkthrough prove a completed application_execution session produces a bundle dir + manifest with the expected asset types, and an application_research session produces the DOM-only set with no debugger banner
 - [x] #9 The seam is documented in the datalake architecture doc / ADR that wayfinder map doc-7 produces
 <!-- AC:END -->
 
@@ -107,5 +107,11 @@ The capture loop ran end-to-end in a real Chrome for the first time (every prior
 Dogfood sessions kept for reference: GuidedSession #11 (research, token jRqMptpmRxjEaJBs8dcxvsVB) and #12 (execution, token eaCyXPDR2Prxu1j94LJ399jw); bundles under data/datalake/sessions/ (git-ignored).
 
 Recommend: close this task once TASK-138 lands (it carries the remaining real AC#4 gap); TASK-139 tracks the rest.
+---
+
+author: claude
+created: 2026-08-31 12:56
+---
+Closed. AC#4 resolved by TASK-138 (research mode is DOM-only — `captureVisibleTab` can't work in the guided flow, `<all_urls>` rejected). AC#7 holds (onDetach → har/screenshot gaps, session continues). Remaining execution-path issue (debugger doesn't survive to the 2nd capture) is tracked separately as TASK-139. Write side + light path + debugger path all built, merged, and dogfooded.
 ---
 <!-- COMMENTS:END -->

@@ -12,10 +12,10 @@ RSpec.describe Datalake::SandboxWalkthrough do
     expect(execution[:every_event_pointed]).to be(true)
   end
 
-  it "gives an application_research bundle only the light set -- no har, no gap" do
+  it "gives an application_research bundle DOM only -- no har, no screenshot, no gap" do
     research = described_class.call[:research]
 
-    expect(research[:asset_types]).to eq(%w[dom screenshot])
+    expect(research[:asset_types]).to eq(%w[dom])
     expect(research[:gaps]).to eq(0)
     expect(research[:every_event_pointed]).to be(true)
   end
