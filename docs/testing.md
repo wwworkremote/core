@@ -33,12 +33,18 @@ We enforce strict architectural boundaries and code style:
 - **Architecture**: `bundle exec packwerk check`
 - **Security**: `bin/brakeman`
 
-## ✅ Local CI
+## ✅ Full check before a risky change
 
-WWWorkRemote supports running the full GitHub Actions pipeline locally using `act`. This is recommended before any major architectural push.
+There is no CI service (solo project, GitHub Actions retired). The everyday loop
+runs in the Overcommit hooks: RuboCop + working-tree-scoped RSpec + ESLint on
+commit, Brakeman on push. Before a large or risky change, run the whole thing on
+a clean tree yourself:
 
 ```bash
-# Run all CI jobs locally
-bin/ci
+bundle exec rubocop
+bundle exec brakeman -q -n -w2
+bundle exec bundle-audit check --update
+bin/rails db:test:prepare && bin/rails tailwindcss:build
+bundle exec rails runner 'puts :ok'
+RAILS_ENV=test bundle exec rspec spec packages/ingestion/spec
 ```
-*Prerequisite: Docker must be running.*

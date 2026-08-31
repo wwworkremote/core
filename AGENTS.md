@@ -40,8 +40,9 @@
     - docs/applying-with-the-harness.md — operator runbook, posting link →
       submitted application, marks automated vs by-hand vs not-built
     - TASK-141 filed, diagnosed (thread dump), mitigated (cluster + watchdog)
-    - CI now MANUAL ONLY (workflow_dispatch) — no auto runs while GHA billing
-      is disabled; hit "Run workflow" for a full-suite check when needed
+    - CI REMOVED — deleted .github/workflows/ci.yml + bin/ci (GHA billing
+      disabled, solo project). Checks = overcommit hooks + a manual full-suite
+      run before risky changes (docs/testing.md). No CI service exists.
   Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140
   filed.
 
@@ -52,10 +53,8 @@
   200+ auto-skill tags, add ActiveCampaign (Sep-Dec 2018), reconcile the
   EMR-Bear entry vs canonical.
 
-  Blocked on Mike: GitHub Actions billing (Settings → Billing & plans) —
-  CI is manual-only now so this blocks nothing day-to-day, but a "Run
-  workflow" click still won't execute until billing is restored. No deploy
-  mechanism exists (kamal unconfigured); deploy is out of scope.
+  Blocked on Mike: nothing outstanding. (GHA billing is moot now — CI removed.)
+  No deploy mechanism exists (kamal unconfigured); deploy is out of scope.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 

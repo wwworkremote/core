@@ -33,7 +33,6 @@ Access the dashboard at `http://localhost:31000`.
 | :--- | :--- |
 | `bin/dev` | Start the Falcon app server and workers. |
 | `bin/setup` | Idempotent system bootstrap. |
-| `bin/ci` | Run full quality pipeline locally via `act`. |
 | `bin/update-geoip` | Download latest MaxMind databases. |
 | `bundle exec rspec` | Run the test suite. |
 

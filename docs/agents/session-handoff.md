@@ -37,8 +37,9 @@ three) is deliberate: three copies rot.
 ## Rules that outlive any one handoff
 
 - Handoff files under `~/.config/adots/handoffs/` are **local-only — never `git add`**.
-- CI is one job on push to `main` only (`.github/workflows/ci.yml`); the fast loop is
-  local overcommit hooks. Don't re-expand the workflow without a reason.
+- There is no CI service — GitHub Actions was retired (billing disabled, solo project).
+  All checks are local overcommit hooks + a manual full-suite run before risky changes
+  (see `docs/testing.md`). Don't add a workflow back without a reason.
 - Bounded Agency: nothing fills or submits a real application without Mike's explicit action.
 - Architecture for the guided-session / datalake arc is spec-locked — `wayfinder doc-7`,
   `ADR 010`, `docs/architecture/datalake.md`. Implementation proceeds as normal Backlog work.

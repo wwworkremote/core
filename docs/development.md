@@ -10,9 +10,9 @@ Ensure your system has the following core dependencies:
 - **PostgreSQL 16+**: Must support `pgvector` and `pg_trgm`.
 - **Node.js**: Required for Tailwind and Ingestion scripts.
 - **llama.cpp**: A local LLM server must be running at `http://localhost:11500`.
-- **Docker (via Colima)**: Optional. Only required for running local CI via `act` or building the
-  optional container images in `docker-compose.yml` -- `bin/dev` itself runs Puma/SolidQueue/
-  Tailwind directly against host PostgreSQL with no Colima/Docker involvement.
+- **Docker (via Colima)**: Optional. Only required for building the optional container images in
+  `docker-compose.yml` -- `bin/dev` itself runs Puma/SolidQueue/Tailwind directly against host
+  PostgreSQL with no Colima/Docker involvement.
 
 ## 🚀 Local Setup
 

@@ -1,7 +1,6 @@
 # Not used by bin/dev -- the actual dev loop (Procfile.dev) runs Puma/
 # SolidQueue/Tailwind directly against host Postgres with zero Colima/Docker
-# involvement. This file exists for optional containerized builds and
-# bin/ci (act) only.
+# involvement. This file exists for optional containerized builds only.
 services:
   web:
     build:

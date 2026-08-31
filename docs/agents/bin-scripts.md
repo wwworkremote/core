@@ -113,8 +113,6 @@ All of these are read-mostly and safe to run against development; none should be
 - **`bin/update-geoip`** — refreshes the MaxMind GeoIP database used by `geocoder`.
 - **`bin/docker-entrypoint`** — container boot script (pidfile cleanup, migrate-on-boot). Docker
   only, not for local dev.
-- **`bin/ci`** — runs GitHub Actions locally via `act`, for testing workflow changes before
-  pushing.
 - **`bin/lint_extension`** — lints `extension/**/*.js`; also runs automatically as a pre-commit
   hook.
 - **`bin/rspec-precommit`** — the suite runner Overcommit's `PreCommit::RSpec` hook invokes. Not
