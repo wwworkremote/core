@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-08-31 (session 2)
+     CURRENT FOCUS  —  last updated 2026-08-31 (session 3)
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -7,16 +7,28 @@
      and fix the block. Full procedure: docs/agents/session-handoff.md
      ═══════════════════════════════════════════════════════════════════════
 
-  In flight: guided-session → datalake capture loop. Architecture is
-  spec-locked (wayfinder doc-7 / ADR 010 / docs/architecture/datalake.md).
-  Engine is built; entry points now wired (top-nav + inline URL form, this
-  session). Still needs one real supervised-application run.
+  In flight: nothing half-built. The guided-session → datalake loop got its
+  first real supervised-application run this session (Basis / Lever — see
+  below). Job search itself is now the active thread: Basis applied, Vanguard
+  warm-lead in progress.
 
   Live tasks (Backlog MCP):
-    TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay)
-              need Mike at the keyboard, ideally vs a real ATS. In Progress.
-              THE blocker between "built" and "useful". Mike attempted a
-              dogfood this session; blocked by TASK-141 (server wedge).
+    TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay).
+              First real run done vs Basis/Lever this session, but Lever isn't
+              first-class (TASK-143) so it was thin. Still wants a clean run
+              on a supported ATS (Greenhouse) with a full annotate/approve/
+              replay pass. In Progress.
+    TASK-143  (Med, NEW) guided harness has no first-class Lever support — the
+              submit-block is hardcoded to the sandbox's `#application-form`,
+              and Lever drops the `?guided_session_token` query string on the
+              `/apply` navigation, so on Lever the harness *records* the lap
+              (DOM/HAR/page-arrivals) but does NOT gate the submit. Ingestion
+              side already works. Full scope in the task.
+    TASK-142  (Low, NEW) `bin/verify_claude_assets` / the ClaudeAssets
+              pre-commit hook is pre-broken on main — it follows the ~38
+              `.agents/skills` symlinks under `.claude/skills/` which lack
+              `metadata.version`. Any commit touching `.claude/` needs
+              `SKIP=ClaudeAssets` until fixed.
     TASK-141  (High, In Progress) dev web service com.wwworkremote.web wedges
               silently — puma holds the socket but stops answering; launchd
               KeepAlive + puma worker_timeout both blind to it. MITIGATED:
@@ -28,23 +40,48 @@
               (target_closed); needs a hands-on retest without Claude-in-
               Chrome attached, then likely a SW-state-persistence fix.
 
-  Operational state (verified 2026-08-31 session 2): dev server up (200),
-  now runs puma cluster mode (master + 1 worker) via bin/wwworkremote-web,
-  with the watchdog recurring job self-healing wedges in ~2-3 min. Ingestion
-  live, 13 recurring jobs scheduled (watchdog added), AI matching hourly,
-  dashboard renders. Build fingerprint now visible in the page footer.
+  Operational state (verified 2026-08-31 session 3): dev server up (200, fast),
+  puma cluster mode + watchdog recurring job self-healing wedges in ~2-3 min.
+  Ingestion live, 13 recurring jobs, AI matching hourly, dashboard renders.
 
-  Done 2026-08-31 session 2 (pushed, main @ 36365d81):
-    - guided sessions: promoted to top nav + inline paste-URL start form
-    - build stamp (git SHA + date + env) in every page footer
-    - docs/applying-with-the-harness.md — operator runbook, posting link →
-      submitted application, marks automated vs by-hand vs not-built
-    - TASK-141 filed, diagnosed (thread dump), mitigated (cluster + watchdog)
-    - CI REMOVED — deleted .github/workflows/ci.yml + bin/ci (GHA billing
-      disabled, solo project). Checks = overcommit hooks + a manual full-suite
-      run before risky changes (docs/testing.md). No CI service exists.
-  Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140
-  filed.
+  Job search — applications tracked:
+    Basis, "Sr Software Engineer - Basis Platform / DSP" (Lever) — JP #7068,
+      UJP #268 = applied, PipelineStep #999 (resume archetype + both Q&A
+      answers + the Lever "error verifying" retry noted), GuidedSession #18
+      completed. Direct contact also engaged. US+remote confirmed in the JD;
+      the "Toronto, ON" line was just where the req is filed. Was auto-ignored
+      on promote (bad remote flag + blank company) — restored + fixed.
+    Vanguard — warm lead via a former colleague (ex-OMF, ran the OTel WG after Mike,
+      actively pulling to get him in). Company #1112. Two reqs already
+      ingested 2026-08-25: JP #6740 "AI Enablement, Specialist" (Charlotte NC,
+      UJP #250 favorited, NOT match-scored — this is likely the referrer's target;
+      maps to Mike's enablement track); JP #6747 "Lead Backend Engineer -
+      Mobile APIs" (auto-ignored). Both flagged remote=false / Charlotte —
+      could be a bad extract like Basis, or genuine RTO (Vanguard is
+      in-office-heavy) → a relocation/hybrid question for Mike + [redacted-name], not a
+      filter question. Session ended with Mike still deciding; open offers to
+      him: match-score #6740, restore #6747 + recheck remote flags, log the
+      the referrer referral as a PipelineStep on #250, maybe wire the
+      vanguardjobs.com board.
+
+  NEW standing criterion (memory feedback_culture_fit_over_comp, 2026-08-31):
+  weight team/culture/belonging fit ABOVE marginal comp — a warmer lower-comp
+  role should rank above a colder higher one. Mike + [redacted-name] explicitly prefer
+  "appreciated for less" over "not, for a bit more". The $200k base floor
+  still holds; this is about weighing everything above it. Not yet reflected
+  in LLM::ProfileMatcher — that's a build task if Mike wants it.
+
+  Done 2026-08-31 session 3 (pushed, main @ c220a057 + this block commit):
+    - indeed-profile-sync skill + indeed-profile-auditor agent (cfaf1f45)
+    - "Start supervised application" button on the admin Lead page (fed55f9e,
+      c220a057) — second entry to guided_sessions#create_from_posting
+    - first real guided-session dogfood (Basis/Lever) — surfaced TASK-143
+    - TASK-142 / TASK-143 filed
+  Done 2026-08-31 session 2 (main @ 36365d81): guided-session top-nav + inline
+  URL form; build stamp in footer; docs/applying-with-the-harness.md; TASK-141
+  filed+mitigated (cluster mode + WebHealthWatchdogJob); CI removed entirely
+  (ci.yml + bin/ci deleted).
+  Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140.
 
   External (NOT repo work, no artifact here): Indeed profile — full pass done
   via Claude-in-Chrome, now in good shape. 15-entry work history deduped +
@@ -64,17 +101,19 @@
   subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
   resume changes or Mike takes/leaves a role.
 
-  Blocked on Mike: nothing outstanding. (GHA billing is moot now — CI removed.)
-  No deploy mechanism exists (kamal unconfigured); deploy is out of scope.
+  Blocked on Mike: pick what to do with the Vanguard lead (4 options above).
+  Everything else is unblocked. GHA billing is moot (CI removed). No deploy
+  mechanism exists (kamal unconfigured); deploy is out of scope.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
   DO NOT touch other repos from a wwworkremote/core session (esp. never commit
   content in the public just3ws.github.io). See memory feedback_stay_in_this_repo.
 
-  Deep handoff: ~/.config/adots/handoffs/2026-08-30-wwworkremote-guided-session.md
-  (local-only, never commit) — NOT yet updated for session 2; this block is
-  the current truth.
+  Deep handoff: ~/.config/adots/handoffs/2026-08-31-wwworkremote-session3.md
+  (local-only, never commit). Earlier sessions:
+  ~/.config/adots/handoffs/2026-08-30-wwworkremote-guided-session.md.
+  This block is the current truth if they disagree.
 -->
 
 # WWWorkRemote: Agent Configuration
