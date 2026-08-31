@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-08-31 14:58'
+updated_date: '2026-08-31 15:08'
 labels:
   - infra
   - dev-env
@@ -45,3 +46,33 @@ Fix is `launchctl kickstart -k gui/$(id -u)/com.wwworkremote.web`.
 - Service plists: `~/Library/LaunchAgents/com.wwworkremote.{web,jobs}.plist` (user LaunchAgents, `runatload` + `keepalive`). Registered by `bin/wwworkremote-ctl`.
 - `com.wwworkremote.jobs` (SolidQueue supervisor, PID stable since 08-27) has NOT shown this problem — web only.
 <!-- SECTION:DESCRIPTION:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+author: claude (session_01WGSW36NJ)
+created: 2026-08-31 15:08
+---
+**Diagnosis pass 1 — 2026-08-31.**
+
+**Mitigation f540efb5 did NOT work.** With `SKIP_OTEL=1` and rdbg env removed, the server still wedged ~7 min after restart. So OTel exporter and rdbg are ruled out as the primary cause.
+
+**Thread dump of the wedged process** (`kill -INFO <pid>`, output in `~/.local/state/wwworkremote/web.log`):
+- All 5 `puma srv tp` worker threads: **idle**, waiting on `@not_empty` condvar (`thread_pool.rb:236`). Not stuck in app code.
+- `puma srv` thread: in `IO.select` inside `handle_servers` (`server.rb:361`).
+- `puma reactor`: in `NIO::Selector#select`.
+- One inbound TCP connection to :31000 accepted but never dispatched to a worker.
+- ActionCable `StreamEventLoop` thread present and in its own `NIO::Selector#select`.
+- Also live (harmless, but noise): a `DEBUGGER__::Session@server` thread (debug gem session still activated despite env removal — source of `RUBY_DEBUG_OPEN` not yet found; not in .env, plist, launchctl env, or repo outside bin/dev), and an `sshkit` connection-pool eviction loop (kamal pulls sshkit into the web boot).
+
+**Signature = puma stopped accepting/dispatching, app itself not deadlocked.** Classic 'the reactor/accept loop wedged' — not worker-pool exhaustion (workers were idle).
+
+**Correlated symptom in `log/development.log`:** every 60s exactly, a malformed `GET /cable` (`HTTP_UPGRADE` and `HTTP_CONNECTION` both empty) → `Failed to upgrade to WebSocket`. Source not identified (not in bin/, crontab, extension, or context-engine). Also seen: occasional 3-4s requests (`ActiveRecord: 3110ms, 27 queries`).
+
+**Environment factor:** Ruby **4.0.6** (bleeding edge) + `nio4r` native selectors used by BOTH puma's reactor and ActionCable's in-process event loop. A native-selector incompatibility on Ruby 4.0 is a live hypothesis and could be upstream.
+
+**Recommended mitigation (not yet applied — needs Mike's ok):** run `com.wwworkremote.web` in puma **cluster mode** (`WEB_CONCURRENCY=1`, `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`) with a short `worker_timeout` (~120s) via a new `PUMA_WORKER_TIMEOUT` env knob in `config/puma.rb`. The master then SIGKILLs + respawns a wedged worker in ~2 min instead of a permanent hang. `bin/dev` stays single-mode (unaffected; keeps the 3600s timeout for breakpoints). Doesn't fix root cause but bounds the outage to ~2 min and makes the box usable for the job search. Root cause (nio4r/cable/Ruby 4.0) stays open under this task.
+
+Manual recovery meanwhile: `launchctl kickstart -k gui/$(id -u)/com.wwworkremote.web`
+---
+<!-- COMMENTS:END -->
