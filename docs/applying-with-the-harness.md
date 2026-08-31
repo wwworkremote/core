@@ -22,12 +22,14 @@ There are two ways in, and they are **not** the same. This is the thing that isn
 
 ### A. From a posting already in the system — *use this to actually apply*
 
-`/job_postings/:id` → **"Start supervised application"** (right sidebar, "Supervised
-application" card).
+**"Start supervised application"** — same button, two places:
+- `/job_postings/:id`, right sidebar "Supervised application" card
+- `/admin/leads/:id` header, once the lead is promoted (skips the hop to the posting page)
 
 This creates a `UserJobPosting` if one doesn't exist, creates a `GuidedSession` with
 **purpose `application_execution`**, and **links the three together**. This is the only
 entry that connects the recording back to the posting, the company, and your pipeline.
+Both buttons POST to `guided_sessions#create_from_posting`.
 
 If the button says *"No application URL on this posting yet"*, the posting has no
 `target_url` — fix that on the posting first (re-capture, or edit it in).
