@@ -14,6 +14,14 @@ cd "$APP_ROOT"
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 export PORT="${PORT:-31000}"
 
+# Cluster mode with a short worker timeout so the master reaps + respawns a
+# wedged worker (~2 min) instead of the process hanging forever with the listen
+# socket held and launchd KeepAlive none the wiser. bin/dev stays single-mode.
+# Root cause still open -- see TASK-141.
+export WEB_CONCURRENCY="${WEB_CONCURRENCY:-1}"
+export PUMA_WORKER_TIMEOUT="${PUMA_WORKER_TIMEOUT:-120}"
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
 # This is a non-interactive launchd service: no TTY to attach rdbg to, and a
 # stray `debugger`/`binding.break` would suspend the whole process forever with
 # nobody to connect (silent wedge, KeepAlive never fires). Skip it here; use
@@ -22,7 +30,4 @@ export PORT="${PORT:-31000}"
 # for a dev web process. See TASK-141.
 export SKIP_OTEL="1"
 
-# ponytail: env-only mitigation for the recurring silent Puma wedge; if the
-# server still wedges with these gone, the cause is elsewhere (cable/thread
-# exhaustion, a blocking gem) — see TASK-141.
 exec bundle exec puma -C config/puma.rb
