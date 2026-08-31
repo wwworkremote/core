@@ -1,5 +1,13 @@
 # Unified Data Acquisition (API, Scrapers, ATS)
 development:
+  # TASK-141: recover the launchd web service when it silently wedges (puma
+  # holds the socket but stops answering; launchd KeepAlive can't see it).
+  # Runs in the jobs process; no-ops unless the com.wwworkremote.web agent is
+  # loaded, so it's dev-machine only and never touches CI.
+  web_health_watchdog:
+    class: WebHealthWatchdogJob
+    schedule: every minute
+
   fetch_all_jobs:
     class: DataAcquisition::RunAllJob
     schedule: every 6 hours
