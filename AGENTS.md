@@ -46,12 +46,20 @@
   Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140
   filed.
 
-  External (NOT repo work, no artifact here): Indeed profile cleanup via
-  Claude-in-Chrome — deduped work history (4 dupes), fixed titles to canonical,
-  set $180k/yr salary floor, fixed work-area categories, added GitHub/site
-  links. Mike still owes: upload the right archetype resume PDF, trim the
-  200+ auto-skill tags, add ActiveCampaign (Sep-Dec 2018), reconcile the
-  EMR-Bear entry vs canonical.
+  External (NOT repo work, no artifact here): Indeed profile — full pass done
+  via Claude-in-Chrome, now in good shape. 15-entry work history deduped +
+  titles/dates aligned to the just3ws canonical resume (bullets filled from
+  canonical highlights); ActiveCampaign + Tandem added; current role company
+  "Independent" → "Self-employed"; summary replaced with the new archetype
+  resume's version. Preferences: the comp floor, Remote+Hybrid+In-person,
+  work-area categories fixed, blue-collar "work schedule" pref deleted. Skills
+  curated 178 → 49. Old "0 to 1" resume deleted; Mike uploaded the Principal
+  Systems Architect archetype PDF; sync-suggestions reviewed (summary accepted,
+  the ~10 duplicate work-exp suggestions + a bogus "MCP" cert dismissed).
+  Open (Mike's judgement, not mechanical): reconcile the EMR-Bear entry vs
+  canonical (it's on Indeed, not in the resume); contact location shows
+  Crystal Lake IL vs resume's Chicago IL. Do NOT click Indeed's "Review
+  suggestions" / "Sync to profile" — it re-adds duplicate work experience.
 
   Blocked on Mike: nothing outstanding. (GHA billing is moot now — CI removed.)
   No deploy mechanism exists (kamal unconfigured); deploy is out of scope.
