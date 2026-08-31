@@ -1,8 +1,9 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-08-30, main @ b8ba49d8
+     CURRENT FOCUS  —  last updated 2026-08-30
      This block is the cold-start resume state. Whoever closes a session
-     updates it (the whole block, in place) before wrapping up. If it
-     contradicts reality, trust `git log` + Backlog and fix the block.
+     rewrites it (the whole block, in place) before wrapping up. `git log`
+     + Backlog are the source of truth for exact SHAs / task status; if
+     this block contradicts them, trust them and fix the block.
      ═══════════════════════════════════════════════════════════════════════
 
   In flight: guided-session → datalake capture loop. Architecture is
