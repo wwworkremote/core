@@ -33,6 +33,10 @@ job-fit scoring via `bin/wwwr match`, never by re-implementing it.
 
 ## Agent skills
 
+### Resuming a session
+Newest file in `~/.config/adots/handoffs/` is the cross-session handoff (local-only,
+never commit). See `docs/agents/session-handoff.md` for how to pick up in-flight work.
+
 ### Issue tracker
 GitHub Issues via `gh` CLI. See `docs/agents/issue-tracker.md`.
 
