@@ -5,7 +5,7 @@ status: Done
 assignee:
   - mike@just3ws.com
 created_date: '2026-09-02 16:44'
-updated_date: '2026-09-02 17:10'
+updated_date: '2026-09-02 17:23'
 labels:
   - job-search
   - llm
@@ -93,6 +93,10 @@ Note: docs/agents/changelog.md does not exist; the changelog lives at docs/chang
 Live generation against the local model was NOT exercised -- Ollama was not running during this session (orchestrator returned connection errors). The generation path is byte-for-byte the ArtifactGenerator pattern (proven in production) with the orchestrator stubbed in specs. Prompt assembly WAS run against the real Basis posting (JP #7068 / UJP #268): title, company_name=Basis, 5563-char body, 12 ranked experiences, prior match_analysis, standing criteria, and the 'omit the referral section' line (no Contact linked) all present, 31k chars total, within the local model's 32k context.
 
 Final targeted sweep: 104 examples, 0 failures across interview_prep_generator_spec, prompt_builder_spec, user_job_postings_spec, job_postings_spec, and job_ingestion_flow_spec (the last one is the flake that failed the pre-commit full-suite run; passes standalone). Follow-up commit d3457a2b used --no-verify for that reason -- rationale in the commit message.
+
+UPDATE 2026-09-02: live end-to-end run completed. The local model server (llama.cpp on :11500, provider `local`) was actually up. Generated a real 9127-char pack for the Basis posting (UJP #268) -- all 7 sections, referral section correctly omitted ('Section omitted as no referral is listed'), comp reality check present ([posted band] vs the comp floor), grounded in real history (Rails, OpenTelemetry, legacy modernization, prompt-injection defense, ADRs), no fabricated titles/employers. Verified rendering on the live page https://wwworkremote.localhost/job_postings/7068: markdown sections, 'Generated N ago', copy + Regenerate + Edit form all present.
+
+Quality on the local 7B: usable scaffold, weaker than the hand-written reference -- generic in places, invents minor team detail not in the posting, undersells the React experience, no specific project names (Speedfunds/CookieOverflow/ReachLocal). This is the signal the models.yml comment predicts for pointing defaults.interview_prep at a stronger model -- blocked on TASK-145 (LLM::Orchestrator fails on the Gemini provider, filed this session).
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary

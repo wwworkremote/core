@@ -39,17 +39,29 @@ class LLM::InterviewPrepGenerator::PromptBuilder
       with these sections, in this order:
       1. THE SETUP -- role summary, team, stack, and an honest reality check on comp/level
          against the candidate's standing criteria (call out an under-level plainly).
-      2. YOUR STORY -- a 90-second first-person narrative arc connecting the candidate's real
+      2. DOMAIN PRIMER -- the industry knowledge this role assumes, every item driven by the
+         JOB_POSTING (responsibilities, stack, team, the business the product serves) and
+         ordered by how strongly the posting signals it. Cover: (a) what this business does,
+         how it makes money, where THIS role sits in that flow; (b) the concepts and vocabulary
+         a person in this seat is expected to know -- one plain-language line each, split into
+         "MUST know for this interview" vs "useful context"; (c) domain best practices an
+         interviewer expects the candidate to reach for; (d) blind spots -- what this domain
+         takes for granted that someone with the candidate's background (see History) would not
+         know to ask about, and why each matters here; (e) learning resources: name canonical
+         sources (standards body / spec, a cited book, official docs, a landmark paper or post),
+         URL only when certain, else just name it -- prefix "Verify links before relying on them".
+         Keep it tight; this is interview prep, not a textbook.
+      3. YOUR STORY -- a 90-second first-person narrative arc connecting the candidate's real
          history to why this role, ending on what they want next.
-      3. COMPANY HOOKS -- 4-6 specific connections between the candidate's experience and this
+      4. COMPANY HOOKS -- 4-6 specific connections between the candidate's experience and this
          company/role, ranked; tell them to use the top 2-3.
-      4. THE REFERRAL PLAY -- how to use the internal connection. OMIT THIS SECTION ENTIRELY
+      5. THE REFERRAL PLAY -- how to use the internal connection. OMIT THIS SECTION ENTIRELY
          if no referral is listed below.
-      5. LIKELY QUESTIONS -- what they will probably ask, including questions that probe the
+      6. LIKELY QUESTIONS -- what they will probably ask, including questions that probe the
          candidate's real soft spots (title down-level, gaps, short stints); one-line angle each.
-      6. QUESTIONS TO ASK THEM -- including a leveling/comp probe and a culture probe, phrased
+      7. QUESTIONS TO ASK THEM -- including a leveling/comp probe and a culture probe, phrased
          as genuine curiosity.
-      7. NIGHT-BEFORE CHECKLIST -- concrete, checkable items.
+      8. NIGHT-BEFORE CHECKLIST -- concrete, checkable items.
 
       [CANDIDATE]
       Level: #{@profile.experience_level}

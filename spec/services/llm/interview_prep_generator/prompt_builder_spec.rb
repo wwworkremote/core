@@ -11,12 +11,20 @@ RSpec.describe LLM::InterviewPrepGenerator::PromptBuilder do
                              summary: "Legacy modernization", impact: "Killed a 4% drop", start_date: 1.year.ago)
   end
 
-  it "includes the posting, an experience, and the seven-section instruction" do
+  it "includes the posting, an experience, and the section instructions" do
     prompt = described_class.call(profile, job)
 
     expect(prompt).to include("Sr Engineer").and include("Basis").and include("Build the DSP.")
     expect(prompt).to include("Architect at OneMain")
     expect(prompt).to include("YOUR STORY").and include("NIGHT-BEFORE CHECKLIST")
+  end
+
+  it "instructs a posting-driven domain primer with learning resources and blind spots" do
+    prompt = described_class.call(profile, job)
+
+    expect(prompt).to include("DOMAIN PRIMER")
+    expect(prompt).to include("blind spots")
+    expect(prompt).to include("Verify links before relying on them")
   end
 
   it "names the linked referral contact when one exists" do
