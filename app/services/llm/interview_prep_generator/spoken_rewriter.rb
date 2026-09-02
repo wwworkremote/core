@@ -15,12 +15,19 @@ class LLM::InterviewPrepGenerator::SpokenRewriter
     Rewrite the pack above for read-aloud. Keep every section, in order, and every claim and
     recommendation. Change only formatting and word choice for speech.
 
-    Open with a YAML frontmatter block fenced by lines of three dashes:
-      title: the pack title, every word and acronym spelled out
-      pronunciation: a map of proper nouns and acronyms a speech engine could stumble on,
-        each to a spoken hint -- for example "DSP: D S P" and "Basis: BAY-sis"
-      sections: the ordered list of section names
-      spoken_minutes: your estimate of how long the pack takes to read aloud
+    Open with a YAML frontmatter block fenced by lines of exactly three dashes. It must be
+    valid YAML -- put every string value in double quotes, since titles and hints contain
+    colons and dashes:
+      title: "the pack title, every word and acronym spelled out"
+      pronunciation:
+        "DSP": "D S P"
+        "Basis": "BAY sis"
+        (one line per proper noun or acronym a speech engine could stumble on)
+      sections:
+        - "The Setup"
+        - "Domain Primer"
+        (the ordered section names, each quoted)
+      spoken_minutes: a bare number, your estimate at about one hundred fifty words per minute
 
     Then the pack, following these rules:
     - Spell out abbreviations and contractions everywhere, not just first use: "Senior" not
