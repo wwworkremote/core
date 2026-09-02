@@ -197,6 +197,10 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   sits, must-know vs useful-context vocabulary, domain best practices, the blind
   spots specific to this candidate's background, and learning resources (model-
   suggested, flagged "verify"). Prompt-only change; no live web research in v1.
+  Follow-up guardrails: "useful context" must be domain concepts not the
+  candidate's own stack; "blind spots" are domain assumptions not skill gaps;
+  every acronym is expanded and bound to the body that defines it (IAB Tech
+  Lab, W3C, an RFC, vendor docs), never a guessed URL.
 
 ## Where to look instead of re-reading this file
 

@@ -4,7 +4,8 @@
 # from a CareerProfile's structured experience, a JobPosting, stored Company
 # reputation intel, an existing match analysis, and any linked referral
 # Contact -- mirrors LLM::ArtifactGenerator::PromptBuilder's shape. The
-# section list tracks docs/research/interview-prep-basis-dsp.md.
+# section list tracks docs/research/interview-prep-basis-dsp.md. ClassLength
+# is waived in .rubocop_todo.yml -- the bulk here is one instruction string.
 class LLM::InterviewPrepGenerator::PromptBuilder
   PROMPT_KEY = "interview_prep_pack"
 
@@ -41,15 +42,26 @@ class LLM::InterviewPrepGenerator::PromptBuilder
          against the candidate's standing criteria (call out an under-level plainly).
       2. DOMAIN PRIMER -- the industry knowledge this role assumes, every item driven by the
          JOB_POSTING (responsibilities, stack, team, the business the product serves) and
-         ordered by how strongly the posting signals it. Cover: (a) what this business does,
-         how it makes money, where THIS role sits in that flow; (b) the concepts and vocabulary
-         a person in this seat is expected to know -- one plain-language line each, split into
-         "MUST know for this interview" vs "useful context"; (c) domain best practices an
-         interviewer expects the candidate to reach for; (d) blind spots -- what this domain
-         takes for granted that someone with the candidate's background (see History) would not
-         know to ask about, and why each matters here; (e) learning resources: name canonical
-         sources (standards body / spec, a cited book, official docs, a landmark paper or post),
-         URL only when certain, else just name it -- prefix "Verify links before relying on them".
+         ordered by how strongly the posting signals it. Cover:
+         (a) what this business does, how it makes money, where THIS role sits in that flow;
+         (b) the concepts and vocabulary a person in this seat is expected to know -- one
+             plain-language line each, split "MUST know for this interview" vs "useful context".
+             "useful context" means adjacent DOMAIN concepts, NOT the candidate's own tools or
+             stack (React, Kafka, OpenTelemetry, etc. belong in THE SETUP, never here);
+         (c) domain best practices an interviewer expects the candidate to reach for -- specific
+             to this domain, not generic engineering hygiene (CI/CD, code review, logging);
+         (d) blind spots -- things THIS DOMAIN assumes as background that the candidate's own
+             history (see History) would never have exposed them to, and why each matters here.
+             These are domain assumptions, NOT the candidate's missing skills or tools -- a gap
+             like "no React" is THE SETUP's job, not a blind spot;
+         (e) learning resources: name the authority for each (standards body, specification,
+             official docs, a widely-cited book or landmark paper). Give a URL only if you are
+             certain it resolves; a named authority always beats a guessed link. Prefix the
+             list "Verify links before relying on them".
+         Every acronym or abbreviation, anywhere in this section: expand it in full on first
+         use AND name the body or document that officially defines it -- e.g. "RTB (Real-Time
+         Bidding), defined by the IAB Tech Lab OpenRTB specification". If you cannot name a
+         real defining authority for a term, do not use the term.
          Keep it tight; this is interview prep, not a textbook.
       3. YOUR STORY -- a 90-second first-person narrative arc connecting the candidate's real
          history to why this role, ending on what they want next.
@@ -97,6 +109,8 @@ class LLM::InterviewPrepGenerator::PromptBuilder
       - Markdown. Second person ("you"), except the STORY section which is first person.
       - Every claim about the candidate must trace to the History above. No invented facts.
       - Be specific, not generic. Name real projects, real numbers, real people.
+      - Spell out every acronym on first use, pack-wide. In the DOMAIN PRIMER, also bind each
+        one to the authority that defines it (see that section). Never invent a URL.
     PROMPT
   end
 

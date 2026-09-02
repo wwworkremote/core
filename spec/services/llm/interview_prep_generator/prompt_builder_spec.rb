@@ -27,6 +27,20 @@ RSpec.describe LLM::InterviewPrepGenerator::PromptBuilder do
     expect(prompt).to include("Verify links before relying on them")
   end
 
+  it "guards the primer against stack-vs-domain and skill-gap-vs-blind-spot confusion" do
+    prompt = described_class.call(profile, job)
+
+    expect(prompt).to include("NOT the candidate's own tools or")
+    expect(prompt).to include("NOT the candidate's missing skills or tools")
+  end
+
+  it "requires every acronym bound to a defining authority, no invented URLs" do
+    prompt = described_class.call(profile, job)
+
+    expect(prompt).to include("name the body or document that officially defines it")
+    expect(prompt).to include("Never invent a URL")
+  end
+
   it "names the linked referral contact when one exists" do
     create(:contact, job_posting: job, name: "Beep", role: "Staff Engineer", relationship_type: "former colleague")
 
