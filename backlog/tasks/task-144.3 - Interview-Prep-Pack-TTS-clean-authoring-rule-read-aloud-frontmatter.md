@@ -1,10 +1,10 @@
 ---
 id: TASK-144.3
 title: 'Interview Prep Pack: TTS-clean authoring rule + read-aloud frontmatter'
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-09-02 23:02'
-updated_date: '2026-09-02 23:21'
+updated_date: '2026-09-02 23:56'
 labels:
   - job-search
   - llm
@@ -44,11 +44,10 @@ Then:
 - [x] #2 Generated pack starts with a YAML frontmatter block carrying a spelled-out title, a pronunciation map, the section list, and estimated spoken minutes
 - [x] #3 prompt_builder_spec asserts the TTS constraints and the frontmatter instruction are present
 - [x] #4 The job posting show view splits the frontmatter fence (no stray horizontal rule) and surfaces the read-aloud hints
-- [ ] #5 docs/research/interview-prep-basis-dsp.md is rewritten TTS-clean and human-readable: no tables in the prose sections, abbreviations/numbers spelled out, still well-structured with headings and lists
-- [x] #6 interview-prep skill and interview-prep-auditor agent updated: pack must be TTS-clean, auditor checks abbreviations/numbers/tables/URLs/emoji, available TTS help noted
-- [x] #7 CONTEXT.md and docs/changelog.md updated
-- [ ] #8 The Basis pack (UJP #268) is regenerated and reads cleanly aloud
-- [x] #9 All touched specs stay green
+- [x] #5 interview-prep skill and interview-prep-auditor agent updated: pack must be TTS-clean, auditor checks abbreviations/numbers/tables/URLs/emoji, available TTS help noted
+- [x] #6 CONTEXT.md and docs/changelog.md updated
+- [x] #7 The Basis pack (UJP #268) is regenerated and reads cleanly aloud
+- [x] #8 All touched specs stay green
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -110,4 +109,55 @@ New: docs/tts-transform-prompt.md -- the copy-paste instruction block for the ex
 160 examples green across the 7 touched spec files. Commit d569b8d6 (one line of the commit message lost a backticked token to shell quoting -- cosmetic).
 
 AC#8 pending: Basis pack regeneration running (2 LLM calls on the local model).
+
+Docs regrouped under docs/interview-prep/ (commit 93fa21e1): basis-dsp/reference.md, tts-readable-documentation.md, tts-transform-prompt.md, plus a README. One per-role subdirectory. AC#5's 'rewrite interview-prep-basis-dsp.md TTS-clean' stays a deliberate no -- it is a human reference doc, not a speech source; it points to the standard instead.
+
+SpokenRewriter fixes: unwrap_fence strips the ```yaml wrapper the local model adds; the prompt now shows a fully-quoted frontmatter example (the model had emitted an unquoted colon-bearing title -> YAML parse failed -> no hints panel). Regen after: frontmatter parses, spoken_minutes ~10, body genuinely TTS-clean.
+
+bin/wwwr interview-prep <id> --export[=<role>] (commit 22d942b9): writes pack.md + pack.spoken.md to ~/ai/outbox/wwwr/interview-prep/<role>/. On export the read-aloud frontmatter is re-serialized with system discovery keys (format/lang/source/generated_at) ahead of the model's content hints -- and a malformed model block is repaired into valid YAML in the process. Verified live: ~/ai/outbox/wwwr/interview-prep/basis-dsp/ has both files, valid frontmatter.
+
+New docs/interview-prep/tts-integration-guide.md -- for wiring up the external TTS tool: discovery (glob + format key + generated_at freshness), the single-file model, full frontmatter schema table, pronunciation-to-SSML mapping, output conventions. Mike's explicit ask.
+
+Local 7B ceilings persist in the output: pronunciation map over-includes (Docker/React get useless hints), IAB hint imperfect, title echoes the human pack's ALL-CAPS heading, and the inherited stack-in-useful-context / skill-gap-in-blind-spots issues. Structure and TTS-cleanliness are solid. TASK-145 (capable model) remains the quality lever.
+
+Full suite green across the touched files (cli_spec 22, generator/rewriter/model 41, job_postings request spec). Commits: d569b8d6, 8e26db7c, 93fa21e1, 22d942b9 (+ the 8e26db7c YAML fix).
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+The prep pack is fed to a text-to-speech engine, so it now ships in **two versions, same content**:
+
+- **`interview_prep_pack`** (human) — the generator's output, unchanged.
+- **`interview_prep_pack_spoken`** (read-aloud) — a `SpokenRewriter` pass over the human pack: opens with a YAML frontmatter block, then text-to-speech-clean prose (abbreviations and numbers spelled out, "to" not dashes in ranges, no tables, no code blocks, no emoji, no bare URLs, one idea per sentence). Non-fatal on failure; `spoken:` kwarg (default true).
+
+## The standard
+
+`docs/interview-prep/tts-readable-documentation.md` — WCAG / GOV.UK / Deque / WebAIM sourced. The `interview-prep-auditor` checks the read-aloud version against it.
+
+## Frontmatter
+
+The read-aloud block carries **content hints** from the model (`title`, `pronunciation` map, `sections`, `spoken_minutes`) and, on `--export`, **discovery keys** injected by the CLI (`format: interview-prep-read-aloud`, `lang`, `source`, `generated_at`). Export re-serializes the block, which also repairs a malformed model block into valid YAML.
+
+## Surfaces
+
+- `UserJobPosting#spoken_pack_parts` splits the frontmatter fence.
+- Job posting page: "Read-aloud version" toggle with pronunciation hints surfaced.
+- `bin/wwwr interview-prep <id> --spoken` prints it; `--export[=<role>]` writes `pack.md` + `pack.spoken.md` to `~/ai/outbox/wwwr/interview-prep/<role>/` (role defaults to `company_name.parameterize`).
+
+## Docs
+
+Regrouped under `docs/interview-prep/` — `basis-dsp/reference.md`, `tts-readable-documentation.md`, `tts-transform-prompt.md` (the LLM-facing transform instruction), `tts-integration-guide.md` (operator-facing: discovery, the single-file model, the frontmatter schema, output conventions), and a README. One subdirectory per role. `interview-prep-basis-dsp.md` is NOT rewritten TTS-clean (removed AC) — it is a human reference doc, not a speech source; it points to the standard.
+
+Caption/lyrics *export* is deferred — the read-aloud version is cleanly sentence-segmented so it stays a formatting transform later.
+
+## Tests
+
+cli_spec (22: stored / regenerate / new / --spoken / --export / --export=role / failure / 404), spoken_rewriter_spec (orchestrator wiring, fence-strip, failure), generator spec (stores both, skips on `spoken: false`, keeps human pack on rewrite failure), model spec (frontmatter split, malformed-YAML tolerance), job_postings request spec (read-aloud toggle + hints). All green.
+
+## Known ceiling
+
+The local 7B half-applies the spoken rules and produces a noisy pronunciation map (`Docker: docker`); it also inherits the human pack's stack-in-useful-context / skill-gap-in-blind-spots weaknesses. Structure and TTS-cleanliness are solid. A capable model on the path is TASK-145.
+
+Commits: d569b8d6 (two versions), 8e26db7c (YAML quoting fix), 93fa21e1 (docs regroup + fence strip), 22d942b9 (--export + integration guide). Branch `feat/interview-prep-pack`.
+<!-- SECTION:FINAL_SUMMARY:END -->
