@@ -19,7 +19,8 @@ top carrying pronunciation and structure hints.
 
 Hand the block below to the tool doing the transform. It is engine-agnostic: it applies
 whether that tool is an LLM orchestrating a speech engine, a thin wrapper over a TTS API, or
-a caption generator.
+a caption generator. For wiring the tool up — file discovery, the full frontmatter schema,
+output conventions — see [`tts-integration-guide.md`](tts-integration-guide.md).
 
 ---
 

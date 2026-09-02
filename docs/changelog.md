@@ -210,8 +210,12 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   `docs/interview-prep/tts-readable-documentation.md`. Consumed per
   `docs/interview-prep/tts-transform-prompt.md` — the read-aloud version is cleanly
   sentence-segmented so it can also feed closed captions or a lyrics transcript.
-  `bin/wwwr interview-prep <id> --spoken` prints it; the posting page shows it
-  under a "Read-aloud version" toggle with the pronunciation hints surfaced.
+  `bin/wwwr interview-prep <id> --spoken` prints it; `--export[=<role>]` writes
+  `pack.md` + `pack.spoken.md` (frontmatter carries `format` / `lang` / `source`
+  / `generated_at` for tool discovery) to `~/ai/outbox/wwwr/interview-prep/<role>/`.
+  The posting page shows the read-aloud version under a toggle with the
+  pronunciation hints surfaced. Wiring a text-to-speech tool:
+  `docs/interview-prep/tts-integration-guide.md`.
 - **Sep 2** — `interview-prep` skill + `interview-prep-auditor` agent + `bin/wwwr
   interview-prep` (TASK-144.2): the skill generates a pack then audits and
   grounds it (auditor punch list; `industry-intelligence-agent` verifies the

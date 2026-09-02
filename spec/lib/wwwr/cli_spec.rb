@@ -169,5 +169,39 @@ RSpec.describe Wwwr::CLI do
     it "reports an unknown posting id instead of raising" do
       expect { cli.run(%w[interview-prep 999999]) }.to output(/not found/).to_stdout
     end
+
+    describe "--export" do
+      let(:export_root) { Pathname(Dir.mktmpdir) }
+
+      before { stub_const("Wwwr::InterviewPrep::EXPORT_ROOT", export_root) }
+      after { FileUtils.remove_entry(export_root) }
+
+      it "writes both versions to a per-role subdirectory of the outbox" do
+        posting = create(:job_posting, company: "Basis Technologies")
+        create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human pack",
+                                  interview_prep_pack_spoken: "---\ntitle: \"P\"\n---\nspoken body")
+        allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+        expect {
+          cli.run(["interview-prep", posting.id.to_s, "--export"])
+        }.to output(/pack\.md.*pack\.spoken\.md/m).to_stdout
+
+        dir = export_root.join("basis-technologies")
+        expect(dir.join("pack.md").read).to eq("human pack")
+        spoken = dir.join("pack.spoken.md").read
+        expect(spoken).to start_with("---\n")
+        expect(spoken).to include("format: interview-prep-read-aloud").and include("spoken body")
+      end
+
+      it "uses an explicit --export=<role> name for the subdirectory" do
+        posting = create(:job_posting, company: "Basis Technologies")
+        create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "p")
+        allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+        cli.run(["interview-prep", posting.id.to_s, "--export=basis-dsp"])
+
+        expect(export_root.join("basis-dsp", "pack.md").read).to eq("p")
+      end
+    end
   end
 end

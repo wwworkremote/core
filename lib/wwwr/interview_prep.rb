@@ -1,25 +1,35 @@
 # frozen_string_literal: true
 
-# `bin/wwwr interview-prep <job_posting_id> [--regenerate] [--spoken]` --
-# prints the stored interview prep pack for a posting, or generates one.
-# `--spoken` prints the read-aloud version instead of the human one. Split
-# out of Wwwr::CLI to keep that class under Metrics/ClassLength. Single-user
-# app, so the pack is read/written against User.sole's UserJobPosting, same
+require "fileutils"
+
+# `bin/wwwr interview-prep <job_posting_id> [--regenerate] [--spoken] [--export[=<role>]]`
+# Prints the stored interview prep pack for a posting, or generates one.
+# `--spoken` prints the read-aloud version instead of the human one.
+# `--export` writes both versions to ~/ai/outbox/wwwr/interview-prep/<role>/
+# (role = the --export value, or the company name parameterized). Split out
+# of Wwwr::CLI to keep that class under Metrics/ClassLength. Single-user app,
+# so the pack is read/written against User.sole's UserJobPosting, same
 # assumption Wwwr::Interop already makes.
 class Wwwr::InterviewPrep
-  def self.call(posting, regenerate: false, spoken: false)
-    new(posting, regenerate, spoken).call
+  EXPORT_ROOT = Pathname(Dir.home).join("ai/outbox/wwwr/interview-prep")
+
+  def self.call(posting, regenerate: false, spoken: false, export: nil)
+    new(posting, regenerate, spoken, export).call
   end
 
-  def initialize(posting, regenerate, spoken)
+  def initialize(posting, regenerate, spoken, export)
     @posting = posting
     @regenerate = regenerate
     @spoken = spoken
+    @export = export
   end
 
   def call
     generate unless fresh_pack_exists?
-    @error || printed_pack
+    return @error if @error
+    return export_files if @export
+
+    printed_pack
   end
 
   private
@@ -33,6 +43,46 @@ class Wwwr::InterviewPrep
   def printed_pack
     stored = @spoken ? record&.interview_prep_pack_spoken : (@generated || record&.interview_prep_pack)
     stored.to_s.presence || missing_hint
+  end
+
+  def export_files
+    dir = EXPORT_ROOT.join(export_slug)
+    FileUtils.mkdir_p(dir)
+    written = export_map.filter_map { |name, body| write_file(dir, name, body) }
+    "Exported to #{dir}:\n#{written.join("\n")}"
+  end
+
+  def export_map
+    { "pack.md" => @generated || record&.interview_prep_pack,
+      "pack.spoken.md" => spoken_with_metadata }
+  end
+
+  # Re-serialize the read-aloud frontmatter: system discovery keys first
+  # (so a directory scan can identify and load the file), then the model's
+  # content hints. Also repairs a malformed model block into valid YAML.
+  def spoken_with_metadata
+    return if record&.interview_prep_pack_spoken.blank?
+
+    hints, body = record.spoken_pack_parts
+    "#{YAML.dump(discovery_keys.merge(hints))}---\n#{body}"
+  end
+
+  def discovery_keys
+    { "format" => "interview-prep-read-aloud", "lang" => "en-US",
+      "source" => @posting.target_url, "generated_at" => Time.current.utc.iso8601 }
+  end
+
+  def write_file(dir, name, body)
+    return if body.blank?
+
+    File.write(dir.join(name), body)
+    "  #{name} (#{body.bytesize} bytes)"
+  end
+
+  def export_slug
+    return @export if @export.is_a?(String)
+
+    (@posting.company_name.presence || "posting-#{@posting.id}").parameterize
   end
 
   def generate

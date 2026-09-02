@@ -35,7 +35,7 @@ diagrams, not just source. This file itself is best read there.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.
 
 ### Interview Prep
-- **[Interview prep docs](interview-prep/README.md)**: The prep pack feature — the read-aloud (text-to-speech) standard, the transform prompt for external TTS tooling, and one worked reference per role.
+- **[Interview prep docs](interview-prep/README.md)**: The prep pack feature — the read-aloud (text-to-speech) standard, the transform prompt for external TTS tooling, and one worked reference per role, plus the export-and-integration guide for wiring up a text-to-speech tool.
 
 ### Research Notes
 - **[Chrome built-in AI flags](research/chrome-built-in-ai-flags.md)**: Which browser AI flags help or interfere with the extension and guided-session dogfooding.

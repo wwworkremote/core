@@ -22,8 +22,19 @@ questions to ask, night-before checklist. It ships in two versions, same content
 | File | What it is |
 |---|---|
 | [`tts-readable-documentation.md`](tts-readable-documentation.md) | The standard the read-aloud version is authored to and the `interview-prep-auditor` checks against |
-| [`tts-transform-prompt.md`](tts-transform-prompt.md) | Copy-paste instruction block for whatever tool turns a `*_spoken` file into speech, closed captions, or a lyrics transcript |
+| [`tts-transform-prompt.md`](tts-transform-prompt.md) | Copy-paste instruction block for whatever tool turns a `pack.spoken.md` into speech, closed captions, or a lyrics transcript |
+| [`tts-integration-guide.md`](tts-integration-guide.md) | For wiring up that tool: where the files land, the single-file model, the frontmatter schema for discovery and pronunciation, output conventions |
 | `<role>/` | One subdirectory per role Mike interviews for |
+
+## Exporting a pack
+
+```bash
+bin/wwwr interview-prep <job_posting_id> --export[=<role>]
+```
+
+Writes `pack.md` (human) and `pack.spoken.md` (read-aloud, with discovery
+frontmatter) to `~/ai/outbox/wwwr/interview-prep/<role>/`. `<role>` defaults to
+the company name parameterized. These are generated artifacts outside the repo.
 
 ## Per-role subdirectories
 

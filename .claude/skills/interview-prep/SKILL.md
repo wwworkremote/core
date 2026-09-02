@@ -56,7 +56,8 @@ bin/wwwr interview-prep <job_posting_id> --regenerate
 ```
 
 Omit `--regenerate` to print what is already stored. Add `--spoken` to print the
-read-aloud version instead. `--regenerate` writes both versions.
+read-aloud version instead. Add `--export[=<role>]` to write both versions to
+`~/ai/outbox/wwwr/interview-prep/<role>/` (see `docs/interview-prep/tts-integration-guide.md`).
 
 **Done when:** a pack with all 8 sections exists and you have read it.
 
