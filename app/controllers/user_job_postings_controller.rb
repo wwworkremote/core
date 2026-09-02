@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserJobPostingsController < ApplicationController
-  before_action :set_job_posting, only: %i[create analyze_match generate_artifacts]
+  before_action :set_job_posting, only: %i[create analyze_match generate_artifacts generate_interview_prep]
 
   # COALESCE rather than plain applied_at: rows tracked before that column
   # existed have no date, and ordering on a bare NULL drops them all to one end
@@ -43,18 +43,12 @@ class UserJobPostingsController < ApplicationController
     redirect_back_or_to(user_job_postings_path, notice: "Job removed from your list.")
   end
 
-  def analyze_match
-    result = LLM::ProfileMatcher.call(current_user, @job_posting, force: forced?)
-    flash_llm_result(result, success: "AI alignment scan complete.", failure: "Scan failed")
-    redirect_back_or_to(job_posting_path(@job_posting))
-  end
+  # Thin POST-and-redirect wrappers over an LLM service -- see #run_llm.
+  def analyze_match = run_llm(LLM::ProfileMatcher, success: "AI alignment scan complete.", failure: "Scan failed")
 
-  def generate_artifacts
-    result = LLM::ArtifactGenerator.call(current_user, @job_posting, force: forced?)
-    flash_llm_result(result, success: "Bespoke application artifacts generated and appended to notes.",
-                             failure: "Generation failed")
-    redirect_back_or_to(job_posting_path(@job_posting))
-  end
+  def generate_artifacts = run_llm(LLM::ArtifactGenerator, success: "Bespoke application artifacts generated.")
+
+  def generate_interview_prep = run_llm(LLM::InterviewPrepGenerator, success: "Interview prep pack generated.")
 
   # Fixed vocabulary, not free text -- the same values the backfill importers
   # write (see bin/import_indeed_applications, bin/import_linkedin_tracker),
@@ -148,6 +142,12 @@ class UserJobPostingsController < ApplicationController
     end
   end
 
+  # The three POST-and-redirect LLM actions differ only in service + notice.
+  def run_llm(service, success:, failure: "Generation failed")
+    flash_llm_result(service.call(current_user, @job_posting, force: forced?), success: success, failure: failure)
+    redirect_back_or_to(job_posting_path(@job_posting))
+  end
+
   # Deliberately excludes :status -- writing that column directly would skip
   # the AASM guards entirely. Status changes go through record_status_event!.
   # outcome and friends (including outcome_reason/outcome_evidence, TASK-91.1)
@@ -157,7 +157,7 @@ class UserJobPostingsController < ApplicationController
   # real outcome goes through apply_manual_outcome's fixed vocabulary in
   # #create, not through arbitrary values on this action.
   def user_job_posting_params
-    permitted = params.expect(user_job_posting: [:notes, *CLEARABLE_OUTCOME_ATTRS])
+    permitted = params.expect(user_job_posting: [:notes, :interview_prep_pack, *CLEARABLE_OUTCOME_ATTRS])
     permitted[:outcome].present? ? permitted.except(*CLEARABLE_OUTCOME_ATTRS) : permitted
   end
 end

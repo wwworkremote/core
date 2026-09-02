@@ -2,6 +2,30 @@
 
 require "rails_helper"
 
+# == Schema Information
+#
+# Table name: guided_session_replays
+#
+#  id                :bigint           not null, primary key
+#  allow_real_site   :boolean          default(FALSE), not null
+#  current_step      :integer          default(0), not null
+#  ended_at          :datetime
+#  ended_reason      :string
+#  started_at        :datetime         not null
+#  status            :string           default("running"), not null
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  guided_session_id :bigint           not null
+#
+# Indexes
+#
+#  index_guided_session_replays_on_guided_session_id             (guided_session_id)
+#  index_guided_session_replays_on_guided_session_id_and_status  (guided_session_id,status)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (guided_session_id => guided_sessions.id)
+#
 RSpec.describe GuidedSessionReplay do
   let(:session) do
     GuidedSession.create!(source_url: "https://wwworkremote.localhost/x", purpose: "application_execution",

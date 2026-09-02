@@ -181,6 +181,7 @@ Rails.application.routes.draw do
     collection do
       post :analyze_match
       post :generate_artifacts
+      post :generate_interview_prep
     end
   end
   resource :career_profile, only: %i[show edit update] do

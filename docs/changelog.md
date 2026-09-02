@@ -181,6 +181,18 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   contrast pass fixing `slate-500`/`slate-600` failing WCAG AA against the
   dark theme (~300 uses across 59 files).
 
+## September 2026
+
+- **Sep 2** — Interview Prep Pack (TASK-144): one-click LLM-generated interview
+  brief per job posting — story arc, ranked company hooks, referral play,
+  likely questions, questions to ask, night-before checklist — grounded in the
+  structured career history, the posting, any stored Company audit, and any
+  linked referral Contact. Stored on `UserJobPosting` next to the cover letter,
+  editable in place and regenerable, surfaced in the Interview Notes section.
+  Built by cloning the cover-letter generation path; the three POST-and-redirect
+  LLM actions on `UserJobPostingsController` collapsed onto one `run_llm` helper.
+  Worked reference: `docs/research/interview-prep-basis-dsp.md`.
+
 ## Where to look instead of re-reading this file
 
 - `docs/adr/*.md` — the "why," not just the "what," for the biggest
