@@ -22,9 +22,9 @@ It ships in **two versions, same content**:
 | Version | Column | Use |
 |---|---|---|
 | Human | `interview_prep_pack` | read on screen; the default render |
-| Read-aloud | `interview_prep_pack_spoken` | fed to text-to-speech; a `SpokenRewriter` pass, opens with a YAML frontmatter block (title, pronunciation map, sections, spoken minutes), follows [`docs/research/tts-readable-documentation.md`](../../../docs/research/tts-readable-documentation.md) |
+| Read-aloud | `interview_prep_pack_spoken` | fed to text-to-speech; a `SpokenRewriter` pass, opens with a YAML frontmatter block (title, pronunciation map, sections, spoken minutes), follows [`docs/interview-prep/tts-readable-documentation.md`](../../../docs/interview-prep/tts-readable-documentation.md) |
 
-Hand [`docs/tts-transform-prompt.md`](../../../docs/tts-transform-prompt.md) to whatever
+Hand [`docs/interview-prep/tts-transform-prompt.md`](../../../docs/interview-prep/tts-transform-prompt.md) to whatever
 tool turns the read-aloud version into speech, captions, or a lyrics transcript.
 
 The generator runs on a local model. Its structure is reliable; its **content is a
@@ -35,7 +35,7 @@ close that gap: generate, then audit and ground it against real sources before
 handing it over.
 
 > [!IMPORTANT]
-> The quality bar is [`docs/research/interview-prep-basis-dsp.md`](../../../docs/research/interview-prep-basis-dsp.md) —
+> The quality bar is [`docs/interview-prep/basis-dsp/reference.md`](../../../docs/interview-prep/basis-dsp/reference.md) —
 > a hand-written prep pack for one real posting. Part 1 is what "good" looks like;
 > Part 2 is the per-section spec. Every generated pack is measured against it.
 
@@ -129,7 +129,7 @@ Give Mike:
 - [ ] The sharpened pack (or a pointer to the posting page)
 - [ ] The **judgement calls** the auditor surfaced, each with its trade-off
 - [ ] One line on what changed from the generated version
-- [ ] That the read-aloud version is ready for text-to-speech, with `docs/tts-transform-prompt.md` as the tool instruction
+- [ ] That the read-aloud version is ready for text-to-speech, with `docs/interview-prep/tts-transform-prompt.md` as the tool instruction
 
 ## Known generator failure modes
 

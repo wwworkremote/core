@@ -4,7 +4,7 @@
 # from a CareerProfile's structured experience, a JobPosting, stored Company
 # reputation intel, an existing match analysis, and any linked referral
 # Contact -- mirrors LLM::ArtifactGenerator::PromptBuilder's shape. The
-# section list tracks docs/research/interview-prep-basis-dsp.md. ClassLength
+# section list tracks docs/interview-prep/basis-dsp/reference.md. ClassLength
 # is waived in .rubocop_todo.yml -- the bulk here is one instruction string.
 class LLM::InterviewPrepGenerator::PromptBuilder
   PROMPT_KEY = "interview_prep_pack"

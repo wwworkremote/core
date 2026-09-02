@@ -35,10 +35,10 @@ bin/wwwr postings --company=<name>    # or a rails runner for the full body:
 bin/rails runner 'jp = JobPosting.find(<id>); puts jp.title; puts jp.body'
 ```
 
-Read the quality bar: [`docs/research/interview-prep-basis-dsp.md`](../../docs/research/interview-prep-basis-dsp.md).
+Read the quality bar: [`docs/interview-prep/basis-dsp/reference.md`](../../docs/interview-prep/basis-dsp/reference.md).
 Part 1 is a hand-written pack; Part 2 is the per-section spec.
 
-Also pull the read-aloud version and read [`docs/research/tts-readable-documentation.md`](../../docs/research/tts-readable-documentation.md):
+Also pull the read-aloud version and read [`docs/interview-prep/tts-readable-documentation.md`](../../docs/interview-prep/tts-readable-documentation.md):
 
 ```bash
 bin/wwwr interview-prep <id> --spoken

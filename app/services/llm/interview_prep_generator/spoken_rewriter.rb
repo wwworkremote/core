@@ -4,10 +4,8 @@
 # sections, same claims, same recommendations, only the wording and layout
 # change for speech. Runs as a second pass after LLM::InterviewPrepGenerator
 # stores the human version, so the two stay content-identical. The standard
-# is docs/research/tts-readable-documentation.md; the output is consumed per
-# docs/tts-transform-prompt.md.
-#
-# string, not logic; waived alongside PromptBuilder in .rubocop_todo.yml.
+# is docs/interview-prep/tts-readable-documentation.md; the output is consumed
+# per docs/interview-prep/tts-transform-prompt.md.
 class LLM::InterviewPrepGenerator::SpokenRewriter
   SYSTEM_RULES = "You reformat an interview prep pack so a text-to-speech engine reads it " \
                  "cleanly aloud. You never change the content -- same sections in the same " \
@@ -53,10 +51,17 @@ class LLM::InterviewPrepGenerator::SpokenRewriter
   def call
     result = LLM::Orchestrator.call(untrusted_text: @human_pack, system_rules: SYSTEM_RULES,
                                     task_instructions: TASK_INSTRUCTIONS, model: rewriter_model)
-    result[:success] ? result[:output] : nil
+    result[:success] ? unwrap_fence(result[:output]) : nil
   end
 
   private
+
+  # Local models like to wrap the whole answer in a ```yaml / ``` fence even
+  # when told not to. Strip one wrapping fence so the "---" frontmatter is the
+  # first line, which is what UserJobPosting#spoken_pack_parts expects.
+  def unwrap_fence(text)
+    text.to_s.strip.sub(/\A```[a-z]*\n/, "").sub(/\n```\s*\z/, "")
+  end
 
   # Same model the prep pack itself uses (LLM::Registry.model_for(:interview_prep)
   # -> primary when unset). A read-aloud rewrite is the same profile: prose Mike

@@ -6,7 +6,7 @@
 # pack in the candidate's structured history, the posting text, any stored
 # Company reputation audit, and any linked referral Contact. The worked
 # reference that defines the section structure is
-# docs/research/interview-prep-basis-dsp.md.
+# docs/interview-prep/basis-dsp/reference.md.
 class LLM::InterviewPrepGenerator
   SYSTEM_RULES = "You are an elite technical interview coach and career strategist. " \
                  "You prepare a specific candidate for a specific interview."

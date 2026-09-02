@@ -11,8 +11,8 @@ metadata:
 
 # Writing documentation that reads cleanly aloud
 
-**Doc location.** Sits in `docs/research/` beside the other reconnaissance docs. It is the
-standard the read-aloud version of the **interview prep pack** is authored to (the
+**Doc location.** Sits in `docs/interview-prep/` with the rest of the feature's docs. It is
+the standard the read-aloud version of the **interview prep pack** is authored to (the
 `SpokenRewriter` pass) and the checklist the `interview-prep-auditor` agent applies. Any
 repo document meant to be read by a text-to-speech engine or a screen reader follows it.
 
@@ -141,7 +141,7 @@ frontmatter block. The `interview-prep` skill requires it to pass before hand-of
 `say` gives a quick spot check; OpenAI and Gemini text-to-speech models sit in the synced
 `Model` table but nothing wires them yet.
 
-`docs/research/interview-prep-basis-dsp.md` stays human-format: it is a reference doc read by
+`docs/interview-prep/basis-dsp/reference.md` stays human-format: it is a reference doc read by
 people and agents, not fed to a speech engine.
 
 (This doc describes the standard; it is not itself a read-aloud document, so it keeps its

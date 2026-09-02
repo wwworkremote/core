@@ -26,5 +26,12 @@ RSpec.describe LLM::InterviewPrepGenerator::SpokenRewriter do
 
       expect(described_class.call("in")).to be_nil
     end
+
+    it "strips a wrapping markdown code fence the model adds" do
+      allow(LLM::Orchestrator).to receive(:call).and_return(success: true,
+                                                            output: "```yaml\n---\ntitle: x\n---\nbody\n```")
+
+      expect(described_class.call("in")).to eq("---\ntitle: x\n---\nbody")
+    end
   end
 end

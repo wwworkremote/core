@@ -3,7 +3,7 @@ name: tts-transform-prompt
 description: >-
   A copy-paste instruction block for whatever tool turns a `*_spoken` file
   (the read-aloud version of an interview prep pack, or any document authored
-  to docs/research/tts-readable-documentation.md) into speech, closed
+  to docs/interview-prep/tts-readable-documentation.md) into speech, closed
   captions, or a lyrics-style transcript.
 metadata:
   version: 1.0.0
@@ -12,7 +12,7 @@ metadata:
 # TTS transform prompt
 
 The read-aloud artifacts in this system — `UserJobPosting#interview_prep_pack_spoken`, and
-anything else authored to [`docs/research/tts-readable-documentation.md`](research/tts-readable-documentation.md) —
+anything else authored to [`tts-readable-documentation.md`](tts-readable-documentation.md) —
 are already written for the ear: abbreviations spelled out, acronyms expanded, numbers in
 spoken form, no tables, no bare URLs, one idea per sentence, and a YAML frontmatter block up
 top carrying pronunciation and structure hints.

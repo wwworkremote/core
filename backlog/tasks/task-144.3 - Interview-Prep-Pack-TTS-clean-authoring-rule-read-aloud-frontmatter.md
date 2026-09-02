@@ -4,7 +4,7 @@ title: 'Interview Prep Pack: TTS-clean authoring rule + read-aloud frontmatter'
 status: In Progress
 assignee: []
 created_date: '2026-09-02 23:02'
-updated_date: '2026-09-02 23:07'
+updated_date: '2026-09-02 23:21'
 labels:
   - job-search
   - llm
@@ -40,15 +40,15 @@ Then:
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Generator prompt instructs TTS-clean output: abbreviations/contractions spelled out, acronyms expanded on first use, numbers/money/ranges spoken-form, no bare URLs, no emoji, no tables or code blocks in the pack body
-- [ ] #2 Generated pack starts with a YAML frontmatter block carrying a spelled-out title, a pronunciation map, the section list, and estimated spoken minutes
-- [ ] #3 prompt_builder_spec asserts the TTS constraints and the frontmatter instruction are present
-- [ ] #4 The job posting show view splits the frontmatter fence (no stray horizontal rule) and surfaces the read-aloud hints
+- [x] #1 Generator prompt instructs TTS-clean output: abbreviations/contractions spelled out, acronyms expanded on first use, numbers/money/ranges spoken-form, no bare URLs, no emoji, no tables or code blocks in the pack body
+- [x] #2 Generated pack starts with a YAML frontmatter block carrying a spelled-out title, a pronunciation map, the section list, and estimated spoken minutes
+- [x] #3 prompt_builder_spec asserts the TTS constraints and the frontmatter instruction are present
+- [x] #4 The job posting show view splits the frontmatter fence (no stray horizontal rule) and surfaces the read-aloud hints
 - [ ] #5 docs/research/interview-prep-basis-dsp.md is rewritten TTS-clean and human-readable: no tables in the prose sections, abbreviations/numbers spelled out, still well-structured with headings and lists
-- [ ] #6 interview-prep skill and interview-prep-auditor agent updated: pack must be TTS-clean, auditor checks abbreviations/numbers/tables/URLs/emoji, available TTS help noted
-- [ ] #7 CONTEXT.md and docs/changelog.md updated
+- [x] #6 interview-prep skill and interview-prep-auditor agent updated: pack must be TTS-clean, auditor checks abbreviations/numbers/tables/URLs/emoji, available TTS help noted
+- [x] #7 CONTEXT.md and docs/changelog.md updated
 - [ ] #8 The Basis pack (UJP #268) is regenerated and reads cleanly aloud
-- [ ] #9 All touched specs stay green
+- [x] #9 All touched specs stay green
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -97,3 +97,17 @@ ponytail: SpokenRewriter is a second LLM call per generation (local model ~5 min
 it skippable via `spoken:` but default-on since TTS is the point. If the local model garbles
 the rewrite, that is the TASK-145 signal again.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+AC#1/#2/#3: the TTS rules + frontmatter instruction live in LLM::InterviewPrepGenerator::SpokenRewriter (not the main prompt) since the pack ships in two formats -- the human generator prompt stays human-format. spoken_rewriter_spec asserts the rules + frontmatter instruction are in the task_instructions.
+
+AC#5: docs/research/interview-prep-basis-dsp.md deliberately NOT rewritten TTS-clean -- it is a reference doc read by people/agents, not fed to a speech engine (decided with Mike; it now points to tts-readable-documentation.md and notes the pack ships both formats). The TTS-clean standard is modelled by the SpokenRewriter output + the frontmatter example in tts-readable-documentation.md.
+
+New: docs/tts-transform-prompt.md -- the copy-paste instruction block for the external TTS tool (Mike's explicit ask). Engine-agnostic: covers parsing/not-speaking the frontmatter, applying the pronunciation map as a lexicon (with SSML mappings), section markers, sentence-per-cue captioning (VTT/SRT), line-per-sentence lyrics (LRC), and the do-nots.
+
+160 examples green across the 7 touched spec files. Commit d569b8d6 (one line of the commit message lost a backticked token to shell quoting -- cosmetic).
+
+AC#8 pending: Basis pack regeneration running (2 LLM calls on the local model).
+<!-- SECTION:NOTES:END -->

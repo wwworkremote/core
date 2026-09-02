@@ -191,7 +191,7 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   editable in place and regenerable, surfaced in the Interview Notes section.
   Built by cloning the cover-letter generation path; the three POST-and-redirect
   LLM actions on `UserJobPostingsController` collapsed onto one `run_llm` helper.
-  Worked reference: `docs/research/interview-prep-basis-dsp.md`.
+  Worked reference: `docs/interview-prep/basis-dsp/reference.md`.
 - **Sep 2** — Interview Prep Pack gains a **Domain Primer** section (TASK-144.1):
   posting-anchored industry knowledge — what the business does and where the role
   sits, must-know vs useful-context vocabulary, domain best practices, the blind
@@ -207,8 +207,8 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   (spelled-out title, pronunciation map, section list, spoken minutes), then
   text-to-speech-clean prose: abbreviations and numbers spelled out, no tables,
   no emoji, no bare URLs, one idea per sentence. Standard:
-  `docs/research/tts-readable-documentation.md`. Consumed per
-  `docs/tts-transform-prompt.md` — the read-aloud version is cleanly
+  `docs/interview-prep/tts-readable-documentation.md`. Consumed per
+  `docs/interview-prep/tts-transform-prompt.md` — the read-aloud version is cleanly
   sentence-segmented so it can also feed closed captions or a lyrics transcript.
   `bin/wwwr interview-prep <id> --spoken` prints it; the posting page shows it
   under a "Read-aloud version" toggle with the pronunciation hints surfaced.
