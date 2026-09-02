@@ -5,6 +5,7 @@ require Rails.root.join("lib/wwwr")
 require Rails.root.join("lib/wwwr/interop")
 require Rails.root.join("lib/wwwr/queue_status")
 require Rails.root.join("lib/wwwr/transition_runner")
+require Rails.root.join("lib/wwwr/interview_prep")
 require Rails.root.join("lib/wwwr/cli")
 
 RSpec.describe Wwwr::CLI do
@@ -112,6 +113,45 @@ RSpec.describe Wwwr::CLI do
       allow(LLM::ProfileMatcher).to receive(:call).with(user, posting).and_return(success: true, output: "Fresh scan.")
 
       expect { cli.run(["match", posting.id.to_s, "--source=spec", "--escalate"]) }.to output(/Fresh scan\./).to_stdout
+    end
+  end
+
+  describe "interview-prep" do
+    let!(:user) { create(:user) }
+
+    it "prints the stored pack without calling the generator" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "## Stored pack")
+      allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+      expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/Stored pack/).to_stdout
+      expect(LLM::InterviewPrepGenerator).not_to have_received(:call)
+    end
+
+    it "regenerates on --regenerate and prints the fresh pack" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "old")
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: true, output: "## Fresh pack")
+
+      expect { cli.run(["interview-prep", posting.id.to_s, "--regenerate"]) }.to output(/Fresh pack/).to_stdout
+    end
+
+    it "generates when no pack is stored yet" do
+      posting = create(:job_posting)
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: true, output: "## New pack")
+
+      expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/New pack/).to_stdout
+    end
+
+    it "surfaces a generation failure instead of raising" do
+      posting = create(:job_posting)
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: false, error: "boom")
+
+      expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/Generation failed: boom/).to_stdout
+    end
+
+    it "reports an unknown posting id instead of raising" do
+      expect { cli.run(%w[interview-prep 999999]) }.to output(/not found/).to_stdout
     end
   end
 end

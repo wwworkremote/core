@@ -12,7 +12,8 @@ class Wwwr::CLI
     "status" => :print_status,
     "postings" => :print_postings,
     "transition" => :run_transition,
-    "match" => :run_match
+    "match" => :run_match,
+    "interview-prep" => :run_interview_prep
   }.freeze
 
   def run(argv)
@@ -24,6 +25,7 @@ class Wwwr::CLI
 
   def print_usage(_args = [])
     puts "Usage: status | postings [filters] | transition <id> <event> | match <id> --source=<n> [--escalate]"
+    puts "       interview-prep <id> [--regenerate]"
     puts "  filters: --company= --source-id= --role-family= --location= --remote --contract"
     puts "  events:  #{Wwwr::TransitionRunner::ALL_EVENTS.join(' ')} (match contract: docs/agents/interop.md)"
   end
@@ -52,6 +54,13 @@ class Wwwr::CLI
     return puts "Posting ##{id} not found." unless posting
 
     Wwwr::TransitionRunner.call(posting, event)
+  end
+
+  def run_interview_prep(args)
+    posting = JobPosting.find_by(id: args.first)
+    return puts "Posting ##{args.first} not found." unless posting
+
+    puts Wwwr::InterviewPrep.call(posting, regenerate: args.include?("--regenerate"))
   end
 
   def print_postings(args)
