@@ -106,6 +106,14 @@ RSpec.describe "UserJobPostings" do
       expect(response).to redirect_to(user_job_postings_path)
     end
 
+    it "saves an edited interview prep pack" do
+      ujp = user.user_job_postings.create!(job_posting: job_posting, interview_prep_pack: "draft")
+
+      patch user_job_posting_path(ujp), params: { user_job_posting: { interview_prep_pack: "my edits" } }
+
+      expect(ujp.reload.interview_prep_pack).to eq("my edits")
+    end
+
     it "clearing the outcome also clears the reason and evidence" do
       ujp = user.user_job_postings.create!(job_posting: job_posting, outcome: "rejected",
                                            outcome_reason: "Not a fit")

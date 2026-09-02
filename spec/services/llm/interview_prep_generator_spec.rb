@@ -56,6 +56,17 @@ RSpec.describe LLM::InterviewPrepGenerator do
       expect(user_job.reload.notes).to eq("my own notes")
     end
 
+    it "routes the posting body through the orchestrator as untrusted text" do
+      create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
+      job.update!(body: "SCRAPED POSTING BODY")
+      captured = nil
+      allow(LLM::Orchestrator).to receive(:call) { |args| captured = args; { success: true, output: "x" } }
+
+      described_class.call(user, job)
+
+      expect(captured[:untrusted_text]).to include("SCRAPED POSTING BODY")
+    end
+
     it "passes the LLM failure through" do
       create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
       allow(LLM::Orchestrator).to receive(:call).and_return(success: false, error: "Timed out")

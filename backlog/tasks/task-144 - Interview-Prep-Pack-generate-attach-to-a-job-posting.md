@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - mike@just3ws.com
 created_date: '2026-09-02 16:44'
-updated_date: '2026-09-02 16:45'
+updated_date: '2026-09-02 17:03'
 labels:
   - job-search
   - llm
@@ -62,3 +62,15 @@ Verification: db:migrate; rspec the 3 files; rubocop the new files; manual again
 
 Out of scope v1: live web research; per-InterviewSession packs; auto-gen on status→interview; structured InterviewQuestion rows.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Implemented on branch feat/interview-prep-pack (commit cc0351b6). Migration + LLM::InterviewPrepGenerator + PromptBuilder (PipelinePrompt key interview_prep_pack) + generate_interview_prep action/route + view block in Interview Notes card + i18n + specs. The three POST-and-redirect LLM actions on UserJobPostingsController collapsed onto #run_llm to stay under ClassLength.
+
+company intel: PromptBuilder resolves the Company via Company.find_by(id: job_posting.company_id) rather than job_posting.company -- the legacy `company` accessor returns a String in test factories (a Company object on real rows), so going through company_id is the portable path.
+
+36 examples green: spec/services/llm/interview_prep_generator_spec.rb, spec/services/llm/interview_prep_generator/prompt_builder_spec.rb, spec/requests/user_job_postings_spec.rb. Also re-ran spec/requests/job_postings_spec.rb (fixed a clipboard-controller leak in the empty state).
+
+Note: docs/agents/changelog.md does not exist; the changelog lives at docs/changelog.md (era-narrative). Added a September 2026 section there.
+<!-- SECTION:NOTES:END -->
