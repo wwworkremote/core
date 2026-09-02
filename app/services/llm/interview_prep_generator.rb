@@ -14,15 +14,16 @@ class LLM::InterviewPrepGenerator
                       "structure named in the objective. Ground every claim in the candidate " \
                       "facts provided; never invent a title, date, employer, or metric."
 
-  def self.call(user, job_posting, force: false)
-    new(user, job_posting, force: force).call
+  def self.call(user, job_posting, force: false, spoken: true)
+    new(user, job_posting, force: force, spoken: spoken).call
   end
 
-  def initialize(user, job_posting, force: false)
+  def initialize(user, job_posting, force: false, spoken: true)
     @user = user
     @job_posting = job_posting
     @profile = user.career_profile
     @force = force
+    @spoken = spoken
   end
 
   def call
@@ -68,8 +69,18 @@ class LLM::InterviewPrepGenerator
     return { success: false, error: result[:error] } unless result[:success]
 
     user_job_posting.update!(interview_prep_pack: result[:output],
+                             interview_prep_pack_spoken: spoken_version(result[:output]),
                              interview_prep_pack_generated_at: Time.current)
     { success: true, output: result[:output] }
+  end
+
+  # Second pass: a read-aloud rewrite of the just-generated human pack, so the
+  # two versions carry identical content. Non-fatal -- a failed rewrite leaves
+  # the spoken column nil, the human pack still lands.
+  def spoken_version(human_pack)
+    return unless @spoken
+
+    SpokenRewriter.call(human_pack)
   end
 
   def user_job_posting

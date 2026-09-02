@@ -7,6 +7,8 @@ RSpec.describe LLM::InterviewPrepGenerator do
   let!(:profile) { create(:career_profile, user: user) }
   let(:job) { create(:job_posting) }
 
+  before { allow(LLM::InterviewPrepGenerator::SpokenRewriter).to receive(:call).and_return("--- \ntitle: x\n---\nspoken") }
+
   describe ".call" do
     it "returns an error when the profile has no work experiences" do
       result = described_class.call(user, job)
@@ -44,6 +46,41 @@ RSpec.describe LLM::InterviewPrepGenerator do
       user_job = user.user_job_postings.find_by(job_posting: job)
       expect(user_job.interview_prep_pack).to eq("# Prep pack\nbody")
       expect(user_job.interview_prep_pack_generated_at).to be_within(5.seconds).of(Time.current)
+    end
+
+    it "stores a read-aloud version rewritten from the human pack" do
+      create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
+      allow(LLM::Orchestrator).to receive(:call).and_return(success: true, output: "# Human pack")
+      spoken = "--- \ntitle: y\n---\nspoken body"
+      allow(LLM::InterviewPrepGenerator::SpokenRewriter).to receive(:call).with("# Human pack").and_return(spoken)
+
+      described_class.call(user, job)
+
+      user_job = user.user_job_postings.find_by(job_posting: job)
+      expect(user_job.interview_prep_pack_spoken).to eq(spoken)
+    end
+
+    it "skips the read-aloud version when spoken: false" do
+      create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
+      allow(LLM::Orchestrator).to receive(:call).and_return(success: true, output: "# Human pack")
+
+      described_class.call(user, job, spoken: false)
+
+      expect(LLM::InterviewPrepGenerator::SpokenRewriter).not_to have_received(:call)
+      expect(user.user_job_postings.find_by(job_posting: job).interview_prep_pack_spoken).to be_nil
+    end
+
+    it "keeps the human pack when the read-aloud rewrite fails" do
+      create(:work_experience, career_profile: profile, title: "Dev", summary: "A", impact: "B")
+      allow(LLM::Orchestrator).to receive(:call).and_return(success: true, output: "# Human pack")
+      allow(LLM::InterviewPrepGenerator::SpokenRewriter).to receive(:call).and_return(nil)
+
+      result = described_class.call(user, job)
+
+      expect(result[:success]).to be true
+      user_job = user.user_job_postings.find_by(job_posting: job)
+      expect(user_job.interview_prep_pack).to eq("# Human pack")
+      expect(user_job.interview_prep_pack_spoken).to be_nil
     end
 
     it "does not touch personal notes on an existing record" do

@@ -201,6 +201,22 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   candidate's own stack; "blind spots" are domain assumptions not skill gaps;
   every acronym is expanded and bound to the body that defines it (IAB Tech
   Lab, W3C, an RFC, vendor docs), never a guessed URL.
+- **Sep 2** — Interview Prep Pack ships in two versions (TASK-144.3): the human
+  pack, and a read-aloud version (`interview_prep_pack_spoken`) produced by a
+  `SpokenRewriter` pass — same content, opens with a YAML frontmatter block
+  (spelled-out title, pronunciation map, section list, spoken minutes), then
+  text-to-speech-clean prose: abbreviations and numbers spelled out, no tables,
+  no emoji, no bare URLs, one idea per sentence. Standard:
+  `docs/research/tts-readable-documentation.md`. Consumed per
+  `docs/tts-transform-prompt.md` — the read-aloud version is cleanly
+  sentence-segmented so it can also feed closed captions or a lyrics transcript.
+  `bin/wwwr interview-prep <id> --spoken` prints it; the posting page shows it
+  under a "Read-aloud version" toggle with the pronunciation hints surfaced.
+- **Sep 2** — `interview-prep` skill + `interview-prep-auditor` agent + `bin/wwwr
+  interview-prep` (TASK-144.2): the skill generates a pack then audits and
+  grounds it (auditor punch list; `industry-intelligence-agent` verifies the
+  primer's concepts, acronym citations, and links); the auditor also checks the
+  read-aloud version against the text-to-speech standard.
 
 ## Where to look instead of re-reading this file
 

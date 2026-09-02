@@ -4,9 +4,10 @@ description: >-
   Audit a generated interview prep pack against the quality bar and the job
   posting, and return a ranked punch list — generic-vs-real domain primer,
   invented links, unbound acronyms, missing must-know concepts, skill-gap /
-  blind-spot confusion, whether the story traces to real history. Read-only;
-  changes nothing. Pair with the interview-prep skill, which generates the
-  pack and applies the fixes.
+  blind-spot confusion, whether the story traces to real history, and whether
+  the read-aloud version meets the text-to-speech standard. Read-only; changes
+  nothing. Pair with the interview-prep skill, which generates the pack and
+  applies the fixes.
 tools: Bash, Read, Grep, Glob
 model: sonnet
 metadata:
@@ -37,6 +38,12 @@ bin/rails runner 'jp = JobPosting.find(<id>); puts jp.title; puts jp.body'
 Read the quality bar: [`docs/research/interview-prep-basis-dsp.md`](../../docs/research/interview-prep-basis-dsp.md).
 Part 1 is a hand-written pack; Part 2 is the per-section spec.
 
+Also pull the read-aloud version and read [`docs/research/tts-readable-documentation.md`](../../docs/research/tts-readable-documentation.md):
+
+```bash
+bin/wwwr interview-prep <id> --spoken
+```
+
 ### 2. Diff the pack, section by section
 
 | Section | What to check |
@@ -52,9 +59,21 @@ Part 1 is a hand-written pack; Part 2 is the per-section spec.
 | **LIKELY QUESTIONS** | Do they probe the real soft spots (level delta, gaps, short stints), or are they softballs? |
 | **QUESTIONS TO ASK / CHECKLIST** | Concrete and checkable? Leveling/comp and culture probes present? |
 
-### 3. Classify every finding
+### 3. Check the read-aloud version against the text-to-speech standard
 
-- **mechanical** — one right answer: a wrong fact, an invented link, an unbound acronym, a missing must-know concept, a stack term in "useful context", a skill gap filed as a blind spot.
+| Check | Flag if |
+|---|---|
+| Frontmatter | No `---` fenced YAML block, or it is missing `title` / `pronunciation` / `sections` / `spoken_minutes`, or it fails to parse |
+| Abbreviations | Any "Sr.", "e.g.", "i.e.", "vs.", "etc.", "&", "w/", "~", "%", "/" between words, or an arrow, survives in the body |
+| Acronyms | An acronym appears with no expansion anywhere in the document |
+| Numbers | Any `[posted band]`, `sub-100ms`, `p99`, `4%`, or a dash used for a range instead of the word "to" |
+| Layout | A table or a fenced code block in the body; an emoji; a bare URL |
+| Sentences | Run-on sentences, or deep nested parentheticals that will not survive being heard |
+| Content parity | The read-aloud version is missing a section the human version has, or states something the human version does not |
+
+### 4. Classify every finding
+
+- **mechanical** — one right answer: a wrong fact, an invented link, an unbound acronym, a missing must-know concept, a stack term in "useful context", a skill gap filed as a blind spot, any read-aloud defect above.
 - **judgement** — Mike's call: how hard to press the level-delta framing, which 2–3 hooks to lead with, whether a thin story is worth telling, how to answer a soft-spot question.
 
 ## What NOT to do

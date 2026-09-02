@@ -143,6 +143,22 @@ RSpec.describe Wwwr::CLI do
       expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/New pack/).to_stdout
     end
 
+    it "prints the read-aloud version with --spoken" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human",
+                                interview_prep_pack_spoken: "--- \ntitle: x\n---\nspoken words")
+      allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+      expect { cli.run(["interview-prep", posting.id.to_s, "--spoken"]) }.to output(/spoken words/).to_stdout
+    end
+
+    it "hints to regenerate when --spoken is asked for but no read-aloud version exists" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human")
+
+      expect { cli.run(["interview-prep", posting.id.to_s, "--spoken"]) }.to output(/no read-aloud version/).to_stdout
+    end
+
     it "surfaces a generation failure instead of raising" do
       posting = create(:job_posting)
       allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: false, error: "boom")

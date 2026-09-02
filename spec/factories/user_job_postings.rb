@@ -10,6 +10,7 @@
 #  cover_letter                     :text
 #  interview_prep_pack              :text
 #  interview_prep_pack_generated_at :datetime
+#  interview_prep_pack_spoken       :text
 #  match_analysis                   :text
 #  match_score                      :integer
 #  match_tags                       :text             default([]), not null, is an Array

@@ -25,7 +25,7 @@ class Wwwr::CLI
 
   def print_usage(_args = [])
     puts "Usage: status | postings [filters] | transition <id> <event> | match <id> --source=<n> [--escalate]"
-    puts "       interview-prep <id> [--regenerate]"
+    puts "       interview-prep <id> [--regenerate] [--spoken]"
     puts "  filters: --company= --source-id= --role-family= --location= --remote --contract"
     puts "  events:  #{Wwwr::TransitionRunner::ALL_EVENTS.join(' ')} (match contract: docs/agents/interop.md)"
   end
@@ -60,7 +60,8 @@ class Wwwr::CLI
     posting = JobPosting.find_by(id: args.first)
     return puts "Posting ##{args.first} not found." unless posting
 
-    puts Wwwr::InterviewPrep.call(posting, regenerate: args.include?("--regenerate"))
+    puts Wwwr::InterviewPrep.call(posting, regenerate: args.include?("--regenerate"),
+                                           spoken: args.include?("--spoken"))
   end
 
   def print_postings(args)

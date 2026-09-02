@@ -471,6 +471,18 @@ RSpec.describe "Job Postings" do
         expect(response.body).to include("Generate Prep Pack")
         expect(response.body).not_to include("Regenerate")
       end
+
+      it "surfaces the read-aloud version and its pronunciation hints when present" do
+        spoken = "---\ntitle: Prep\npronunciation:\n  DSP: D S P\n---\n## Setup\nspoken words"
+        create(:user_job_posting, user: current_user, job_posting: job,
+                                  interview_prep_pack: "## Setup\nhuman", interview_prep_pack_spoken: spoken)
+
+        get job_posting_path(job)
+
+        expect(response.body).to include("Read-aloud version")
+        expect(response.body).to include("spoken words")
+        expect(response.body).to include("D S P")
+      end
     end
 
     context "application Q&A panel" do

@@ -1,10 +1,20 @@
+---
+name: tts-readable-documentation
+description: >-
+  The standard a read-aloud document is authored to: how to write prose that a
+  text-to-speech engine speaks cleanly without making it worse to read on
+  screen, and what a YAML frontmatter block carries as read-aloud hints.
+metadata:
+  type: reference
+  version: 1.0.0
+---
+
 # Writing documentation that reads cleanly aloud
 
 **Doc location.** Sits in `docs/research/` beside the other reconnaissance docs. It is the
-standard the **interview prep pack** is authored to (both the hand-written reference,
-`interview-prep-basis-dsp.md`, and the `LLM::InterviewPrepGenerator` prompt) and the checklist
-the `interview-prep-auditor` agent applies. Any repo document meant to be read by a
-text-to-speech engine or a screen reader follows it.
+standard the read-aloud version of the **interview prep pack** is authored to (the
+`SpokenRewriter` pass) and the checklist the `interview-prep-auditor` agent applies. Any
+repo document meant to be read by a text-to-speech engine or a screen reader follows it.
 
 **Question.** The prep pack is fed to a text-to-speech engine. What makes prose read cleanly
 aloud without making it worse to read on screen, and what can carry pronunciation hints
