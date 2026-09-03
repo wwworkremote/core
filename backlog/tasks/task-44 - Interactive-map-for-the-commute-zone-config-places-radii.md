@@ -1,6 +1,6 @@
 ---
 id: TASK-44
-title: Interactive map for commute zone (UP-NW stations + terminal radii)
+title: Interactive map for the commute-zone config (places + radii)
 status: To Do
 assignee: []
 created_date: '2026-08-14 19:31'
