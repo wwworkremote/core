@@ -1,0 +1,30 @@
+# Geo::CommuteZone config — copy to config/commute_zone.yml (gitignored) and
+# fill in real places. If config/commute_zone.yml is absent or empty, the
+# commute filter is inert: it never blocks a geocoded posting.
+#
+# Model: a home point + a radius, plus any number of named "zones". A zone is
+# a list of places and a radius; a non-remote job within `radius_miles` of
+# ANY place in ANY zone (or within `home_radius_miles` of home) is an
+# acceptable commute. Everything else geocoded gets auto-ignored.
+#
+# Places are geocoded through the app's Geocoder + cache — use any string
+# that resolves cleanly (a station name, an address, "City, ST").
+
+# Optional. Falls back to ENV["HOME_LOCATION"] when null. Keep the real value
+# here or in .env.local — both are gitignored.
+home: null
+home_radius_miles: 10.0
+
+zones:
+  - name: "Commuter rail line"
+    radius_miles: 1.5
+    places:
+      - "Example Station, Anytown, ST"
+      - "Second Station, Nexttown, ST"
+      - "Terminus, Lasttown, ST"
+
+  - name: "Walkable downtown anchors"
+    radius_miles: 0.75
+    places:
+      - "Downtown Terminal, Big City, ST"
+      - "Union Depot, Big City, ST"

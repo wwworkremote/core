@@ -3,100 +3,99 @@
 require "rails_helper"
 
 RSpec.describe Geo::CommuteZone do
-  # Home: an arbitrary point NW of the terminal. Ogilvie: roughly its real
-  # downtown coordinates. Cary: a UP-NW station roughly on-line but a
-  # few towns further from home. Coordinates only
-  # need to be self-consistent with the test distances below, not
-  # geographically exact.
-  let(:home_stub) { { "latitude" => 42.30, "longitude" => -88.40 } }
-  let(:ogilvie_stub) { { "latitude" => 41.8839, "longitude" => -87.6408 } }
-  let(:cary_stub) { { "latitude" => 42.2114, "longitude" => -88.2384 } }
+  # Synthetic fixtures — coordinates only need to be self-consistent with the
+  # distances asserted below, not geographically real.
+  let(:home_stub) { { "latitude" => 40.00, "longitude" => -80.00 } }
+  let(:anchor_stub) { { "latitude" => 41.00, "longitude" => -81.00 } }
+  let(:line_stop_stub) { { "latitude" => 40.30, "longitude" => -80.20 } }
+
+  let(:test_config) do
+    {
+      "home" => "Test Home",
+      "home_radius_miles" => 10.0,
+      "zones" => [
+        { "name" => "Rail line", "radius_miles" => 1.5, "places" => ["Line Stop"] },
+        { "name" => "Downtown anchor", "radius_miles" => 0.75, "places" => ["City Anchor"] }
+      ]
+    }
+  end
 
   around do |example|
-    original_home = ENV.fetch("HOME_LOCATION", nil)
-    ENV["HOME_LOCATION"] = "[home location]"
+    described_class.instance_variable_set(:@config, test_config)
     described_class.instance_variable_set(:@geocode_cache, nil)
-    Geocoder::Lookup::Test.set_default_stub([]) # every other UP-NW station/terminal: "not found"
-    Geocoder::Lookup::Test.add_stub("[home location]", [home_stub])
-    Geocoder::Lookup::Test.add_stub("Ogilvie Transportation Center, Chicago, IL", [ogilvie_stub])
-    Geocoder::Lookup::Test.add_stub("Cary, IL", [cary_stub])
+    Geocoder::Lookup::Test.set_default_stub([]) # anything not stubbed: "not found"
+    Geocoder::Lookup::Test.add_stub("Test Home", [home_stub])
+    Geocoder::Lookup::Test.add_stub("Line Stop", [line_stop_stub])
+    Geocoder::Lookup::Test.add_stub("City Anchor", [anchor_stub])
 
     example.run
 
-    ENV["HOME_LOCATION"] = original_home
-    described_class.instance_variable_set(:@geocode_cache, nil)
+    described_class.reload_config!
   end
 
-  def job_posting_at(lat, lng, location: "Somewhere, IL", data: {})
+  def job_posting_at(lat, lng, location: "Somewhere", data: {})
     build_stubbed(:job_posting, location: location, latitude: lat, longitude: lng, data: data)
   end
 
   describe ".call" do
-    it "allows postings whose location text says remote, without needing coordinates" do
-      posting = job_posting_at(nil, nil, location: "Remote - USA")
-
-      expect(described_class.call(posting)).to eq(:allowed)
+    it "allows a posting whose location text says remote, without coordinates" do
+      expect(described_class.call(job_posting_at(nil, nil, location: "Remote - USA"))).to eq(:allowed)
     end
 
-    it "allows postings the categorizer already flagged as remote (is_remote key)" do
-      posting = job_posting_at(nil, nil, data: { "is_remote" => true })
-
-      expect(described_class.call(posting)).to eq(:allowed)
+    it "allows a posting the categorizer flagged remote (is_remote key)" do
+      expect(described_class.call(job_posting_at(nil, nil, data: { "is_remote" => true }))).to eq(:allowed)
     end
 
-    it "allows postings the primary enrichment pipeline flagged as remote (remote key)" do
-      # Regression: AttributeBuilder writes data["remote"], not
-      # data["is_remote"] -- this is the key every extension capture and
-      # standard scraper enrichment actually sets. Location text
-      # deliberately has no "remote" mention so only the structured flag
-      # can be doing the work here.
+    it "allows a posting the primary enrichment pipeline flagged remote (remote key)" do
       posting = job_posting_at(nil, nil, location: "Hockenheim", data: { "remote" => true })
-
       expect(described_class.call(posting)).to eq(:allowed)
     end
 
     it "is undetermined for a non-remote posting that hasn't been geocoded yet" do
-      posting = job_posting_at(nil, nil)
-
-      expect(described_class.call(posting)).to eq(:undetermined)
+      expect(described_class.call(job_posting_at(nil, nil))).to eq(:undetermined)
     end
 
-    it "allows a geocoded posting within the hyperlocal radius of home" do
-      posting = job_posting_at(42.25, -88.30) # a few miles from the home stub
-
-      expect(described_class.call(posting)).to eq(:allowed)
+    it "allows a geocoded posting within the home radius" do
+      expect(described_class.call(job_posting_at(40.05, -80.05))).to eq(:allowed)
     end
 
-    it "allows a geocoded posting within walking distance of Ogilvie" do
-      posting = job_posting_at(41.884, -87.641) # right by the Ogilvie stub
-
-      expect(described_class.call(posting)).to eq(:allowed)
+    it "allows a geocoded posting within a zone place's radius" do
+      expect(described_class.call(job_posting_at(40.301, -80.201))).to eq(:allowed)
     end
 
-    it "allows a geocoded posting near a UP-NW line station away from home" do
-      posting = job_posting_at(42.211, -88.238) # right by the Cary stub
-
-      expect(described_class.call(posting)).to eq(:allowed)
+    it "blocks a geocoded posting far from home and every zone place" do
+      expect(described_class.call(job_posting_at(34.0522, -118.2437))).to eq(:blocked) # Los Angeles
     end
 
-    it "blocks a geocoded posting far from home, every UP-NW station, and both terminals" do
-      posting = job_posting_at(34.0522, -118.2437) # Los Angeles
+    it "falls back to ENV['HOME_LOCATION'] when the config has no home" do
+      described_class.instance_variable_set(:@config, test_config.except("home"))
+      ENV["HOME_LOCATION"] = "Test Home"
 
-      expect(described_class.call(posting)).to eq(:blocked)
+      expect(described_class.call(job_posting_at(40.05, -80.05))).to eq(:allowed)
+    ensure
+      ENV.delete("HOME_LOCATION")
+    end
+  end
+
+  describe ".call when nothing is configured" do
+    around do |example|
+      described_class.instance_variable_set(:@config, {})
+      original_home = ENV.delete("HOME_LOCATION")
+      example.run
+      ENV["HOME_LOCATION"] = original_home if original_home
+      described_class.reload_config!
     end
 
-    it "still allows an Ogilvie-adjacent posting when HOME_LOCATION is unset" do
-      ENV["HOME_LOCATION"] = nil
-      posting = job_posting_at(41.884, -87.641)
-
-      expect(described_class.call(posting)).to eq(:allowed)
+    it "is inert — a geocoded posting anywhere is allowed, not blocked" do
+      expect(described_class.configured?).to be(false)
+      expect(described_class.call(job_posting_at(34.0522, -118.2437))).to eq(:allowed)
     end
+  end
 
-    it "can no longer apply the hyperlocal exception when HOME_LOCATION is unset" do
-      ENV["HOME_LOCATION"] = nil
-      posting = job_posting_at(42.25, -88.30) # would be hyperlocal-allowed if home were configured
-
-      expect(described_class.call(posting)).to eq(:blocked)
+  describe ".zones" do
+    it "reads the named zones and radii from config" do
+      expect(described_class.zones.map(&:name)).to eq(["Rail line", "Downtown anchor"])
+      expect(described_class.zones.first).to have_attributes(radius_miles: 1.5, places: ["Line Stop"])
     end
   end
 end
