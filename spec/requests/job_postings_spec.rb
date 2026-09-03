@@ -580,6 +580,23 @@ RSpec.describe "Job Postings" do
 
       expect(job.reload.title).to eq("Fixed Title")
     end
+
+    it "edits location, multi-country, and tags inline (TASK-148)" do
+      patch job_posting_path(job), params: { section: "core", job_posting: {
+        location: "Chicago, IL · New York, NY", countries_text: "us, ca", tags_text: "ruby, rails"
+      } }
+
+      job.reload
+      expect(job.location).to eq("Chicago, IL · New York, NY")
+      expect(job.data["countries"]).to eq(%w[US CA])
+      expect(job.tags).to eq(%w[ruby rails])
+    end
+
+    it "shows the inline editor when ?section=core" do
+      get job_posting_path(job, section: "core")
+      expect(response.body).to include("Countries")
+      expect(response.body).to include('name="job_posting[countries_text]"')
+    end
   end
 
   describe "POST /job_postings/:id/apply_on_site" do

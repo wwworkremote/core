@@ -1,0 +1,69 @@
+<%# TASK-148: inline editor for a posting's core scraped fields. Rendered
+    inside the dom_id(job_posting, :core) turbo frame -- a save redirects
+    back to the frame in display mode, a validation error re-renders here. %>
+<%= form_with model: job_posting, url: job_posting_path(job_posting, section: "core"), method: :patch,
+              class: "mt-6 space-y-3" do |f| %>
+  <% if job_posting.errors.any? %>
+    <div class="alert alert-error text-xs font-bold"><%= job_posting.errors.full_messages.to_sentence %></div>
+  <% end %>
+
+  <% field = "input input-bordered bg-base-300 w-full rounded-xl text-sm" %>
+  <% label = "block text-xs font-bold text-base-content/40 mb-1" %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <label class="md:col-span-2">
+      <span class="<%= label %>">Title</span>
+      <%= f.text_field :title, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Company</span>
+      <%= f.text_field :company_name, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Source URL</span>
+      <%= f.url_field :target_url, class: field %>
+    </label>
+    <label class="md:col-span-2">
+      <span class="<%= label %>">Location <span class="opacity-60">— free text, list several with · or ;</span></span>
+      <%= f.text_field :location, class: field %>
+    </label>
+    <label class="md:col-span-2">
+      <span class="<%= label %>">Countries <span class="opacity-60">— ISO codes, comma-separated (US, CA). Drives the US-only filter.</span></span>
+      <%= f.text_field :countries_text, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Posted date</span>
+      <%= f.date_field :published_at, value: job_posting.published_at&.to_date, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Employment type</span>
+      <%= f.text_field :employment_type, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Salary min</span>
+      <%= f.number_field :salary_min, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Salary max</span>
+      <%= f.number_field :salary_max, class: field %>
+    </label>
+    <label>
+      <span class="<%= label %>">Currency</span>
+      <%= f.text_field :currency, class: field %>
+    </label>
+    <label class="flex items-center gap-2 mt-5">
+      <%= f.check_box :remote, { checked: f.object.remote.present?, class: "checkbox checkbox-sm" }, "1", "0" %>
+      <span class="text-xs font-bold text-base-content/60">Remote</span>
+    </label>
+    <label class="md:col-span-2">
+      <span class="<%= label %>">Tags <span class="opacity-60">— comma-separated</span></span>
+      <%= f.text_field :tags_text, class: field %>
+    </label>
+  </div>
+
+  <div class="flex gap-3 pt-1">
+    <%= f.submit "Save", class: "btn btn-primary btn-sm rounded-xl font-bold" %>
+    <%= link_to "Cancel", job_posting_path(job_posting),
+          class: "btn btn-ghost btn-sm rounded-xl font-bold text-base-content/50" %>
+  </div>
+<% end %>

@@ -53,6 +53,12 @@
             <%= heroicon "map-pin", variant: :solid, options: { class: "w-4 h-4 text-primary" } %>
             <span class="text-white"><%= @job_posting.location.presence || t('.remote_fallback') %></span>
           </div>
+          <% if Array(@job_posting.data["countries"]).present? %>
+            <div class="flex items-center gap-2">
+              <%= heroicon "flag", variant: :solid, options: { class: "w-4 h-4 text-info" } %>
+              <span class="text-white"><%= Array(@job_posting.data["countries"]).join(" · ") %></span>
+            </div>
+          <% end %>
           <div class="flex items-center gap-2">
             <%= heroicon "calendar-days", options: { class: "w-4 h-4 text-accent" } %>
             <span class="text-white"><%= t('.posted_prefix') %> <%= @job_posting.published_at&.strftime("%b %-d, %Y") || t('.posted_unknown') %></span>
@@ -71,23 +77,20 @@
           </div>
         </div>
 
-        <%# TASK-86: scraped data is dirty by nature (#5034's title had a leading
-            character eaten during extraction) and there was previously no way to
-            fix it without a console. A <details> disclosure, not a Stimulus
-            controller -- the context panel's "raw data" collapsible already
-            establishes this as the app's pattern for optional dense content. %>
-        <details class="mt-6">
-          <summary class="text-xs font-bold text-base-content/40 cursor-pointer hover:text-white transition-colors">
-            Edit title / company / location
-          </summary>
-          <%= form_with model: @job_posting, url: job_posting_path(@job_posting), method: :patch,
-                        class: "mt-4 grid grid-cols-1 md:grid-cols-3 gap-3" do |f| %>
-            <%= f.text_field :title, class: "input input-bordered bg-base-300 w-full rounded-xl text-sm" %>
-            <%= f.text_field :company_name, class: "input input-bordered bg-base-300 w-full rounded-xl text-sm" %>
-            <%= f.text_field :location, class: "input input-bordered bg-base-300 w-full rounded-xl text-sm" %>
-            <%= f.submit "Save", class: "md:col-span-3 py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all cursor-pointer" %>
+        <%# TASK-86 / TASK-148: scraped data is dirty by nature and there was no
+            way to fix it without a console. Inline edit-in-place: this frame
+            shows a pencil in display mode and the full field editor in edit
+            mode (?section=core), re-rendering just itself on save. %>
+        <%= turbo_frame_tag dom_id(@job_posting, :core) do %>
+          <% if params[:section] == "core" || @editing == "core" %>
+            <%= render "job_postings/core_form", job_posting: @job_posting %>
+          <% else %>
+            <%= link_to job_posting_path(@job_posting, section: "core"),
+                  class: "inline-flex items-center gap-1 mt-6 text-xs font-bold text-base-content/40 hover:text-white transition-colors" do %>
+              <%= heroicon "pencil-square", options: { class: "w-3.5 h-3.5" } %> Edit posting details
+            <% end %>
           <% end %>
-        </details>
+        <% end %>
       </div>
     </header>
 

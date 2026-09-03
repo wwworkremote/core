@@ -134,6 +134,54 @@ RSpec.describe JobPosting do
     end
   end
 
+  describe "inline-edit accessors (TASK-148)" do
+    it "translates countries_text to an uppercased array in data, with dirty tracking" do
+      job = create(:job_posting)
+      job.update!(countries_text: "us, ca")
+
+      expect(job.reload.data["countries"]).to eq(%w[US CA])
+      expect(job.countries_text).to eq("US, CA")
+    end
+
+    it "translates tags_text to the tags array" do
+      job = create(:job_posting)
+      job.update!(tags_text: "ruby, rails,  kafka ")
+
+      expect(job.reload.tags).to eq(%w[ruby rails kafka])
+    end
+
+    it "casts the remote flag to a real boolean in data" do
+      job = create(:job_posting, data: { "remote" => true })
+      job.update!(remote: "0")
+
+      expect(job.reload.data["remote"]).to be(false)
+    end
+
+    it "reads salary/employment_type straight out of data via store_accessor" do
+      job = build(:job_posting, data: { "salary_min" => 120_000, "employment_type" => "FULL_TIME" })
+
+      expect(job.salary_min).to eq(120_000)
+      expect(job.employment_type).to eq("FULL_TIME")
+    end
+  end
+
+  describe ".geo_allowed (TASK-148 multi-country)" do
+    it "keeps a posting whose data['countries'] includes US even when country_code is not US" do
+      job = create(:job_posting, country_code: "CA", data: { "countries" => %w[CA US] })
+      expect(described_class.geo_allowed).to include(job)
+    end
+
+    it "still excludes a confirmed non-US posting with no US country listed" do
+      job = create(:job_posting, country_code: "CA", data: { "countries" => %w[CA] })
+      expect(described_class.geo_allowed).not_to include(job)
+    end
+
+    it "still allows an ungeocoded posting (country_code nil, no countries)" do
+      job = create(:job_posting, country_code: nil, data: {})
+      expect(described_class.geo_allowed).to include(job)
+    end
+  end
+
   describe ".by_role_family" do
     it "matches titles in the given family" do
       manager = create(:job_posting, title: "Engineering Manager, Payments")
