@@ -25,10 +25,10 @@
   Session 5 also ran /pipeline-health + local-LLM health — all green
   (verified 2026-09-03), no action.
 
-  Job search: Basis recruiter reached out 2026-09-03 (warm intro — the
-  recruiter's note said the internal contact "bragged about" Mike). Call
-  was ~10:00 CT. Debrief NOT logged (InterviewSession round 1 has no
-  feedback/vibe/questions). Vanguard warm-lead still open.
+  Job search: active threads and application state live in the app
+  (`/user_job_postings`, `/home`) and the local deep handoff — not
+  duplicated here. As of session 5: one interview in progress (round 1
+  held, debrief not yet logged) and one referral lead being evaluated.
 
   Live tasks (Backlog MCP):
     TASK-140  (Med, sharpened session 4) JobBoards::Syncer starves on an
@@ -64,10 +64,10 @@
     TASK-146  DONE session 4 — man/wwwr.1 + completions/wwwr.{bash,zsh} added
               for the whole bin/wwwr CLI, not just interview-prep.
     TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay).
-              First real run done vs Basis/Lever this session, but Lever isn't
-              first-class (TASK-143) so it was thin. Still wants a clean run
-              on a supported ATS (Greenhouse) with a full annotate/approve/
-              replay pass. In Progress.
+              First real run done against a live Lever posting, but Lever
+              isn't first-class (TASK-143) so it was thin. Still wants a
+              clean run on a supported ATS (Greenhouse) with a full
+              annotate/approve/replay pass. In Progress.
     TASK-143  (Med, NEW) guided harness has no first-class Lever support — the
               submit-block is hardcoded to the sandbox's `#application-form`,
               and Lever drops the `?guided_session_token` query string on the
@@ -94,37 +94,17 @@
   puma cluster mode + watchdog recurring job self-healing wedges in ~2-3 min.
   Ingestion live, 13 recurring jobs, AI matching hourly, dashboard renders.
 
-  Job search — applications tracked:
-    Basis, "Sr Software Engineer - Basis Platform / DSP" (Lever) — JP #7068,
-      UJP #268 = INTERVIEW (advanced from applied session 5 when the
-      InterviewSession process was seeded). PipelineStep history +
-      GuidedSession #18 completed. Interview process seeded (:compressed,
-      6 rounds) — round 1 (recruiter screen) scheduled 2026-09-03 15:00
-      UTC, rounds 2-6 unscheduled. THIS IS DEV-DB SEED DATA, not in PR #23.
-      Recruiter engaged via warm intro. Basis is formerly Centro (rebrand
-      2022), US HQ Chicago + Toronto — corrected in dev DB session 5
-      (JP #7068 location "Chicago, IL · Toronto, ON", country_code US,
-      data.countries [US,CA]; Centro note on UJP #268 notes). Was
-      auto-ignored on promote (bad remote flag + blank company) — restored.
-    Vanguard — warm internal referral in progress. The referrer is a former
-      colleague; their real identity lives only in the linked Contact record,
-      not here. Company #1112. Two reqs ingested 2026-08-25: JP #6740 "AI
-      Enablement, Specialist" (Charlotte NC, UJP #250 favorited, NOT
-      match-scored — likely the referrer's target, maps to the enablement
-      track); JP #6747 "Lead Backend Engineer - Mobile APIs" (auto-ignored).
-      Both flagged remote=false / Charlotte — could be a bad extract like
-      Basis, or genuine RTO (Vanguard is in-office-heavy) → a relocation/
-      hybrid question for Mike, not a filter question. Still deciding; open
-      offers: match-score #6740, restore #6747 + recheck remote flags, log
-      the referral as a PipelineStep on #250, maybe wire the vanguardjobs.com
-      board.
+  Job-search working state: not tracked in this file. Per-application
+  status, contacts, and notes live in the app (UserJobPosting /
+  PipelineStep / Contact records); session-specific detail is in the local
+  deep handoff. Session 5 seeded interview-round dev data on one test
+  posting and corrected its location/country fields — dev-DB only, not in
+  the PRs.
 
-  NEW standing criterion (memory feedback_culture_fit_over_comp, 2026-08-31):
-  weight team/culture/belonging fit ABOVE marginal comp — a warmer lower-comp
-  role should rank above a colder higher one. Mike prefers "appreciated for
-  less" over "not, for a bit more". The base comp floor still holds; this is
-  about weighing everything above it. Not yet reflected in
-  LLM::ProfileMatcher — that's a build task if Mike wants it.
+  Standing scoring requirement (memory feedback_culture_fit_over_comp):
+  LLM::ProfileMatcher should weight team/culture fit above marginal
+  compensation, as a first-class factor rather than a tiebreaker. Not yet
+  implemented — build task.
 
   Done 2026-09-03 session 5 (2 stacked PRs OPEN, NOT merged — main still
   @ 6ca8bd72 for feature code):
@@ -140,9 +120,8 @@
       multi-country data["countries"] + geo_allowed honoring it.
     - CONTEXT.md +4 domain entries (interview round/task/template, +
       Job Posting = canonical edit surface).
-    - Basis interview process seeded in dev DB (:compressed); JP #7068
-      location/country data corrected — see above.
-    - Slack message to the Basis warm-intro contact drafted (not sent).
+    - Seeded interview-round dev data on a test posting; corrected its
+      geo fields (dev-DB only).
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
@@ -163,14 +142,14 @@
     - `format: read-aloud` frontmatter is now a repo-wide convention (memory
       feedback_read_aloud_document_convention).
     - TASK-145 filed (Gemini orchestrator bug, pre-existing, High).
-    - Basis interview 2026-09-03 prepped (hand-written pack:
-      docs/interview-prep/basis-dsp/reference.md is the better one for the
-      actual interview; the generated one is the working pipeline).
+    - Interview Prep Pack feature dogfooded on a real posting; a
+      hand-written reference pack under docs/interview-prep/ serves as the
+      quality bar for the generator.
   Done 2026-08-31 session 3 (pushed, main @ c220a057 + this block commit):
     - indeed-profile-sync skill + indeed-profile-auditor agent (cfaf1f45)
     - "Start supervised application" button on the admin Lead page (fed55f9e,
       c220a057) — second entry to guided_sessions#create_from_posting
-    - first real guided-session dogfood (Basis/Lever) — surfaced TASK-143
+    - first real guided-session dogfood (a live Lever posting) — surfaced TASK-143
     - TASK-142 / TASK-143 filed
   Done 2026-08-31 session 2 (main @ 36365d81): guided-session top-nav + inline
   URL form; build stamp in footer; docs/applying-with-the-harness.md; TASK-141
@@ -178,26 +157,17 @@
   (ci.yml + bin/ci deleted).
   Done 2026-08-31 session 1: TASK-138 / TASK-126 / TASK-84 closed; TASK-140.
 
-  External (NOT repo work, no artifact here): Indeed profile — full pass done
-  via Claude-in-Chrome, now in good shape. 15-entry work history deduped +
-  titles/dates aligned to the just3ws canonical resume (bullets filled from
-  canonical highlights); ActiveCampaign + Tandem added; current role company
-  "Independent" → "Self-employed"; summary replaced with the new archetype
-  resume's version. Preferences: comp floor set, Remote+Hybrid+In-person,
-  work-area categories fixed, blue-collar "work schedule" pref deleted. Skills
-  curated 178 → 49. Old "0 to 1" resume deleted; Mike uploaded the Principal
-  Systems Architect archetype PDF; sync-suggestions reviewed (summary accepted,
-  the ~10 duplicate work-exp suggestions + a bogus "MCP" cert dismissed).
-  Open (Mike's judgement, not mechanical): reconcile the EMR-Bear entry vs
-  canonical (it's on Indeed, not in the resume); the Indeed profile location
-  and the resume location differ — reconcile. Do NOT click Indeed's "Review
-  suggestions" / "Sync to profile" — it re-adds duplicate work experience.
-  Workflow codified: `indeed-profile-sync` skill + `indeed-profile-auditor`
-  subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
-  resume changes or Mike takes/leaves a role.
+  External (NOT repo work): Indeed profile reconciled against the canonical
+  resume via Claude-in-Chrome. Workflow codified as the `indeed-profile-sync`
+  skill + `indeed-profile-auditor` subagent (Claude Code only — needs
+  Claude-in-Chrome); re-run when the resume changes or Mike takes/leaves a
+  role. A few resume-reconciliation items remain for Mike's judgement —
+  details in the deep handoff, not here. Gotcha: never click Indeed's
+  "Review suggestions" / "Sync to profile" — it re-adds duplicate work
+  experience.
 
   Blocked on Mike: (1) review + merge PR #23, then PR #24 (stacked);
-  (2) pick what to do with the Vanguard lead (4 options above).
+  (2) job-search decisions — tracked in the app + the deep handoff.
   Everything else is unblocked. GHA billing is moot (CI removed). No deploy
   mechanism exists (kamal unconfigured); deploy is out of scope.
 
