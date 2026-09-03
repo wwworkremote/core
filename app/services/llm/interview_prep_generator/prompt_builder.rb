@@ -83,11 +83,7 @@ class LLM::InterviewPrepGenerator::PromptBuilder
       #{experiences}
 
       [STANDING_CRITERIA]
-      - Comp floor per config; below that, culture/belonging has to carry real weight.
-      - Weight team culture and "genuinely glad to have him" above marginal comp -- a
-        first-class factor, not a tiebreaker.
-      - US-only. A role that cannot employ a US resident is a hard pass.
-      - Level is sized to company stage (Staff/Principal through CTO), not a fixed title.
+      #{StandingCriteria.prompt_block}
 
       [JOB_POSTING]
       Title: #{@job_posting.title}

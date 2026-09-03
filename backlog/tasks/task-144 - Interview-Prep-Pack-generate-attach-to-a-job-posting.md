@@ -11,7 +11,7 @@ labels:
   - llm
 dependencies: []
 references:
-  - docs/research/interview-prep-basis-dsp.md
+  - docs/interview-prep/_reference/reference.md
   - 'https://jobs.lever.co/basis/bb213682-6e49-48d4-bdfe-3b17aba79366'
 modified_files:
   - db/migrate/20260902170000_add_interview_prep_pack_to_user_job_postings.rb
@@ -24,7 +24,7 @@ modified_files:
   - app/views/job_postings/show.html.erb
   - CONTEXT.md
   - docs/changelog.md
-  - docs/research/interview-prep-basis-dsp.md
+  - docs/interview-prep/_reference/reference.md
   - spec/services/llm/interview_prep_generator_spec.rb
   - spec/services/llm/interview_prep_generator/prompt_builder_spec.rb
   - spec/requests/user_job_postings_spec.rb
@@ -39,7 +39,7 @@ ordinal: 160000
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Mike gets warm-intro interviews on short notice and needs prep fast. Today that prep is hand-built each time. Give the job-posting flow a one-click "generate interview prep pack" that produces a bespoke, reviewable markdown brief from his résumé + the posting + what the system already knows about the company, editable in place and regenerable — the same shape as the existing cover-letter generator, surfaced in the job posting's Interview notes section.
 
-The worked reference that defines the target structure and depth is docs/research/interview-prep-basis-dsp.md (Part 2 is the generalized per-section spec). The existing InterviewSession/InterviewQuestion/InterviewTask models and the small INTERVIEW_PREP snippet inside LLM::ProfileMatcher stay as they are; this is a new standalone artifact, not a change to those.
+The worked reference that defines the target structure and depth is docs/interview-prep/_reference/reference.md (Part 2 is the generalized per-section spec). The existing InterviewSession/InterviewQuestion/InterviewTask models and the small INTERVIEW_PREP snippet inside LLM::ProfileMatcher stay as they are; this is a new standalone artifact, not a change to those.
 
 Prompted by a real Basis (Lever) interview on 2026-09-03.
 <!-- SECTION:DESCRIPTION:END -->
@@ -72,7 +72,7 @@ Clone the cover-letter generation path for a new artifact type. Storage = text c
 5. View job_postings/show.html.erb Interview notes card (~line 113), above New Session Form: present→markdown render + clipboard copy (copy cover_letter block ~465) + generated-at + Regenerate button_to(force:true) + <details> textarea edit form (mirror Personal Notes ~480); absent→Generate button + helper (mirror no_match_yet).
 6. i18n config/locales/en.yml under job_postings.show.interview_notes: prep_heading, generate_prep, regenerate_prep, prep_generated_at, no_prep_yet, prep_helper, edit_prep, save_prep, copy.
 7. Specs: interview_prep_generator_spec (guards, force, success writes column), prompt_builder_spec (posting title/company + experience + referral-present-vs-absent + section instruction + PipelinePrompt fallback), user_job_postings request spec generate_interview_prep example.
-8. Docs: CONTEXT.md domain language "Interview Prep Pack"; changelog entry; one-line "Implemented by TASK-144" note atop docs/research/interview-prep-basis-dsp.md.
+8. Docs: CONTEXT.md domain language "Interview Prep Pack"; changelog entry; one-line "Implemented by TASK-144" note atop docs/interview-prep/_reference/reference.md.
 
 Verification: db:migrate; rspec the 3 files; rubocop the new files; manual against Basis posting (UJP #268) — generate/edit/persist/regenerate; confirm write via runner.
 
