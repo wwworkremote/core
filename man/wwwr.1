@@ -1,0 +1,134 @@
+.\" man/wwwr.1 -- manual page for the bin/wwwr operational CLI.
+.\" View with:  man ./man/wwwr.1     Install: see FILES.
+.TH WWWR 1 "2026-09-02" "wwworkremote/core" "WWWorkRemote Manual"
+.SH NAME
+wwwr \- WWWorkRemote operational CLI: pipeline health, postings, transitions, prep packs
+.SH SYNOPSIS
+.B bin/wwwr
+.I command
+.RI [ args ]
+.RI [ flags ]
+.br
+.B bin/wwwr
+.RB [ --help | -h ]
+.RB [ help
+.IR command ]
+.SH DESCRIPTION
+.B wwwr
+is the shell-side control surface for a single-user WWWorkRemote install. It
+answers "what is the state of the pipeline / a specific posting" and drives a
+few write paths, without a
+.B bin/rails runner
+one-liner. All reads and writes act against the one local user.
+.SH COMMANDS
+.TP
+.B status
+Print a pipeline health summary: job-posting and source counts, pending
+documents, whether pipelines are paused, the SolidQueue error rate, and the
+oldest unclaimed job.
+.TP
+.BI "postings " "[filters]"
+List up to 20 postings matching the given filters. With no match, says so.
+.TP
+.BI "transition " "<id> <event>"
+Apply one lifecycle or pipeline event to a posting and record it against the
+user's tracked record. Illegal transitions are reported, never raised.
+.TP
+.BI "match " "<id> --source=<name> [--escalate]"
+Return the job-fit score and analysis for a posting. Reads an existing
+analysis for free;
+.B --escalate
+runs a fresh LLM scan.
+.B --source
+is required for attribution logging. See
+.IR docs/agents/interop.md .
+.TP
+.BI "interview-prep " "<id> [--regenerate] [--spoken] [--export[=<role>]]"
+Print or generate the interview prep pack for a posting. Two versions, same
+content: a human version and a read-aloud version for text-to-speech.
+.TP
+.BI "help " "[command]"
+With a command, print its detailed help. Without, print the usage summary.
+.B --help
+and
+.B -h
+are aliases for the summary.
+.SH OPTIONS
+.SS postings filters
+.TP
+.BI --company= NAME
+Match the company name (substring).
+.TP
+.BI --source-id= ID
+Match the ingestion source.
+.TP
+.BI --role-family= FAMILY
+Match the role family.
+.TP
+.BI --location= LOCATION
+Match the location string.
+.TP
+.B --remote
+Only remote postings.
+.TP
+.B --contract
+Only contract / temp postings.
+.SS transition events
+.B favorite\fR, \fBapply\fR, \fBinterview\fR, \fBoffer\fR, \fBreject\fR, \fBignore\fR, \fBarchive
+(the exact list is printed by
+.BR "bin/wwwr --help" ).
+.SS interview-prep flags
+.TP
+.B (no flags)
+Print the stored human pack; generate one if none exists.
+.TP
+.B --regenerate
+Force a fresh generation. Rewrites both the human and the read-aloud version.
+.TP
+.B --spoken
+Print the read-aloud version instead of the human one.
+.TP
+.B --export
+Write
+.B pack.md
+and
+.B pack.spoken.md
+to
+.IR ~/ai/outbox/wwwr/interview-prep/<role>/ .
+The read-aloud file gains discovery frontmatter
+.RB ( "format: read-aloud" ", " kind ", " lang ", " source ", " generated_at )
+ahead of the content hints.
+.TP
+.BI --export= ROLE
+Use
+.I ROLE
+as the subdirectory name instead of the company slug.
+.SH FILES
+.TP
+.I bin/wwwr
+The five-line shim; logic in
+.IR lib/wwwr/cli.rb .
+.TP
+.I ~/ai/outbox/wwwr/interview-prep/<role>/
+Exported prep packs (generated artifacts, outside the repo).
+.TP
+.I completions/wwwr.bash ", " completions/wwwr.zsh
+Shell completion. Install by sourcing
+.I completions/wwwr.bash
+from
+.IR ~/.bashrc ,
+or adding
+.I completions/
+to
+.B fpath
+before
+.B compinit
+in
+.IR ~/.zshrc .
+.SH SEE ALSO
+.IR docs/agents/bin-scripts.md ,
+.IR docs/interview-prep/README.md ,
+.IR docs/architecture/interview-prep-tooling.md ,
+.IR docs/agents/interop.md
+.SH AUTHOR
+Mike Hall.

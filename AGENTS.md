@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-08-31 (session 3)
+     CURRENT FOCUS  —  last updated 2026-09-02 (session 4)
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -7,12 +7,22 @@
      and fix the block. Full procedure: docs/agents/session-handoff.md
      ═══════════════════════════════════════════════════════════════════════
 
-  In flight: nothing half-built. The guided-session → datalake loop got its
-  first real supervised-application run this session (Basis / Lever — see
-  below). Job search itself is now the active thread: Basis applied, Vanguard
-  warm-lead in progress.
+  In flight: nothing half-built. Session 4 built the Interview Prep Pack
+  feature end-to-end (TASK-144 + .1/.2/.3/.4, all Done) on branch
+  `feat/interview-prep-pack` — merge to main pending Mike's push go. Job
+  search is still the active thread: Basis interview was 2026-09-03 10:00 CT
+  (warm intro via a UGtastic contact); Vanguard warm-lead still open.
 
   Live tasks (Backlog MCP):
+    TASK-145  (High, NEW) LLM::Orchestrator always fails on the Gemini provider
+              ("Role 'system' is not supported"). defaults.answer_generation
+              has pointed at gemini-3.7-flash since 2026-08-24 → every AI-path
+              screening answer has been silently failing. Also blocks a
+              stronger model on the interview-prep path. Repro + root cause in
+              the task (Streamer replays roles verbatim, bypassing RubyLLM's
+              system→system_instruction mapping).
+    TASK-146  DONE session 4 — man/wwwr.1 + completions/wwwr.{bash,zsh} added
+              for the whole bin/wwwr CLI, not just interview-prep.
     TASK-112  guided recorder — HITL ACs (#3 annotate, #4 approve, #5 replay).
               First real run done vs Basis/Lever this session, but Lever isn't
               first-class (TASK-143) so it was thin. Still wants a clean run
@@ -71,6 +81,25 @@
   still holds; this is about weighing everything above it. Not yet reflected
   in LLM::ProfileMatcher — that's a build task if Mike wants it.
 
+  Done 2026-09-02 session 4 (branch feat/interview-prep-pack, ~19 commits,
+  merge to main pending Mike's push go):
+    - Interview Prep Pack: LLM-generated briefing per posting (role setup,
+      domain primer w/ acronym→authority binding, story arc, hooks, referral
+      play, likely questions, questions to ask, checklist). Button on the job
+      posting page + `bin/wwwr interview-prep <id>`. TASK-144 + .1 (domain
+      primer) + .2 (skill + interview-prep-auditor agent) + .4 (docs/diagrams).
+    - Read-aloud version (TASK-144.3): `interview_prep_pack_spoken`, a
+      SpokenRewriter pass → TTS-clean prose + a `format: read-aloud` YAML
+      frontmatter block. `--export[=<role>]` writes pack.md + pack.spoken.md
+      to ~/ai/outbox/wwwr/interview-prep/<role>/. Convention doc'd:
+      docs/interview-prep/ (standard, transform prompt, integration guide);
+      diagrams in docs/architecture/interview-prep-tooling.md.
+    - `format: read-aloud` frontmatter is now a repo-wide convention (memory
+      feedback_read_aloud_document_convention).
+    - TASK-145 filed (Gemini orchestrator bug, pre-existing, High).
+    - Basis interview 2026-09-03 prepped (hand-written pack:
+      docs/interview-prep/basis-dsp/reference.md is the better one for the
+      actual interview; the generated one is the working pipeline).
   Done 2026-08-31 session 3 (pushed, main @ c220a057 + this block commit):
     - indeed-profile-sync skill + indeed-profile-auditor agent (cfaf1f45)
     - "Start supervised application" button on the admin Lead page (fed55f9e,
