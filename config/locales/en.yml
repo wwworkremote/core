@@ -222,6 +222,7 @@ en:
       open_source_listing: "Open Source Listing"
       interview_notes:
         heading: "Interview Notes"
+        not_scheduled: "Not scheduled yet"
         log_session: "Log Session"
         add_session: "Add Session"
         vibe_label: "Vibe"

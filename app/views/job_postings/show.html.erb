@@ -188,19 +188,29 @@
 
         <!-- Session List -->
         <div class="space-y-8">
-          <% @job_posting.interview_sessions.order(scheduled_at: :desc).each do |session| %>
+          <% @job_posting.interview_sessions.ordered.includes(:interview_questions).each do |session| %>
             <div class="border-l-2 border-primary/30 pl-8 relative">
-              <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+              <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full <%= session.pending? ? "bg-primary/40" : "bg-primary" %>"></div>
 
               <div class="flex justify-between items-start mb-4">
                 <div>
                   <div class="text-xs font-bold text-slate-400 mb-1">
-                    <%= session.scheduled_at.strftime("%b %-d, %Y · %H:%M") %>
+                    <% if session.position %>Round <%= session.position %> &middot; <% end %>
+                    <%= session.scheduled_at ? session.scheduled_at.strftime("%b %-d, %Y · %H:%M") : t('.interview_notes.not_scheduled') %>
                   </div>
-                  <h4 class="text-lg font-black text-white tracking-tight"><%= session.session_type.humanize %></h4>
+                  <h4 class="text-lg font-black text-white tracking-tight">
+                    <%= session.notes.presence || session.session_type.humanize %>
+                  </h4>
                 </div>
-                <div class="badge badge-outline border-primary/40 text-primary text-xs font-bold">
-                  <%= t('.interview_notes.vibe_label') %>: <%= session.vibe || t('.interview_notes.vibe_pending') %>
+                <div class="flex flex-col items-end gap-1">
+                  <div class="badge badge-outline border-primary/40 text-primary text-xs font-bold">
+                    <%= t('.interview_notes.vibe_label') %>: <%= session.vibe || t('.interview_notes.vibe_pending') %>
+                  </div>
+                  <% unless session.pending? %>
+                    <div class="badge badge-outline text-xs font-bold <%= session.outcome == "rejected" ? "border-error/40 text-error" : "border-success/40 text-success" %>">
+                      <%= session.outcome.humanize %>
+                    </div>
+                  <% end %>
                 </div>
               </div>
 

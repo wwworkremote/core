@@ -483,6 +483,18 @@ RSpec.describe "Job Postings" do
         expect(response.body).to include("spoken words")
         expect(response.body).to include("D S P")
       end
+
+      it "renders a seeded interview process with unscheduled placeholder rounds" do
+        ujp = create(:user_job_posting, user: current_user, job_posting: job, status: "applied")
+        InterviewProcess.seed_default(ujp, template: :compressed)
+
+        get job_posting_path(job)
+
+        expect(response).to be_successful
+        expect(response.body).to include("Round 1")
+        expect(response.body).to include("Not scheduled yet")
+        expect(response.body).to include("Recruiter screen")
+      end
     end
 
     context "application Q&A panel" do
