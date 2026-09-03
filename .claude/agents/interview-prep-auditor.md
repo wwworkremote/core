@@ -11,7 +11,7 @@ description: >-
 tools: Bash, Read, Grep, Glob
 model: sonnet
 metadata:
-  version: 1.0.1
+  version: 1.0.2
 ---
 
 You audit one interview **prep pack** against the quality bar and the posting it
@@ -66,7 +66,7 @@ bin/wwwr interview-prep <id> --spoken
 | Frontmatter | No `---` fenced YAML block, or it is missing `title` / `pronunciation` / `sections` / `spoken_minutes`, or it fails to parse |
 | Abbreviations | Any "Sr.", "e.g.", "i.e.", "vs.", "etc.", "&", "w/", "~", "%", "/" between words, or an arrow, survives in the body |
 | Acronyms | An acronym appears with no expansion anywhere in the document |
-| Numbers | Any `[posted band]`, `sub-100ms`, `p99`, `4%`, or a dash used for a range instead of the word "to" |
+| Numbers | Any `$140–175K`, `sub-100ms`, `p99`, `4%`, or a dash used for a range instead of the word "to" |
 | Layout | A table or a fenced code block in the body; an emoji; a bare URL |
 | Sentences | Run-on sentences, or deep nested parentheticals that will not survive being heard |
 | Content parity | The read-aloud version is missing a section the human version has, or states something the human version does not |

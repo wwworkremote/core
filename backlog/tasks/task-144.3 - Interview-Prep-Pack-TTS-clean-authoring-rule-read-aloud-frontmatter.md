@@ -24,7 +24,7 @@ The prep pack gets fed to a text-to-speech engine. It must read cleanly aloud as
 Make it a rule (in the generator prompt CONSTRAINTS + a shared reference the skill/agent point to):
 - Spell out abbreviations and contractions everywhere: "Senior" not "Sr.", "for example" not "e.g.", "that is" not "i.e.", "versus" not "vs.", "and so on" not "etc.", "and" not "&", "with" not "w/", "about" not "~", "percent" not "%", "then" / "leads to" not the arrow, "and"/"to" not "/".
 - Expand every acronym on first use in a spoken-friendly way; short form is fine after that.
-- Numbers, money, ranges as words or spoken digits: "[posted band]" not "[posted band]"; "under 100 milliseconds" not "sub-100ms"; "99th percentile" not "p99"; "4 percent" not "4%".
+- Numbers, money, ranges as words or spoken digits: "140,000 to 175,000 dollars" not "$140–175K"; "under 100 milliseconds" not "sub-100ms"; "99th percentile" not "p99"; "4 percent" not "4%".
 - No bare URLs in the spoken body -- name the source (reinforces the existing rule).
 - No emoji.
 - Prose and simple bullet lists only in the pack body -- no tables, no code blocks (a table row reads as a run-on).

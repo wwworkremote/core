@@ -58,7 +58,7 @@ is inconsistent across engines and it degrades the experience for everyone else.
 The meaning of a number decides how it should be said, and the engine cannot tell.
 
 - Ranges use the word "to", not a dash: "one hundred nineteen thousand to one hundred sixty
-  thousand dollars", not "[posted band]". A dash in a range is read inconsistently, and "to" is
+  thousand dollars", not "$140–175K". A dash in a range is read inconsistently, and "to" is
   faster to read on screen as well.
 - Ordinals as words: "first", "ninety-ninth percentile", not "1st", "p99".
 - Currency and units written out: "under one hundred milliseconds", not "sub-100ms".
@@ -111,7 +111,7 @@ pronunciation:
   Basis: "BAY sis"
   DSP: "D S P"
   OpenRTB: "open R T B"
-  [redacted-name]: "shiv AWN"
+  Siobhan: "shiv AWN"
 sections:
   - "The setup"
   - "Domain primer"

@@ -161,6 +161,6 @@ see [`tts-integration-guide.md`](tts-integration-guide.md).
 | `DSP: D S P` | say each letter, short gaps | `<say-as interpret-as="characters">DSP</say-as>` |
 | `OpenRTB: open R T B` | mixed word + letters | `open <say-as interpret-as="characters">RTB</say-as>` |
 | `Basis: BAY-sis` | respelling, stress on caps | `<phoneme alphabet="ipa" ph="ˈbeɪ.sɪs">Basis</phoneme>` or `<sub alias="BAY sis">Basis</sub>` |
-| `[redacted-name]: shiv-AWN` | respelling, stress on middle | `<sub alias="shiv AWN">[redacted-name]</sub>` |
+| `Siobhan: shiv-AWN` | respelling, stress on middle | `<sub alias="shiv AWN">Siobhan</sub>` |
 
 If the engine has no SSML, fall back to substituting the spoken hint text directly.
