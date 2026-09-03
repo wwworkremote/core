@@ -4,29 +4,32 @@
 #
 # Table name: user_job_postings
 #
-#  id                           :bigint           not null, primary key
-#  application_profile_snapshot :jsonb            not null
-#  applied_at                   :datetime
-#  cover_letter                 :text
-#  match_analysis               :text
-#  match_score                  :integer
-#  match_tags                   :text             default([]), not null, is an Array
-#  notes                        :text
-#  outcome                      :string
-#  outcome_at                   :datetime
-#  outcome_reason               :text
-#  outcome_source               :string
-#  priority_flag                :boolean
-#  resume_persona_snapshot      :jsonb            not null
-#  status                       :string
-#  strategy                     :jsonb            not null
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  application_trace_id         :string
-#  job_posting_id               :bigint           not null
-#  job_search_id                :bigint
-#  resume_persona_id            :string
-#  user_id                      :bigint           not null
+#  id                               :bigint           not null, primary key
+#  application_profile_snapshot     :jsonb            not null
+#  applied_at                       :datetime
+#  cover_letter                     :text
+#  interview_prep_pack              :text
+#  interview_prep_pack_generated_at :datetime
+#  interview_prep_pack_spoken       :text
+#  match_analysis                   :text
+#  match_score                      :integer
+#  match_tags                       :text             default([]), not null, is an Array
+#  notes                            :text
+#  outcome                          :string
+#  outcome_at                       :datetime
+#  outcome_reason                   :text
+#  outcome_source                   :string
+#  priority_flag                    :boolean
+#  resume_persona_snapshot          :jsonb            not null
+#  status                           :string
+#  strategy                         :jsonb            not null
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#  application_trace_id             :string
+#  job_posting_id                   :bigint           not null
+#  job_search_id                    :bigint
+#  resume_persona_id                :string
+#  user_id                          :bigint           not null
 #
 # Indexes
 #
@@ -208,6 +211,32 @@ RSpec.describe UserJobPosting do
     it "falls back to created_at, never nil, when no PipelineStep exists" do
       ujp = create(:user_job_posting, status: "applied")
       expect(ujp.last_pipeline_activity_at).to eq(ujp.created_at)
+    end
+  end
+
+  describe "#spoken_pack_parts" do
+    it "splits the YAML frontmatter from the body" do
+      raw = "---\ntitle: Prep\nspoken_minutes: 8\n---\n# The setup\nbody"
+      ujp = described_class.new(interview_prep_pack_spoken: raw)
+
+      hints, body = ujp.spoken_pack_parts
+
+      expect(hints).to eq("title" => "Prep", "spoken_minutes" => 8)
+      expect(body).to eq("# The setup\nbody")
+    end
+
+    it "returns the whole text and empty hints when there is no frontmatter" do
+      ujp = described_class.new(interview_prep_pack_spoken: "# just a body")
+
+      expect(ujp.spoken_pack_parts).to eq([{}, "# just a body"])
+    end
+
+    it "returns empty hints on malformed YAML rather than raising" do
+      ujp = described_class.new(interview_prep_pack_spoken: "---\ntitle: : :\n---\nbody")
+
+      hints, body = ujp.spoken_pack_parts
+      expect(hints).to eq({})
+      expect(body).to eq("body")
     end
   end
 end

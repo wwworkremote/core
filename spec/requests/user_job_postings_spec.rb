@@ -106,6 +106,14 @@ RSpec.describe "UserJobPostings" do
       expect(response).to redirect_to(user_job_postings_path)
     end
 
+    it "saves an edited interview prep pack" do
+      ujp = user.user_job_postings.create!(job_posting: job_posting, interview_prep_pack: "draft")
+
+      patch user_job_posting_path(ujp), params: { user_job_posting: { interview_prep_pack: "my edits" } }
+
+      expect(ujp.reload.interview_prep_pack).to eq("my edits")
+    end
+
     it "clearing the outcome also clears the reason and evidence" do
       ujp = user.user_job_postings.create!(job_posting: job_posting, outcome: "rejected",
                                            outcome_reason: "Not a fit")
@@ -194,13 +202,41 @@ RSpec.describe "UserJobPostings" do
 
       post generate_artifacts_user_job_postings_path, params: { job_posting_id: job_posting.id }
 
-      expect(flash[:notice]).to eq("Bespoke application artifacts generated and appended to notes.")
+      expect(flash[:notice]).to eq("Bespoke application artifacts generated.")
     end
 
     it "flashes the error when generation fails" do
       allow(LLM::ArtifactGenerator).to receive(:call).and_return(success: false, error: "boom")
 
       post generate_artifacts_user_job_postings_path, params: { job_posting_id: job_posting.id }
+
+      expect(flash[:alert]).to eq("Generation failed: boom")
+    end
+  end
+
+  describe "POST /user_job_postings/generate_interview_prep" do
+    it "flashes success and redirects when generation succeeds" do
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: true)
+
+      post generate_interview_prep_user_job_postings_path, params: { job_posting_id: job_posting.id }
+
+      expect(flash[:notice]).to eq("Interview prep pack generated.")
+      expect(response).to be_redirect
+    end
+
+    it "passes force: true through on regenerate" do
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: true)
+
+      post generate_interview_prep_user_job_postings_path,
+           params: { job_posting_id: job_posting.id, force: "true" }
+
+      expect(LLM::InterviewPrepGenerator).to have_received(:call).with(user, job_posting, force: true)
+    end
+
+    it "flashes the error when generation fails" do
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: false, error: "boom")
+
+      post generate_interview_prep_user_job_postings_path, params: { job_posting_id: job_posting.id }
 
       expect(flash[:alert]).to eq("Generation failed: boom")
     end

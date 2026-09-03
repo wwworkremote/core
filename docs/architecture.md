@@ -28,6 +28,15 @@ Diagrammed versions of this, plus the application pipeline's state machines, liv
 [`architecture/pipeline-statechart.md`](architecture/pipeline-statechart.md), and
 [`architecture/application-sequence.md`](architecture/application-sequence.md).
 
+### 4. Candidate-side artifacts
+
+Beyond ranking, the system produces artifacts for the candidate: a **cover letter** and an
+**interview prep pack** (human + read-aloud text-to-speech versions) per posting, both
+LLM-generated from the structured career data and stored on `UserJobPosting`.
+[`architecture/interview-prep-tooling.md`](architecture/interview-prep-tooling.md) diagrams
+the prep-pack generation, the read-aloud rewrite, the outbox export, and the skill's audit
+loop.
+
 ## 🧠 AI Architectural Principles
 
 The system implements a production-grade AI stack designed for reliability, safety, and deep technical alignment.

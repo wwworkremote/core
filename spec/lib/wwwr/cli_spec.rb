@@ -5,6 +5,7 @@ require Rails.root.join("lib/wwwr")
 require Rails.root.join("lib/wwwr/interop")
 require Rails.root.join("lib/wwwr/queue_status")
 require Rails.root.join("lib/wwwr/transition_runner")
+require Rails.root.join("lib/wwwr/interview_prep")
 require Rails.root.join("lib/wwwr/cli")
 
 RSpec.describe Wwwr::CLI do
@@ -112,6 +113,110 @@ RSpec.describe Wwwr::CLI do
       allow(LLM::ProfileMatcher).to receive(:call).with(user, posting).and_return(success: true, output: "Fresh scan.")
 
       expect { cli.run(["match", posting.id.to_s, "--source=spec", "--escalate"]) }.to output(/Fresh scan\./).to_stdout
+    end
+  end
+
+  describe "help" do
+    it "prints the top-level usage with no topic" do
+      expect { cli.run(["help"]) }.to output(/interview-prep <id>/).to_stdout
+    end
+
+    it "prints detailed help for a known topic" do
+      expect { cli.run(%w[help interview-prep]) }.to output(/--export=<role>.*subdirectory name/m).to_stdout
+    end
+
+    it "answers --help and -h as well" do
+      expect { cli.run(["--help"]) }.to output(/Usage:/).to_stdout
+      expect { cli.run(["-h"]) }.to output(/Usage:/).to_stdout
+    end
+  end
+
+  describe "interview-prep" do
+    let!(:user) { create(:user) }
+
+    it "prints the stored pack without calling the generator" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "## Stored pack")
+      allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+      expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/Stored pack/).to_stdout
+      expect(LLM::InterviewPrepGenerator).not_to have_received(:call)
+    end
+
+    it "regenerates on --regenerate and prints the fresh pack" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "old")
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: true, output: "## Fresh pack")
+
+      expect { cli.run(["interview-prep", posting.id.to_s, "--regenerate"]) }.to output(/Fresh pack/).to_stdout
+    end
+
+    it "generates when no pack is stored yet" do
+      posting = create(:job_posting)
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: true, output: "## New pack")
+
+      expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/New pack/).to_stdout
+    end
+
+    it "prints the read-aloud version with --spoken" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human",
+                                interview_prep_pack_spoken: "--- \ntitle: x\n---\nspoken words")
+      allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+      expect { cli.run(["interview-prep", posting.id.to_s, "--spoken"]) }.to output(/spoken words/).to_stdout
+    end
+
+    it "hints to regenerate when --spoken is asked for but no read-aloud version exists" do
+      posting = create(:job_posting)
+      create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human")
+
+      expect { cli.run(["interview-prep", posting.id.to_s, "--spoken"]) }.to output(/no read-aloud version/).to_stdout
+    end
+
+    it "surfaces a generation failure instead of raising" do
+      posting = create(:job_posting)
+      allow(LLM::InterviewPrepGenerator).to receive(:call).and_return(success: false, error: "boom")
+
+      expect { cli.run(["interview-prep", posting.id.to_s]) }.to output(/Generation failed: boom/).to_stdout
+    end
+
+    it "reports an unknown posting id instead of raising" do
+      expect { cli.run(%w[interview-prep 999999]) }.to output(/not found/).to_stdout
+    end
+
+    describe "--export" do
+      let(:export_root) { Pathname(Dir.mktmpdir) }
+
+      before { stub_const("Wwwr::InterviewPrep::EXPORT_ROOT", export_root) }
+      after { FileUtils.remove_entry(export_root) }
+
+      it "writes both versions to a per-role subdirectory of the outbox" do
+        posting = create(:job_posting, company: "Basis Technologies")
+        create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human pack",
+                                  interview_prep_pack_spoken: "---\ntitle: \"P\"\n---\nspoken body")
+        allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+        expect {
+          cli.run(["interview-prep", posting.id.to_s, "--export"])
+        }.to output(/pack\.md.*pack\.spoken\.md/m).to_stdout
+
+        dir = export_root.join("basis-technologies")
+        expect(dir.join("pack.md").read).to eq("human pack")
+        spoken = dir.join("pack.spoken.md").read
+        expect(spoken).to start_with("---\n")
+        expect(spoken).to include("format: read-aloud").and include("kind: interview-prep").and include("spoken body")
+      end
+
+      it "uses an explicit --export=<role> name for the subdirectory" do
+        posting = create(:job_posting, company: "Basis Technologies")
+        create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "p")
+        allow(LLM::InterviewPrepGenerator).to receive(:call)
+
+        cli.run(["interview-prep", posting.id.to_s, "--export=basis-dsp"])
+
+        expect(export_root.join("basis-dsp", "pack.md").read).to eq("p")
+      end
     end
   end
 end

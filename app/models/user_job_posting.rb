@@ -4,29 +4,32 @@
 #
 # Table name: user_job_postings
 #
-#  id                           :bigint           not null, primary key
-#  application_profile_snapshot :jsonb            not null
-#  applied_at                   :datetime
-#  cover_letter                 :text
-#  match_analysis               :text
-#  match_score                  :integer
-#  match_tags                   :text             default([]), not null, is an Array
-#  notes                        :text
-#  outcome                      :string
-#  outcome_at                   :datetime
-#  outcome_reason               :text
-#  outcome_source               :string
-#  priority_flag                :boolean
-#  resume_persona_snapshot      :jsonb            not null
-#  status                       :string
-#  strategy                     :jsonb            not null
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  application_trace_id         :string
-#  job_posting_id               :bigint           not null
-#  job_search_id                :bigint
-#  resume_persona_id            :string
-#  user_id                      :bigint           not null
+#  id                               :bigint           not null, primary key
+#  application_profile_snapshot     :jsonb            not null
+#  applied_at                       :datetime
+#  cover_letter                     :text
+#  interview_prep_pack              :text
+#  interview_prep_pack_generated_at :datetime
+#  interview_prep_pack_spoken       :text
+#  match_analysis                   :text
+#  match_score                      :integer
+#  match_tags                       :text             default([]), not null, is an Array
+#  notes                            :text
+#  outcome                          :string
+#  outcome_at                       :datetime
+#  outcome_reason                   :text
+#  outcome_source                   :string
+#  priority_flag                    :boolean
+#  resume_persona_snapshot          :jsonb            not null
+#  status                           :string
+#  strategy                         :jsonb            not null
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#  application_trace_id             :string
+#  job_posting_id                   :bigint           not null
+#  job_search_id                    :bigint
+#  resume_persona_id                :string
+#  user_id                          :bigint           not null
 #
 # Indexes
 #
@@ -125,6 +128,21 @@ class UserJobPosting < ApplicationRecord
 
   def harness_recorded?
     guided_sessions.completed.where.not(scenario_id: nil).exists?
+  end
+
+  # The read-aloud pack opens with a YAML frontmatter block fenced by "---".
+  # Returns [hints_hash, body] so the view can surface the read-aloud hints
+  # and markdown-render the body without a stray horizontal rule.
+  def spoken_pack_parts
+    m = interview_prep_pack_spoken.to_s.match(/\A---\s*\n(?<fm>.*?)\n---\s*\n(?<body>.*)\z/m)
+    m ? [parse_frontmatter(m[:fm]), m[:body]] : [{}, interview_prep_pack_spoken.to_s]
+  end
+
+  def parse_frontmatter(text)
+    parsed = YAML.safe_load(text, permitted_classes: [], aliases: false)
+    parsed.is_a?(Hash) ? parsed : {}
+  rescue Psych::SyntaxError
+    {}
   end
 
   # TASK-93: "actively pursuing, gone quiet." archived/none excluded --

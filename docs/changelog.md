@@ -181,6 +181,46 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   contrast pass fixing `slate-500`/`slate-600` failing WCAG AA against the
   dark theme (~300 uses across 59 files).
 
+## September 2026
+
+- **Sep 2** — Interview Prep Pack (TASK-144): one-click LLM-generated interview
+  brief per job posting — story arc, ranked company hooks, referral play,
+  likely questions, questions to ask, night-before checklist — grounded in the
+  structured career history, the posting, any stored Company audit, and any
+  linked referral Contact. Stored on `UserJobPosting` next to the cover letter,
+  editable in place and regenerable, surfaced in the Interview Notes section.
+  Built by cloning the cover-letter generation path; the three POST-and-redirect
+  LLM actions on `UserJobPostingsController` collapsed onto one `run_llm` helper.
+  Worked reference: `docs/interview-prep/basis-dsp/reference.md`.
+- **Sep 2** — Interview Prep Pack gains a **Domain Primer** section (TASK-144.1):
+  posting-anchored industry knowledge — what the business does and where the role
+  sits, must-know vs useful-context vocabulary, domain best practices, the blind
+  spots specific to this candidate's background, and learning resources (model-
+  suggested, flagged "verify"). Prompt-only change; no live web research in v1.
+  Follow-up guardrails: "useful context" must be domain concepts not the
+  candidate's own stack; "blind spots" are domain assumptions not skill gaps;
+  every acronym is expanded and bound to the body that defines it (IAB Tech
+  Lab, W3C, an RFC, vendor docs), never a guessed URL.
+- **Sep 2** — Interview Prep Pack ships in two versions (TASK-144.3): the human
+  pack, and a read-aloud version (`interview_prep_pack_spoken`) produced by a
+  `SpokenRewriter` pass — same content, opens with a YAML frontmatter block
+  (spelled-out title, pronunciation map, section list, spoken minutes), then
+  text-to-speech-clean prose: abbreviations and numbers spelled out, no tables,
+  no emoji, no bare URLs, one idea per sentence. Standard:
+  `docs/interview-prep/tts-readable-documentation.md`. Consumed per
+  `docs/interview-prep/tts-transform-prompt.md` — the read-aloud version is cleanly
+  sentence-segmented so it can also feed closed captions or a lyrics transcript.
+  `bin/wwwr interview-prep <id> --spoken` prints it; `--export[=<role>]` writes
+  `pack.md` + `pack.spoken.md` (frontmatter carries `format: read-aloud` plus `kind` / `lang` / `source` / `generated_at` for tool discovery) to `~/ai/outbox/wwwr/interview-prep/<role>/`.
+  The posting page shows the read-aloud version under a toggle with the
+  pronunciation hints surfaced. Wiring a text-to-speech tool:
+  `docs/interview-prep/tts-integration-guide.md`.
+- **Sep 2** — `interview-prep` skill + `interview-prep-auditor` agent + `bin/wwwr
+  interview-prep` (TASK-144.2): the skill generates a pack then audits and
+  grounds it (auditor punch list; `industry-intelligence-agent` verifies the
+  primer's concepts, acronym citations, and links); the auditor also checks the
+  read-aloud version against the text-to-speech standard.
+
 ## Where to look instead of re-reading this file
 
 - `docs/adr/*.md` — the "why," not just the "what," for the biggest

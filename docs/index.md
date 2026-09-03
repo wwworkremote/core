@@ -34,6 +34,10 @@ diagrams, not just source. This file itself is best read there.
 - **[Troubleshooting](troubleshooting.md)**: Common failures and fixes.
 - **[Deployment](deployment.md)**: Disaster recovery and scaling.
 
+### Interview Prep
+- **[Interview prep docs](interview-prep/README.md)**: The prep pack feature — the read-aloud (text-to-speech) standard, the transform prompt for external TTS tooling, and one worked reference per role, plus the export-and-integration guide for wiring up a text-to-speech tool.
+- **[Interview prep tooling](architecture/interview-prep-tooling.md)**: How it fits together — generation, the read-aloud rewrite, storage, the export, and the audit loop, with sequence and pipeline diagrams.
+
 ### Research Notes
 - **[Chrome built-in AI flags](research/chrome-built-in-ai-flags.md)**: Which browser AI flags help or interfere with the extension and guided-session dogfooding.
 - **[Chrome platform and WASM leverage](research/chrome-platform-and-wasm-leverage.md)**: Ranked opportunities for CDP, Offscreen Documents, WASM inference, and future harness work.

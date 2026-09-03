@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_060000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -1194,6 +1194,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_060000) do
     t.datetime "applied_at"
     t.text "cover_letter"
     t.datetime "created_at", null: false
+    t.text "interview_prep_pack"
+    t.datetime "interview_prep_pack_generated_at"
+    t.text "interview_prep_pack_spoken"
     t.bigint "job_posting_id", null: false
     t.bigint "job_search_id"
     t.text "match_analysis"

@@ -21,6 +21,14 @@ defaults:
   # Caveat worth keeping: nothing reads defaults.fallback below, so if this
   # model ever fails to authenticate, answer generation goes down rather
   # than degrading to local. Comment this line out to fall back by hand.
+  #
+  # interview_prep: the interview prep pack (LLM::InterviewPrepGenerator).
+  # Same profile as answer_generation -- prose Mike reads, no PHI, the only
+  # untrusted text is the posting body which the orchestrator already
+  # screens -- so quality outranks on-box. Left unset (uses primary) until
+  # the local prose quality proves insufficient; then point it at the same
+  # model answer_generation uses.
+  # interview_prep: "gemini-3.7-flash"
 
 models:
   local:

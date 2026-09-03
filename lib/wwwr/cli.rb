@@ -12,7 +12,30 @@ class Wwwr::CLI
     "status" => :print_status,
     "postings" => :print_postings,
     "transition" => :run_transition,
-    "match" => :run_match
+    "match" => :run_match,
+    "interview-prep" => :run_interview_prep,
+    "help" => :print_help,
+    "--help" => :print_help,
+    "-h" => :print_help
+  }.freeze
+
+  HELP = {
+    "interview-prep" => <<~TXT
+      bin/wwwr interview-prep <job_posting_id> [--regenerate] [--spoken] [--export[=<role>]]
+
+        Print or generate the interview prep pack for a posting. Two versions,
+        same content: a human version and a read-aloud version for text-to-speech.
+
+        (no flags)      print the stored human pack, or generate one if none exists
+        --regenerate    force a fresh generation (rewrites both versions)
+        --spoken        print the read-aloud version instead of the human one
+        --export        write pack.md + pack.spoken.md to
+                        ~/ai/outbox/wwwr/interview-prep/<role>/
+        --export=<role> use <role> as the subdirectory name (default: company slug)
+
+        Docs: docs/interview-prep/README.md
+              docs/architecture/interview-prep-tooling.md (diagrams)
+    TXT
   }.freeze
 
   def run(argv)
@@ -24,8 +47,15 @@ class Wwwr::CLI
 
   def print_usage(_args = [])
     puts "Usage: status | postings [filters] | transition <id> <event> | match <id> --source=<n> [--escalate]"
+    puts "       interview-prep <id> [--regenerate] [--spoken] [--export[=<role>]]"
+    puts "       help [<command>]"
     puts "  filters: --company= --source-id= --role-family= --location= --remote --contract"
     puts "  events:  #{Wwwr::TransitionRunner::ALL_EVENTS.join(' ')} (match contract: docs/agents/interop.md)"
+  end
+
+  def print_help(args)
+    topic = HELP[args.first]
+    topic ? puts(topic) : print_usage
   end
 
   def print_status(_args = [])
@@ -52,6 +82,19 @@ class Wwwr::CLI
     return puts "Posting ##{id} not found." unless posting
 
     Wwwr::TransitionRunner.call(posting, event)
+  end
+
+  def run_interview_prep(args)
+    posting = JobPosting.find_by(id: args.first)
+    return puts "Posting ##{args.first} not found." unless posting
+
+    puts Wwwr::InterviewPrep.call(posting, **interview_prep_flags(args))
+  end
+
+  def interview_prep_flags(args)
+    export = args.find { |a| a.start_with?("--export") }
+    { regenerate: args.include?("--regenerate"), spoken: args.include?("--spoken"),
+      export: export && (export.split("=", 2)[1] || true) }
   end
 
   def print_postings(args)
