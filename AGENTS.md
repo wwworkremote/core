@@ -122,17 +122,20 @@
       Job Posting = canonical edit surface).
     - Seeded interview-round dev data on a test posting; corrected its
       geo fields (dev-DB only).
-    - EXPOSURE PASS (main commits 779fc705 / bf2eabf5 / 65ad15e3 /
-      b9ee4648): repo is private, but scrubbed personal detail from the
-      coordination layer — pseudonymized a named referral contact, dropped
-      spouse name / comp figures / home-town hints from AGENTS.md, replaced
-      the job-search dossier with app + deep-handoff pointers,
-      de-personalized TASK-57, stubbed the closed just3ws resume-reconcile
-      queue doc, gitignored .yardoc. Refactored Geo::CommuteZone to be
-      config-driven (config/commute_zone.yml, gitignored) instead of
-      hardcoding a specific rail line + stations. Full review:
+    - EXPOSURE PASS (main commits 779fc705 → 62ce8128): repo is private,
+      but scrubbed personal detail from the coordination layer —
+      pseudonymized a named referral contact, dropped spouse name / comp
+      figures / home-town hints from AGENTS.md, replaced the job-search
+      dossier with app + deep-handoff pointers, de-personalized TASK-57,
+      stubbed the closed just3ws resume-reconcile queue doc, gitignored
+      .yardoc. Refactored Geo::CommuteZone to be config-driven
+      (config/commute_zone.yml, gitignored). TASK-149 DONE: replaced the
+      real company-named interview-prep reference with a fully synthetic
+      one (docs/interview-prep/_reference/reference.md); real prep
+      preserved in ~/ai/outbox/. Full review:
       scratchpad/exposure-review-2026-09-03.md (local). Git history still
-      holds prior versions — acceptable while private.
+      holds prior versions — acceptable while private; rewrite before ever
+      going public.
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused

@@ -1,9 +1,10 @@
 ---
 id: TASK-149
 title: Replace the company-named interview-prep reference with a synthetic example
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-03 19:33'
+updated_date: '2026-09-03 20:20'
 labels:
   - interview-prep
   - privacy
@@ -42,3 +43,16 @@ Keeping a real, company-named, comp-discussing prep doc in the repo is the kind 
 - Needs `SKIP=ClaudeAssets` on the commit (touches `.claude/` — TASK-142).
 - Do step 3's preservation check with Mike before deleting.
 <!-- SECTION:DESCRIPTION:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Done on main, commit 62ce8128 (SKIP=ClaudeAssets — touches .claude/).
+
+- `docs/interview-prep/_reference/reference.md` (new): fully synthetic worked example — fictional "Wayfare Logistics", Senior SWE / Matching Platform, invented candidate + referrer, a real-ish real-time freight-matching domain for the primer section (loads/tenders/HOS-ELD/deadhead/spot-vs-contract, standards bodies as authorities). Part 2 (the per-section generator spec) carried over verbatim — it was already generic.
+- `git rm docs/interview-prep/basis-dsp/`. Mike's real hand-written `reference.md` preserved at `~/ai/outbox/wwwr/interview-prep/basis-dsp/reference.md` (outside the repo, alongside the exported `pack.md` / `pack.spoken.md`).
+- Repointed every LIVE reference to the new path: `.claude/agents/interview-prep-auditor.md`, `.claude/skills/interview-prep/SKILL.md`, `CLAUDE.md`, `CONTEXT.md`, `app/services/llm/interview_prep_generator.rb` + `/prompt_builder.rb` (doc comments), `docs/architecture/interview-prep-tooling.md`, `docs/changelog.md`, `docs/interview-prep/README.md`, `docs/interview-prep/tts-readable-documentation.md`, `docs/interview-prep/tts-integration-guide.md` (slug example), `spec/lib/wwwr/cli_spec.rb` (export example: `basis-dsp`/`Basis Technologies` → `example-role`/`Example Corp`).
+- Skill + auditor-agent frontmatter `version` → 1.0.1.
+- Backlog task HISTORY (task-144, .1, .2, .3) still references `docs/interview-prep/basis-dsp/reference.md` and the older `docs/research/interview-prep-basis-dsp.md` path — left as-is; those are completed-task records, not live pointers.
+- No live file contains "basis" / "Basis" / "DSP" / the interview-prep-specific real content (UGtastic, Speedfunds, etc.) any more. Verified.
+<!-- SECTION:NOTES:END -->
