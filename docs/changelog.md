@@ -153,8 +153,8 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   plus a security-review remediation pass on it (`b905dceb`).
 - **Aug 14** — extraction-rule "teach flow" for the extension, geocoding/
   location-filtering refactored into concerns, `bin/wwwr` CLI and a SwiftBar
-  menubar plugin shipped, UP-NW commute-line modeling for the Chicago
-  suburbs use case, a 12-view i18n copy pass.
+  menubar plugin shipped, commute-line modeling for the hybrid-work
+  use case, a 12-view i18n copy pass.
 - **Aug 15** — search performance (`fffb920c`, ~3s to ~60ms), the embedding
   dimension mismatch behind hybrid search fixed (TASK-38), `Adp::Fetcher`
   and `Workday::Fetcher` — the direct-hiring-page ingestion pipeline (still

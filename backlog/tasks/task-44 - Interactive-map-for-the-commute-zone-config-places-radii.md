@@ -22,7 +22,7 @@ Mike likes interactive maps and already has maxmind-geoip2 in the Gemfile (used 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Admin pipeline_filters Commute Zone card renders an interactive map showing home (approx), UP-NW stations, and Ogilvie/Union walk radii
+- [ ] #1 Admin pipeline_filters Commute Zone card renders an interactive map showing home (approx) and the configured zone places with their radii
 - [ ] #2 No new JS build tooling required -- importmap or vendored asset only
 - [ ] #3 Map degrades gracefully (no JS error) if HOME_LOCATION is unset
 <!-- AC:END -->
