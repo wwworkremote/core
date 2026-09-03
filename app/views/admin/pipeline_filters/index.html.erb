@@ -80,26 +80,27 @@
   <!-- Commute Zone -->
   <div class="card-neural p-8">
     <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Commute Zone</h3>
-    <p class="text-xs text-slate-500 mb-4">Non-remote postings outside these radii are purged once geocoded. Home address stays in <code class="font-mono text-slate-400">.env.local</code>, never shown here.</p>
-    <div class="grid grid-cols-3 gap-4">
-      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
-        <div class="text-lg font-black text-white"><%= @commute_hyperlocal_radius %> mi</div>
+    <% unless @commute_zone_configured %>
+      <p class="text-xs text-slate-500">Not configured — the commute filter is inert. Add <code class="font-mono text-slate-400">config/commute_zone.yml</code> (see <code class="font-mono text-slate-400">.example</code>) to enable it.</p>
+    <% else %>
+      <p class="text-xs text-slate-500 mb-4">Non-remote postings outside the home radius and every zone below are purged once geocoded. The zone map lives in <code class="font-mono text-slate-400">config/commute_zone.yml</code> (gitignored); the home point stays there or in <code class="font-mono text-slate-400">.env.local</code>, never shown here.</p>
+      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center w-32 mb-4">
+        <div class="text-lg font-black text-white"><%= @commute_home_radius %> mi</div>
         <div class="text-xs font-bold text-slate-500 mt-1">Home radius</div>
       </div>
-      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
-        <div class="text-lg font-black text-white"><%= @commute_station_radius %> mi</div>
-        <div class="text-xs font-bold text-slate-500 mt-1">UP-NW station radius</div>
+      <div class="space-y-4">
+        <% @commute_zones.each do |zone| %>
+          <div>
+            <div class="text-xs font-bold text-slate-400 mb-2"><%= zone.name %> <span class="text-slate-600">· <%= zone.radius_miles %> mi</span></div>
+            <div class="flex flex-wrap gap-2">
+              <% zone.places.each do |place| %>
+                <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= place.split(",").first %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       </div>
-      <div class="p-3 bg-white/5 rounded-lg border border-white/5 text-center">
-        <div class="text-lg font-black text-white"><%= @commute_terminal_radius %> mi</div>
-        <div class="text-xs font-bold text-slate-500 mt-1">Ogilvie/Union walk radius</div>
-      </div>
-    </div>
-    <div class="mt-4 flex flex-wrap gap-2">
-      <% Geo::CommuteZone::UP_NW_STATIONS.each do |station| %>
-        <span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs font-mono text-slate-400"><%= station.split(",").first %></span>
-      <% end %>
-    </div>
+    <% end %>
   </div>
 
   <!-- Country Filter -->

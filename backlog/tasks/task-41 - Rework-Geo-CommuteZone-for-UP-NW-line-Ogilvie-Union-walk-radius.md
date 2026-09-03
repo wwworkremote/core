@@ -32,4 +32,6 @@ Current Geo::CommuteZone is a point-radius model: a circle around HOME_LOCATION 
 
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
 Replaced the flat "Chicago Loop" 2mi circle with a real line-corridor model: a tight 0.75mi walk radius around Ogilvie and Union specifically (TERMINALS), plus a 1.5mi radius around every UP-NW stop from Clybourn out to Harvard including the McHenry branch (UP_NW_STATIONS), geocoded through the existing Geocoder/cache path -- no hardcoded lat/lngs. HOME_LOCATION hyperlocal radius unchanged. Updated admin/pipeline_filters to show all three radii plus the station list, and rewrote commute_zone_spec.rb for the new zone shape (10 examples, all passing). Built an interactive verification map (published as a Claude artifact) plotting real geocoded coordinates for every station/terminal plus Loop landmarks, confirmed the walk-radius/station-radius geometry visually before landing.
+
+**Superseded (TASK-148 exposure pass):** the hardcoded `TERMINALS` / `UP_NW_STATIONS` / `DEFAULT_*_RADIUS` constants are gone. The whole zone is now data — `config/commute_zone.yml` (gitignored): a home point + radius plus named zones, each a list of geocoded places and a radius. No file → the filter is inert. Shape: `config/commute_zone.yml.example`.
 <!-- SECTION:FINAL_SUMMARY:END -->

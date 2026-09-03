@@ -1,78 +1,80 @@
 # frozen_string_literal: true
 
 # Decides whether a non-remote job's location is within an acceptable
-# commute zone: home-adjacent ("hyperlocal"), anywhere along the Metra
-# UP-NW line (the line this filter targets), or downtown Chicago
-# specifically within walking distance of Ogilvie or Union -- the two
-# UP-NW terminals -- not the Loop generally, since the rest of downtown
-# isn't reachable without a second transfer.
+# commute zone. The zone is entirely data-driven: a home point with a
+# radius, plus any number of named "zones" -- a zone is a set of places
+# and a radius, and a job within that radius of ANY place in the zone
+# counts as an acceptable commute. A rail line is just a zone whose places
+# are its stations; a walkable downtown is a zone with a tight radius.
 #
-# Station/terminal coordinates are resolved through the same geocoder +
-# cache as home, rather than hardcoded lat/lngs -- one fewer thing to keep
-# in sync if a station's canonical address search result ever shifts.
+# Config lives in `config/commute_zone.yml` (gitignored -- it carries
+# location information). No file, or an empty one, means the filter is
+# inert: it never blocks a geocoded posting. See `commute_zone.yml.example`
+# for the shape. `home:` may also be left in `ENV["HOME_LOCATION"]`.
 #
-# Configuration lives entirely in ENV, never in code -- HOME_LOCATION is
-# personal address information and must never be committed. Set it in
-# .env.local (gitignored), never in the tracked .env.
+# Place coordinates are resolved through the app Geocoder + a per-process
+# cache, not hardcoded lat/lngs.
+#
+# rubocop:disable ThreadSafety/ClassInstanceVariable -- @config / @geocode_cache
+# are per-process read-through caches of immutable config; a race just repeats a
+# harmless read. See the note on .geocode.
 class Geo::CommuteZone
-  DEFAULT_HYPERLOCAL_RADIUS_MILES = 10.0
-  DEFAULT_STATION_RADIUS_MILES = 1.5
-  DEFAULT_TERMINAL_WALK_RADIUS_MILES = 0.75
+  DEFAULT_HOME_RADIUS_MILES = 10.0
+  CONFIG_PATH = Rails.root.join("config/commute_zone.yml")
 
-  # The two UP-NW downtown terminals -- a much tighter radius than the old
-  # flat "Chicago Loop" circle, since the constraint is walking distance
-  # from these two stations specifically, not the neighborhood generally.
-  TERMINALS = [
-    "Ogilvie Transportation Center, Chicago, IL",
-    "Union Station, Chicago, IL"
-  ].freeze
+  Zone = Data.define(:name, :radius_miles, :places)
 
-  # Every UP-NW stop from Ogilvie out to Harvard, IL (the end of the line),
-  # minus the two terminals above. Minor stops omitted where they sit
-  # within a station radius of an adjacent named stop already in this list
-  # (Gladstone Park/Dee Road/Cumberland/Arlington Park/Pingree Road) --
-  # station_radius covers them without one geocode call each.
-  UP_NW_STATIONS = [
-    "Clybourn, Chicago, IL",
-    "Irving Park, Chicago, IL",
-    "Jefferson Park, Chicago, IL",
-    "Norwood Park, Chicago, IL",
-    "Edison Park, Chicago, IL",
-    "Park Ridge, IL",
-    "Des Plaines, IL",
-    "Mount Prospect, IL",
-    "Arlington Heights, IL",
-    "Palatine, IL",
-    "Barrington, IL",
-    "Fox River Grove, IL",
-    "Cary, IL",
-    "McHenry, IL",
-    "Crystal Lake, IL",
-    "Woodstock, IL",
-    "Harvard, IL"
-  ].freeze
+  class << self
+    def call(job_posting)
+      new(job_posting).call
+    end
 
-  def self.call(job_posting)
-    new(job_posting).call
-  end
+    def config
+      @config ||= CONFIG_PATH.exist? ? (YAML.safe_load_file(CONFIG_PATH) || {}) : {}
+    end
 
-  # Memoized per-process, keyed by address -- home/loop coordinates don't
-  # change between jobs, and this avoids a geocoding API call per posting.
-  # Under a race, worst case is two threads geocoding the same address
-  # once each -- not a correctness hazard, so ThreadSafety/
-  # ClassInstanceVariable is disabled rather than adding synchronization
-  # this doesn't need. Defined above `private` -- singleton methods
-  # ignore that keyword, so keeping it visually separate avoids implying
-  # a privacy this class can't actually enforce.
-  # rubocop:disable-next ThreadSafety/ClassInstanceVariable
-  def self.geocode(address)
-    return nil if address.blank?
+    def reload_config!
+      @config = nil
+      @geocode_cache = nil
+    end
 
-    @geocode_cache ||= {}
-    return @geocode_cache[address] if @geocode_cache.key?(address)
+    def home_location
+      config["home"].presence || ENV.fetch("HOME_LOCATION", nil)
+    end
 
-    result = Geocoder.search(address).first
-    @geocode_cache[address] = result ? [result.latitude, result.longitude] : nil
+    def home_radius_miles
+      (config["home_radius_miles"] || DEFAULT_HOME_RADIUS_MILES).to_f
+    end
+
+    def zones
+      Array(config["zones"]).map { |zone| build_zone(zone) }
+    end
+
+    # Nothing to check against -- callers should treat every geocoded
+    # posting as :allowed rather than purging the corpus.
+    def configured?
+      home_location.present? || zones.any?
+    end
+
+    # Memoized per-process, keyed by address -- zone coordinates don't
+    # change between jobs, and this avoids a geocoding API call per
+    # posting. Under a race, worst case is two threads geocoding the same
+    # address once each -- not a correctness hazard.
+    def geocode(address)
+      return nil if address.blank?
+
+      @geocode_cache ||= {}
+      return @geocode_cache[address] if @geocode_cache.key?(address)
+
+      result = Geocoder.search(address).first
+      @geocode_cache[address] = result ? [result.latitude, result.longitude] : nil
+    end
+
+    private
+
+    def build_zone(zone)
+      Zone.new(name: zone["name"], radius_miles: zone["radius_miles"].to_f, places: Array(zone["places"]))
+    end
   end
 
   def initialize(job_posting)
@@ -94,11 +96,7 @@ class Geo::CommuteZone
   # "remote" is the key JobPostingEnrichment::AttributeBuilder writes (every
   # extension capture/enrich and the standard scraper enrichment path);
   # "is_remote" is a separate key JobBoards::CategorizerAgent writes on its
-  # own AI categorization pass. Checking only the latter (the original bug
-  # here) meant a posting flagged remote by the primary pipeline, with no
-  # literal "remote" in its free-text location, fell through to a real
-  # distance check against home/Loop coordinates -- and could get silently
-  # auto-ignored despite being remote. Check both; either is authoritative.
+  # own AI categorization pass. Check both; either is authoritative.
   def remote?
     @job_posting.data["remote"] == true || @job_posting.data["is_remote"] == true ||
       @job_posting.location.to_s.match?(/remote/i)
@@ -109,16 +107,21 @@ class Geo::CommuteZone
   end
 
   def within_zone?
-    within_radius_of?(home_coords, hyperlocal_radius) ||
-      near_any?(TERMINALS, terminal_radius) ||
-      near_any?(UP_NW_STATIONS, station_radius)
+    return true unless self.class.configured?
+
+    near_home? || self.class.zones.any? { |zone| in_zone?(zone) }
   end
 
-  def near_any?(addresses, radius_miles)
-    addresses.any? { |address| within_radius_of?(self.class.geocode(address), radius_miles) }
+  def near_home?
+    near?(self.class.home_location, self.class.home_radius_miles)
   end
 
-  def within_radius_of?(center, radius_miles)
+  def in_zone?(zone)
+    zone.places.any? { |place| near?(place, zone.radius_miles) }
+  end
+
+  def near?(address, radius_miles)
+    center = self.class.geocode(address)
     return false unless center
 
     Geocoder::Calculations.distance_between(job_coords, center, units: :mi) <= radius_miles
@@ -127,20 +130,5 @@ class Geo::CommuteZone
   def job_coords
     [@job_posting.latitude, @job_posting.longitude]
   end
-
-  def hyperlocal_radius
-    ENV.fetch("HYPERLOCAL_RADIUS_MILES", DEFAULT_HYPERLOCAL_RADIUS_MILES).to_f
-  end
-
-  def station_radius
-    ENV.fetch("STATION_RADIUS_MILES", DEFAULT_STATION_RADIUS_MILES).to_f
-  end
-
-  def terminal_radius
-    ENV.fetch("TERMINAL_WALK_RADIUS_MILES", DEFAULT_TERMINAL_WALK_RADIUS_MILES).to_f
-  end
-
-  def home_coords
-    self.class.geocode(ENV.fetch("HOME_LOCATION", nil))
-  end
 end
+# rubocop:enable ThreadSafety/ClassInstanceVariable
