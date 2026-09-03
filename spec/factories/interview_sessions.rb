@@ -6,7 +6,10 @@
 #
 #  id             :bigint           not null, primary key
 #  feedback       :text
+#  interviewers   :string
 #  notes          :text
+#  outcome        :string           default("pending"), not null
+#  position       :integer
 #  scheduled_at   :datetime
 #  session_type   :string
 #  vibe           :string
@@ -31,5 +34,18 @@ FactoryBot.define do
     job_posting
     session_type { "Screening" }
     scheduled_at { 2.days.from_now }
+
+    # An unscheduled placeholder round from a seeded process.
+    trait :placeholder do
+      scheduled_at { nil }
+    end
+
+    trait :advanced do
+      outcome { "advanced" }
+    end
+
+    trait :rejected do
+      outcome { "rejected" }
+    end
   end
 end

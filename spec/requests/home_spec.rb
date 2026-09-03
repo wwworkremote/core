@@ -72,6 +72,19 @@ RSpec.describe "Home" do
       expect(response.body).to include(job_posting_path(job_posting, anchor: "interview-prep"))
     end
 
+    it "shows the sequence position for a seeded multi-round process" do
+      ujp = create(:user_job_posting, user: user, job_posting: create(:job_posting, title: "Sequenced Role"),
+                                      status: "applied")
+      rounds = InterviewProcess.seed_default(ujp, template: :compressed)
+      rounds.first.update!(scheduled_at: 1.day.from_now, outcome: "advanced")
+
+      get root_path
+
+      expect(response.body).to include("Sequenced Role")
+      expect(response.body).to include("Round 2 of #{rounds.size}")
+      expect(response.body).to include("Not scheduled yet")
+    end
+
     it "lists favorited postings as active leads and applied ones as awaiting response" do
       lead = create(:job_posting, title: "Lead Role")
       applied = create(:job_posting, title: "Applied Role")

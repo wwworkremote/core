@@ -109,6 +109,9 @@ en:
       interviews:
         heading: "Interviews"
         open_prep: "Open Prep Pack"
+        round_of: "Round %{position} of %{total}"
+        not_scheduled: "Not scheduled yet"
+        next_task: "Next: %{task}"
       active_leads:
         heading: "Active Leads"
         review: "Review"

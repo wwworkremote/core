@@ -6,7 +6,10 @@
 #
 #  id             :bigint           not null, primary key
 #  feedback       :text
+#  interviewers   :string
 #  notes          :text
+#  outcome        :string           default("pending"), not null
+#  position       :integer
 #  scheduled_at   :datetime
 #  session_type   :string
 #  vibe           :string
@@ -37,7 +40,17 @@ RSpec.describe InterviewSession do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:session_type) }
-    it { is_expected.to validate_presence_of(:scheduled_at) }
+    it { is_expected.to validate_inclusion_of(:outcome).in_array(described_class::OUTCOMES) }
+
+    it "requires scheduled_at once a round has an outcome" do
+      session = build(:interview_session, scheduled_at: nil, outcome: "advanced")
+      expect(session).not_to be_valid
+      expect(session.errors[:scheduled_at]).to be_present
+    end
+
+    it "allows a pending placeholder round with no scheduled_at" do
+      expect(build(:interview_session, :placeholder)).to be_valid
+    end
   end
 
   describe "constants" do
@@ -75,6 +88,23 @@ RSpec.describe InterviewSession do
 
     it "is a no-op when the posting was never tracked" do
       expect { create(:interview_session, user:, job_posting:) }.not_to raise_error
+    end
+
+    it "does not move the pipeline for an unscheduled placeholder round" do
+      ujp = create(:user_job_posting, user:, job_posting:, status: "applied")
+
+      create(:interview_session, :placeholder, user:, job_posting:)
+
+      expect(ujp.reload.status).to eq("applied")
+    end
+
+    it "advances when a date is later booked on a placeholder round" do
+      ujp = create(:user_job_posting, user:, job_posting:, status: "applied")
+      round = create(:interview_session, :placeholder, user:, job_posting:)
+
+      round.update!(scheduled_at: 1.day.from_now)
+
+      expect(ujp.reload.status).to eq("interview")
     end
   end
 end

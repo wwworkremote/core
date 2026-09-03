@@ -38,31 +38,44 @@
 <%= turbo_stream_from "system_telemetry" %>
 
 <div class="grid grid-cols-1 gap-12">
-  <!-- Interviews Block: scheduled interviews, each linking to its prep pack -->
-  <% if @upcoming_interviews.any? %>
+  <!-- Interviews Block: in-flight interview processes, each linking to its prep pack -->
+  <% if @interview_processes.any? %>
     <section>
       <div class="flex items-center gap-4 mb-6">
         <h2 class="text-sm font-black uppercase tracking-widest text-error"><%= t('.interviews.heading') %></h2>
         <div class="h-px flex-1 bg-error/20"></div>
-        <span class="badge badge-error badge-xs font-black"><%= @upcoming_interviews.count %></span>
+        <span class="badge badge-error badge-xs font-black"><%= @interview_processes.count %></span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <% @upcoming_interviews.each do |session| %>
-          <% job = session.job_posting %>
+        <% @interview_processes.each do |process| %>
+          <% job = process.posting %>
+          <% round = process.current %>
           <div class="card bg-base-200 border border-error/20 hover:border-error/60 transition-all shadow-xl group">
             <div class="card-body p-6">
               <div class="flex justify-between items-start mb-4">
                 <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
-                <div class="badge badge-error text-xs font-bold"><%= session.session_type.humanize %></div>
+                <div class="badge badge-error text-xs font-bold"><%= round.session_type.humanize %></div>
               </div>
               <h3 class="text-md font-black text-white group-hover:text-error transition-colors leading-tight mb-3">
                 <%= link_to job.title, job_posting_path(job) %>
               </h3>
-              <div class="text-xs font-bold text-error/90 mb-4">
-                <%= session.scheduled_at.strftime("%a %b %-d, %H:%M") %>
-                <span class="text-slate-500">(<%= distance_of_time_in_words(Time.current, session.scheduled_at) %>)</span>
+              <div class="text-xs font-bold text-slate-400 mb-1">
+                <%= t('.interviews.round_of', position: process.position, total: process.total) %> &middot; <%= round.notes.presence || round.session_type.humanize %>
               </div>
+              <div class="text-xs font-bold text-error/90 mb-4">
+                <% if round.scheduled_at %>
+                  <%= round.scheduled_at.strftime("%a %b %-d, %H:%M") %>
+                  <span class="text-slate-500">(<%= distance_of_time_in_words(Time.current, round.scheduled_at) %>)</span>
+                <% else %>
+                  <%= t('.interviews.not_scheduled') %>
+                <% end %>
+              </div>
+              <% if process.next_task %>
+                <div class="text-xs font-bold text-warning mb-4">
+                  <%= t('.interviews.next_task', task: process.next_task.title) %>
+                </div>
+              <% end %>
               <div class="mt-auto">
                 <%= link_to t('.interviews.open_prep'), job_posting_path(job, anchor: "interview-prep"),
                       class: "btn btn-error btn-sm rounded-lg font-bold w-full" %>

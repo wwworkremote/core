@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_02_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_03_154301) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "fuzzystrmatch"
@@ -554,8 +554,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_230000) do
   create_table "interview_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "feedback"
+    t.string "interviewers"
     t.bigint "job_posting_id", null: false
     t.text "notes"
+    t.string "outcome", default: "pending", null: false
+    t.integer "position"
     t.datetime "scheduled_at"
     t.string "session_type"
     t.datetime "updated_at", null: false

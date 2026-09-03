@@ -5,7 +5,7 @@ class HomeController < ApplicationController
 
   # rubocop:disable-next Metrics/MethodLength
   def index
-    assign_upcoming_interviews
+    assign_interview_processes
     assign_active_leads
     assign_awaiting_response
     assign_top_matches
@@ -17,15 +17,11 @@ class HomeController < ApplicationController
 
   private
 
-  # Scheduled (or just-happened) interviews, each linking straight to that
-  # posting's prep pack. The 1.day.ago floor keeps this morning's interview
-  # on the page through the day it happens instead of dropping off at
-  # midnight, without turning the block into a history log.
-  def assign_upcoming_interviews
-    @upcoming_interviews = current_user.interview_sessions
-                                       .where(scheduled_at: 1.day.ago..)
-                                       .order(:scheduled_at)
-                                       .includes(:job_posting)
+  # In-flight interview processes -- one row per posting with a pending round,
+  # showing where in the sequence Mike is and linking straight to that
+  # posting's prep pack. See InterviewProcess.
+  def assign_interview_processes
+    @interview_processes = InterviewProcess.in_flight_for(current_user)
   end
 
   # Leads Mike is working but hasn't applied to yet.
