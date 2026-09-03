@@ -45,8 +45,8 @@ This is also plain-English practice: short common words over formal or clipped o
 ### 2. Expand every acronym, and hint the hard ones
 
 Expand each acronym in full the first time it appears. The short form is fine afterward: a
-listener who has heard "Demand-Side Platform" once follows "D S P" for the rest of the
-document.
+listener who has heard "Electronic Logging Device" once follows "E L D" for the rest of
+the document.
 
 For an acronym or proper noun a speech engine mispronounces, add a spoken hint in the
 frontmatter pronunciation map (see below) rather than reshaping the word in the body. Do not
@@ -88,8 +88,8 @@ serves both the eye and the ear.
 ### 6. Drop the decorative layer
 
 - No emoji. It is read as its name ("brain", "check mark") or skipped, and adds nothing.
-- No bare URLs. A URL is read as a mangled character string. Name the destination — "the IAB
-  Tech Lab OpenRTB specification" — and let the reader search for it.
+- No bare URLs. A URL is read as a mangled character string. Name the destination — "the W3C
+  Web Speech API specification" — and let the reader search for it.
 - No ASCII art, no box-drawing, no symbol shorthand for emphasis.
 
 ### 7. Carry hints in frontmatter
@@ -108,9 +108,9 @@ source: https://…            # provenance (optional)
 generated_at: 2026-09-02T23:55:57Z   # ISO 8601, for freshness (optional)
 title: "Interview Prep — Senior Software Engineer, Realtime Matching Platform"
 pronunciation:
-  Basis: "BAY sis"
-  DSP: "D S P"
-  OpenRTB: "open R T B"
+  Acme: "AK mee"
+  ELD: "E L D"
+  WebAPI: "web A P I"
   Siobhan: "shiv AWN"
 sections:
   - "The setup"

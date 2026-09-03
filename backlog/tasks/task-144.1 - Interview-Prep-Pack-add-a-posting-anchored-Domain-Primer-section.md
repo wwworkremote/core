@@ -38,7 +38,7 @@ No live web research in v1 — the primer is the model's own knowledge, anchored
 - [x] #4 Primer includes a blind-spots subsection derived from the candidate's actual background
 - [x] #5 Primer includes named learning resources with a 'verify links' caveat
 - [x] #6 prompt_builder_spec asserts the DOMAIN PRIMER instruction, the blind-spots instruction, and the verify-links caveat are present
-- [x] #7 docs/research/interview-prep-basis-dsp.md carries a hand-written domain primer (Part 1) and the new row in the Part 2 spec table; CONTEXT.md and docs/changelog.md updated
+- [x] #7 docs/interview-prep/_reference/reference.md carries a hand-written domain primer (Part 1) and the new row in the Part 2 spec table; CONTEXT.md and docs/changelog.md updated
 - [x] #8 The Basis pack (UJP #268) is regenerated so it carries the new section
 <!-- AC:END -->
 
@@ -47,7 +47,7 @@ No live web research in v1 — the primer is the model's own knowledge, anchored
 <!-- SECTION:NOTES:BEGIN -->
 Regenerated the Basis pack (UJP #268): 10,693 chars, DOMAIN PRIMER now section 2, renders on https://wwworkremote.localhost/job_postings/7068. Structure correct on the local 7B (MUST KNOW vs USEFUL CONTEXT split, blind spots, learning resources w/ verify caveat).
 
-Quality caveat (local 7B): the primer is shallow and the model misreads two things -- (1) it fills USEFUL CONTEXT with the candidate's own stack (OTel/Kafka/React) instead of domain concepts; (2) blind spots conflates skill gaps (Java/React, which belong in THE SETUP) with real domain blind spots. Learning-resource URLs are partly hallucinated (Adobe whitepaper, arxiv link). The IAB OpenRTB spec -- the single most important resource -- is missing. The hand-written primer in docs/research/interview-prep-basis-dsp.md is the good version. Two prompt guardrails would help any model (USEFUL CONTEXT = domain not candidate-stack; blind spots != skill gaps; a fabricated URL is worse than a named source) but the real fix is a capable model on this path -> TASK-145.
+Quality caveat (local 7B): the primer is shallow and the model misreads two things -- (1) it fills USEFUL CONTEXT with the candidate's own stack (OTel/Kafka/React) instead of domain concepts; (2) blind spots conflates skill gaps (Java/React, which belong in THE SETUP) with real domain blind spots. Learning-resource URLs are partly hallucinated (Adobe whitepaper, arxiv link). The IAB OpenRTB spec -- the single most important resource -- is missing. The hand-written primer in docs/interview-prep/_reference/reference.md is the good version. Two prompt guardrails would help any model (USEFUL CONTEXT = domain not candidate-stack; blind spots != skill gaps; a fabricated URL is worse than a named source) but the real fix is a capable model on this path -> TASK-145.
 <!-- SECTION:NOTES:END -->
 
 ## Final Summary
@@ -55,7 +55,7 @@ Quality caveat (local 7B): the primer is shallow and the model misreads two thin
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
 Added a DOMAIN PRIMER section (section 2, after THE SETUP, before YOUR STORY) to the interview prep pack. Prompt-only change to `LLM::InterviewPrepGenerator::PromptBuilder#default_prompt`: instructs the model to produce posting-anchored industry knowledge — business model + where the role sits, must-know vs useful-context vocabulary, domain best practices, blind spots computed against the candidate's own History, and named learning resources flagged "verify links". Sections renumbered 7 → 8.
 
-`prompt_builder_spec` asserts the primer / blind-spots / verify-links instructions are present (13 examples green; full sweep 104 green). `docs/research/interview-prep-basis-dsp.md` gains a hand-written programmatic-advertising / DSP primer in Part 1 (RTB, OpenRTB, first-price auctions + bid shading, budget pacing as a control problem, the Platform↔DSP seam, cookie-deprecation, ad fraud, thin-margin P&L) and a new row in the Part 2 spec table; CONTEXT.md + docs/changelog.md updated. Basis pack (UJP #268) regenerated.
+`prompt_builder_spec` asserts the primer / blind-spots / verify-links instructions are present (13 examples green; full sweep 104 green). `docs/interview-prep/_reference/reference.md` gains a hand-written programmatic-advertising / DSP primer in Part 1 (RTB, OpenRTB, first-price auctions + bid shading, budget pacing as a control problem, the Platform↔DSP seam, cookie-deprecation, ad fraud, thin-margin P&L) and a new row in the Part 2 spec table; CONTEXT.md + docs/changelog.md updated. Basis pack (UJP #268) regenerated.
 
 Known limitation: on the local 7B the primer comes out shallow and slightly confused (mixes the candidate's tech stack into "useful context", conflates skill gaps with domain blind spots, hallucinates two resource URLs). The hand-written primer in the reference doc is the quality bar; getting there in the generated pack needs a capable model on the orchestrator path (blocked on TASK-145). Optional follow-up: two prompt guardrails (useful-context = domain not candidate-stack; blind-spots ≠ skill-gaps; prefer a named source to a guessed URL).
 

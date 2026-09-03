@@ -101,9 +101,9 @@ see [`tts-integration-guide.md`](tts-integration-guide.md).
 >   full pause, before the first section. If the target is captions, it is the first cue or
 >   the track metadata, not a spoken line.
 > - **`pronunciation`** — a lexicon. Each entry maps a word or acronym to how it should sound:
->   - `"DSP: D S P"` — say the letters separately, with a short gap between them. Apply as
+>   - `"ELD: E L D"` — say the letters separately, with a short gap between them. Apply as
 >     SSML `<say-as interpret-as="characters">` or spell-out.
->   - `"Basis: BAY-sis"` — a respelling; the capitalized syllable takes the stress. Apply as
+>   - `"Acme: AK-mee"` — a respelling; the capitalized syllable takes the stress. Apply as
 >     SSML `<phoneme>` if you can derive one, otherwise `<sub alias="BAY sis">`.
 >   Apply every entry everywhere the term appears, not just the first time.
 > - **`sections`** — the ordered section list. Each is a chapter boundary: insert a chapter
@@ -158,9 +158,9 @@ see [`tts-integration-guide.md`](tts-integration-guide.md).
 
 | Frontmatter entry | Meaning | SSML |
 |---|---|---|
-| `DSP: D S P` | say each letter, short gaps | `<say-as interpret-as="characters">DSP</say-as>` |
-| `OpenRTB: open R T B` | mixed word + letters | `open <say-as interpret-as="characters">RTB</say-as>` |
-| `Basis: BAY-sis` | respelling, stress on caps | `<phoneme alphabet="ipa" ph="ˈbeɪ.sɪs">Basis</phoneme>` or `<sub alias="BAY sis">Basis</sub>` |
+| `ELD: E L D` | say each letter, short gaps | `<say-as interpret-as="characters">ELD</say-as>` |
+| `WebAPI: web A P I` | mixed word + letters | `web <say-as interpret-as="characters">API</say-as>` |
+| `Acme: AK-mee` | respelling, stress on caps | `<phoneme alphabet="ipa" ph="ˈæk.miː">Acme</phoneme>` or `<sub alias="AK mee">Acme</sub>` |
 | `Siobhan: shiv-AWN` | respelling, stress on middle | `<sub alias="shiv AWN">Siobhan</sub>` |
 
 If the engine has no SSML, fall back to substituting the spoken hint text directly.

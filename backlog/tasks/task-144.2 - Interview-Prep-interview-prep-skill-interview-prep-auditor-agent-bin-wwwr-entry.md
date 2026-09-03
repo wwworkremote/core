@@ -25,7 +25,7 @@ Package the interview-prep-pack workflow into the repo's skills + agents layer, 
 
 - bin/wwwr interview-prep <job_posting_id> [--regenerate]: CLI entry (Wwwr::InterviewPrep in lib/wwwr/), prints the stored pack, regenerates on demand. Mirrors bin/wwwr match.
 - .claude/skills/interview-prep/SKILL.md: model-invoked skill. Workflow: locate posting + interview context -> generate via bin/wwwr -> dispatch interview-prep-auditor for a quality punch list -> dispatch industry-intelligence-agent to verify the domain primer's facts / acronym-authority bindings / learning links against real current sources -> fold fixes back into the pack -> optionally career-coach-agent (story) and hiring-manager-agent / recruiter-agent (pressure-test likely questions) -> hand Mike the sharpened pack + residual judgement calls.
-- .claude/agents/interview-prep-auditor.md: read-only agent, mirror of indeed-profile-auditor. Input: a generated pack. Diffs against the quality bar (docs/research/interview-prep-basis-dsp.md) + the posting requirements. Punch list: generic-vs-real domain primer, hallucinated links, unbound acronyms, missing must-know concepts, skill-gap/blind-spot confusion, story grounded in real history or not. Split mechanical vs judgement.
+- .claude/agents/interview-prep-auditor.md: read-only agent, mirror of indeed-profile-auditor. Input: a generated pack. Diffs against the quality bar (docs/interview-prep/_reference/reference.md) + the posting requirements. Punch list: generic-vs-real domain primer, hallucinated links, unbound acronyms, missing must-know concepts, skill-gap/blind-spot confusion, story grounded in real history or not. Split mechanical vs judgement.
 - Register in CLAUDE.md Agent skills section (like the Indeed entry).
 
 All rules files: expressive GitHub-flavored extended Markdown, YAML frontmatter mandatory.
@@ -60,7 +60,7 @@ Packaged the interview-prep-pack workflow into the skills + agents layer, mirror
 
 **`.claude/skills/interview-prep/SKILL.md`** — model-invoked (description carries three trigger branches: scheduled interview, sharpen/regenerate/fact-check an existing pack, ground the primer). 7-step workflow: locate posting + context → `bin/wwwr interview-prep --regenerate` → dispatch `interview-prep-auditor` → dispatch `industry-intelligence-agent` to verify primer concepts / acronym-to-authority citations / learning links → optional `career-coach-agent` + `hiring-manager-agent` + `recruiter-agent` pressure-test → fold mechanical fixes in, leave judgement calls → hand off. Closes with the known local-model failure modes.
 
-**`.claude/agents/interview-prep-auditor.md`** — read-only (Bash/Read/Grep/Glob, sonnet). Pulls the pack + posting + quality bar (`docs/research/interview-prep-basis-dsp.md`), diffs section-by-section via a checks table, classifies every finding mechanical vs judgement, reports a ranked punch list + "what's clean". Explicitly hunts stack-as-domain, skill-gap-as-blind-spot, and invented links.
+**`.claude/agents/interview-prep-auditor.md`** — read-only (Bash/Read/Grep/Glob, sonnet). Pulls the pack + posting + quality bar (`docs/interview-prep/_reference/reference.md`), diffs section-by-section via a checks table, classifies every finding mechanical vs judgement, reports a ranked punch list + "what's clean". Explicitly hunts stack-as-domain, skill-gap-as-blind-spot, and invented links.
 
 **`CLAUDE.md`** — "Prepping for an interview" entry in the Agent skills section.
 
