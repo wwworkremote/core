@@ -7,14 +7,21 @@
      and fix the block. Full procedure: docs/agents/session-handoff.md
      ═══════════════════════════════════════════════════════════════════════
 
-  In flight: PR #23 OPEN, not merged — main still @ 6ca8bd72.
-  https://github.com/wwworkremote/core/pull/23 (branch
-  feat/homepage-pipeline-blocks, 4 commits, merge state CLEAN). Homepage
-  now leads with Interviews / Active Leads / Awaiting Response blocks (the
-  "What this app does" marketing cards deleted); InterviewSession becomes
-  an ordered multi-round pipeline (position/outcome/interviewers cols,
-  InterviewProcess templates, seed_default, in_flight_for). Steps 1-3 of
-  TASK-147.1; ACs 6+7 still open (see task). Needs review + merge.
+  In flight: TWO stacked PRs open, neither merged — main still @ 6ca8bd72
+  for feature code (main HEAD is only doc/focus commits).
+    PR #23 https://github.com/wwworkremote/core/pull/23 — branch
+      feat/homepage-pipeline-blocks. Homepage leads with Interviews /
+      Active Leads / Awaiting Response blocks ("What this app does" cards
+      deleted); InterviewSession → ordered multi-round pipeline
+      (position/outcome/interviewers, InterviewProcess templates,
+      seed_default, in_flight_for). TASK-147.1 steps 1-3; ACs 6+7 open.
+    PR #24 https://github.com/wwworkremote/core/pull/24 — branch
+      feat/inline-edit-job-posting, STACKED on #23 (base is #23's branch,
+      merge #23 first). TASK-148 slice 1: JobPosting core fields editable
+      inline on the show page (?section=core turbo frame), JobPosting::
+      InlineEditing concern, multi-country data["countries"] + geo_allowed
+      honoring it. AC#4 done. Slices 2-4 (UserJobPosting fields, interview-
+      round UI, prep/Q&A) not started — see TASK-148 Implementation Notes.
   Session 5 also ran /pipeline-health + local-LLM health — all green
   (verified 2026-09-03), no action.
 
@@ -94,18 +101,11 @@
       GuidedSession #18 completed. Interview process seeded (:compressed,
       6 rounds) — round 1 (recruiter screen) scheduled 2026-09-03 15:00
       UTC, rounds 2-6 unscheduled. THIS IS DEV-DB SEED DATA, not in PR #23.
-      Recruiter engaged via warm intro. Mike says Basis is "US & Canada",
-      formerly Centro, US HQ Chicago — JP #7068 location data is thin /
-      Toronto-filed; offered to fix the posting location+notes, Mike has
-      NOT said go. US+remote confirmed in the JD; "Toronto, ON" was just
-      where the req is filed. Was auto-ignored on promote (bad remote flag
-      + blank company) — restored + fixed.
-    TASK-148 (feature, NEW session 5 end): Mike wants to edit/revise
-      "pretty much any data" on the job_postings/7068 show page. Decided
-      UX: inline edit-in-place via Turbo frames, no separate edit page.
-      Scope = JobPosting core + UserJobPosting + interview rounds
-      (absorbs TASK-147.1 AC#7) + prep-pack/Q&A. Full scope + 10 ACs in
-      the task. Not started.
+      Recruiter engaged via warm intro. Basis is formerly Centro (rebrand
+      2022), US HQ Chicago + Toronto — corrected in dev DB session 5
+      (JP #7068 location "Chicago, IL · Toronto, ON", country_code US,
+      data.countries [US,CA]; Centro note on UJP #268 notes). Was
+      auto-ignored on promote (bad remote flag + blank company) — restored.
     Vanguard — warm lead via a former colleague (ex-OMF, ran the OTel WG after Mike,
       actively pulling to get him in). Company #1112. Two reqs already
       ingested 2026-08-25: JP #6740 "AI Enablement, Specialist" (Charlotte NC,
@@ -126,18 +126,23 @@
   still holds; this is about weighing everything above it. Not yet reflected
   in LLM::ProfileMatcher — that's a build task if Mike wants it.
 
-  Done 2026-09-03 session 5 (PR #23 OPEN, NOT merged — main still @ 6ca8bd72):
-    - Homepage redesign: leads with Interviews / Active Leads / Awaiting
-      Response pipeline blocks; "What this app does" marketing cards deleted.
-    - TASK-147.1 filed + steps 1-3 built: InterviewSession position/outcome/
-      interviewers cols, relaxed scheduled_at validation, app/models/
-      interview_process.rb (3 frozen hiring-pipeline TEMPLATES +
-      seed_default + in_flight_for), homepage "Round N of M" block, show
-      page renders the round sequence. CONTEXT.md +3 domain entries.
-    - Fixed a regression: show page crashed on unscheduled rounds (f730cfdb).
-    - Basis interview process seeded in dev DB (:compressed) — see above.
-    - Slack message to the Basis warm-intro contact drafted (not sent by
-      the agent).
+  Done 2026-09-03 session 5 (2 stacked PRs OPEN, NOT merged — main still
+  @ 6ca8bd72 for feature code):
+    - PR #23: homepage redesign (Interviews / Active Leads / Awaiting
+      Response pipeline blocks; marketing cards deleted). TASK-147.1
+      steps 1-3: InterviewSession position/outcome/interviewers cols,
+      relaxed scheduled_at validation, app/models/interview_process.rb
+      (3 frozen TEMPLATES + seed_default + in_flight_for), homepage
+      "Round N of M" block, show page renders the sequence. Fixed a
+      regression: show page crashed on unscheduled rounds (f730cfdb).
+    - PR #24 (stacked on #23): TASK-148 slice 1 — JobPosting core fields
+      editable inline on the show page, JobPosting::InlineEditing concern,
+      multi-country data["countries"] + geo_allowed honoring it.
+    - CONTEXT.md +4 domain entries (interview round/task/template, +
+      Job Posting = canonical edit surface).
+    - Basis interview process seeded in dev DB (:compressed); JP #7068
+      location/country data corrected — see above.
+    - Slack message to the Basis warm-intro contact drafted (not sent).
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
@@ -191,15 +196,15 @@
   subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
   resume changes or Mike takes/leaves a role.
 
-  Blocked on Mike: (1) review + merge PR #23; (2) pick what to do with the
-  Vanguard lead (4 options above); (3) say go / no-go on updating JP #7068's
-  location + notes (Basis = US & Canada, ex-Centro, Chicago HQ).
+  Blocked on Mike: (1) review + merge PR #23, then PR #24 (stacked);
+  (2) pick what to do with the Vanguard lead (4 options above).
   Everything else is unblocked. GHA billing is moot (CI removed). No deploy
   mechanism exists (kamal unconfigured); deploy is out of scope.
 
-  Next build (session 6): TASK-148 (inline edit-in-place on the posting
-  show page) — it absorbs TASK-147.1 AC#7. TASK-147.1 AC#6 (final-round
-  outcome → UserJobPosting) is separate and smaller; do it alongside.
+  Next build (session 6): TASK-148 remaining slices — UserJobPosting fields
+  (notes/priority/applied_at), interview-round editing UI (absorbs
+  TASK-147.1 AC#7), body/ai_category, prep-pack/Q&A. TASK-147.1 AC#6
+  (final-round outcome → UserJobPosting) is separate + smaller; alongside.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
