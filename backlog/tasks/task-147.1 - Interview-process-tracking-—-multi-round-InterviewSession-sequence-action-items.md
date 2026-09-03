@@ -6,6 +6,7 @@ title: >-
 status: In Progress
 assignee: []
 created_date: '2026-09-03 15:42'
+updated_date: '2026-09-03 15:53'
 labels:
   - job-search
   - interview-prep
@@ -71,14 +72,44 @@ Steps 1–3 (migration + validation + template method + homepage wiring) ship no
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 InterviewSession has position:integer, outcome:string, interviewers:string columns via migration; schema annotations regenerated
-- [ ] #2 scheduled_at is no longer unconditionally required — an InterviewSession with outcome 'pending' and no scheduled_at is valid; a held/completed round still requires it
-- [ ] #3 InterviewProcess.seed_default(user_job_posting, template:) creates an ordered set of InterviewSession rows for :standard_senior, :compressed, and :staff templates; templates live in a frozen constant, not a DB table
-- [ ] #4 seed_default is idempotent-safe: calling it when sessions already exist for that posting does not duplicate rows (raises or no-ops, documented)
-- [ ] #5 Homepage Interviews block shows round position/count, session type, scheduled time (or 'not scheduled'), and the next open InterviewTask for that posting
+- [x] #1 InterviewSession has position:integer, outcome:string, interviewers:string columns via migration; schema annotations regenerated
+- [x] #2 scheduled_at is no longer unconditionally required — an InterviewSession with outcome 'pending' and no scheduled_at is valid; a held/completed round still requires it
+- [x] #3 InterviewProcess.seed_default(user_job_posting, template:) creates an ordered set of InterviewSession rows for :standard_senior, :compressed, and :staff templates; templates live in a frozen constant, not a DB table
+- [x] #4 seed_default is idempotent-safe: calling it when sessions already exist for that posting does not duplicate rows (raises or no-ops, documented)
+- [x] #5 Homepage Interviews block shows round position/count, session type, scheduled time (or 'not scheduled'), and the next open InterviewTask for that posting
 - [ ] #6 Per-round outcome (advanced/rejected/no_signal) is settable and, on the final round, drives UserJobPosting status/outcome consistently with the existing after_create interview hook
 - [ ] #7 Posting show page renders the session list as an ordered sequence with per-round outcome and an 'add next round' affordance
 - [ ] #8 Model specs cover: the three templates, the relaxed validation, seed_default idempotency, and terminal outcome -> UserJobPosting wiring
-- [ ] #9 Request/system spec covers the homepage Interviews block showing sequence position and next action
-- [ ] #10 docs/agents/domain.md (or the relevant domain doc) notes InterviewSession = round, InterviewTask = action item, and the template constant
+- [x] #9 Request/system spec covers the homepage Interviews block showing sequence position and next action
+- [x] #10 docs/agents/domain.md (or the relevant domain doc) notes InterviewSession = round, InterviewTask = action item, and the template constant
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Steps 1-3 of the design shipped on branch `feat/homepage-pipeline-blocks` (commits 3f04454a homepage pipeline blocks, 0823bfa0 this).
+
+DONE:
+- Migration `20260903154301` adds `position:integer`, `outcome:string` (not null, default "pending"), `interviewers:string` to `interview_sessions`.
+- `InterviewSession`: `OUTCOMES = %w[pending advanced rejected no_signal]`, `validates :outcome, inclusion`, `validates :scheduled_at, presence: true, unless: :pending?`, `scope :ordered` (position, scheduled_at), `#pending?`. `after_create` + `after_update if: saved_change_to_scheduled_at?` both call `advance_application_to_interview`, which no-ops unless the round has a date.
+- `app/models/interview_process.rb` (plain module): `TEMPLATES` frozen constant (`:standard_senior` 7 rounds / `:compressed` 6 / `:staff` 10), `.seed_default(ujp, template:)` -> ordered unscheduled `InterviewSession` rows, no-op if the posting already has sessions for that user, raises ArgumentError on unknown template. `.in_flight_for(user)` -> `[Progress(posting, current, position, total, next_task)]`, one per posting with a pending round; `next_task` = soonest pending `InterviewTask`.
+- `User has_many :interview_sessions, :interview_tasks`.
+- Homepage Interviews block iterates `@interview_processes` (was `@upcoming_interviews`): "Round N of M", current round type + `notes` label, date or "Not scheduled yet", "Next: <task>" when present, "Open Prep Pack" -> `job_posting_path(job, anchor: "interview-prep")`.
+- `CONTEXT.md` domain-language entries: Interview Round / Interview Task / Interview Process Template.
+- Specs: `spec/models/interview_process_spec.rb` (templates, seed_default incl. idempotency + unknown template, in_flight_for), `interview_session_spec.rb` (relaxed validation, placeholder no-advance, book-date-later advances), `home_spec.rb` (sequence position renders).
+- Basis (JP #7068 / UJP #268) seeded with `:compressed`; round 1 (Screening / "Recruiter screen") scheduled 2026-09-03 15:00 UTC, interviewers "Recruiter (via Beep intro)".
+
+NOT DONE (remaining ACs #6, #7, #8-partial):
+- No UI to run `seed_default` or set a round's `outcome` / `scheduled_at` -- console only right now. The posting show page still has the old flat "log session" admin form + `order(scheduled_at: :desc)` list; it needs the ordered checklist + per-round outcome control + "add next round" / "seed process from template".
+- Terminal wiring: setting the final round's `outcome` to advanced/rejected does not yet move `UserJobPosting` to an `offered`/`rejected` outcome or back to `applied`. Only the scheduled-round -> `interview` advance exists.
+- `interview_process_spec.rb` has no terminal-outcome test (nothing to test yet).
+<!-- SECTION:NOTES:END -->
+
+## Comments
+
+<!-- COMMENTS:BEGIN -->
+created: 2026-09-03 15:53
+---
+Shipped steps 1-3 (migration + InterviewProcess templates + homepage "Round N of M" block) on branch feat/homepage-pipeline-blocks, commit 0823bfa0. Remaining: posting-page checklist UI to seed a process / set round dates + outcomes (AC #7), and terminal outcome -> UserJobPosting wiring (AC #6). 41 specs green.
+---
+<!-- COMMENTS:END -->
