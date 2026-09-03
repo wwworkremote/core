@@ -2,7 +2,7 @@
 
 # Decides whether a non-remote job's location is within an acceptable
 # commute zone: home-adjacent ("hyperlocal"), anywhere along the Metra
-# UP-NW line (the only line reachable from home), or downtown Chicago
+# UP-NW line (the line this filter targets), or downtown Chicago
 # specifically within walking distance of Ogilvie or Union -- the two
 # UP-NW terminals -- not the Loop generally, since the rest of downtown
 # isn't reachable without a second transfer.
@@ -64,7 +64,7 @@ class Geo::CommuteZone
   # this doesn't need. Defined above `private` -- singleton methods
   # ignore that keyword, so keeping it visually separate avoids implying
   # a privacy this class can't actually enforce.
-  # rubocop:disable ThreadSafety/ClassInstanceVariable
+  # rubocop:disable-next ThreadSafety/ClassInstanceVariable
   def self.geocode(address)
     return nil if address.blank?
 
@@ -74,7 +74,6 @@ class Geo::CommuteZone
     result = Geocoder.search(address).first
     @geocode_cache[address] = result ? [result.latitude, result.longitude] : nil
   end
-  # rubocop:enable ThreadSafety/ClassInstanceVariable
 
   def initialize(job_posting)
     @job_posting = job_posting

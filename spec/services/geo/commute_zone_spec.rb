@@ -3,21 +3,22 @@
 require "rails_helper"
 
 RSpec.describe Geo::CommuteZone do
-  # Home: an arbitrary point NW of the terminal. Ogilvie: roughly its real
-  # downtown coordinates. Cary: a UP-NW station roughly on-line but a
-  # few towns further from home. Coordinates only
-  # need to be self-consistent with the test distances below, not
-  # geographically exact.
+  # Synthetic fixtures. Home: an arbitrary point NW of the Ogilvie
+  # terminal (HOME_LOCATION is real personal config and lives only in
+  # .env.local). Ogilvie: roughly its real downtown coordinates. Cary: a
+  # real UP-NW station (it's in UP_NW_STATIONS) roughly on-line but
+  # further out than the home point. Coordinates only need to be
+  # self-consistent with the test distances below, not geographically exact.
   let(:home_stub) { { "latitude" => 42.30, "longitude" => -88.40 } }
   let(:ogilvie_stub) { { "latitude" => 41.8839, "longitude" => -87.6408 } }
   let(:cary_stub) { { "latitude" => 42.2114, "longitude" => -88.2384 } }
 
   around do |example|
     original_home = ENV.fetch("HOME_LOCATION", nil)
-    ENV["HOME_LOCATION"] = "[home location]"
+    ENV["HOME_LOCATION"] = "Test Home, IL"
     described_class.instance_variable_set(:@geocode_cache, nil)
     Geocoder::Lookup::Test.set_default_stub([]) # every other UP-NW station/terminal: "not found"
-    Geocoder::Lookup::Test.add_stub("[home location]", [home_stub])
+    Geocoder::Lookup::Test.add_stub("Test Home, IL", [home_stub])
     Geocoder::Lookup::Test.add_stub("Ogilvie Transportation Center, Chicago, IL", [ogilvie_stub])
     Geocoder::Lookup::Test.add_stub("Cary, IL", [cary_stub])
 
