@@ -34,6 +34,8 @@ Access the dashboard at `http://localhost:31000`.
 | `bin/dev` | Start the Falcon app server and workers. |
 | `bin/setup` | Idempotent system bootstrap. |
 | `bin/update-geoip` | Download latest MaxMind databases. |
+| `bin/wwwr status` | Pipeline health from the shell (`bin/wwwr --help` for the rest). |
+| `bin/wwwr interview-prep <id>` | Generate an interview prep pack — human + read-aloud (text-to-speech) versions. `--export` writes them to `~/ai/outbox/`. See [docs/interview-prep/](docs/interview-prep/README.md). |
 | `bundle exec rspec` | Run the test suite. |
 
 ---

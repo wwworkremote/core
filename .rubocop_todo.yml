@@ -6,9 +6,11 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# The bulk of this class is one necessarily-detailed LLM instruction string
-# (#default_prompt), not logic. Splitting the prompt to satisfy a line count
-# would fragment a single template for no readability gain.
+# prompt_builder.rb: the bulk is one necessarily-detailed LLM instruction
+# string (#default_prompt), not logic. cli.rb: a flat table of many thin
+# subcommands plus their --help text. Splitting either to satisfy a line
+# count fragments a cohesive whole for no readability gain.
 Metrics/ClassLength:
   Exclude:
     - 'app/services/llm/interview_prep_generator/prompt_builder.rb'
+    - 'lib/wwwr/cli.rb'

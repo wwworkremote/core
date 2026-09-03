@@ -21,9 +21,12 @@ guidance needed.
 ## Status and health
 
 - **`bin/wwwr`** — the main operational CLI: `bin/wwwr status`, `bin/wwwr postings [filters]`,
-  `bin/wwwr transition <id> <event>`. `--help` is current and accurate. This is the fastest way
-  to answer "what's the state of the pipeline / a specific posting" without writing a
-  `bin/rails runner` one-liner.
+  `bin/wwwr transition <id> <event>`, `bin/wwwr match <id> --source=<n>`,
+  `bin/wwwr interview-prep <id> [--regenerate] [--spoken] [--export[=<role>]]`.
+  `bin/wwwr --help` for the summary, `bin/wwwr help <command>` for a command's detail. This is
+  the fastest way to answer "what's the state of the pipeline / a specific posting" without
+  writing a `bin/rails runner` one-liner. Interview-prep tooling: `docs/interview-prep/README.md`,
+  diagrams in `docs/architecture/interview-prep-tooling.md`.
 - **Pipeline health skill** (`.claude/skills/pipeline-health/`) — deeper live audit than
   `bin/wwwr status`: ingestion volume trend, SolidQueue backlog, failed-job classification
   (code bug vs. worker/infra), recurring-job schedule cross-check. Use when something's actually

@@ -116,6 +116,21 @@ RSpec.describe Wwwr::CLI do
     end
   end
 
+  describe "help" do
+    it "prints the top-level usage with no topic" do
+      expect { cli.run(["help"]) }.to output(/interview-prep <id>/).to_stdout
+    end
+
+    it "prints detailed help for a known topic" do
+      expect { cli.run(%w[help interview-prep]) }.to output(/--export=<role>.*subdirectory name/m).to_stdout
+    end
+
+    it "answers --help and -h as well" do
+      expect { cli.run(["--help"]) }.to output(/Usage:/).to_stdout
+      expect { cli.run(["-h"]) }.to output(/Usage:/).to_stdout
+    end
+  end
+
   describe "interview-prep" do
     let!(:user) { create(:user) }
 
