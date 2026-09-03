@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-09-03 (session 4 close)
+     CURRENT FOCUS  —  last updated 2026-09-03 (session 5 close)
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -7,12 +7,28 @@
      and fix the block. Full procedure: docs/agents/session-handoff.md
      ═══════════════════════════════════════════════════════════════════════
 
-  In flight: nothing half-built. Session 4 built the Interview Prep Pack
-  feature end-to-end (TASK-144 + .1/.2/.3/.4, all Done); merged + pushed,
-  main @ 6ca8bd72. Job search is the active thread: Basis interview was
-  2026-09-03 10:00 CT (warm intro via a UGtastic contact) — debrief not
-  yet logged (InterviewSession for JP #7068 / UJP #268; UserJobPosting
-  #outcome if there's a result). Vanguard warm-lead still open.
+  In flight: TWO stacked PRs open, neither merged — main still @ 6ca8bd72
+  for feature code (main HEAD is only doc/focus commits).
+    PR #23 https://github.com/wwworkremote/core/pull/23 — branch
+      feat/homepage-pipeline-blocks. Homepage leads with Interviews /
+      Active Leads / Awaiting Response blocks ("What this app does" cards
+      deleted); InterviewSession → ordered multi-round pipeline
+      (position/outcome/interviewers, InterviewProcess templates,
+      seed_default, in_flight_for). TASK-147.1 steps 1-3; ACs 6+7 open.
+    PR #24 https://github.com/wwworkremote/core/pull/24 — branch
+      feat/inline-edit-job-posting, STACKED on #23 (base is #23's branch,
+      merge #23 first). TASK-148 slice 1: JobPosting core fields editable
+      inline on the show page (?section=core turbo frame), JobPosting::
+      InlineEditing concern, multi-country data["countries"] + geo_allowed
+      honoring it. AC#4 done. Slices 2-4 (UserJobPosting fields, interview-
+      round UI, prep/Q&A) not started — see TASK-148 Implementation Notes.
+  Session 5 also ran /pipeline-health + local-LLM health — all green
+  (verified 2026-09-03), no action.
+
+  Job search: Basis recruiter reached out 2026-09-03 (warm intro — the
+  recruiter's note said the internal contact "bragged about" Mike). Call
+  was ~10:00 CT. Debrief NOT logged (InterviewSession round 1 has no
+  feedback/vibe/questions). Vanguard warm-lead still open.
 
   Live tasks (Backlog MCP):
     TASK-140  (Med, sharpened session 4) JobBoards::Syncer starves on an
@@ -30,6 +46,14 @@
               career-development lap — ADR + sequenced plan, no impl, for
               making lead → application → interview-prep → interview one
               repeatable, evolvable harness process instead of three layers.
+    TASK-147.1 (feature, In Progress, NEW session 5) multi-round interview
+              tracking. Steps 1-3 done in PR #23 (InterviewSession =
+              round, InterviewTask = action item, InterviewProcess
+              TEMPLATES + seed_default + in_flight_for; homepage "Round N
+              of M" block). OPEN: AC#6 final-round outcome → UserJobPosting
+              wiring; AC#7 posting-page UI to seed a process / set round
+              dates+outcomes (console-only right now). Full state in the
+              task's Implementation Notes.
     TASK-145  (High, NEW) LLM::Orchestrator always fails on the Gemini provider
               ("Role 'system' is not supported"). defaults.answer_generation
               has pointed at gemini-3.7-flash since 2026-08-24 → every AI-path
@@ -72,31 +96,53 @@
 
   Job search — applications tracked:
     Basis, "Sr Software Engineer - Basis Platform / DSP" (Lever) — JP #7068,
-      UJP #268 = applied, PipelineStep #999 (resume archetype + both Q&A
-      answers + the Lever "error verifying" retry noted), GuidedSession #18
-      completed. Direct contact also engaged. US+remote confirmed in the JD;
-      the "Toronto, ON" line was just where the req is filed. Was auto-ignored
-      on promote (bad remote flag + blank company) — restored + fixed.
-    Vanguard — warm lead via a former colleague (ex-OMF, ran the OTel WG after Mike,
-      actively pulling to get him in). Company #1112. Two reqs already
-      ingested 2026-08-25: JP #6740 "AI Enablement, Specialist" (Charlotte NC,
-      UJP #250 favorited, NOT match-scored — this is likely the referrer's target;
-      maps to Mike's enablement track); JP #6747 "Lead Backend Engineer -
-      Mobile APIs" (auto-ignored). Both flagged remote=false / Charlotte —
-      could be a bad extract like Basis, or genuine RTO (Vanguard is
-      in-office-heavy) → a relocation/hybrid question for Mike + [redacted-name], not a
-      filter question. Session ended with Mike still deciding; open offers to
-      him: match-score #6740, restore #6747 + recheck remote flags, log the
-      the referrer referral as a PipelineStep on #250, maybe wire the
-      vanguardjobs.com board.
+      UJP #268 = INTERVIEW (advanced from applied session 5 when the
+      InterviewSession process was seeded). PipelineStep history +
+      GuidedSession #18 completed. Interview process seeded (:compressed,
+      6 rounds) — round 1 (recruiter screen) scheduled 2026-09-03 15:00
+      UTC, rounds 2-6 unscheduled. THIS IS DEV-DB SEED DATA, not in PR #23.
+      Recruiter engaged via warm intro. Basis is formerly Centro (rebrand
+      2022), US HQ Chicago + Toronto — corrected in dev DB session 5
+      (JP #7068 location "Chicago, IL · Toronto, ON", country_code US,
+      data.countries [US,CA]; Centro note on UJP #268 notes). Was
+      auto-ignored on promote (bad remote flag + blank company) — restored.
+    Vanguard — warm internal referral in progress. The referrer is a former
+      colleague; their real identity lives only in the linked Contact record,
+      not here. Company #1112. Two reqs ingested 2026-08-25: JP #6740 "AI
+      Enablement, Specialist" (Charlotte NC, UJP #250 favorited, NOT
+      match-scored — likely the referrer's target, maps to the enablement
+      track); JP #6747 "Lead Backend Engineer - Mobile APIs" (auto-ignored).
+      Both flagged remote=false / Charlotte — could be a bad extract like
+      Basis, or genuine RTO (Vanguard is in-office-heavy) → a relocation/
+      hybrid question for Mike, not a filter question. Still deciding; open
+      offers: match-score #6740, restore #6747 + recheck remote flags, log
+      the referral as a PipelineStep on #250, maybe wire the vanguardjobs.com
+      board.
 
   NEW standing criterion (memory feedback_culture_fit_over_comp, 2026-08-31):
   weight team/culture/belonging fit ABOVE marginal comp — a warmer lower-comp
-  role should rank above a colder higher one. Mike + [redacted-name] explicitly prefer
-  "appreciated for less" over "not, for a bit more". The $200k base floor
-  still holds; this is about weighing everything above it. Not yet reflected
-  in LLM::ProfileMatcher — that's a build task if Mike wants it.
+  role should rank above a colder higher one. Mike prefers "appreciated for
+  less" over "not, for a bit more". The base comp floor still holds; this is
+  about weighing everything above it. Not yet reflected in
+  LLM::ProfileMatcher — that's a build task if Mike wants it.
 
+  Done 2026-09-03 session 5 (2 stacked PRs OPEN, NOT merged — main still
+  @ 6ca8bd72 for feature code):
+    - PR #23: homepage redesign (Interviews / Active Leads / Awaiting
+      Response pipeline blocks; marketing cards deleted). TASK-147.1
+      steps 1-3: InterviewSession position/outcome/interviewers cols,
+      relaxed scheduled_at validation, app/models/interview_process.rb
+      (3 frozen TEMPLATES + seed_default + in_flight_for), homepage
+      "Round N of M" block, show page renders the sequence. Fixed a
+      regression: show page crashed on unscheduled rounds (f730cfdb).
+    - PR #24 (stacked on #23): TASK-148 slice 1 — JobPosting core fields
+      editable inline on the show page, JobPosting::InlineEditing concern,
+      multi-country data["countries"] + geo_allowed honoring it.
+    - CONTEXT.md +4 domain entries (interview round/task/template, +
+      Job Posting = canonical edit surface).
+    - Basis interview process seeded in dev DB (:compressed); JP #7068
+      location/country data corrected — see above.
+    - Slack message to the Basis warm-intro contact drafted (not sent).
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
@@ -137,30 +183,36 @@
   titles/dates aligned to the just3ws canonical resume (bullets filled from
   canonical highlights); ActiveCampaign + Tandem added; current role company
   "Independent" → "Self-employed"; summary replaced with the new archetype
-  resume's version. Preferences: the comp floor, Remote+Hybrid+In-person,
+  resume's version. Preferences: comp floor set, Remote+Hybrid+In-person,
   work-area categories fixed, blue-collar "work schedule" pref deleted. Skills
   curated 178 → 49. Old "0 to 1" resume deleted; Mike uploaded the Principal
   Systems Architect archetype PDF; sync-suggestions reviewed (summary accepted,
   the ~10 duplicate work-exp suggestions + a bogus "MCP" cert dismissed).
   Open (Mike's judgement, not mechanical): reconcile the EMR-Bear entry vs
-  canonical (it's on Indeed, not in the resume); contact location shows
-  Crystal Lake IL vs resume's Chicago IL. Do NOT click Indeed's "Review
+  canonical (it's on Indeed, not in the resume); the Indeed profile location
+  and the resume location differ — reconcile. Do NOT click Indeed's "Review
   suggestions" / "Sync to profile" — it re-adds duplicate work experience.
   Workflow codified: `indeed-profile-sync` skill + `indeed-profile-auditor`
   subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
   resume changes or Mike takes/leaves a role.
 
-  Blocked on Mike: pick what to do with the Vanguard lead (4 options above).
+  Blocked on Mike: (1) review + merge PR #23, then PR #24 (stacked);
+  (2) pick what to do with the Vanguard lead (4 options above).
   Everything else is unblocked. GHA billing is moot (CI removed). No deploy
   mechanism exists (kamal unconfigured); deploy is out of scope.
+
+  Next build (session 6): TASK-148 remaining slices — UserJobPosting fields
+  (notes/priority/applied_at), interview-round editing UI (absorbs
+  TASK-147.1 AC#7), body/ai_category, prep-pack/Q&A. TASK-147.1 AC#6
+  (final-round outcome → UserJobPosting) is separate + smaller; alongside.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
   DO NOT touch other repos from a wwworkremote/core session (esp. never commit
   content in the public just3ws.github.io). See memory feedback_stay_in_this_repo.
 
-  Deep handoff: ~/.config/adots/handoffs/2026-09-02-wwworkremote-session4.md
-  (local-only, never commit). Earlier: 2026-08-31-wwworkremote-session3.md.
+  Deep handoff: ~/.config/adots/handoffs/2026-09-03-wwworkremote-session5.md
+  (local-only, never commit). Earlier: 2026-09-02-wwworkremote-session4.md.
   This block is the current truth if they disagree.
 -->
 
