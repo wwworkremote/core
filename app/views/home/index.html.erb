@@ -35,54 +35,108 @@
   <% end %>
 </div>
 
-<!-- What this app does -->
-<section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
-    <div class="card-body p-8 relative z-10">
-      <div class="text-xs font-bold text-primary mb-4"><%= t('.capabilities.job_postings_eyebrow') %></div>
-      <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.job_aggregation_title') %></h2>
-      <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.job_aggregation_body') %></p>
-      <%= link_to job_postings_path, class: "btn btn-ghost btn-xs p-0 text-primary hover:bg-transparent font-bold" do %>
-        <%= t('.capabilities.browse_jobs') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
-      <% end %>
-    </div>
-    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-      <%= heroicon "globe-alt", options: { class: "w-24 h-24" } %>
-    </div>
-  </div>
-
-  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group border-primary/20">
-    <div class="card-body p-8 relative z-10">
-      <div class="text-xs font-bold text-secondary mb-4"><%= t('.capabilities.saved_jobs_eyebrow') %></div>
-      <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.match_scoring_title') %></h2>
-      <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.match_scoring_body') %></p>
-      <%= link_to user_job_postings_path, class: "btn btn-ghost btn-xs p-0 text-secondary hover:bg-transparent font-bold" do %>
-        <%= t('.capabilities.view_saved_jobs') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
-      <% end %>
-    </div>
-    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-      <%= heroicon "sparkles", options: { class: "w-24 h-24" } %>
-    </div>
-  </div>
-
-  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
-    <div class="card-body p-8 relative z-10">
-      <div class="text-xs font-bold text-accent mb-4"><%= t('.capabilities.admin_eyebrow') %></div>
-      <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.pipeline_status_title') %></h2>
-      <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.pipeline_status_body') %></p>
-      <%= link_to admin_root_path, class: "btn btn-ghost btn-xs p-0 text-accent hover:bg-transparent font-bold" do %>
-        <%= t('.capabilities.open_admin') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
-      <% end %>
-    </div>
-    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-      <%= heroicon "adjustments-horizontal", options: { class: "w-24 h-24" } %>
-    </div>
-  </div>
-</section>
-
 <%= turbo_stream_from "system_telemetry" %>
 
 <div class="grid grid-cols-1 gap-12">
+  <!-- Interviews Block: scheduled interviews, each linking to its prep pack -->
+  <% if @upcoming_interviews.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-error"><%= t('.interviews.heading') %></h2>
+        <div class="h-px flex-1 bg-error/20"></div>
+        <span class="badge badge-error badge-xs font-black"><%= @upcoming_interviews.count %></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @upcoming_interviews.each do |session| %>
+          <% job = session.job_posting %>
+          <div class="card bg-base-200 border border-error/20 hover:border-error/60 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
+                <div class="badge badge-error text-xs font-bold"><%= session.session_type.humanize %></div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-error transition-colors leading-tight mb-3">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="text-xs font-bold text-error/90 mb-4">
+                <%= session.scheduled_at.strftime("%a %b %-d, %H:%M") %>
+                <span class="text-slate-500">(<%= distance_of_time_in_words(Time.current, session.scheduled_at) %>)</span>
+              </div>
+              <div class="mt-auto">
+                <%= link_to t('.interviews.open_prep'), job_posting_path(job, anchor: "interview-prep"),
+                      class: "btn btn-error btn-sm rounded-lg font-bold w-full" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Active Leads Block: favorited, not applied yet -->
+  <% if @active_leads.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-primary"><%= t('.active_leads.heading') %></h2>
+        <div class="h-px flex-1 bg-primary/20"></div>
+        <span class="badge badge-primary badge-xs font-black"><%= @active_leads.count %></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @active_leads.each do |user_job| %>
+          <% job = user_job.job_posting %>
+          <div class="card bg-base-200 border border-primary/10 hover:border-primary/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="text-xs font-bold text-slate-400 mb-4"><%= job.company_name %></div>
+              <h3 class="text-md font-black text-white group-hover:text-primary transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-xs font-bold text-slate-500"><%= job.location.presence || t('job_postings.show.remote_fallback') %></div>
+                <%= link_to t('.active_leads.review'), job_posting_path(job), class: "text-xs font-bold text-primary hover:underline" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Awaiting Response Block: applied, no outcome yet -->
+  <% if @awaiting_response.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-secondary"><%= t('.awaiting_response.heading') %></h2>
+        <div class="h-px flex-1 bg-secondary/20"></div>
+        <span class="badge badge-secondary badge-xs font-black"><%= @awaiting_response.count %></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @awaiting_response.each do |user_job| %>
+          <% job = user_job.job_posting %>
+          <div class="card bg-base-200 border border-secondary/10 hover:border-secondary/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
+                <% if user_job.applied_at %>
+                  <div class="text-xs font-bold text-slate-500"><%= t('.awaiting_response.applied_ago', duration: time_ago_in_words(user_job.applied_at)) %></div>
+                <% end %>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-secondary transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-xs font-bold text-slate-500"><%= job.location.presence || t('job_postings.show.remote_fallback') %></div>
+                <%= link_to t('.awaiting_response.review'), job_posting_path(job), class: "text-xs font-bold text-secondary hover:underline" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
   <!-- Priority In-Box Block -->
   <% if @priority_inbox.any? %>
     <section>

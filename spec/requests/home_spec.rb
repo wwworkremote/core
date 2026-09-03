@@ -60,6 +60,32 @@ RSpec.describe "Home" do
       expect(response.body).to include("about 1 hour")
     end
 
+    it "surfaces a scheduled interview with a link to its prep pack" do
+      job_posting = create(:job_posting, title: "Interview Role")
+      create(:user_job_posting, user: user, job_posting: job_posting, status: "applied")
+      create(:interview_session, user: user, job_posting: job_posting, scheduled_at: 2.days.from_now)
+
+      get root_path
+
+      expect(response.body).to include("Interviews")
+      expect(response.body).to include("Interview Role")
+      expect(response.body).to include(job_posting_path(job_posting, anchor: "interview-prep"))
+    end
+
+    it "lists favorited postings as active leads and applied ones as awaiting response" do
+      lead = create(:job_posting, title: "Lead Role")
+      applied = create(:job_posting, title: "Applied Role")
+      create(:user_job_posting, user: user, job_posting: lead, status: "favorited")
+      create(:user_job_posting, user: user, job_posting: applied, status: "applied")
+
+      get root_path
+
+      expect(response.body).to include("Active Leads")
+      expect(response.body).to include("Lead Role")
+      expect(response.body).to include("Awaiting Response")
+      expect(response.body).to include("Applied Role")
+    end
+
     it "surfaces the untriaged count and oldest-untriaged age" do
       job_posting = create(:job_posting)
       ujp = create(:user_job_posting, user: user, job_posting: job_posting, status: "none")

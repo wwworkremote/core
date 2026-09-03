@@ -106,19 +106,16 @@ en:
         untriaged: "Untriaged"
         oldest_untriaged: "Oldest Untriaged"
         never: "Never"
-      capabilities:
-        job_postings_eyebrow: "Aggregation"
-        job_aggregation_title: "Every Board, One Feed"
-        job_aggregation_body: "Postings pulled from every source you've configured, deduplicated and normalized into one feed."
-        browse_jobs: "Browse Jobs"
-        saved_jobs_eyebrow: "Matching"
-        match_scoring_title: "AI Match Scoring"
-        match_scoring_body: "Your resume and goals scored against every posting, so you know what's worth your time."
-        view_saved_jobs: "View Saved Jobs"
-        admin_eyebrow: "Operations"
-        pipeline_status_title: "Pipeline Status"
-        pipeline_status_body: "Ingestion volume, enrichment health, and worker status in one place."
-        open_admin: "Open Admin"
+      interviews:
+        heading: "Interviews"
+        open_prep: "Open Prep Pack"
+      active_leads:
+        heading: "Active Leads"
+        review: "Review"
+      awaiting_response:
+        heading: "Awaiting Response"
+        review: "Review"
+        applied_ago: "Applied %{duration} ago"
       priority_inbox:
         heading: "Priority Inbox"
         pending: "pending"

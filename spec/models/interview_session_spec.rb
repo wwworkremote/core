@@ -45,4 +45,36 @@ RSpec.describe InterviewSession do
       expect(described_class::SESSION_TYPES).to include("Technical")
     end
   end
+
+  describe "advancing the tracked application on create" do
+    let(:user) { create(:user) }
+    let(:job_posting) { create(:job_posting) }
+
+    it "moves the matching UserJobPosting from applied to interview" do
+      ujp = create(:user_job_posting, user:, job_posting:, status: "applied")
+
+      create(:interview_session, user:, job_posting:)
+
+      expect(ujp.reload.status).to eq("interview")
+    end
+
+    it "logs the transition to the pipeline timeline" do
+      create(:user_job_posting, user:, job_posting:, status: "favorited")
+
+      expect { create(:interview_session, user:, job_posting:) }
+        .to change { PipelineStep.where(user:, job_posting:, status: "interview").count }.by(1)
+    end
+
+    it "is a no-op when the application can't advance (already archived)" do
+      ujp = create(:user_job_posting, user:, job_posting:, status: "archived")
+
+      create(:interview_session, user:, job_posting:)
+
+      expect(ujp.reload.status).to eq("archived")
+    end
+
+    it "is a no-op when the posting was never tracked" do
+      expect { create(:interview_session, user:, job_posting:) }.not_to raise_error
+    end
+  end
 end

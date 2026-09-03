@@ -3,7 +3,11 @@
 class HomeController < ApplicationController
   PRIORITY_INBOX_STATUSES = ["none", nil].freeze
 
+  # rubocop:disable-next Metrics/MethodLength
   def index
+    assign_upcoming_interviews
+    assign_active_leads
+    assign_awaiting_response
     assign_top_matches
     assign_priority_inbox
     assign_idle_followups
@@ -12,6 +16,37 @@ class HomeController < ApplicationController
   end
 
   private
+
+  # Scheduled (or just-happened) interviews, each linking straight to that
+  # posting's prep pack. The 1.day.ago floor keeps this morning's interview
+  # on the page through the day it happens instead of dropping off at
+  # midnight, without turning the block into a history log.
+  def assign_upcoming_interviews
+    @upcoming_interviews = current_user.interview_sessions
+                                       .where(scheduled_at: 1.day.ago..)
+                                       .order(:scheduled_at)
+                                       .includes(:job_posting)
+  end
+
+  # Leads Mike is working but hasn't applied to yet.
+  def assign_active_leads
+    @active_leads = current_user.user_job_postings
+                                .includes(:job_posting)
+                                .where(status: "favorited")
+                                .order(updated_at: :desc)
+                                .limit(9)
+  end
+
+  # Applied, no interview and no outcome yet -- the "waiting to hear back"
+  # pile, kept distinct from active leads and from scheduled interviews.
+  # NULLS LAST because the backfill importers write status without applied_at.
+  def assign_awaiting_response
+    @awaiting_response = current_user.user_job_postings
+                                     .includes(:job_posting)
+                                     .where(status: "applied", outcome: nil)
+                                     .order(Arel.sql("applied_at DESC NULLS LAST"))
+                                     .limit(9)
+  end
 
   def assign_idle_followups
     @idle_followups = current_user.user_job_postings.idle.includes(:job_posting).limit(6)

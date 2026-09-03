@@ -37,4 +37,17 @@ class InterviewSession < ApplicationRecord
 
   # Predefined session types for the lab
   SESSION_TYPES = %w[Screening Technical System_Design Cultural Management Offer_Negotiation].freeze
+
+  # Logging an interview session is itself the signal that this application
+  # reached the interview stage -- advance the matching UserJobPosting so the
+  # homepage's "Interviews" block and the pipeline timeline agree with the
+  # Laboratory. No-op when there's no tracked application or it can't advance
+  # (never favorited/applied, already past interview, archived).
+  after_create :advance_application_to_interview
+
+  private
+
+  def advance_application_to_interview
+    UserJobPosting.find_by(user_id:, job_posting_id:)&.record_status_event!("interview")
+  end
 end
