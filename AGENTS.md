@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-09-03 (session 4 close)
+     CURRENT FOCUS  —  last updated 2026-09-03 (session 5 close)
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -7,12 +7,21 @@
      and fix the block. Full procedure: docs/agents/session-handoff.md
      ═══════════════════════════════════════════════════════════════════════
 
-  In flight: nothing half-built. Session 4 built the Interview Prep Pack
-  feature end-to-end (TASK-144 + .1/.2/.3/.4, all Done); merged + pushed,
-  main @ 6ca8bd72. Job search is the active thread: Basis interview was
-  2026-09-03 10:00 CT (warm intro via a UGtastic contact) — debrief not
-  yet logged (InterviewSession for JP #7068 / UJP #268; UserJobPosting
-  #outcome if there's a result). Vanguard warm-lead still open.
+  In flight: PR #23 OPEN, not merged — main still @ 6ca8bd72.
+  https://github.com/wwworkremote/core/pull/23 (branch
+  feat/homepage-pipeline-blocks, 4 commits, merge state CLEAN). Homepage
+  now leads with Interviews / Active Leads / Awaiting Response blocks (the
+  "What this app does" marketing cards deleted); InterviewSession becomes
+  an ordered multi-round pipeline (position/outcome/interviewers cols,
+  InterviewProcess templates, seed_default, in_flight_for). Steps 1-3 of
+  TASK-147.1; ACs 6+7 still open (see task). Needs review + merge.
+  Session 5 also ran /pipeline-health + local-LLM health — all green
+  (verified 2026-09-03), no action.
+
+  Job search: Basis recruiter reached out 2026-09-03 (warm intro — the
+  recruiter's note said the internal contact "bragged about" Mike). Call
+  was ~10:00 CT. Debrief NOT logged (InterviewSession round 1 has no
+  feedback/vibe/questions). Vanguard warm-lead still open.
 
   Live tasks (Backlog MCP):
     TASK-140  (Med, sharpened session 4) JobBoards::Syncer starves on an
@@ -30,6 +39,14 @@
               career-development lap — ADR + sequenced plan, no impl, for
               making lead → application → interview-prep → interview one
               repeatable, evolvable harness process instead of three layers.
+    TASK-147.1 (feature, In Progress, NEW session 5) multi-round interview
+              tracking. Steps 1-3 done in PR #23 (InterviewSession =
+              round, InterviewTask = action item, InterviewProcess
+              TEMPLATES + seed_default + in_flight_for; homepage "Round N
+              of M" block). OPEN: AC#6 final-round outcome → UserJobPosting
+              wiring; AC#7 posting-page UI to seed a process / set round
+              dates+outcomes (console-only right now). Full state in the
+              task's Implementation Notes.
     TASK-145  (High, NEW) LLM::Orchestrator always fails on the Gemini provider
               ("Role 'system' is not supported"). defaults.answer_generation
               has pointed at gemini-3.7-flash since 2026-08-24 → every AI-path
@@ -72,11 +89,19 @@
 
   Job search — applications tracked:
     Basis, "Sr Software Engineer - Basis Platform / DSP" (Lever) — JP #7068,
-      UJP #268 = applied, PipelineStep #999 (resume archetype + both Q&A
-      answers + the Lever "error verifying" retry noted), GuidedSession #18
-      completed. Direct contact also engaged. US+remote confirmed in the JD;
-      the "Toronto, ON" line was just where the req is filed. Was auto-ignored
-      on promote (bad remote flag + blank company) — restored + fixed.
+      UJP #268 = INTERVIEW (advanced from applied session 5 when the
+      InterviewSession process was seeded). PipelineStep history +
+      GuidedSession #18 completed. Interview process seeded (:compressed,
+      6 rounds) — round 1 (recruiter screen) scheduled 2026-09-03 15:00
+      UTC, rounds 2-6 unscheduled. THIS IS DEV-DB SEED DATA, not in PR #23.
+      Recruiter engaged via warm intro. Mike says Basis is "US & Canada",
+      formerly Centro, US HQ Chicago — JP #7068 location data is thin /
+      Toronto-filed; offered to fix the posting location+notes, Mike has
+      NOT said go. US+remote confirmed in the JD; "Toronto, ON" was just
+      where the req is filed. Was auto-ignored on promote (bad remote flag
+      + blank company) — restored + fixed.
+    NEW REQUEST (session 5, end): Mike wants to edit/revise "pretty much
+      any data" on the job_postings/7068 show page. Not started.
     Vanguard — warm lead via a former colleague (ex-OMF, ran the OTel WG after Mike,
       actively pulling to get him in). Company #1112. Two reqs already
       ingested 2026-08-25: JP #6740 "AI Enablement, Specialist" (Charlotte NC,
@@ -97,6 +122,18 @@
   still holds; this is about weighing everything above it. Not yet reflected
   in LLM::ProfileMatcher — that's a build task if Mike wants it.
 
+  Done 2026-09-03 session 5 (PR #23 OPEN, NOT merged — main still @ 6ca8bd72):
+    - Homepage redesign: leads with Interviews / Active Leads / Awaiting
+      Response pipeline blocks; "What this app does" marketing cards deleted.
+    - TASK-147.1 filed + steps 1-3 built: InterviewSession position/outcome/
+      interviewers cols, relaxed scheduled_at validation, app/models/
+      interview_process.rb (3 frozen hiring-pipeline TEMPLATES +
+      seed_default + in_flight_for), homepage "Round N of M" block, show
+      page renders the round sequence. CONTEXT.md +3 domain entries.
+    - Fixed a regression: show page crashed on unscheduled rounds (f730cfdb).
+    - Basis interview process seeded in dev DB (:compressed) — see above.
+    - Slack message to the Basis warm-intro contact drafted (not sent by
+      the agent).
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
@@ -150,17 +187,23 @@
   subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
   resume changes or Mike takes/leaves a role.
 
-  Blocked on Mike: pick what to do with the Vanguard lead (4 options above).
+  Blocked on Mike: (1) review + merge PR #23; (2) pick what to do with the
+  Vanguard lead (4 options above); (3) say go / no-go on updating JP #7068's
+  location + notes (Basis = US & Canada, ex-Centro, Chicago HQ).
   Everything else is unblocked. GHA billing is moot (CI removed). No deploy
   mechanism exists (kamal unconfigured); deploy is out of scope.
+
+  Next build (session 6): the job_postings/7068 "edit any field" request +
+  TASK-147.1 ACs 6/7 (they overlap — the interview-round editors are part
+  of making the show page fully editable).
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
   DO NOT touch other repos from a wwworkremote/core session (esp. never commit
   content in the public just3ws.github.io). See memory feedback_stay_in_this_repo.
 
-  Deep handoff: ~/.config/adots/handoffs/2026-09-02-wwworkremote-session4.md
-  (local-only, never commit). Earlier: 2026-08-31-wwworkremote-session3.md.
+  Deep handoff: ~/.config/adots/handoffs/2026-09-03-wwworkremote-session5.md
+  (local-only, never commit). Earlier: 2026-09-02-wwworkremote-session4.md.
   This block is the current truth if they disagree.
 -->
 
