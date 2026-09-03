@@ -62,3 +62,6 @@ doc/
 
 # Commute-zone config carries location info
 config/commute_zone.yml
+
+# Standing job-search criteria carries a comp figure
+config/job_search_criteria.yml

@@ -36,7 +36,7 @@ class LLM::InterviewPrepGenerator::SpokenRewriter
       "React and JavaScript" not "React/JS", "then" or "leads to" not an arrow.
     - Expand every acronym in full on first use; the short form is fine afterward.
     - Write numbers as spoken: "one hundred nineteen thousand to one hundred sixty thousand
-      dollars" not "[posted band]"; "under one hundred milliseconds" not "sub-100ms"; "ninety-
+      dollars" not "$140–175K"; "under one hundred milliseconds" not "sub-100ms"; "ninety-
       ninth percentile" not "p99"; "four percent" not "4%". Ranges use the word "to".
     - No tables and no code blocks -- convert a table to a heading with a short bullet list.
     - No emoji. No bare URLs -- name the source instead.

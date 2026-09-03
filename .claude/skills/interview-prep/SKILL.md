@@ -6,7 +6,7 @@ description: >-
   fact-check an existing prep pack; or when the domain primer's concepts,
   acronym citations, or learning links need grounding against real sources.
 metadata:
-  version: 1.0.1
+  version: 1.0.2
 ---
 
 # Interview prep
@@ -140,4 +140,4 @@ The auditor checks for these; know them so you can confirm its findings:
 - **Skill-gap-as-blind-spot** — "no React experience" listed under blind spots. A missing tool is THE SETUP's reality check; a blind spot is a domain assumption Mike's background never exposed him to.
 - **Invented links** — a plausible-looking URL for a whitepaper or paper that does not exist. Section (e) must name the authority even when it cannot give a real URL.
 - **Reality-check overreach** — claiming a hard "no experience" gap the History actually contradicts (Mike has production React and Java).
-- **Read-aloud drift** — the local model half-applies the spoken rules: leaves a `[posted band]`, keeps a table, keeps an emoji. Fix by hand or re-run the rewrite.
+- **Read-aloud drift** — the local model half-applies the spoken rules: leaves a `$140–175K`, keeps a table, keeps an emoji. Fix by hand or re-run the rewrite.

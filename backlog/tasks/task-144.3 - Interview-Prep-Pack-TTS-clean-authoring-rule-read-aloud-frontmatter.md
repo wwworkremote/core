@@ -24,7 +24,7 @@ The prep pack gets fed to a text-to-speech engine. It must read cleanly aloud as
 Make it a rule (in the generator prompt CONSTRAINTS + a shared reference the skill/agent point to):
 - Spell out abbreviations and contractions everywhere: "Senior" not "Sr.", "for example" not "e.g.", "that is" not "i.e.", "versus" not "vs.", "and so on" not "etc.", "and" not "&", "with" not "w/", "about" not "~", "percent" not "%", "then" / "leads to" not the arrow, "and"/"to" not "/".
 - Expand every acronym on first use in a spoken-friendly way; short form is fine after that.
-- Numbers, money, ranges as words or spoken digits: "[posted band]" not "[posted band]"; "under 100 milliseconds" not "sub-100ms"; "99th percentile" not "p99"; "4 percent" not "4%".
+- Numbers, money, ranges as words or spoken digits: "140,000 to 175,000 dollars" not "$140–175K"; "under 100 milliseconds" not "sub-100ms"; "99th percentile" not "p99"; "4 percent" not "4%".
 - No bare URLs in the spoken body -- name the source (reinforces the existing rule).
 - No emoji.
 - Prose and simple bullet lists only in the pack body -- no tables, no code blocks (a table row reads as a run-on).
@@ -32,7 +32,7 @@ Make it a rule (in the generator prompt CONSTRAINTS + a shared reference the ski
 - A YAML frontmatter block at the top of the pack with read-aloud hints: fully-spelled title, a pronunciation map for tricky proper nouns, the section list, estimated spoken minutes.
 
 Then:
-- Regenerate docs/research/interview-prep-basis-dsp.md TTS-clean + human-readable (it is the quality bar, so it must model the target -- convert its tables to prose/definition lists, spell everything out).
+- Regenerate docs/interview-prep/_reference/reference.md TTS-clean + human-readable (it is the quality bar, so it must model the target -- convert its tables to prose/definition lists, spell everything out).
 - The job posting show view renders the pack: split the frontmatter fence so it does not render as a horizontal rule; surface the read-aloud hints.
 - Update the interview-prep skill and interview-prep-auditor agent: the pack must be TTS-clean; the auditor checks it. Note what is available locally to help (macOS `say`; OpenAI/Gemini TTS models are in the synced Model table but nothing wires them). Rules-file frontmatter should carry read-aloud context.
 - Regenerate the Basis pack.
@@ -84,7 +84,7 @@ Files:
 8. interview-prep skill + interview-prep-auditor agent: both versions; auditor checks the
    spoken one against the tts-readable standard (abbreviations, spoken numbers, no tables,
    no bare URLs, no emoji, valid frontmatter). Note macOS `say` for spot-checks.
-9. docs/research/interview-prep-basis-dsp.md stays human-format (it is a reference doc read by
+9. docs/interview-prep/_reference/reference.md stays human-format (it is a reference doc read by
    humans/agents, not TTS) -- add a pointer to tts-readable-documentation.md and the note that
    the generated pack ships in both formats.
 10. CONTEXT.md + changelog.
@@ -102,7 +102,7 @@ the rewrite, that is the TASK-145 signal again.
 <!-- SECTION:NOTES:BEGIN -->
 AC#1/#2/#3: the TTS rules + frontmatter instruction live in LLM::InterviewPrepGenerator::SpokenRewriter (not the main prompt) since the pack ships in two formats -- the human generator prompt stays human-format. spoken_rewriter_spec asserts the rules + frontmatter instruction are in the task_instructions.
 
-AC#5: docs/research/interview-prep-basis-dsp.md deliberately NOT rewritten TTS-clean -- it is a reference doc read by people/agents, not fed to a speech engine (decided with Mike; it now points to tts-readable-documentation.md and notes the pack ships both formats). The TTS-clean standard is modelled by the SpokenRewriter output + the frontmatter example in tts-readable-documentation.md.
+AC#5: docs/interview-prep/_reference/reference.md deliberately NOT rewritten TTS-clean -- it is a reference doc read by people/agents, not fed to a speech engine (decided with Mike; it now points to tts-readable-documentation.md and notes the pack ships both formats). The TTS-clean standard is modelled by the SpokenRewriter output + the frontmatter example in tts-readable-documentation.md.
 
 New: docs/tts-transform-prompt.md -- the copy-paste instruction block for the external TTS tool (Mike's explicit ask). Engine-agnostic: covers parsing/not-speaking the frontmatter, applying the pronunciation map as a lexicon (with SSML mappings), section markers, sentence-per-cue captioning (VTT/SRT), line-per-sentence lyrics (LRC), and the do-nots.
 
@@ -110,7 +110,7 @@ New: docs/tts-transform-prompt.md -- the copy-paste instruction block for the ex
 
 AC#8 pending: Basis pack regeneration running (2 LLM calls on the local model).
 
-Docs regrouped under docs/interview-prep/ (commit 93fa21e1): basis-dsp/reference.md, tts-readable-documentation.md, tts-transform-prompt.md, plus a README. One per-role subdirectory. AC#5's 'rewrite interview-prep-basis-dsp.md TTS-clean' stays a deliberate no -- it is a human reference doc, not a speech source; it points to the standard instead.
+Docs regrouped under docs/interview-prep/ (commit 93fa21e1): _reference/reference.md, tts-readable-documentation.md, tts-transform-prompt.md, plus a README. One per-role subdirectory. AC#5's 'rewrite interview-prep-basis-dsp.md TTS-clean' stays a deliberate no -- it is a human reference doc, not a speech source; it points to the standard instead.
 
 SpokenRewriter fixes: unwrap_fence strips the ```yaml wrapper the local model adds; the prompt now shows a fully-quoted frontmatter example (the model had emitted an unquoted colon-bearing title -> YAML parse failed -> no hints panel). Regen after: frontmatter parses, spoken_minutes ~10, body genuinely TTS-clean.
 
@@ -147,7 +147,7 @@ The read-aloud block carries **content hints** from the model (`title`, `pronunc
 
 ## Docs
 
-Regrouped under `docs/interview-prep/` — `basis-dsp/reference.md`, `tts-readable-documentation.md`, `tts-transform-prompt.md` (the LLM-facing transform instruction), `tts-integration-guide.md` (operator-facing: discovery, the single-file model, the frontmatter schema, output conventions), and a README. One subdirectory per role. `interview-prep-basis-dsp.md` is NOT rewritten TTS-clean (removed AC) — it is a human reference doc, not a speech source; it points to the standard.
+Regrouped under `docs/interview-prep/` — `_reference/reference.md`, `tts-readable-documentation.md`, `tts-transform-prompt.md` (the LLM-facing transform instruction), `tts-integration-guide.md` (operator-facing: discovery, the single-file model, the frontmatter schema, output conventions), and a README. One subdirectory per role. `interview-prep-basis-dsp.md` is NOT rewritten TTS-clean (removed AC) — it is a human reference doc, not a speech source; it points to the standard.
 
 Caption/lyrics *export* is deferred — the read-aloud version is cleanly sentence-segmented so it stays a formatting transform later.
 

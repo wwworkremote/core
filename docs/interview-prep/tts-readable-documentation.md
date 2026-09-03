@@ -45,8 +45,8 @@ This is also plain-English practice: short common words over formal or clipped o
 ### 2. Expand every acronym, and hint the hard ones
 
 Expand each acronym in full the first time it appears. The short form is fine afterward: a
-listener who has heard "Demand-Side Platform" once follows "D S P" for the rest of the
-document.
+listener who has heard "Electronic Logging Device" once follows "E L D" for the rest of
+the document.
 
 For an acronym or proper noun a speech engine mispronounces, add a spoken hint in the
 frontmatter pronunciation map (see below) rather than reshaping the word in the body. Do not
@@ -58,7 +58,7 @@ is inconsistent across engines and it degrades the experience for everyone else.
 The meaning of a number decides how it should be said, and the engine cannot tell.
 
 - Ranges use the word "to", not a dash: "one hundred nineteen thousand to one hundred sixty
-  thousand dollars", not "[posted band]". A dash in a range is read inconsistently, and "to" is
+  thousand dollars", not "$140–175K". A dash in a range is read inconsistently, and "to" is
   faster to read on screen as well.
 - Ordinals as words: "first", "ninety-ninth percentile", not "1st", "p99".
 - Currency and units written out: "under one hundred milliseconds", not "sub-100ms".
@@ -88,8 +88,8 @@ serves both the eye and the ear.
 ### 6. Drop the decorative layer
 
 - No emoji. It is read as its name ("brain", "check mark") or skipped, and adds nothing.
-- No bare URLs. A URL is read as a mangled character string. Name the destination — "the IAB
-  Tech Lab OpenRTB specification" — and let the reader search for it.
+- No bare URLs. A URL is read as a mangled character string. Name the destination — "the W3C
+  Web Speech API specification" — and let the reader search for it.
 - No ASCII art, no box-drawing, no symbol shorthand for emphasis.
 
 ### 7. Carry hints in frontmatter
@@ -108,10 +108,10 @@ source: https://…            # provenance (optional)
 generated_at: 2026-09-02T23:55:57Z   # ISO 8601, for freshness (optional)
 title: "Interview Prep — Senior Software Engineer, Realtime Matching Platform"
 pronunciation:
-  Basis: "BAY sis"
-  DSP: "D S P"
-  OpenRTB: "open R T B"
-  [redacted-name]: "shiv AWN"
+  Acme: "AK mee"
+  ELD: "E L D"
+  WebAPI: "web A P I"
+  Siobhan: "shiv AWN"
 sections:
   - "The setup"
   - "Domain primer"
