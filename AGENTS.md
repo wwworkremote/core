@@ -8,10 +8,10 @@
      ═══════════════════════════════════════════════════════════════════════
 
   In flight: nothing half-built. Session 4 built the Interview Prep Pack
-  feature end-to-end (TASK-144 + .1/.2/.3/.4, all Done) on branch
-  `feat/interview-prep-pack` — merge to main pending Mike's push go. Job
-  search is still the active thread: Basis interview was 2026-09-03 10:00 CT
-  (warm intro via a UGtastic contact); Vanguard warm-lead still open.
+  feature end-to-end (TASK-144 + .1/.2/.3/.4, all Done); merged + pushed,
+  main @ f9787ead. Job search is still the active thread: Basis interview
+  was 2026-09-03 10:00 CT (warm intro via a UGtastic contact); Vanguard
+  warm-lead still open.
 
   Live tasks (Backlog MCP):
     TASK-145  (High, NEW) LLM::Orchestrator always fails on the Gemini provider
@@ -81,8 +81,7 @@
   still holds; this is about weighing everything above it. Not yet reflected
   in LLM::ProfileMatcher — that's a build task if Mike wants it.
 
-  Done 2026-09-02 session 4 (branch feat/interview-prep-pack, ~19 commits,
-  merge to main pending Mike's push go):
+  Done 2026-09-02 session 4 (merged + pushed, main @ f9787ead):
     - Interview Prep Pack: LLM-generated briefing per posting (role setup,
       domain primer w/ acronym→authority binding, story arc, hooks, referral
       play, likely questions, questions to ask, checklist). Button on the job
