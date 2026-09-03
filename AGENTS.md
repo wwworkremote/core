@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CURRENT FOCUS  —  last updated 2026-09-02 (session 4)
+     CURRENT FOCUS  —  last updated 2026-09-03 (session 4 close)
      Cold-start resume state, canonical for every agent tool (Claude, Codex,
      Gemini, Antigravity). Whoever closes a session rewrites this whole block
      in place — step one, before the wrap-up. `git log` + Backlog are truth
@@ -9,11 +9,27 @@
 
   In flight: nothing half-built. Session 4 built the Interview Prep Pack
   feature end-to-end (TASK-144 + .1/.2/.3/.4, all Done); merged + pushed,
-  main @ f9787ead. Job search is still the active thread: Basis interview
-  was 2026-09-03 10:00 CT (warm intro via a UGtastic contact); Vanguard
-  warm-lead still open.
+  main @ 6ca8bd72. Job search is the active thread: Basis interview was
+  2026-09-03 10:00 CT (warm intro via a UGtastic contact) — debrief not
+  yet logged (InterviewSession for JP #7068 / UJP #268; UserJobPosting
+  #outcome if there's a result). Vanguard warm-lead still open.
 
   Live tasks (Backlog MCP):
+    TASK-140  (Med, sharpened session 4) JobBoards::Syncer starves on an
+              unordered LIMIT. fetch_pending_docs does
+              .where(aasm_state: ["pending", nil]).limit(10) with no ORDER
+              BY → re-selects the same ~10 un-convertible oldest rows every
+              run. ~36 conversions/day vs ~157/day intake; 6,831 nil-state
+              JobBoards::Document rows backlogged since 2026-07-30. Do NOT
+              one-line it (order ASC alone blocks FIFO when poison > limit;
+              raising the limit floods JobBoards::AnalysisJob's per-posting
+              LLM call). Needs a terminal `failed` state / cursor + a
+              characterization spec + a one-time bulk drain. 5-step plan in
+              the task's Implementation Notes.
+    TASK-147  (Med, spike, NEW session 4) design the end-to-end
+              career-development lap — ADR + sequenced plan, no impl, for
+              making lead → application → interview-prep → interview one
+              repeatable, evolvable harness process instead of three layers.
     TASK-145  (High, NEW) LLM::Orchestrator always fails on the Gemini provider
               ("Role 'system' is not supported"). defaults.answer_generation
               has pointed at gemini-3.7-flash since 2026-08-24 → every AI-path
@@ -81,7 +97,12 @@
   still holds; this is about weighing everything above it. Not yet reflected
   in LLM::ProfileMatcher — that's a build task if Mike wants it.
 
-  Done 2026-09-02 session 4 (merged + pushed, main @ f9787ead):
+  Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
+    - TASK-147 filed (design the end-to-end career-development lap, spike).
+    - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
+      via /pipeline-health; 5-step fix plan added to the task, not built.
+    - /fewer-permission-prompts: 17 read-only tool patterns allowlisted in
+      .claude/settings.json.
     - Interview Prep Pack: LLM-generated briefing per posting (role setup,
       domain primer w/ acronym→authority binding, story arc, hooks, referral
       play, likely questions, questions to ask, checklist). Button on the job
