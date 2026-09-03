@@ -28,7 +28,7 @@ files and how to find and load them.
 ```
 
 `<role>` is the `--export=<role>` value, or the company name parameterized
-(`Basis Technologies` → `basis-technologies`). One directory per role.
+(`Example Corp` → `example-corp`). One directory per role.
 
 Your tool writes its outputs back into the same directory (see
 [Output conventions](#output-conventions)).

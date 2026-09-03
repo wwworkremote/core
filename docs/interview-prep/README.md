@@ -36,20 +36,15 @@ Writes `pack.md` (human) and `pack.spoken.md` (read-aloud, with discovery
 frontmatter) to `~/ai/outbox/wwwr/interview-prep/<role>/`. `<role>` defaults to
 the company name parameterized. These are generated artifacts outside the repo.
 
-## Per-role subdirectories
+## The quality-bar reference
 
-Each role gets its own subdirectory, named for the company (and disambiguated by
-role where a company has more than one opening):
+[`_reference/reference.md`](_reference/reference.md) is the hand-written prep pack
+the generated packs are measured against — the `interview-prep-auditor` diffs
+against it and the generator's section structure mirrors it. Part 1 is a fully
+**synthetic** worked example (invented company, role, candidate, referrer) so it
+can live in the repo without carrying real interview prep; Part 2 is the
+per-section spec.
 
-| Subdirectory | Role |
-|---|---|
-| [`basis-dsp/`](basis-dsp/) | Basis Technologies — Senior Software Engineer, Basis Platform / DSP |
-
-A subdirectory holds:
-
-- `reference.md` — a hand-written prep pack for that posting, the quality bar the
-  generated pack is measured against. Part 1 is what "good" looks like; Part 2 is
-  the per-section spec.
-
-The generated pack itself lives on the `UserJobPosting` and renders on the posting
-page; it is not committed here.
+Real generated packs live on the `UserJobPosting` and render on the posting page;
+they are not committed here. `--export` writes them to `~/ai/outbox/`, outside the
+repo.
