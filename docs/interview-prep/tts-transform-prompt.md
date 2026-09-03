@@ -104,7 +104,7 @@ see [`tts-integration-guide.md`](tts-integration-guide.md).
 >   - `"ELD: E L D"` — say the letters separately, with a short gap between them. Apply as
 >     SSML `<say-as interpret-as="characters">` or spell-out.
 >   - `"Acme: AK-mee"` — a respelling; the capitalized syllable takes the stress. Apply as
->     SSML `<phoneme>` if you can derive one, otherwise `<sub alias="BAY sis">`.
+>     SSML `<phoneme>` if you can derive one, otherwise `<sub alias="AK mee">`.
 >   Apply every entry everywhere the term appears, not just the first time.
 > - **`sections`** — the ordered section list. Each is a chapter boundary: insert a chapter
 >   marker (or a caption chapter cue), and speak the heading with a slight drop in pitch and
