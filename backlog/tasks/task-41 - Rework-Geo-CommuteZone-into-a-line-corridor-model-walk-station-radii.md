@@ -17,15 +17,15 @@ ordinal: 47000
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Current Geo::CommuteZone is a point-radius model: a circle around HOME_LOCATION plus a 2mi circle around a "Chicago Loop" centroid. This can't express the real commute constraint: hybrid work is feasible anywhere along the Metra UP-NW line (Ogilvie Transportation Center, Clybourn, Irving Park, Jefferson Park, Gladstone Park, Norwood Park, Edison Park, Park Ridge, Dee Road, Des Plaines, Cumberland, Mount Prospect, Arlington Heights, Arlington Park, Palatine, Barrington, Fox River Grove, Cary, Pingree Road, McHenry, Crystal Lake, Woodstock, Harvard -- confirmed via web search 2026-08-14), OR downtown Chicago specifically within walking distance of Ogilvie or Union Station (the two UP-NW termini) -- not the Loop generally. Replace the single Loop-centroid circle with (a) a small station-proximity radius checked against each named UP-NW station (geocoded via the existing Geocoder/Nominatim setup, same pattern as CHICAGO_LOOP_LOCATION today), and (b) a tight walk radius around Ogilvie and Union specifically. Keep HOME_LOCATION hyperlocal radius as-is.
+Geo::CommuteZone was a point-radius model: a circle around home plus one circle around a downtown centroid. That can't express a real hybrid-commute constraint, which is often a *corridor*: acceptable anywhere near a stop on a commuter-rail line, OR within walking distance of that line's downtown terminals — not the whole downtown. Replace the single downtown circle with (a) a station-proximity radius checked against each stop on the target line and (b) a tight walk radius around the terminals. Keep the home hyperlocal radius. All places geocoded through the existing Geocoder/cache path, no hardcoded lat/lngs. No personal address or route data in code — see AC #4.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Geo::CommuteZone recognizes a job location near any UP-NW station as :allowed
-- [ ] #2 Geo::CommuteZone only allows downtown Chicago locations within a tight walk radius of Ogilvie or Union, not the whole Loop
+- [ ] #1 Geo::CommuteZone recognizes a job near any configured line stop as :allowed
+- [ ] #2 Geo::CommuteZone only allows downtown locations within a tight walk radius of the configured terminals, not the whole downtown
 - [ ] #3 Existing hyperlocal/remote/blocked spec behavior in commute_zone_spec.rb still passes
-- [ ] #4 Radii remain ENV-configurable, no personal address data committed
+- [ ] #4 The route (stops, terminals, radii, home) is data/config, never committed to the repo
 <!-- AC:END -->
 
 ## Final Summary
