@@ -7,8 +7,15 @@
      and fix the block. Full procedure: docs/agents/session-handoff.md
      ═══════════════════════════════════════════════════════════════════════
 
-  In flight: TWO stacked PRs open, neither merged — main still @ 6ca8bd72
-  for feature code (main HEAD is only doc/focus commits).
+  ⚠ GIT HISTORY WAS REWRITTEN 2026-09-03 (git filter-repo, exposure pass).
+  EVERY commit SHA changed. Any SHA cited below or in task notes that
+  predates the rewrite is DANGLING — do not try to `git show` it. `git log`
+  + Backlog are the only truth. If you have an old local clone, re-clone.
+  The pre-rewrite bundle is at scratchpad/wwwr-pre-rewrite-*.bundle (local,
+  short-lived). origin/bakup was NOT rewritten — decide separately.
+
+  In flight: TWO stacked PRs open, neither merged. Feature code is only on
+  the PR branches; main carries the exposure-pass + doc commits.
     PR #23 https://github.com/wwworkremote/core/pull/23 — branch
       feat/homepage-pipeline-blocks. Homepage leads with Interviews /
       Active Leads / Awaiting Response blocks ("What this app does" cards
@@ -122,20 +129,26 @@
       Job Posting = canonical edit surface).
     - Seeded interview-round dev data on a test posting; corrected its
       geo fields (dev-DB only).
-    - EXPOSURE PASS (main commits 779fc705 → 62ce8128): repo is private,
-      but scrubbed personal detail from the coordination layer —
-      pseudonymized a named referral contact, dropped spouse name / comp
-      figures / home-town hints from AGENTS.md, replaced the job-search
-      dossier with app + deep-handoff pointers, de-personalized TASK-57,
-      stubbed the closed just3ws resume-reconcile queue doc, gitignored
-      .yardoc. Refactored Geo::CommuteZone to be config-driven
-      (config/commute_zone.yml, gitignored). TASK-149 DONE: replaced the
-      real company-named interview-prep reference with a fully synthetic
-      one (docs/interview-prep/_reference/reference.md); real prep
-      preserved in ~/ai/outbox/. Full review:
-      scratchpad/exposure-review-2026-09-03.md (local). Git history still
-      holds prior versions — acceptable while private; rewrite before ever
-      going public.
+    - EXPOSURE PASS (session 5, ~15 commits): repo is private, but scrubbed
+      personal detail from the coordination layer — pseudonymized a named
+      referral contact, dropped spouse name / comp figures / home-town
+      hints, replaced the job-search dossier with app + deep-handoff
+      pointers, de-personalized TASK-57, stubbed the closed just3ws
+      resume-reconcile queue doc, gitignored .yardoc. Refactored
+      Geo::CommuteZone AND StandingCriteria (job-search comp floor etc.)
+      to be config-driven (config/commute_zone.yml,
+      config/job_search_criteria.yml — both gitignored, .example committed).
+      TASK-149 DONE: the real company-named interview-prep reference →
+      fully synthetic (docs/interview-prep/_reference/reference.md); real
+      prep preserved in ~/ai/outbox/. THEN git filter-repo rewrote all
+      history to purge the pre-scrub blobs + the basis-dsp/ path; force-
+      pushed main + both PR branches. Verified: names/address/comp/
+      grievance strings gone from all reachable history. Full review:
+      scratchpad/exposure-review-2026-09-03.md (local).
+      Still open: origin/bakup (ancient orphan branch, not rewritten —
+      delete or keep, Mike's call); GitHub retains pre-force-push commits
+      for a while (unavoidable; irrelevant while private); a 94MB
+      data/backups/*.dump still bloats history (not PII, left alone).
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
