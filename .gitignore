@@ -55,3 +55,7 @@ coverage/
 HUMAN.md
 HUMAN.local.md
 HUMAN.answered.md
+
+# Generated API docs
+.yardoc/
+doc/
