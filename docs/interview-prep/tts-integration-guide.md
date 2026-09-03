@@ -79,9 +79,9 @@ the term appears, not just the first time.
 
 | Hint shape | Meaning | SSML |
 |---|---|---|
-| `DSP: D S P` | Say the letters separately | `<say-as interpret-as="characters">DSP</say-as>` |
-| `OpenRTB: open R T B` | Word plus letters | `open <say-as interpret-as="characters">RTB</say-as>` |
-| `Basis: BAY sis` | Respelling, capitalized syllable stressed | `<phoneme>` if you can derive one, else `<sub alias="BAY sis">Basis</sub>` |
+| `ELD: E L D` | Say the letters separately | `<say-as interpret-as="characters">ELD</say-as>` |
+| `WebAPI: web A P I` | Word plus letters | `web <say-as interpret-as="characters">API</say-as>` |
+| `Acme: AK mee` | Respelling, capitalized syllable stressed | `<phoneme>` if you can derive one, else `<sub alias="AK mee">Acme</sub>` |
 
 No SSML support: substitute the hint text directly.
 
