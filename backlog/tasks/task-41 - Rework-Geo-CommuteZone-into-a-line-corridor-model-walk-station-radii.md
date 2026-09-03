@@ -1,6 +1,6 @@
 ---
 id: TASK-41
-title: 'Rework Geo::CommuteZone for UP-NW line + Ogilvie/Union walk radius'
+title: 'Rework Geo::CommuteZone into a line-corridor model (walk + station radii)'
 status: Done
 assignee: []
 created_date: '2026-08-14 17:31'
@@ -31,7 +31,7 @@ Current Geo::CommuteZone is a point-radius model: a circle around HOME_LOCATION 
 ## Final Summary
 
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
-Replaced the flat "Chicago Loop" 2mi circle with a real line-corridor model: a tight 0.75mi walk radius around Ogilvie and Union specifically (TERMINALS), plus a 1.5mi radius around every UP-NW stop from Clybourn out to Harvard including the McHenry branch (UP_NW_STATIONS), geocoded through the existing Geocoder/cache path -- no hardcoded lat/lngs. HOME_LOCATION hyperlocal radius unchanged. Updated admin/pipeline_filters to show all three radii plus the station list, and rewrote commute_zone_spec.rb for the new zone shape (10 examples, all passing). Built an interactive verification map (published as a Claude artifact) plotting real geocoded coordinates for every station/terminal plus Loop landmarks, confirmed the walk-radius/station-radius geometry visually before landing.
+Replaced the flat single-centroid circle with a line-corridor model: a tight walk radius around the two downtown transit terminals, plus a station radius around every stop on the target commuter-rail line, geocoded through the existing Geocoder/cache path -- no hardcoded lat/lngs. Home hyperlocal radius unchanged. Updated admin/pipeline_filters and rewrote commute_zone_spec.rb for the new zone shape. Verified the geometry against real geocoded coordinates before landing.
 
-**Superseded (TASK-148 exposure pass):** the hardcoded `TERMINALS` / `UP_NW_STATIONS` / `DEFAULT_*_RADIUS` constants are gone. The whole zone is now data — `config/commute_zone.yml` (gitignored): a home point + radius plus named zones, each a list of geocoded places and a radius. No file → the filter is inert. Shape: `config/commute_zone.yml.example`.
+**Superseded (later exposure pass):** the hardcoded terminal/station/radius constants are gone. The whole zone is now data — `config/commute_zone.yml` (gitignored): a home point + radius plus named zones, each a list of geocoded places and a radius. No file → the filter is inert. Shape: `config/commute_zone.yml.example`.
 <!-- SECTION:FINAL_SUMMARY:END -->
