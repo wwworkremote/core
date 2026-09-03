@@ -139,9 +139,8 @@
   DO NOT touch other repos from a wwworkremote/core session (esp. never commit
   content in the public just3ws.github.io). See memory feedback_stay_in_this_repo.
 
-  Deep handoff: ~/.config/adots/handoffs/2026-08-31-wwworkremote-session3.md
-  (local-only, never commit). Earlier sessions:
-  ~/.config/adots/handoffs/2026-08-30-wwworkremote-guided-session.md.
+  Deep handoff: ~/.config/adots/handoffs/2026-09-02-wwworkremote-session4.md
+  (local-only, never commit). Earlier: 2026-08-31-wwworkremote-session3.md.
   This block is the current truth if they disagree.
 -->
 
