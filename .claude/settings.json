@@ -20,7 +20,24 @@
       "mcp__o2__o2_service",
       "mcp__o2__o2_slow",
       "mcp__claude-in-chrome__get_page_text",
-      "mcp__backlog__task_search"
+      "mcp__backlog__task_search",
+      "Bash(rtk git status *)",
+      "Bash(rtk git diff *)",
+      "Bash(rtk git log *)",
+      "Bash(zdots-ctx bus-read *)",
+      "Bash(zdots-ctx query *)",
+      "Bash(bin/wwworkremote-ctl status)",
+      "Bash(bin/rails routes)",
+      "Bash(bin/rails routes *)",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "mcp__claude-in-chrome__find",
+      "mcp__claude-in-chrome__read_network_requests",
+      "mcp__claude-in-chrome__read_page",
+      "mcp__backlog__milestone_list",
+      "mcp__backlog__document_view",
+      "mcp__ctx__ctx_semantic_search",
+      "mcp__ctx__ctx_query",
+      "mcp__o2__o2_logs"
     ]
   },
   "hooks": {
