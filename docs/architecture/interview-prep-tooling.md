@@ -109,9 +109,9 @@ flowchart LR
     PT --> Hand[Hand off: sharpened pack<br/>+ judgement calls]
 ```
 
-The quality bar is `docs/interview-prep/basis-dsp/reference.md` (a hand-written pack, one per
-role). The local model's structure is reliable; its content is a scaffold — see the skill's
-"known failure modes" section.
+The quality bar is `docs/interview-prep/_reference/reference.md` (a hand-written,
+fully synthetic worked example). The local model's structure is reliable; its
+content is a scaffold — see the skill's "known failure modes" section.
 
 ## Key components
 

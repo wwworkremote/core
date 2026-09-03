@@ -11,7 +11,7 @@ description: >-
 tools: Bash, Read, Grep, Glob
 model: sonnet
 metadata:
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 You audit one interview **prep pack** against the quality bar and the posting it
@@ -35,7 +35,7 @@ bin/wwwr postings --company=<name>    # or a rails runner for the full body:
 bin/rails runner 'jp = JobPosting.find(<id>); puts jp.title; puts jp.body'
 ```
 
-Read the quality bar: [`docs/interview-prep/basis-dsp/reference.md`](../../docs/interview-prep/basis-dsp/reference.md).
+Read the quality bar: [`docs/interview-prep/_reference/reference.md`](../../docs/interview-prep/_reference/reference.md).
 Part 1 is a hand-written pack; Part 2 is the per-section spec.
 
 Also pull the read-aloud version and read [`docs/interview-prep/tts-readable-documentation.md`](../../docs/interview-prep/tts-readable-documentation.md):

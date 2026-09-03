@@ -191,7 +191,7 @@ marking Backlog.md's adoption as the standing workflow (per this repo's
   editable in place and regenerable, surfaced in the Interview Notes section.
   Built by cloning the cover-letter generation path; the three POST-and-redirect
   LLM actions on `UserJobPostingsController` collapsed onto one `run_llm` helper.
-  Worked reference: `docs/interview-prep/basis-dsp/reference.md`.
+  Worked reference: `docs/interview-prep/_reference/reference.md`.
 - **Sep 2** — Interview Prep Pack gains a **Domain Primer** section (TASK-144.1):
   posting-anchored industry knowledge — what the business does and where the role
   sits, must-know vs useful-context vocabulary, domain best practices, the blind
