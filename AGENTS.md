@@ -106,25 +106,25 @@
       (JP #7068 location "Chicago, IL · Toronto, ON", country_code US,
       data.countries [US,CA]; Centro note on UJP #268 notes). Was
       auto-ignored on promote (bad remote flag + blank company) — restored.
-    Vanguard — warm lead via a former colleague (ex-OMF, ran the OTel WG after Mike,
-      actively pulling to get him in). Company #1112. Two reqs already
-      ingested 2026-08-25: JP #6740 "AI Enablement, Specialist" (Charlotte NC,
-      UJP #250 favorited, NOT match-scored — this is likely the referrer's target;
-      maps to Mike's enablement track); JP #6747 "Lead Backend Engineer -
-      Mobile APIs" (auto-ignored). Both flagged remote=false / Charlotte —
-      could be a bad extract like Basis, or genuine RTO (Vanguard is
-      in-office-heavy) → a relocation/hybrid question for Mike + [redacted-name], not a
-      filter question. Session ended with Mike still deciding; open offers to
-      him: match-score #6740, restore #6747 + recheck remote flags, log the
-      the referrer referral as a PipelineStep on #250, maybe wire the
-      vanguardjobs.com board.
+    Vanguard — warm internal referral in progress. The referrer is a former
+      colleague; their real identity lives only in the linked Contact record,
+      not here. Company #1112. Two reqs ingested 2026-08-25: JP #6740 "AI
+      Enablement, Specialist" (Charlotte NC, UJP #250 favorited, NOT
+      match-scored — likely the referrer's target, maps to the enablement
+      track); JP #6747 "Lead Backend Engineer - Mobile APIs" (auto-ignored).
+      Both flagged remote=false / Charlotte — could be a bad extract like
+      Basis, or genuine RTO (Vanguard is in-office-heavy) → a relocation/
+      hybrid question for Mike, not a filter question. Still deciding; open
+      offers: match-score #6740, restore #6747 + recheck remote flags, log
+      the referral as a PipelineStep on #250, maybe wire the vanguardjobs.com
+      board.
 
   NEW standing criterion (memory feedback_culture_fit_over_comp, 2026-08-31):
   weight team/culture/belonging fit ABOVE marginal comp — a warmer lower-comp
-  role should rank above a colder higher one. Mike + [redacted-name] explicitly prefer
-  "appreciated for less" over "not, for a bit more". The $200k base floor
-  still holds; this is about weighing everything above it. Not yet reflected
-  in LLM::ProfileMatcher — that's a build task if Mike wants it.
+  role should rank above a colder higher one. Mike prefers "appreciated for
+  less" over "not, for a bit more". The base comp floor still holds; this is
+  about weighing everything above it. Not yet reflected in
+  LLM::ProfileMatcher — that's a build task if Mike wants it.
 
   Done 2026-09-03 session 5 (2 stacked PRs OPEN, NOT merged — main still
   @ 6ca8bd72 for feature code):
@@ -183,14 +183,14 @@
   titles/dates aligned to the just3ws canonical resume (bullets filled from
   canonical highlights); ActiveCampaign + Tandem added; current role company
   "Independent" → "Self-employed"; summary replaced with the new archetype
-  resume's version. Preferences: the comp floor, Remote+Hybrid+In-person,
+  resume's version. Preferences: comp floor set, Remote+Hybrid+In-person,
   work-area categories fixed, blue-collar "work schedule" pref deleted. Skills
   curated 178 → 49. Old "0 to 1" resume deleted; Mike uploaded the Principal
   Systems Architect archetype PDF; sync-suggestions reviewed (summary accepted,
   the ~10 duplicate work-exp suggestions + a bogus "MCP" cert dismissed).
   Open (Mike's judgement, not mechanical): reconcile the EMR-Bear entry vs
-  canonical (it's on Indeed, not in the resume); contact location shows
-  Crystal Lake IL vs resume's Chicago IL. Do NOT click Indeed's "Review
+  canonical (it's on Indeed, not in the resume); the Indeed profile location
+  and the resume location differ — reconcile. Do NOT click Indeed's "Review
   suggestions" / "Sync to profile" — it re-adds duplicate work experience.
   Workflow codified: `indeed-profile-sync` skill + `indeed-profile-auditor`
   subagent (Claude Code only — needs Claude-in-Chrome). Re-run when the
