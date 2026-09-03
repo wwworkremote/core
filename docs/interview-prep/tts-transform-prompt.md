@@ -17,14 +17,75 @@ are already written for the ear: abbreviations spelled out, acronyms expanded, n
 spoken form, no tables, no bare URLs, one idea per sentence, and a YAML frontmatter block up
 top carrying pronunciation and structure hints.
 
-Hand the block below to the tool doing the transform. It is engine-agnostic: it applies
-whether that tool is an LLM orchestrating a speech engine, a thin wrapper over a TTS API, or
-a caption generator. For wiring the tool up — file discovery, the full frontmatter schema,
-output conventions — see [`tts-integration-guide.md`](tts-integration-guide.md).
+Give the tool doing the transform **both blocks below**. They are engine-agnostic — they
+apply whether the tool is an LLM orchestrating a speech engine, a thin wrapper over a
+text-to-speech API, or a caption generator.
+
+- **The detection prompt** teaches the tool to recognize an enhanced read-aloud document and
+  what its frontmatter buys it.
+- **The transform prompt** is the delivery rules once it is processing one.
+
+For wiring the tool up — file discovery, the full frontmatter schema, output conventions —
+see [`tts-integration-guide.md`](tts-integration-guide.md).
+
+> [!NOTE]
+> The enhanced read-aloud frontmatter (`format: read-aloud`, plus `title` / `pronunciation` /
+> `sections` / `spoken_minutes`) is a **repo-wide convention**, not specific to interview
+> prep. Any document meant to be published as listen-to-able and read-along-able carries it
+> and follows [`tts-readable-documentation.md`](tts-readable-documentation.md).
 
 ---
 
-## The prompt
+## The detection prompt
+
+> **Detecting an enhanced read-aloud document**
+>
+> Before processing any Markdown file, check whether it is an **enhanced read-aloud document**
+> — one already written for speech and carrying a metadata block for you.
+>
+> **It is enhanced if** the file opens with a YAML frontmatter block (the first line is `---`,
+> closed by a later line that is exactly `---`) and that block contains **`format: read-aloud`**.
+> A `kind:` key (for example `kind: interview-prep`) names the document type but does not
+> change how you process it. As a looser fallback, treat it as enhanced if the block contains
+> `pronunciation:`, `sections:`, and `spoken_minutes:` together.
+>
+> **If there is no such block**, treat the file as a plain document: best-effort
+> text-to-speech, derive a title from the first heading, chapter on `#` / `##`, no lexicon.
+>
+> **When the block is present, read it for context — never speak it — and use it to publish
+> two paired artifacts:**
+>
+> | Key | Use it for |
+> |---|---|
+> | `kind` (optional) | The document type (e.g. `interview-prep`) — for naming and grouping the published artifacts, not for processing |
+> | `title` | The published title of the audio track, the caption file, and the transcript header |
+> | `lang` (e.g. `en-US`) | Voice and locale selection |
+> | `pronunciation` (map of term → spoken hint) | A lexicon: apply to **every** occurrence of each term in the audio (as `<say-as>` / `<phoneme>` / `<sub>` or plain substitution). Leave the written spelling untouched in captions and transcript. |
+> | `sections` (ordered list) | Chapter markers in the audio; chapter cues in the captions; the heading list in the read-along transcript. Each entry matches an `#` / `##` heading in the body. |
+> | `spoken_minutes` (number) | Expected duration — put it in the published metadata; sanity-check your output against it; do not pad or rush to hit it. |
+> | `source` (URL) | Provenance for the published artifact's metadata |
+> | `generated_at` (ISO 8601) | Freshness — skip a file you have already published from at this timestamp or newer |
+>
+> **Produce, for publication:**
+>
+> 1. **Listen-to-able** — an audio file with the `pronunciation` lexicon applied, chaptered by
+>    `sections`, spoken in a neutral, measured, informational voice at a moderate pace.
+>    Punctuation drives the pauses.
+> 2. **Read-along-able** — time-synced captions (WebVTT) and a plain transcript, **one cue and
+>    one line per sentence**, aligned to the audio and chaptered by `sections`, so a reader can
+>    follow the text while the audio plays.
+>
+> The body is already speech-ready: abbreviations spelled out, acronyms expanded, numbers in
+> spoken form, no tables, no bare URLs, one idea per sentence. **Do not re-expand, rewrite,
+> summarize, reorder, or drop anything.** Markdown headings and bullets are structure, not
+> speech.
+>
+> If the frontmatter is partial or malformed, use whatever parses and fall back to the
+> plain-document defaults for the rest.
+
+---
+
+## The transform prompt
 
 > You are converting a **read-aloud document** into audio (and, if the target player needs
 > it, into closed captions or a lyrics-style transcript). The document is already optimized

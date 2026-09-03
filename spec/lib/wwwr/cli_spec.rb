@@ -190,7 +190,7 @@ RSpec.describe Wwwr::CLI do
         expect(dir.join("pack.md").read).to eq("human pack")
         spoken = dir.join("pack.spoken.md").read
         expect(spoken).to start_with("---\n")
-        expect(spoken).to include("format: interview-prep-read-aloud").and include("spoken body")
+        expect(spoken).to include("format: read-aloud").and include("kind: interview-prep").and include("spoken body")
       end
 
       it "uses an explicit --export=<role> name for the subdirectory" do

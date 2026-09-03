@@ -95,31 +95,44 @@ serves both the eye and the ear.
 ### 7. Carry hints in frontmatter
 
 A YAML frontmatter block at the top of the document, fenced by lines of three dashes, gives a
-reader or a read-aloud session what it needs before the first word:
+reader or a read-aloud session what it needs before the first word. This is a **repo-wide
+convention**: any document meant to be published as listen-to-able and read-along-able carries
+it, and `format: read-aloud` is the marker a text-to-speech tool detects.
 
 ```yaml
 ---
-title: Interview Prep — Senior Software Engineer, Basis Platform and Demand-Side Platform
+format: read-aloud
+kind: interview-prep          # the document type; naming only, not processing
+lang: en-US
+source: https://…            # provenance (optional)
+generated_at: 2026-09-02T23:55:57Z   # ISO 8601, for freshness (optional)
+title: "Interview Prep — Senior Software Engineer, Basis Platform and Demand-Side Platform"
 pronunciation:
-  Basis: BAY-sis
-  DSP: D S P
-  OpenRTB: open R T B
-  [redacted-name]: shiv-AWN
+  Basis: "BAY sis"
+  DSP: "D S P"
+  OpenRTB: "open R T B"
+  [redacted-name]: "shiv AWN"
 sections:
-  - The setup
-  - Domain primer
-  - Your story
-  - Company hooks
-  - Likely questions
-  - Questions to ask them
-  - Night-before checklist
+  - "The setup"
+  - "Domain primer"
+  - "Your story"
+  - "Company hooks"
+  - "Likely questions"
+  - "Questions to ask them"
+  - "Night-before checklist"
 spoken_minutes: 8
 ---
 ```
 
+`format` / `kind` / `lang` / `source` / `generated_at` are discovery metadata for the tool;
+`title` / `pronunciation` / `sections` / `spoken_minutes` are the content hints. Quote every
+string value — titles and hints contain colons and dashes.
+
 This is the portable, engine-agnostic equivalent of an SSML lexicon: a human setting up a
-session reads the pronunciation map first, and a future automated read-aloud step can load it
-directly.
+session reads the pronunciation map first, and an automated read-aloud step loads it directly.
+The detection and delivery prompts are in
+[`tts-transform-prompt.md`](tts-transform-prompt.md); the wiring is in
+[`tts-integration-guide.md`](tts-integration-guide.md).
 
 ---
 

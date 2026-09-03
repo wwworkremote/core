@@ -67,8 +67,11 @@ class Wwwr::InterviewPrep
     "#{YAML.dump(discovery_keys.merge(hints))}---\n#{body}"
   end
 
+  # The read-aloud convention (docs/interview-prep/tts-readable-documentation.md):
+  # format: read-aloud is the marker a text-to-speech tool detects; kind names
+  # the document type without changing how it is processed.
   def discovery_keys
-    { "format" => "interview-prep-read-aloud", "lang" => "en-US",
+    { "format" => "read-aloud", "kind" => "interview-prep", "lang" => "en-US",
       "source" => @posting.target_url, "generated_at" => Time.current.utc.iso8601 }
   end
 

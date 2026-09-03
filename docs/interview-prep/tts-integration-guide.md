@@ -46,7 +46,7 @@ transcript.
 ## Discovery — finding the files
 
 1. **Glob**: `~/ai/outbox/wwwr/interview-prep/*/pack.spoken.md`
-2. **Confirm**: the frontmatter has `format: interview-prep-read-aloud`. Skip
+2. **Confirm**: the frontmatter has `format: read-aloud`. Skip
    anything else (a stray `pack.md` has no frontmatter).
 3. **Name outputs** from the parent directory — it is the role slug.
 4. **Check freshness**: `generated_at` is an ISO 8601 timestamp. Skip a file
@@ -62,7 +62,8 @@ first (injected at export), then the content hints (written by the generator).
 
 | Key | Type | Meaning | How the tool uses it |
 |---|---|---|---|
-| `format` | string | Always `interview-prep-read-aloud` | Discovery filter — this is a text-to-speech source |
+| `format` | string | Always `read-aloud` | Discovery filter — this is a text-to-speech source |
+| `kind` | string | The document type, e.g. `interview-prep` | Naming and grouping the published artifacts; not for processing |
 | `lang` | BCP-47 string, e.g. `en-US` | Language and locale | Select the engine voice and locale |
 | `source` | URL | The job posting this pack is for | Provenance; disambiguate two roles at one company |
 | `generated_at` | ISO 8601 datetime | When the pack was produced | Freshness check against existing outputs |
