@@ -100,8 +100,12 @@
       NOT said go. US+remote confirmed in the JD; "Toronto, ON" was just
       where the req is filed. Was auto-ignored on promote (bad remote flag
       + blank company) — restored + fixed.
-    NEW REQUEST (session 5, end): Mike wants to edit/revise "pretty much
-      any data" on the job_postings/7068 show page. Not started.
+    TASK-148 (feature, NEW session 5 end): Mike wants to edit/revise
+      "pretty much any data" on the job_postings/7068 show page. Decided
+      UX: inline edit-in-place via Turbo frames, no separate edit page.
+      Scope = JobPosting core + UserJobPosting + interview rounds
+      (absorbs TASK-147.1 AC#7) + prep-pack/Q&A. Full scope + 10 ACs in
+      the task. Not started.
     Vanguard — warm lead via a former colleague (ex-OMF, ran the OTel WG after Mike,
       actively pulling to get him in). Company #1112. Two reqs already
       ingested 2026-08-25: JP #6740 "AI Enablement, Specialist" (Charlotte NC,
@@ -193,9 +197,9 @@
   Everything else is unblocked. GHA billing is moot (CI removed). No deploy
   mechanism exists (kamal unconfigured); deploy is out of scope.
 
-  Next build (session 6): the job_postings/7068 "edit any field" request +
-  TASK-147.1 ACs 6/7 (they overlap — the interview-round editors are part
-  of making the show page fully editable).
+  Next build (session 6): TASK-148 (inline edit-in-place on the posting
+  show page) — it absorbs TASK-147.1 AC#7. TASK-147.1 AC#6 (final-round
+  outcome → UserJobPosting) is separate and smaller; do it alongside.
 
   Deferred (YAGNI): first concrete Datalake::Extractor — waits for a consumer.
 
