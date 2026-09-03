@@ -6,7 +6,7 @@ description: >-
   fact-check an existing prep pack; or when the domain primer's concepts,
   acronym citations, or learning links need grounding against real sources.
 metadata:
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # Interview prep
@@ -35,7 +35,7 @@ close that gap: generate, then audit and ground it against real sources before
 handing it over.
 
 > [!IMPORTANT]
-> The quality bar is [`docs/interview-prep/basis-dsp/reference.md`](../../../docs/interview-prep/basis-dsp/reference.md) —
+> The quality bar is [`docs/interview-prep/_reference/reference.md`](../../../docs/interview-prep/_reference/reference.md) —
 > a hand-written prep pack for one real posting. Part 1 is what "good" looks like;
 > Part 2 is the per-section spec. Every generated pack is measured against it.
 

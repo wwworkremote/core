@@ -192,7 +192,7 @@ RSpec.describe Wwwr::CLI do
       after { FileUtils.remove_entry(export_root) }
 
       it "writes both versions to a per-role subdirectory of the outbox" do
-        posting = create(:job_posting, company: "Basis Technologies")
+        posting = create(:job_posting, company: "Example Corp")
         create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "human pack",
                                   interview_prep_pack_spoken: "---\ntitle: \"P\"\n---\nspoken body")
         allow(LLM::InterviewPrepGenerator).to receive(:call)
@@ -201,7 +201,7 @@ RSpec.describe Wwwr::CLI do
           cli.run(["interview-prep", posting.id.to_s, "--export"])
         }.to output(/pack\.md.*pack\.spoken\.md/m).to_stdout
 
-        dir = export_root.join("basis-technologies")
+        dir = export_root.join("example-corp")
         expect(dir.join("pack.md").read).to eq("human pack")
         spoken = dir.join("pack.spoken.md").read
         expect(spoken).to start_with("---\n")
@@ -209,13 +209,13 @@ RSpec.describe Wwwr::CLI do
       end
 
       it "uses an explicit --export=<role> name for the subdirectory" do
-        posting = create(:job_posting, company: "Basis Technologies")
+        posting = create(:job_posting, company: "Example Corp")
         create(:user_job_posting, user: user, job_posting: posting, interview_prep_pack: "p")
         allow(LLM::InterviewPrepGenerator).to receive(:call)
 
-        cli.run(["interview-prep", posting.id.to_s, "--export=basis-dsp"])
+        cli.run(["interview-prep", posting.id.to_s, "--export=example-role"])
 
-        expect(export_root.join("basis-dsp", "pack.md").read).to eq("p")
+        expect(export_root.join("example-role", "pack.md").read).to eq("p")
       end
     end
   end

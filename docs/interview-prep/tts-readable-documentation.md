@@ -106,7 +106,7 @@ kind: interview-prep          # the document type; naming only, not processing
 lang: en-US
 source: https://…            # provenance (optional)
 generated_at: 2026-09-02T23:55:57Z   # ISO 8601, for freshness (optional)
-title: "Interview Prep — Senior Software Engineer, Basis Platform and Demand-Side Platform"
+title: "Interview Prep — Senior Software Engineer, Realtime Matching Platform"
 pronunciation:
   Basis: "BAY sis"
   DSP: "D S P"
@@ -154,7 +154,7 @@ frontmatter block. The `interview-prep` skill requires it to pass before hand-of
 `say` gives a quick spot check; OpenAI and Gemini text-to-speech models sit in the synced
 `Model` table but nothing wires them yet.
 
-`docs/interview-prep/basis-dsp/reference.md` stays human-format: it is a reference doc read by
+`docs/interview-prep/_reference/reference.md` stays human-format: it is a reference doc read by
 people and agents, not fed to a speech engine.
 
 (This doc describes the standard; it is not itself a read-aloud document, so it keeps its
