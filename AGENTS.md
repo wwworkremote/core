@@ -140,15 +140,20 @@
       config/job_search_criteria.yml — both gitignored, .example committed).
       TASK-149 DONE: the real company-named interview-prep reference →
       fully synthetic (docs/interview-prep/_reference/reference.md); real
-      prep preserved in ~/ai/outbox/. THEN git filter-repo rewrote all
-      history to purge the pre-scrub blobs + the basis-dsp/ path; force-
-      pushed main + both PR branches. Verified: names/address/comp/
-      grievance strings gone from all reachable history. Full review:
-      scratchpad/exposure-review-2026-09-03.md (local).
+      prep preserved in ~/ai/outbox/. THEN two git filter-repo passes
+      rewrote ALL history: (1) purge the pre-scrub strings + the basis-dsp/
+      path; (2) purge data/backups/ — two committed pg_dumps from
+      2026-04-25 (critical_data + a 94MB full_backup) that held real
+      career_profiles / contacts / user_job_postings TABLE DATA, i.e. the
+      referrer PII everything else was scrubbed of. Force-pushed main +
+      both PR branches after each. .git went 123MB → 31MB. Verified: names/
+      address/comp/grievance strings AND the dumps gone from all reachable
+      history. Review: scratchpad/exposure-review-2026-09-03.md (local).
       Still open: origin/bakup (ancient orphan branch, not rewritten —
       delete or keep, Mike's call); GitHub retains pre-force-push commits
-      for a while (unavoidable; irrelevant while private); a 94MB
-      data/backups/*.dump still bloats history (not PII, left alone).
+      ~90d (unavoidable; moot while private); lib/corpus.json (~100MB
+      across old versions) + data/backfills/*.json (11MB, tracked) still in
+      history as bloat — not PII, flagged for a decision.
   Done 2026-09-02..09-03 session 4 (merged + pushed, main @ 6ca8bd72):
     - TASK-147 filed (design the end-to-end career-development lap, spike).
     - TASK-140 sharpened + bumped Low→Medium — Syncer starvation root-caused
