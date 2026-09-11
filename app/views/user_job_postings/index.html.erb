@@ -42,7 +42,7 @@
           <% @favorites.each do |user_job| %>
             <% job = user_job.job_posting %>
             <div class="card-neural p-6 hover:border-primary/50 transition-all group border border-white/5">
-              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] gap-6 items-center">
+              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1.35fr)_minmax(0,1.35fr)_auto] gap-6 items-center">
                 <div class="min-w-0">
                   <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
                   <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors truncate"><%= link_to job.title, job_posting_path(job) %></h4>
@@ -54,10 +54,15 @@
                     <% end %>
                   </div>
                 </div>
-                <div class="flex flex-wrap lg:flex-col gap-2 text-xs font-bold">
-                  <span class="text-slate-500">Saved <%= user_job.created_at.strftime("%b %-d, %Y") %></span>
-                  <% if user_job.match_score.present? %><span class="text-primary"><%= user_job.match_score %>% match</span><% end %>
-                  <span class="text-slate-600"><%= time_ago_in_words(user_job.created_at) %> ago</span>
+                <div class="flex flex-wrap lg:flex-col gap-2 text-xs font-bold border-l border-white/5 lg:pl-5">
+                  <span class="text-slate-500">Saved <%= user_job.created_at.strftime("%b %-d, %Y") %> · <%= time_ago_in_words(user_job.created_at) %> ago</span>
+                  <% if user_job.match_score.present? %><span class="text-primary"><%= user_job.match_score %>% match</span><% else %><span class="text-slate-600">Match not scored</span><% end %>
+                  <span class="text-slate-600"><%= job.enriched_at.present? ? "Enriched" : "Needs enrichment" %></span>
+                </div>
+                <div class="flex flex-wrap lg:flex-col gap-2 text-xs font-bold border-l border-white/5 lg:pl-5">
+                  <span class="text-primary">Favorited · not applied</span>
+                  <% if user_job.interview_prep_pack.present? %><span class="text-success">Prep pack ready</span><% end %>
+                  <% if job.published_at %><span class="text-slate-500">Posted <%= time_ago_in_words(job.published_at) %> ago</span><% end %>
                 </div>
                 <div class="flex lg:flex-col items-start lg:items-end gap-2">
                   <%= button_to "Mark Applied", user_job_postings_path(job_posting_id: job.id, status: 'applied'), class: "btn btn-xs rounded-lg bg-emerald-900/20 text-emerald-500 border-none font-bold" %>
@@ -81,7 +86,7 @@
           <% @applied.each do |user_job| %>
             <% job = user_job.job_posting %>
             <div class="card-neural p-6 border border-accent/20">
-              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] gap-6 items-center">
+              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1.35fr)_minmax(0,1.35fr)_auto] gap-6 items-center">
                 <div class="min-w-0">
                   <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
                   <h4 class="text-lg font-black text-white truncate"><%= link_to job.title, job_posting_path(job) %></h4>
@@ -123,6 +128,11 @@
                   <span class="text-slate-500"><%= job.location.presence || "Location unknown" %></span>
                   <% if job.data['is_remote'] %><span class="text-emerald-500">Remote eligible</span><% end %>
                   <% if user_job.match_score.present? %><span class="text-primary"><%= user_job.match_score %>% match</span><% end %>
+                </div>
+                <div class="flex flex-wrap lg:flex-col gap-2 text-xs font-bold border-l border-white/5 lg:pl-5">
+                  <span class="text-accent">Applied <%= user_job.applied_at ? time_ago_in_words(user_job.applied_at) + " ago" : "date unknown" %></span>
+                  <% if user_job.outcome.present? %><span class="text-warning"><%= user_job.outcome.humanize %></span><% else %><span class="text-slate-500">Awaiting employer</span><% end %>
+                  <% if user_job.interview_prep_pack.present? %><span class="text-success">Prep pack ready</span><% end %>
                 </div>
                 <div class="flex lg:flex-col items-start lg:items-end gap-2">
                   <%= link_to "Open posting", job_posting_path(job), class: "text-xs font-bold text-primary hover:underline" %>
