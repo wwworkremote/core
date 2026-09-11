@@ -63,3 +63,9 @@ manifest version in the panel header.
 Copyright &copy; 2024-2026 Mike Hall. Licensed under AGPLv3 or later; see
 [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md). Do not add personal data,
 credentials, or private local integrations to a public checkout.
+
+## Contact
+
+WWWorkRemote is maintained by Mike Hall. For project questions, privacy
+requests, or security reports, contact [mike@just3ws.com](mailto:mike@just3ws.com)
+or visit [just3ws.com](https://www.just3ws.com).
