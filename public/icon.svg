@@ -1,7 +1,10 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">WWWorkRemote</title>
-  <desc id="desc">A violet and cyan W mark representing the job search pipeline.</desc>
+  <desc id="desc">A three-W monogram for WWWorkRemote and the just3ws handle.</desc>
   <rect width="512" height="512" rx="112" fill="#171b22"/>
-  <path d="M92 142 146 370h48l62-150 62 150h48l54-228h-56l-28 133-57-133h-46l-58 133-28-133z" fill="#8b7cff"/>
-  <circle cx="420" cy="94" r="18" fill="#ff2b9a"/>
+  <g transform="translate(58 142) scale(1.16)">
+    <path d="M0 0 25 196h29l31-106 31 106h29L170 0h-32l-16 115-29-115H70L40 115 24 0z" fill="#8b7cff"/>
+    <path d="M145 0 170 196h29l31-106 31 106h29L315 0h-32l-16 115-29-115h-33l-30 115L169 0z" fill="#8b7cff"/>
+    <path d="M290 0 315 196h29l31-106 31 106h29L460 0h-32l-16 115-29-115h-33l-30 115L314 0z" fill="#00d4c7"/>
+  </g>
 </svg>
