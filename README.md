@@ -30,6 +30,7 @@ Access the dashboard at `http://localhost:31000`.
 - **[docs/configuration.md](docs/configuration.md)**: Environment variables and encrypted credentials.
 - **[docs/troubleshooting.md](docs/troubleshooting.md)**: Common failures and recovery steps.
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: Standards, PR expectations, and adding new sources.
+- **[DISCLAIMER.md](DISCLAIMER.md)**: Public-use, privacy, and integration boundaries.
 
 ## 🛠️ Key Commands
 

@@ -47,3 +47,16 @@ Updates to the core logic require corresponding updates to:
 - `CONTEXT.md` (if domain language changes).
 - `README.md` (if prerequisites or setup changes).
 - An ADR in `docs/adr/` (for significant architectural decisions).
+
+## 🚢 Release Discipline
+
+Before merging or releasing, run `bin/audit_public_release --json`. Every
+feature branch needs a recorded disposition: merged, cherry-picked, obsolete,
+or blocked. A closed pull request is not evidence that its code was preserved.
+
+For a public-history rewrite, create and verify a full Git bundle backup first,
+reconcile all pull requests and remote branches, run the audit, and only then
+perform the orphan squash and force-push described in
+`docs/runbooks/history-reset.md`. The initial root commit may use
+`SKIP=RuboCop` because changed-lines linting has no parent to compare against;
+all other hooks must pass and RuboCop must pass on subsequent commits.
