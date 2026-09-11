@@ -31,6 +31,13 @@ Access the dashboard at `http://localhost:31000`.
 - **[docs/troubleshooting.md](docs/troubleshooting.md)**: Common failures and recovery steps.
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: Standards, PR expectations, and adding new sources.
 - **[DISCLAIMER.md](DISCLAIMER.md)**: Public-use, privacy, and integration boundaries.
+- **[NOTICE.md](NOTICE.md)**: Copyright, trademark, and AGPLv3 boundary notice.
+
+## License
+
+WWWorkRemote is licensed under the [GNU Affero General Public License v3.0 or
+later](LICENSE). Personal data, credentials, and local configuration are
+excluded from the repository.
 
 ## 🛠️ Key Commands
 
