@@ -69,6 +69,20 @@ guard :rspec, cmd: "bundle exec rspec" do
   end
 end
 
+# Focused loop for the companies/sources surfaces. Run with:
+#   bundle exec guard -g companies
+group :companies do
+  guard :rspec, cmd: "bundle exec rspec" do
+    watch(%r{^spec/requests/companies_spec\.rb$})
+    watch(%r{^spec/requests/sources_spec\.rb$})
+    watch(%r{^app/controllers/companies_controller\.rb$}) { "spec/requests/companies_spec.rb" }
+    watch(%r{^app/controllers/sources_controller\.rb$}) { "spec/requests/sources_spec.rb" }
+    watch(%r{^app/views/companies/.+\.html\.erb$}) { "spec/requests/companies_spec.rb" }
+    watch(%r{^app/views/sources/.+\.html\.erb$}) { "spec/requests/sources_spec.rb" }
+    watch(%r{^config/routes\.rb$}) { %w[spec/requests/companies_spec.rb spec/requests/sources_spec.rb] }
+  end
+end
+
 guard 'livereload' do
   extensions = {
     css: :css,

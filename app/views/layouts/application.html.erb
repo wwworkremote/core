@@ -70,6 +70,32 @@
                guided_sessions: [t('.nav.guided_sessions'), guided_sessions_path],
                docs: [t('.nav.docs'), docs_path]
              } %>
+          <% nav_tree = {
+               "Career & discovery" => [
+                 ["Companies", companies_path], ["Job postings", job_postings_path],
+                 ["Sources", sources_path], ["Saved jobs", user_job_postings_path],
+                 ["Saved searches", job_searches_path], ["Guided sessions", guided_sessions_path],
+                 ["Data fetchers", data_fetchers_path], ["Documentation", docs_path]
+               ],
+               "Profile & AI" => [
+                 ["Career profile", career_profile_path], ["Résumé versions", resumes_path],
+                 ["Question graph", question_archetypes_path], ["AI chats", llm_chats_path],
+                 ["AI models", models_path]
+               ],
+               "Operations" => [
+                 ["Admin dashboard", admin_root_path], ["Admin skills", admin_skills_path],
+                 ["Pipeline prompts", admin_pipeline_prompts_path],
+                 ["Background jobs", admin_jobs_path], ["System health", admin_observability_path],
+                 ["Admin companies", admin_companies_path], ["Admin postings", admin_job_postings_path],
+                 ["Admin sources", admin_sources_path], ["Admin leads", admin_leads_path],
+                 ["Admin tasks", admin_tasks_path], ["Admin human tasks", admin_human_tasks_path],
+                 ["Admin documents", admin_documents_path], ["Admin domains", admin_domains_path],
+                 ["Admin queries", admin_queries_path], ["Admin email imports", admin_email_import_records_path],
+                 ["Admin models", admin_models_path], ["Admin visits", admin_visits_path],
+                 ["Admin events", admin_events_path],
+                 ["Extraction rules", admin_extraction_rules_path], ["Pipeline filters", admin_pipeline_filters_path]
+               ]
+             } %>
           <% nav_links.each_value do |label, path| %>
             <% active = current_page?(path) %>
             <li>
@@ -78,6 +104,19 @@
                   "aria-current": (active ? "page" : nil) %>
             </li>
           <% end %>
+
+          <li class="dropdown dropdown-end">
+            <div tabindex="0" role="button" aria-haspopup="true" class="btn btn-ghost btn-xs rounded text-primary">Explore</div>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-3 shadow bg-base-300 rounded-box w-72 mt-4 border border-white/5">
+              <% nav_tree.each do |section, links| %>
+                <li class="menu-title text-xs opacity-60"><%= section %></li>
+                <% links.each do |label, path| %>
+                  <li><%= link_to label, path, class: current_page?(path) ? "text-primary" : nil %></li>
+                <% end %>
+                <div class="divider my-1 opacity-10"></div>
+              <% end %>
+            </ul>
+          </li>
 
           <li class="dropdown dropdown-end">
             <div tabindex="0" role="button" aria-haspopup="menu" class="btn btn-ghost btn-xs rounded text-primary"><%= t('.nav.profile_menu') %></div>
@@ -117,6 +156,13 @@
         <ul class="dropdown-content z-[60] menu p-3 mt-3 w-64 gap-1 rounded-2xl border border-white/10 bg-base-300 shadow-2xl font-bold">
           <% nav_links.each_value do |label, path| %>
             <li><%= link_to label, path, class: current_page?(path) ? "text-primary" : nil %></li>
+          <% end %>
+          <li class="menu-title mt-2 text-xs opacity-60">Explore</li>
+          <% nav_tree.each do |section, links| %>
+            <li class="menu-title text-xs opacity-50"><%= section %></li>
+            <% links.each do |label, path| %>
+              <li><%= link_to label, path, class: current_page?(path) ? "text-primary" : nil %></li>
+            <% end %>
           <% end %>
           <li class="menu-title mt-2 text-xs opacity-60"><%= t('.nav.admin_section_label') %></li>
           <li><%= link_to t('.nav.admin_dashboard'), admin_root_path %></li>

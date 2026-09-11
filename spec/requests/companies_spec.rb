@@ -26,6 +26,15 @@ RSpec.describe "Companies" do
       get companies_path
       expect(response.body).not_to include("Cooldown")
     end
+
+    it "searches and filters companies" do
+      create(:company, name: "Other Corp", toxic_culture_flag: true)
+
+      get companies_path, params: { q: "Test", active: "1" }
+
+      expect(response.body).to include("Test Corp")
+      expect(response.body).not_to include("Other Corp")
+    end
   end
 
   describe "GET /companies/:id" do

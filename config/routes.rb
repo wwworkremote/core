@@ -190,6 +190,7 @@ Rails.application.routes.draw do
     end
   end
   resources :companies, only: %i[index show]
+  resources :sources, only: %i[index show]
   get "docs", to: "docs#index"
   get "docs/*path", to: "docs#show", as: :doc, constraints: { path: /.*/ }, format: false
   resources :llm_chats do

@@ -1,7 +1,7 @@
 // WWWorkRemote Popup
 // Manages API URL and admin credentials in chrome.storage.local.
 
-const DEFAULT_API = 'http://localhost:31000';
+const DEFAULT_API = 'https://wwwr.localhost';
 
 document.addEventListener('DOMContentLoaded', () => {
   const urlInput   = document.getElementById('api-url');

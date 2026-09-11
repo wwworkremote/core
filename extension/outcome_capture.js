@@ -21,7 +21,7 @@
   const LOG_OK = (...a) => console.log(`%c[WWWR-Outcome ${ts()}] ✓`, 'color:#8aff80;font-weight:bold', ...a);
   const LOG_ERR = (...a) => console.error(`%c[WWWR-Outcome ${ts()}] ✗`, 'color:#ff9580;font-weight:bold', ...a);
 
-  const DEFAULT_API = 'http://localhost:31000';
+  const DEFAULT_API = 'https://wwwr.localhost';
 
   async function getApiBase() {
     return new Promise(resolve => {

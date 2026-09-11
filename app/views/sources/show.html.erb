@@ -1,0 +1,7 @@
+<% content_for :title, "#{@source.name} | Sources" %>
+<%= link_to "← Sources", sources_path, class: "text-sm font-bold text-primary hover:underline" %>
+<div class="mt-8 card-neural p-8 max-w-2xl">
+  <h1 class="text-3xl font-black text-white"><%= @source.name %></h1>
+  <p class="text-slate-500 font-bold mt-2"><%= @source.slug %></p>
+  <dl class="grid grid-cols-2 gap-6 mt-8 text-sm"><div><dt class="text-slate-500">Documents</dt><dd class="text-white font-black text-xl"><%= @source.job_boards_documents_count %></dd></div><div><dt class="text-slate-500">Status</dt><dd class="text-white font-black"><%= @source.ingestion_paused? ? "Paused" : "Active" %></dd></div></dl>
+</div>

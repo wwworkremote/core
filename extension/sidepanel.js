@@ -2,7 +2,7 @@
 'use strict';
 
 const SESSION_KEY = 'wwr_panel_state';
-const DEFAULT_API = 'http://localhost:31000';
+const DEFAULT_API = 'https://wwwr.localhost';
 
 // ── API config (mirrors content.js's getApiConfig) ──────────────────────────
 // Side panels are extension pages with their own host-permission access, so
@@ -575,6 +575,7 @@ function renderApplicationContext(context, fields) {
       <div class="app-field-actions"><span class="app-field-source">${mapping ? `mapped → ${escapeHtml(mapping.semantic_key)}` : (saved ? 'provided' : source)}</span>
         <button type="button" class="app-skip-btn" aria-label="Skip ${escapeHtml(field.label)} for now">Skip</button>
         <button type="button" class="app-map-btn" aria-label="${mapping ? 'Remap' : 'Map'} ${escapeHtml(field.label)}">${mapping ? 'Remap' : 'Map'}</button>
+        <button type="button" class="app-learn-btn" aria-label="Save reviewed answer for ${escapeHtml(field.label)}">Save to library</button>
         <button type="button" class="app-fill-btn" data-source="${escapeHtml(source)}" aria-label="Fill answer for ${escapeHtml(field.label)}">Fill</button></div>
     </div>`;
   }).join('');
@@ -626,6 +627,26 @@ function renderApplicationContext(context, fields) {
     });
   });
 
+  container.querySelectorAll('.app-learn-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.app-field-row');
+      const prompt = row.dataset.label;
+      const answer = row.querySelector('.app-field-answer').value.trim();
+      if (!answer) { setStatus('Enter and review an answer before saving it', 'var(--yellow)'); return; }
+      if (!window.confirm(`Save this reviewed answer to the library?\n\n${prompt}`)) return;
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        await saveAnswerTemplate(prompt, answer, currentState?.applicationContext?.selected_persona_id,
+          row.querySelector('.app-field-answer')?.type || 'text');
+        btn.textContent = 'Saved ✓';
+        setStatus(`Reviewed answer saved for “${prompt}”`, 'var(--green)');
+      } catch (error) {
+        btn.disabled = false; btn.textContent = 'Save to library';
+        setStatus(`Could not save answer: ${error.message}`, 'var(--red)');
+      }
+    });
+  });
+
   container.querySelectorAll('.app-skip-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       // Dismiss this field for the current view only -- it reappears on the
@@ -643,6 +664,26 @@ function renderApplicationContext(context, fields) {
       startApplicationMapping(row.dataset.fieldKey, btn);
     });
   });
+}
+
+async function saveAnswerTemplate(prompt, answer, personaId, fieldType) {
+  const { base: apiBase, authHeader } = await getApiConfig();
+  const headers = { 'Content-Type': 'application/json', ...(authHeader ? { Authorization: authHeader } : {}) };
+  const normalized = prompt.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const questionKind = /email|phone|city|state|zip|postal|address/i.test(prompt) ? 'contact'
+    : /authorized|sponsor|work in/i.test(prompt) ? 'eligibility'
+    : /gender|race|ethnicity|veteran|disab/i.test(prompt) ? 'demographic'
+    : fieldType === 'textarea' ? 'free_text' : 'other';
+  const response = await fetch(`${apiBase}/api/v0/application_answer_templates`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ application_answer_template: {
+      persona_id: personaId || null, question_kind: questionKind,
+      normalized_prompt: normalized, prompt, answer, source: 'learned', enabled: true,
+    } }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.success) throw new Error(data.errors?.join(', ') || `HTTP ${response.status}`);
+  return data.template;
 }
 
 async function recordApplicationFieldObservations(state) {
@@ -811,6 +852,23 @@ function populateForm(state) {
   document.getElementById('hdr-id').textContent =
     mode === 'capture' ? (state.leadId ? `#${state.leadId}` : '…') : (state.wwrId || '—');
   document.getElementById('hdr-board').textContent = BOARD_LABELS[state.provider] || state.provider || '—';
+  const modeBanner = document.getElementById('mode-banner');
+  modeBanner.textContent = mode === 'capture'
+    ? 'CAPTURE MODE — creates a new lead, then promotes it to a posting'
+    : mode === 'application'
+      ? `APPLICATION MODE — assists with posting #${state.wwrId}; never submits for you`
+      : mode === 'receipt'
+        ? `RECEIPT MODE — application submitted for posting #${state.wwrId}`
+      : mode === 'local'
+        ? `LOCAL REVIEW MODE — reviewing WWWorkRemote lead #${state.leadId}`
+      : `UPDATE MODE — refreshes existing WWWorkRemote posting #${state.wwrId}`;
+  modeBanner.style.color = mode === 'capture' ? 'var(--yellow)' : 'var(--green)';
+  modeBanner.style.borderColor = mode === 'capture' ? 'var(--yellow)' : 'var(--green)';
+  const facts = document.getElementById('capture-facts');
+  const workplace = e.workplace_type ? e.workplace_type.replace('_', '-') : 'unknown workplace';
+  const application = e.application_method === 'easy_apply' ? 'Easy Apply'
+    : e.application_method === 'external_site' ? 'External application' : 'application method unknown';
+  facts.textContent = `Decision context: ${workplace} · ${application}`;
   updateConfidenceBadge(e._method);
   renderApplicationStatus(state.applicationStatus);
   renderApplicationCompletion(state.applicationCompletion);
@@ -844,6 +902,14 @@ function populateForm(state) {
   applyFieldState('fld-remote', 'f-remote');
   document.getElementById('remote-label').textContent =
     remoteChecked ? '✓ Remote position' : 'Remote position';
+  const workplaceEl = document.getElementById('f-workplace-type');
+  workplaceEl.value = ['remote', 'hybrid', 'on_site'].includes(e.workplace_type) ? e.workplace_type : '';
+  markSource('src-workplace-type', !!e.workplace_type);
+  applyFieldState('fld-workplace-type', 'f-workplace-type');
+  const applicationMethodEl = document.getElementById('f-application-method');
+  applicationMethodEl.value = ['easy_apply', 'external_site'].includes(e.application_method) ? e.application_method : '';
+  markSource('src-application-method', !!e.application_method);
+  applyFieldState('fld-application-method', 'f-application-method');
 
   // ── Employment type ───────────────────────────────────────────────────────
   const rawType  = coalesce(e, 'employment_type');
@@ -945,7 +1011,8 @@ function populateForm(state) {
   // Enable submit
   const btn = document.getElementById('submit-btn');
   btn.disabled        = false;
-  btn.textContent     = mode === 'capture' ? 'Ingest' : 'Submit to WWWorkRemote';
+  btn.textContent     = mode === 'capture' ? 'Ingest' : mode === 'receipt' ? 'Receipt recorded' : mode === 'local' ? 'Review lead in WWWorkRemote' : 'Submit to WWWorkRemote';
+  btn.disabled        = ['receipt', 'local'].includes(mode);
   btn.style.background = '';
   setStatus('Ready — review fields and submit');
 }
@@ -1094,6 +1161,8 @@ function readForm() {
     company:          document.getElementById('f-company').value.trim()           || null,
     location:         document.getElementById('f-location').value.trim()          || null,
     remote:           document.getElementById('f-remote').checked,
+    workplace_type:   document.getElementById('f-workplace-type').value || null,
+    application_method: document.getElementById('f-application-method').value || null,
     employment_type:  document.getElementById('f-employment-type').value          || null,
     experience:       document.getElementById('f-experience').value.trim()        || null,
     apply_url:        document.getElementById('f-apply-url').value.trim()         || null,
@@ -1114,6 +1183,8 @@ function readForm() {
     // Pass-through (not editable in form)
     industry:         e.industry         || null,
     company_logo_url: e.company_logo_url || null,
+    application_method: e.application_method || null,
+    workplace_type: e.workplace_type || null,
     _method:          e._method,
     _confidence:      e._confidence,
     // Capture mode only: set when the user picked an existing company from
@@ -1318,6 +1389,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 let diagRenderedCount = 0;
 
+document.getElementById('friction-report')?.addEventListener('click', () => {
+  const note = window.prompt('What blocked or confused you?')?.trim();
+  if (!note) return;
+  chrome.runtime.sendMessage({ type: 'EXTENSION_ERROR', event_name: 'friction_report', phase: currentState?.phase || 'unknown',
+    provider: currentState?.provider || 'unknown', page_host: location.host, error_name: 'UserReportedFriction',
+    error_message: note.slice(0, 1000), recoverable: true, guided_session_token: currentState?.guidedSessionToken || null,
+    context: { page_url: currentState?.pageUrl || null, source_url: currentState?.sourceUrl || null,
+      phase: currentState?.phase || null, provider: currentState?.provider || null, reported_at: new Date().toISOString() } });
+  setStatus('Friction report saved to WWWorkRemote.');
+});
+
 document.getElementById('diag-toggle').addEventListener('click', () => {
   const body   = document.getElementById('diag-log');
   const toggle = document.getElementById('diag-toggle');
@@ -1392,7 +1474,7 @@ async function refreshIngestionLog() {
     if (!response.ok) throw new Error(`Server error ${response.status}`);
     const leads = await response.json();
     renderIngestionLog(leads.slice(0, 10), apiBase);
-    if (currentState?.mode === 'enrich' && currentState.wwrId) {
+    if (['enrich', 'application'].includes(currentState?.mode) && currentState.wwrId) {
       renderCurrentEnrichment(currentState.extracted?.title, currentState.wwrId, null, apiBase);
     }
   } catch (err) {

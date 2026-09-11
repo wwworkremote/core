@@ -34,6 +34,11 @@
   // 'application_execution' runs the chrome.debugger HAR / full-page path.
   const guidedSessionPurpose = urlParams.get('guided_session_purpose');
   const isGuidedExecution = guidedSessionPurpose === 'application_execution';
+  const IS_APP_HOST = ['wwworkremote.localhost', 'wwwr.localhost'].includes(window.location.hostname);
+  const localLeadMatch = window.location.pathname.match(/^\/admin\/leads\/(\d+)/);
+  const isLocalReviewContext = !!localLeadMatch && (['wwwr.localhost', 'wwworkremote.localhost'].includes(window.location.hostname) ||
+    (window.location.hostname === 'localhost' && window.location.port === '31000'));
+  const localLeadId = localLeadMatch?.[1] || null;
 
   // Set by popup.js's "Scan This Page" button immediately before injecting
   // this file, via a separate executeScript call -- allows generic capture
@@ -609,6 +614,13 @@
     // title/description fallback -- `.iCIMS_JobContent` is real,
     // plainly-named markup (confirmed live, not a print-only template like
     // SmartRecruiters' old selectors turned out to be).
+    jobvite: {
+      label: 'Jobvite',
+      match: h => h.includes('jobvite.com'),
+      readySelector: 'h1, [role="main"], form',
+      readyTimeout: 8000,
+    },
+
     icims: {
       label: 'iCIMS',
       match: h => h.includes('icims.com'),
@@ -1033,6 +1045,18 @@
       .map(q => ({ question: q.text, answer: q.value.trim() }));
   }
 
+  // Provider application forms do not share a stable DOM id. Keep this
+  // deliberately narrow: guided execution should pause the employer's
+  // application submit, but never interfere with unrelated forms on a job
+  // detail page.
+  function isGuidedApplicationForm(form) {
+    if (!form || !guidedSessionToken || !isGuidedExecution) return false;
+    if (form.id === 'application-form') return true;
+    if (provider?.key === 'lever' && /\/apply(?:\/|$)/i.test(window.location.pathname)) return true;
+    if (provider?.key === 'workday' && isWorkdayApplicationPage()) return true;
+    return false;
+  }
+
   // Greenhouse replaces the form with a confirmation view once it accepts a
   // submission, so by the time the user marks the application applied there
   // may be nothing left to read. Snapshot on the way out. Passive listener in
@@ -1041,7 +1065,7 @@
   // -- nothing else carries id="application-form".
   let submittedAnswers = null;
   document.addEventListener('submit', (e) => {
-    if (!e.target || e.target.id !== 'application-form') return;
+    if (!isGuidedApplicationForm(e.target)) return;
 
     submittedAnswers = currentAnswers();
     if (!IS_LOCAL_BUILD || !guidedSessionToken) return;
@@ -1059,7 +1083,7 @@
       reversibility: 'irreversible',
       approval_state: 'pending',
       phase: 'reorientation',
-      evidence: { answer_count: submittedAnswers.length, form_id: e.target.id },
+      evidence: { answer_count: submittedAnswers.length, form_id: e.target.id || null, provider: provider?.key || 'unknown', page_url: window.location.href },
     });
     LOG_WARN('Guided session paused before irreversible application submission');
   }, true);
@@ -1259,6 +1283,10 @@
 
   const hostname = window.location.hostname;
   const IS_SANDBOX_HOST = hostname === 'wwworkremote.localhost';
+  // The Rails app is a control surface, never an ingestion source. Keep the
+  // extension available for its explicit lead-review route, but do not run
+  // provider detection, extraction, or lead capture on ordinary app pages.
+  if (IS_APP_HOST && !isLocalReviewContext) return;
   let provider = null;
   for (const [key, p] of Object.entries(PROVIDERS)) {
     if (p.match(hostname)) { provider = { key, ...p }; break; }
@@ -1561,7 +1589,10 @@
   // this file is only ever injected on other sites via that explicit,
   // one-tab, one-click action, never automatically.
 
-  const captureMode = wwrId ? 'enrich' : 'capture';
+  const isReceiptPage = /\/confirmation(?:\/|$)|thank[- ]you|application received|successfully submitted/i.test(`${location.pathname} ${document.title} ${document.body?.innerText?.slice(0, 1200) || ''}`);
+  const hasApplicationForm = !!document.querySelector('form#application-form, form[action*="application" i], form[action*="apply" i]');
+  const isApplicationContext = isGuidedExecution || (wwrId && hasApplicationForm && /apply for this job|submit application|resume\/cv/i.test(document.body?.innerText?.slice(0, 12000) || ''));
+  const captureMode = isLocalReviewContext ? 'local' : isReceiptPage ? 'receipt' : wwrId ? (isApplicationContext ? 'application' : 'enrich') : 'capture';
   if (captureMode === 'capture' && !provider && !manualScan) return;
 
   LOG(captureMode === 'enrich'
@@ -1628,9 +1659,9 @@
 
   // ─── Configurable API config ───────────────────────────────────────────────
   // Reads apiUrl, apiEmail, apiPassword from chrome.storage.local (set via popup).
-  // Falls back to localhost:31000 with no auth if nothing is saved.
+  // Uses the canonical local app origin with no auth if nothing is saved.
 
-  const DEFAULT_API = 'http://localhost:31000';
+  const DEFAULT_API = 'https://wwwr.localhost';
 
   async function getApiConfig() {
     return new Promise(resolve => {
@@ -1990,8 +2021,8 @@
     padding: '0', borderRadius: '8px',
     boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
     border: '2px solid #9580ff',
-    fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.5',
-    width: '300px', userSelect: 'none',
+    fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif', fontSize: '15px', lineHeight: '1.5',
+    width: '360px', userSelect: 'none',
     transition: 'opacity 0.2s',
   });
 
@@ -2015,7 +2046,7 @@
 
     <div id="wwr-body" style="padding:12px 12px 10px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-        <span style="color:#9590c5;">${captureMode === 'enrich'
+        <span style="color:#9590c5;">${captureMode !== 'capture'
           ? `ID: <span style="color:#8aff80;">#${esc(wwrId)}</span>`
           : '<span id="wwr-lead-status" style="color:#9590c5;">Not yet captured</span>'}</span>
         <span style="color:#9590c5;">Board:
@@ -2024,10 +2055,13 @@
           </span>
         </span>
       </div>
+      <div style="margin:7px 0;padding:6px 8px;border:1px solid ${captureMode === 'capture' ? '#ffff80' : captureMode === 'receipt' ? '#8aff80' : '#8aff80'};border-radius:3px;color:${captureMode === 'capture' ? '#ffff80' : '#8aff80'};font-size:11px;font-weight:bold;">
+        ${captureMode === 'capture' ? 'CAPTURE MODE · New lead' : captureMode === 'application' ? `APPLICATION MODE · Supervised posting #${esc(wwrId)}` : captureMode === 'receipt' ? 'RECEIPT MODE · Application submitted' : captureMode === 'local' ? `LOCAL REVIEW MODE · Lead #${esc(localLeadId)}` : `UPDATE MODE · Existing posting #${esc(wwrId)}`}
+      </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;min-height:20px;">
         <span id="wwr-badge" style="font-size:12px;padding:2px 6px;border-radius:3px;background:#454158;color:#9590c5;">
-          ${captureMode === 'capture' ? 'ready' : 'scanning…'}
+          ${captureMode === 'capture' ? 'ready' : captureMode === 'receipt' ? 'receipt detected' : 'scanning…'}
         </span>
         <span id="wwr-field-count" style="font-size:12px;color:#9590c5;"></span>
       </div>
@@ -2045,10 +2079,10 @@
         border:none; border-radius:4px;
         font-weight:bold; cursor:pointer; margin-bottom:8px;
         font-family:monospace; font-size:13px; letter-spacing:1px;
-      ">${captureMode === 'capture' ? '↗ CAPTURE THIS JOB' : '↗ OPEN REVIEW PANEL'}</button>
+      ">${captureMode === 'capture' ? '↗ CAPTURE THIS JOB' : captureMode === 'receipt' ? '✓ VIEW RECEIPT IN WWWorkRemote' : captureMode === 'local' ? '↗ OPEN LEAD REVIEW PANEL' : '↗ OPEN REVIEW PANEL'}</button>
 
       <div id="wwr-status" style="text-align:center;font-size:12px;color:#9590c5;min-height:14px;">
-        ${captureMode === 'capture' ? 'Click to capture' : 'Extracting…'}
+        ${captureMode === 'capture' ? 'Click to capture' : captureMode === 'receipt' ? 'Submission confirmation detected' : 'Extracting…'}
       </div>
 
       <div id="wwr-api-indicator" style="text-align:center;font-size:11px;color:#454158;margin-top:5px;">
@@ -2147,6 +2181,8 @@
       remoteStr ? row('Remote', remoteStr, remoteStr === 'Remote' ? '#8aff80' : '#f8f8f2') : '',
       salaryStr ? row('Pay',    salaryStr, '#8aff80') : '',
       row('Type',   extracted.employment_type ? formatEmploymentType(extracted.employment_type) : null),
+      row('Apply',  extracted.application_method ? formatEmploymentType(extracted.application_method) : null),
+      row('Work',   extracted.workplace_type ? formatEmploymentType(extracted.workplace_type) : null),
       row('Posted', extracted.posted_at),
       row('Exp.',   extracted.experience ? String(extracted.experience).substring(0, 60) : null),
       descRow,
@@ -2181,6 +2217,28 @@
       PER_DIEM: 'Per Diem',  OTHER: 'Other',
     };
     return map[t] || t;
+  }
+
+  // These are triage facts, not guesses about job quality. Prefer the
+  // provider's compact top-card controls over the full description so a
+  // sentence such as "remote collaboration" cannot misclassify the role.
+  function detectApplicationMethod(doc) {
+    const controls = Array.from(doc.querySelectorAll('button, a, [role="button"]'))
+      .map(el => (el.innerText || el.textContent || '').trim()).join(' ');
+    if (/easy\s+apply/i.test(controls)) return 'easy_apply';
+    if (/apply\s+(on|at)\s+(company|employer)|apply\s+externally|company\s+website/i.test(controls)) return 'external_site';
+    return null;
+  }
+
+  function detectWorkplaceType(doc) {
+    const topCard = doc.querySelector(
+      '.job-details-jobs-unified-top-card__container, .jobs-unified-top-card, .top-card-layout, [data-testid="job-location"]'
+    );
+    const text = (topCard?.innerText || topCard?.textContent || '').trim();
+    if (/\bhybrid\b/i.test(text)) return 'hybrid';
+    if (/\bon[- ]site\b/i.test(text)) return 'on_site';
+    if (/\bremote\b/i.test(text)) return 'remote';
+    return null;
   }
 
   // ─── Extraction preview ─────────────────────────────────────────────────────
@@ -2241,6 +2299,11 @@
 
     // Step 3: Run extraction chain, apply any taught field overrides, show preview
     const extracted = Extractor.run(extractDoc, provider);
+    extracted.application_method ||= detectApplicationMethod(extractDoc);
+    extracted.workplace_type ||= detectWorkplaceType(extractDoc);
+    setBadge(extracted._method, countFields(extracted));
+    renderPreview(extracted);
+    setStatus(`Extracted — finalizing ${countFields(extracted)} fields…`, '#ffff80');
     // Workday completion dialogs are often mounted after the initial DOM
     // settles. Re-evaluate here so the panel receives completion evidence.
     applicationCompletion = detectWorkdayCompletion() || applicationCompletion;
@@ -2259,8 +2322,9 @@
       lastExtractedSnapshot = extractDoc.querySelector(provider.readySelector)?.textContent ?? null;
     }
 
-    setBadge(extracted._method, countFields(extracted));
-    renderPreview(extracted);
+    const extractedFields = countFields(extracted);
+    const descriptionWords = wordCount(extracted.description_text);
+    setStatus(`Ready — ${extractedFields} fields${descriptionWords ? ` · ${descriptionWords} description words` : ''}`, '#8aff80');
     extracted._applicationAssist = await computeApplicationAssist();
     return extracted;
   }
@@ -2281,7 +2345,12 @@
     });
   }
 
-  if (captureMode === 'enrich') {
+  if (captureMode === 'local') {
+    leadId = localLeadId;
+    notifyPanel({ title: 'Lead review', description_text: 'Reviewing a WWWorkRemote lead. No page capture or application action is available in this context.', _method: 'local-review' });
+  } else if (captureMode === 'receipt') {
+    notifyPanel({ title: 'Application submitted', description_text: 'Employer confirmation page detected.', _method: 'receipt', application_method: 'external_site' });
+  } else if (captureMode === 'enrich' || captureMode === 'application') {
     // Trusted flow (user explicitly clicked "Source & Enrich" in the app) —
     // extract and open the panel immediately, same as before.
     previewExtraction().then(e => {
@@ -2317,6 +2386,18 @@
   };
 
   document.getElementById('wwr-capture-btn').addEventListener('click', () => {
+    if (captureMode === 'local') {
+      notifyPanel({ title: 'Lead review', description_text: 'Local lead review panel opened.', _method: 'local-review' });
+      setStatus('Lead review panel opened', '#8aff80');
+      return;
+    }
+    if (captureMode === 'receipt') {
+      setStatus('Opening receipt in WWWorkRemote…', '#8aff80');
+      chrome.runtime.sendMessage({ type: 'OPEN_TRACKED_RECEIPT', base: 'https://wwwr.localhost' }, response => {
+        if (!response?.ok) setStatus(response?.error || 'Tracked posting not found', '#ff9580');
+      });
+      return;
+    }
     if (applicationCompletion) {
       notifyPanel(cachedExtraction);
       return;
@@ -2390,6 +2471,60 @@
         LOG_OK('Side panel opened');
       }
     });
+    recordCapabilityProbe();
+  }
+
+  // Read-only ATS capability probe. This deliberately inspects only structure
+  // and visible labels; it never reads field values or changes the page.
+  let capabilityProbeSent = false;
+  function visible(element) {
+    return !!element && element.offsetParent !== null && getComputedStyle(element).visibility !== 'hidden';
+  }
+
+  function capabilityObservations() {
+    const forms = [...document.querySelectorAll('form')].filter(visible);
+    const fields = [...document.querySelectorAll('input, select, textarea')].filter(visible);
+    const namedFields = fields.filter(field => field.labels?.length || field.getAttribute('aria-label') || field.placeholder);
+    const text = document.body?.innerText?.slice(0, 12000) || '';
+    const buttons = [...document.querySelectorAll('button, input[type="submit"], a')].filter(visible);
+    const actionText = buttons.map(button => `${button.innerText} ${button.getAttribute('aria-label') || ''}`).join(' ');
+    const hasApplyAction = /apply\s+(now|for this job)|start application|submit application/i.test(actionText);
+    const samePageApplyLink = buttons.some(button => {
+      if (!/apply\s+(now|for this job)|start application/i.test(button.innerText || '')) return false;
+      return !button.href || new URL(button.href, location.href).href.split('#')[0] === location.href.split('#')[0];
+    });
+    const captcha = /captcha|recaptcha|hcaptcha|verify you are human|i'm not a robot/i.test(text) ||
+      [...document.querySelectorAll('iframe')].some(frame => /captcha|recaptcha|hcaptcha/i.test(frame.src || ''));
+    const authenticationWall = /(^|\s)(sign in|log in|login|authenticate)(\s|$)/i.test(text) && forms.length === 0;
+    return {
+      form_detected: forms.length > 0,
+      fields_discoverable: fields.length > 0 && namedFields.length >= Math.min(fields.length, 3),
+      upload_supported: fields.some(field => field.type === 'file'),
+      submit_detected: /submit|send application|finish application/i.test(actionText),
+      receipt_detected: /thank you|application received|confirmation number|successfully submitted/i.test(text),
+      captcha,
+      listing_loop: !forms.length && hasApplyAction && samePageApplyLink,
+      authentication_wall: authenticationWall,
+    };
+  }
+
+  async function recordCapabilityProbe() {
+    if (!wwrId || capabilityProbeSent) return;
+    capabilityProbeSent = true;
+    try {
+      const { base: apiBase, authHeader } = await getApiConfig();
+      const headers = { 'Content-Type': 'application/json' };
+      if (authHeader) headers.Authorization = authHeader;
+      const observations = capabilityObservations();
+      const result = await apiFetch(`${apiBase}/api/v0/job_postings/${encodeURIComponent(wwrId)}/application_capability_probes`, {
+        method: 'POST', headers, body: JSON.stringify({ provider: provider?.key || 'generic', ...observations }),
+      });
+      if (!result.ok) throw new Error(result.data?.error || `HTTP ${result.status}`);
+      LOG_OK('ATS capability probe recorded:', result.data?.grade, result.data?.score);
+    } catch (error) {
+      capabilityProbeSent = false;
+      LOG_WARN('ATS capability probe unavailable:', error.message);
+    }
   }
 
   // ─── Lead capture (capture mode only) ──────────────────────────────────────
@@ -2741,6 +2876,7 @@
     'employment_type', 'remote', 'experience', 'valid_through',
     'education', 'qualifications', 'responsibilities', 'benefits',
     'company_logo_url', 'industry',
+    'application_method', 'workplace_type',
   ];
 
   function buildPromotePayload(editedData) {

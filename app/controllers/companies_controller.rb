@@ -1,12 +1,19 @@
 # frozen_string_literal: true
 
 class CompaniesController < ApplicationController
+  # The index composes the query from independent URL filters.
+  # rubocop:disable-next Metrics/AbcSize, Metrics/MethodLength
   def index
-    @companies = Company.select("companies.*, count(job_postings.id) as job_postings_count")
-                        .left_joins(:job_postings)
-                        .group("companies.id")
-                        .order(job_postings_count: :desc, name: :asc)
-                        .page(params[:page]).per(24)
+    scope = Company.select("companies.*, count(job_postings.id) as job_postings_count")
+                   .left_joins(:job_postings)
+                   .group("companies.id")
+    @query = params[:q].to_s.strip
+    scope = scope.where("companies.name ILIKE ?", "%#{Company.sanitize_sql_like(@query)}%") if @query.present?
+    scope = scope.where(ingestion_enabled: true) if params[:active] == "1"
+    scope = scope.where(toxic_culture_flag: true) if params[:flagged] == "1"
+    scope = scope.where("last_declined_at > ?", Company::COOLDOWN.ago) if params[:cooldown] == "1"
+    @companies = scope.order(job_postings_count: :desc, name: :asc)
+                      .page(params[:page]).per(24)
   end
 
   def show

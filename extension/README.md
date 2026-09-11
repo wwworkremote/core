@@ -1,6 +1,15 @@
 # WWWorkRemote Ingestion Assistant
 
-Current unpacked build: `1.26.0`.
+Current unpacked build: `1.36.13`.
+
+On tracked application pages, the extension also performs a read-only ATS
+capability probe. It records whether forms, discoverable fields, uploads,
+submission controls, receipts, CAPTCHA, authentication walls, or same-page
+listing loops are present. The result is graded and recommended next action is
+stored on the job posting; no field values are read and no action is taken.
+
+On local `/admin/leads/:id` pages it shows `LOCAL REVIEW MODE`, preserving lead
+context without offering capture or application actions.
 
 Keyboard shortcuts: `Ctrl+Shift+Y` (macOS: `Command+Shift+Y`) or alternate `Option+Shift+Y` opens the panel for the active tab. Configure them at `chrome://extensions/shortcuts` if Chrome reports a conflict. (`Option` is Chrome's `Alt` key.)
 
@@ -79,7 +88,7 @@ descriptor, allowing later tooling to learn stable associations and noise.
 The extension sends HTTP Basic Auth credentials to the Rails API. Set your credentials once in the popup:
 
 1. Click the extension icon in the toolbar
-2. Enter the **API endpoint** (default: `http://localhost:31000`)
+2. Enter the **API endpoint** (default: `https://wwwr.localhost`)
 3. Enter your **Admin email** and **Admin password** (matching `ADMIN_EMAIL` / `ADMIN_PASSWORD` in Rails `.env`)
 4. Click **SAVE** (or press Enter)
 

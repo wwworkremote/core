@@ -219,7 +219,7 @@ function buildPanelState(msg, tabId, priorState = null) {
     mode:      msg.mode,
     // Workday drops the query string when it redirects to userHome. Keep the
     // tracked posting only for an explicit completion event from that tab.
-    wwrId:     msg.wwrId || (msg.applicationCompletion ? priorState?.wwrId : null),
+    wwrId:     msg.wwrId || (['receipt', 'application'].includes(msg.mode) ? priorState?.wwrId : null) || (msg.applicationCompletion ? priorState?.wwrId : null),
     leadId:    msg.leadId,
     extracted: msg.extracted,
     applicationQA: msg.applicationQA || { matches: [], unmatched: [] },
@@ -244,6 +244,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     captureCdpSnapshot(msg.tabId)
       .then(snapshot => sendResponse({ ok: true, snapshot }))
       .catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+
+  if (msg.type === 'OPEN_TRACKED_RECEIPT') {
+    const tabId = sender.tab?.id;
+    chrome.storage.session.get(TAB_STATES_KEY, (data) => {
+      const state = tabId ? (data[TAB_STATES_KEY] || {})[tabId] : null;
+      if (!state?.wwrId) { sendResponse({ ok: false, error: 'No tracked WWWorkRemote posting for this receipt' }); return; }
+      const base = msg.base || 'https://wwwr.localhost';
+      chrome.tabs.create({ url: `${base.replace(/\/$/, '')}/job_postings/${encodeURIComponent(state.wwrId)}#application-receipt` })
+        .then(() => sendResponse({ ok: true, wwrId: state.wwrId }))
+        .catch(error => sendResponse({ ok: false, error: error.message }));
+    });
     return true;
   }
 
@@ -545,7 +558,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       // Correlation spine (ADR 010): stamp the guided session token from the
       // panel state when the error happened during a guided lap.
       const token = msg.guided_session_token || state?.guidedSessionToken || null;
-      fetch('http://localhost:31000/api/v0/extension_error_events', {
+      fetch('https://wwwr.localhost/api/v0/extension_error_events', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ extension_error_event: msg, guided_session_token: token }),
       }).catch(() => {});

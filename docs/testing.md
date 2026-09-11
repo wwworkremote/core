@@ -33,6 +33,23 @@ We enforce strict architectural boundaries and code style:
 - **Architecture**: `bundle exec packwerk check`
 - **Security**: `bin/brakeman`
 
+## 🔁 Focused development loop
+
+Guard watches the Rails, view, and spec files and reruns only the affected
+RSpec examples. The companies/sources loop is isolated for UI work:
+
+```bash
+bundle exec guard -g companies
+```
+
+SimpleCov is started by `spec/rails_helper.rb` for every Guard-triggered Rails
+spec run. Coverage is written to `coverage/`; open `coverage/index.html` to
+inspect the current run. Run one example directly when narrowing a failure:
+
+```bash
+bundle exec rspec spec/requests/companies_spec.rb:24
+```
+
 ## ✅ Full check before a risky change
 
 There is no CI service (solo project, GitHub Actions retired). The everyday loop

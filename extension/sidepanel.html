@@ -8,10 +8,10 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #22212c;
-      --bg-mid:    #454158;
-      --bg-dark:   #17161d;
-      --comment:   #9590c5;
+      --bg:        #111827;
+      --bg-mid:    #1f2937;
+      --bg-dark:   #0b1220;
+      --comment:   #b7c0d1;
       --fg:        #f8f8f2;
       --purple:    #9580ff;
       --pink:      #ff80bf;
@@ -21,11 +21,13 @@
       --red:       #ff9580;
       --cyan:      #80ffea;
       --radius:    6px;
-      --font:      'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --font:      -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     html, body { height: 100%; background: var(--bg); color: var(--fg);
-      font-family: var(--font); font-size: 14px; line-height: 1.5; }
+      font-family: var(--font); font-size: 15px; line-height: 1.5; }
+
+    :focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
 
     #app { display: flex; flex-direction: column; height: 100vh; }
 
@@ -35,7 +37,7 @@
       background: #3a3000;
       border-bottom: 1px solid var(--yellow);
       padding: 6px 14px;
-      font-size: 12px;
+      font-size: 13px;
       color: var(--yellow);
       flex-shrink: 0;
       display: none;
@@ -48,7 +50,7 @@
       border: none;
       border-radius: 3px;
       font-family: var(--font);
-      font-size: 12px;
+      font-size: 13px;
       padding: 2px 8px;
       cursor: pointer;
       font-weight: bold;
@@ -206,11 +208,11 @@
     .persona-picker { display: grid; grid-template-columns: 1fr auto; gap: 5px; margin-bottom: 8px; }
     .persona-picker label { grid-column: 1 / -1; font-size: 11px; color: var(--comment); text-transform: uppercase; }
     .persona-picker select { min-width: 0; }
-    .persona-picker button, .app-fill-btn, .app-map-btn { background: none; border: 1px solid var(--purple); border-radius: 4px; color: var(--purple); font-family: var(--font); font-size: 12px; padding: 6px 10px; min-height: 36px; cursor: pointer; }
-    .app-skip-btn { background: none; border: 1px solid var(--comment); border-radius: 4px; color: var(--comment); font-family: var(--font); font-size: 12px; padding: 6px 10px; min-height: 36px; cursor: pointer; }
+    .persona-picker button, .app-fill-btn, .app-map-btn, .app-learn-btn { background: none; border: 1px solid var(--purple); border-radius: 4px; color: var(--purple); font-family: var(--font); font-size: 13px; padding: 8px 10px; min-height: 40px; cursor: pointer; }
+    .app-skip-btn { background: none; border: 1px solid var(--comment); border-radius: 4px; color: var(--comment); font-family: var(--font); font-size: 13px; padding: 8px 10px; min-height: 40px; cursor: pointer; }
     .app-skip-btn:hover { background: var(--bg-mid); }
     .app-field-row { border-top: 1px solid var(--bg-mid); padding: 7px 0; }
-    .app-field-label { display: flex; justify-content: space-between; color: var(--fg); font-size: 12px; margin-bottom: 3px; }
+    .app-field-label { display: flex; justify-content: space-between; color: var(--fg); font-size: 14px; margin-bottom: 5px; }
     .app-field-label label { cursor: pointer; }
     .app-field-label b { color: var(--red); }
     .app-field-answer { min-height: 34px; }
@@ -376,6 +378,8 @@
       <span><span id="hdr-id-label">ID:</span> <b id="hdr-id">—</b></span>
       <span>Board: <b id="hdr-board">—</b></span>
     </div>
+    <div id="mode-banner" style="margin:8px 0;padding:8px 10px;border:1px solid var(--purple);border-radius:4px;font-size:12px;font-weight:bold;"></div>
+    <div id="capture-facts" style="margin:6px 0 8px;color:var(--comment);font-size:11px;"></div>
     <div id="header-actions">
       <div id="field-summary">
         <b id="hdr-filled">0</b> fields extracted &nbsp;·&nbsp;
@@ -419,6 +423,15 @@
         <input type="checkbox" id="f-remote">
         <label for="f-remote" id="remote-label">Remote position</label>
       </div>
+    </div>
+
+    <div class="field" id="fld-workplace-type">
+      <div class="field-header"><label><span class="src missing" id="src-workplace-type"></span>Workplace type</label></div>
+      <select id="f-workplace-type"><option value="">— unknown —</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option><option value="on_site">On-site</option></select>
+    </div>
+    <div class="field" id="fld-application-method">
+      <div class="field-header"><label><span class="src missing" id="src-application-method"></span>Application method</label></div>
+      <select id="f-application-method"><option value="">— unknown —</option><option value="easy_apply">Easy Apply</option><option value="external_site">External site</option></select>
     </div>
 
     <div class="section-header">Job Details</div>
@@ -557,6 +570,8 @@
 
   <!-- Diagnostics log — collapsed by default, mirrors LOG*/setStatus activity -->
   <button id="diag-toggle">▸ Show diagnostics log</button>
+  <button id="friction-report" class="save-btn" style="width:100%;margin-top:8px;padding:7px;">Report friction</button>
+  <div class="note" style="margin-top:4px;">Saves this page, provider, phase, session, and your note to WWWorkRemote.</div>
   <div id="diag-log"></div>
 
 </div>

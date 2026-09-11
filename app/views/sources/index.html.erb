@@ -1,0 +1,23 @@
+<% content_for :title, "Sources | WWWorkRemote" %>
+
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+  <div>
+    <h1 class="text-4xl font-black text-white mb-2 tracking-tight">Sources</h1>
+    <p class="text-slate-500 font-bold text-sm">The job boards and feeds supplying your postings.</p>
+  </div>
+  <%= form_with url: sources_path, method: :get, class: "w-full md:max-w-xl space-y-3" do |f| %>
+    <div class="flex gap-2"><%= f.search_field :q, value: @query, placeholder: "Search sources…", class: "input input-bordered bg-base-200 border-white/10 flex-1" %><%= f.submit "Search", class: "btn btn-primary" %></div>
+    <div class="flex gap-4 text-xs font-bold text-base-content/70"><label><%= check_box_tag :active, "1", params[:active] == "1", class: "checkbox checkbox-xs checkbox-primary mr-1" %> Active only</label><label><%= check_box_tag :excluded, "1", params[:excluded] == "1", class: "checkbox checkbox-xs checkbox-primary mr-1" %> Excluded</label><%= link_to "Clear", sources_path, class: "text-error hover:underline" %></div>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+  <% @sources.each do |source| %>
+    <%= link_to source_path(source), class: "card-neural p-6 hover:border-primary/50 transition-all" do %>
+      <h2 class="text-lg font-black text-white"><%= source.name %></h2>
+      <p class="text-xs text-slate-500 font-bold mt-1"><%= source.slug %></p>
+      <div class="flex justify-between mt-6 pt-4 border-t border-white/5 text-xs font-bold"><span><%= source.job_boards_documents_count %> documents</span><span><%= source.ingestion_paused? ? "Paused" : "Active" %></span></div>
+    <% end %>
+  <% end %>
+</div>
+<div class="flex justify-center"><%= paginate @sources %></div>

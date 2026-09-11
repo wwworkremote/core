@@ -6,6 +6,7 @@ require "maxmind/geoip2"
 module Geo
   class GeoipClient
     DEFAULT_DB_DIR = "data/maxmind"
+    SYSTEM_DB_DIRS = ["/opt/homebrew/var/GeoIP", "/usr/share/GeoIP"].freeze
     DEFAULT_CITY_DB_NAME = "GeoLite2-City.mmdb"
 
     ENV_ALIASES = {
@@ -56,8 +57,15 @@ module Geo
       explicit = env_value("MAXMIND_CITY_DB_PATH")
       return explicit if explicit.present?
 
-      db_dir = env_value("MAXMIND_DB_DIR") || Rails.root.join(DEFAULT_DB_DIR).to_s
+      db_dir = env_value("MAXMIND_DB_DIR") || default_db_dir
       File.join(db_dir, DEFAULT_CITY_DB_NAME)
+    end
+
+    def self.default_db_dir
+      project_dir = Rails.root.join(DEFAULT_DB_DIR).to_s
+      return project_dir if File.file?(File.join(project_dir, DEFAULT_CITY_DB_NAME))
+
+      SYSTEM_DB_DIRS.find { |dir| File.file?(File.join(dir, DEFAULT_CITY_DB_NAME)) } || project_dir
     end
 
     def initialize(reader:)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../../app/services/geo/geoip_client"
+
 Geocoder.configure(
   # geocoding service (look at https://github.com/alexreisnero/geocoder/blob/master/README.md for more)
   lookup: :nominatim,
@@ -9,7 +11,7 @@ Geocoder.configure(
 
   # configuration options for geoip2
   geoip2: {
-    file: Rails.root.join("data/maxmind/GeoLite2-City.mmdb")
+    file: Geo::GeoipClient.resolved_city_db_path
   },
 
   # to use an API key:
