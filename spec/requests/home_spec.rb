@@ -85,6 +85,19 @@ RSpec.describe "Home" do
       expect(response.body).to include("Not scheduled yet")
     end
 
+    it "does not show a rejected interview process as an active interview" do
+      job_posting = create(:job_posting, title: "Rejected Interview Role")
+      ujp = create(:user_job_posting, user: user, job_posting: job_posting,
+                                      status: "interview", outcome: "rejected")
+      create(:interview_session, user: user, job_posting: job_posting)
+
+      get root_path
+
+      expect(response.body).not_to include("Rejected Interview Role")
+      expect(InterviewProcess.in_flight_for(user).map(&:posting)).not_to include(job_posting)
+      expect(ujp.reload.outcome).to eq("rejected")
+    end
+
     it "lists favorited postings as active leads and applied ones as awaiting response" do
       lead = create(:job_posting, title: "Lead Role")
       applied = create(:job_posting, title: "Applied Role")

@@ -61,8 +61,19 @@ module InterviewProcess
   # (position, then scheduled_at).
   def self.in_flight_for(user)
     tasks = user.interview_tasks.where(status: "pending").order(:due_at).group_by(&:job_posting_id)
-    rounds_by_posting(user).filter_map { |posting, rounds| progress(posting, rounds, tasks) }
+    active_rounds_for(user).filter_map { |posting, rounds| progress(posting, rounds, tasks) }
   end
+
+  def self.active_rounds_for(user)
+    terminal_ids = terminal_posting_ids(user)
+    rounds_by_posting(user).reject { |posting, _| terminal_ids.include?(posting.id) }
+  end
+  private_class_method :active_rounds_for
+
+  def self.terminal_posting_ids(user)
+    user.user_job_postings.where(outcome: UserJobPosting::TERMINAL_OUTCOMES).pluck(:job_posting_id)
+  end
+  private_class_method :terminal_posting_ids
 
   def self.rounds_by_posting(user)
     user.interview_sessions.includes(:job_posting).ordered.group_by(&:job_posting)
