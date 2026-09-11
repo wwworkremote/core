@@ -20,7 +20,9 @@ bin/rails ruby_llm:load_models
 # 3. Start development server
 bin/dev
 ```
-Access the dashboard at `http://localhost:31000`.
+Access the dashboard at `https://wwwr.localhost` in the local development
+environment. The legacy `http://localhost:31000` address is an internal
+fallback only.
 
 ## 📚 Canonical Documentation
 
@@ -54,4 +56,6 @@ excluded from the repository.
 
 ## ⚖️ License
 
-Copyright &copy; 2024-2026 Mike Hall. Proprietary software. Unauthorized distribution prohibited. See [LICENSE](LICENSE).
+Copyright &copy; 2024-2026 Mike Hall. Licensed under AGPLv3 or later; see
+[LICENSE](LICENSE) and [NOTICE.md](NOTICE.md). Do not add personal data,
+credentials, or private local integrations to a public checkout.
