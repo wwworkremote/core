@@ -3,6 +3,5 @@
   <desc id="desc">A violet and cyan W mark representing the job search pipeline.</desc>
   <rect width="512" height="512" rx="112" fill="#171b22"/>
   <path d="M92 142 146 370h48l62-150 62 150h48l54-228h-56l-28 133-57-133h-46l-58 133-28-133z" fill="#8b7cff"/>
-  <path d="M261 220 318 370h48l54-228h-28l-28 133-46-107z" fill="#00d4c7"/>
   <circle cx="420" cy="94" r="18" fill="#ff2b9a"/>
 </svg>
