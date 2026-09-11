@@ -49,7 +49,7 @@ match" button calls), keyed off the one local `User`'s `career_profile`, not the
 export. Two independent scorers would drift. Call the existing one instead:
 
 ```bash
-cd ~/github.com/wwworkremote/core
+cd ~/github.com/wwworkremote/wwworkremote
 bin/wwwr match <job_posting_id> --source=just3ws-cli           # read-only: prints existing analysis
 bin/wwwr match <job_posting_id> --source=just3ws-cli --escalate  # runs a fresh LLM scan, persists it
 ```

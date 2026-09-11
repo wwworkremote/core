@@ -35,12 +35,12 @@
 
   In flight: TWO stacked PRs open, neither merged. Feature code is only on
   the PR branches; main carries exposure-pass + doc commits + TASK-150.
-    PR #23 https://github.com/wwworkremote/core/pull/23 — branch
+    PR #23 https://github.com/wwworkremote/wwworkremote/pull/23 — branch
       feat/homepage-pipeline-blocks. Homepage leads with Interviews /
       Active Leads / Awaiting Response blocks; InterviewSession → ordered
       multi-round pipeline (position/outcome/interviewers, InterviewProcess
       templates). TASK-147.1 steps 1-3; ACs 6+7 open.
-    PR #24 https://github.com/wwworkremote/core/pull/24 — branch
+    PR #24 https://github.com/wwworkremote/wwworkremote/pull/24 — branch
       feat/inline-edit-job-posting, STACKED on #23 (merge #23 first).
       TASK-148 slice 1: JobPosting core fields editable inline on the show
       page. Slices 2-4 not started — see TASK-148 Implementation Notes.

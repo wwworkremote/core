@@ -18,16 +18,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wwworkremote/core.git"
+    "url": "git+https://github.com/wwworkremote/wwworkremote.git"
   },
   "keywords": [],
   "author": "Mike Hall",
   "license": "AGPL-3.0-or-later",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/wwworkremote/core/issues"
+    "url": "https://github.com/wwworkremote/wwworkremote/issues"
   },
-  "homepage": "https://github.com/wwworkremote/core#readme",
+  "homepage": "https://github.com/wwworkremote/wwworkremote#readme",
   "devDependencies": {
     "eslint": "^10.8.1",
     "globals": "^17.11.0",

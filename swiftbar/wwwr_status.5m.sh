@@ -13,7 +13,7 @@
 # symlinked into $HOME/.swiftbar, this script's location no longer has any
 # relation to the repo it's calling into -- every SwiftBar plugin that
 # shells into a specific project ends up pinned to that project's path.
-WWWR="/Users/mike/github.com/wwworkremote/core/bin/wwwr"
+WWWR="/Users/mike/github.com/wwworkremote/wwworkremote/bin/wwwr"
 
 # bin/wwwr boots the full Rails app, which logs OpenTelemetry/instrumentation
 # lines straight to stdout regardless of RAILS_ENV -- strip those so they
