@@ -51,6 +51,16 @@ RSpec.describe Pipeline::DisplayStatus do
 
       expect(result[:semantic]).to eq(:outcome_rejected)
     end
+
+    it "does not let an ignored listing hide a terminal employer rejection" do
+      job_posting.status = "ignored"
+      user_job = build_stubbed(:user_job_posting, status: "interview", outcome: "rejected")
+
+      result = described_class.call(job_posting: job_posting, user_job: user_job)
+
+      expect(result[:semantic]).to eq(:outcome_rejected)
+      expect(result[:label]).to eq("Rejected")
+    end
   end
 
   describe ".outcome" do
