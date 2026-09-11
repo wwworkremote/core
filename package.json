@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "1.0.0",
+  "version": "1.36.13",
   "description": "Bleeding-edge data acquisition engine and dashboard for remote job listings, powered by the \"Ultimate Rails Platform Stack.\"",
   "main": "index.js",
   "directories": {
@@ -22,7 +22,7 @@
   },
   "keywords": [],
   "author": "Mike Hall",
-  "license": "Proprietary",
+  "license": "AGPL-3.0-or-later",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/wwworkremote/core/issues"

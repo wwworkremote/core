@@ -60,6 +60,12 @@ success, stdout, stderr = run("ruby", scanner,
                               env: { "TMI_DENYLIST" => File.join(ROOT, "config/tmi_denylist.yml.example") })
 add.call("tmi_scan", success, (stdout + stderr).lines.first.to_s.strip)
 
+manifest_version = JSON.parse(File.read(File.join(ROOT, "extension/manifest.json"))).fetch("version")
+package_version = JSON.parse(File.read(File.join(ROOT, "package.json"))).fetch("version")
+application_version = File.read(File.join(ROOT, "config/application.rb"))[/VERSION = "([^"]+)"/, 1]
+versions = [application_version, manifest_version, package_version]
+add.call("version_alignment", versions.uniq.one?, versions.join(", "))
+
 passed = checks.all? { |check| check[:passed] }
 if JSON_OUTPUT
   puts JSON.generate(ok: passed, checks: checks)

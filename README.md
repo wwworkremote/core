@@ -41,6 +41,10 @@ WWWorkRemote is licensed under the [GNU Affero General Public License v3.0 or
 later](LICENSE). Personal data, credentials, and local configuration are
 excluded from the repository.
 
+The backend and browser extension release line is `1.36.13`. The running site
+also exposes its Git build fingerprint in the footer; the extension shows its
+manifest version in the panel header.
+
 ## 🛠️ Key Commands
 
 | Command | Purpose |
