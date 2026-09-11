@@ -14,7 +14,7 @@ For each branch, record exactly one outcome:
 Run the read-only audit before rewriting history:
 
 ```bash
-bin/audit_public_release --json
+bin/audit_public_release --json --strict-history
 ```
 
 The audit fails if any non-`main` local branch is not an ancestor of `main`.

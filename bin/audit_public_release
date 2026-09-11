@@ -2,13 +2,14 @@
 # frozen_string_literal: true
 
 # Public-release audit: bounded, read-only checks for a clean public snapshot.
-# Usage: bin/audit_public_release [--json]
+# Usage: bin/audit_public_release [--json] [--strict-history]
 
 require "json"
 require "open3"
 
 ROOT = File.expand_path("..", __dir__)
 JSON_OUTPUT = ARGV.delete("--json")
+STRICT_HISTORY = ARGV.delete("--strict-history")
 
 def run(*command, env: {})
   stdout, stderr, status = Open3.capture3(env, *command, chdir: ROOT)
@@ -31,8 +32,13 @@ add.call("working_tree", success && stdout.empty?, if success
                                                      "git status failed"
                                                    end)
 
-success, stdout, = run("git", "rev-list", "--count", "HEAD")
-add.call("history_depth", success && stdout.to_i == 1, success ? stdout.strip : "git history check failed")
+success, stdout, = run("git", "rev-list", "--count", "--max-parents=0", "HEAD")
+root_count = stdout.to_i
+commit_success, commit_stdout, = run("git", "rev-list", "--count", "HEAD")
+commit_count = commit_stdout.to_i
+history_ok = success && commit_success && root_count == 1 && (!STRICT_HISTORY || commit_count == 1)
+history_detail = success ? "#{root_count} root, #{commit_count} commits" : "git history check failed"
+add.call("history", history_ok, history_detail)
 
 success, stdout, = run("git", "for-each-ref", "refs/heads", "--format=%(refname:short)")
 branches = stdout.lines.map(&:chomp).reject { |branch| branch == "main" }
