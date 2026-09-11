@@ -14,7 +14,7 @@ class CreatePgSearchDocuments < ActiveRecord::Migration[7.0]
   private
 
   # Vendored verbatim from the pg_search gem's own generator output.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_pg_search_documents_table
     say_with_time("Creating table for pg_search multisearch") do
       create_table :pg_search_documents do |t|
@@ -24,5 +24,4 @@ class CreatePgSearchDocuments < ActiveRecord::Migration[7.0]
       end
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

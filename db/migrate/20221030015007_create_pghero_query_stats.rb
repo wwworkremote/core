@@ -11,7 +11,7 @@ class CreatePgheroQueryStats < ActiveRecord::Migration[7.0]
   # Schema mirrors the pghero gem's own generator output verbatim --
   # deliberately no created_at/updated_at, since pghero itself queries
   # only the columns below.
-  # rubocop:disable Metrics/MethodLength, Rails/CreateTableWithTimestamps
+  # rubocop:disable-next Metrics/MethodLength, Rails/CreateTableWithTimestamps
   def create_pghero_query_stats_table
     create_table :pghero_query_stats do |t|
       t.text :database
@@ -23,5 +23,4 @@ class CreatePgheroQueryStats < ActiveRecord::Migration[7.0]
       t.timestamp :captured_at
     end
   end
-  # rubocop:enable Metrics/MethodLength, Rails/CreateTableWithTimestamps
 end

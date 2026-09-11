@@ -18,7 +18,7 @@ class CreateVersions < ActiveRecord::Migration[7.0]
 
   # Vendored verbatim from the paper_trail gem's own generator output --
   # splitting the column list further would diverge from PT's schema.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_versions_table
     create_table :versions do |t|
       t.string   :item_type, null: false
@@ -45,5 +45,4 @@ class CreateVersions < ActiveRecord::Migration[7.0]
       t.datetime :created_at
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

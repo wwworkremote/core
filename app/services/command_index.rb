@@ -28,7 +28,7 @@ class CommandIndex
 
   def self.build_entries
     Rails.application.routes.routes.filter_map { |route| entry_for(route) }
-                                   .sort_by { |entry| entry[:label] }
+         .sort_by { |entry| entry[:label] }
   end
   private_class_method :build_entries
 

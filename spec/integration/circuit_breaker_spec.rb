@@ -5,7 +5,7 @@ require "rails_helper"
 # This is a cross-cutting integration spec, not a spec for one class --
 # RSpec/DescribeClass's "describe the class under test" convention
 # doesn't apply.
-# rubocop:disable RSpec/DescribeClass
+# rubocop:disable-next RSpec/DescribeClass
 RSpec.describe "Distributed Circuit Breaker Integration" do
   include ApiGuard
 
@@ -72,4 +72,3 @@ RSpec.describe "Distributed Circuit Breaker Integration" do
     }.to change { source_locked?("geocoding") }.from(false).to(true)
   end
 end
-# rubocop:enable RSpec/DescribeClass

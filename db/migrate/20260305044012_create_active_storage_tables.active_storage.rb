@@ -18,7 +18,7 @@ class CreateActiveStorageTables < ActiveRecord::Migration[7.0]
     [primary_key_type, foreign_key_type]
   end
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_active_storage_blobs_table
     primary_key_type, = primary_and_foreign_key_types
 
@@ -40,9 +40,8 @@ class CreateActiveStorageTables < ActiveRecord::Migration[7.0]
       t.index [:key], unique: true
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_active_storage_attachments_table
     primary_key_type, foreign_key_type = primary_and_foreign_key_types
 
@@ -61,9 +60,8 @@ class CreateActiveStorageTables < ActiveRecord::Migration[7.0]
       t.foreign_key :active_storage_blobs, column: :blob_id
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_active_storage_variant_records_table
     primary_key_type, foreign_key_type = primary_and_foreign_key_types
 
@@ -75,5 +73,4 @@ class CreateActiveStorageTables < ActiveRecord::Migration[7.0]
       t.foreign_key :active_storage_blobs, column: :blob_id
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

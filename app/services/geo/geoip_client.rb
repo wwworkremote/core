@@ -2,7 +2,7 @@
 
 require "maxmind/geoip2"
 
-# rubocop:disable Style/ClassAndModuleChildren
+# rubocop:disable-next Style/ClassAndModuleChildren
 module Geo
   class GeoipClient
     DEFAULT_DB_DIR = "data/maxmind"
@@ -113,4 +113,3 @@ module Geo
     end
   end
 end
-# rubocop:enable Style/ClassAndModuleChildren

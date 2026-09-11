@@ -54,7 +54,7 @@ class RailsJobBoard::Fetcher
 
   # One cohesive find_or_create_by! call -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def store_document(job_data, source, query)
     signature = "rubyonrails-#{job_data['guid']}"
 
@@ -64,5 +64,4 @@ class RailsJobBoard::Fetcher
       doc.document = job_data.to_json
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

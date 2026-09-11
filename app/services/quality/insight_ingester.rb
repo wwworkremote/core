@@ -64,11 +64,10 @@ class Quality::InsightIngester
 
   # update_all deliberately skips validations/callbacks -- this is a bulk
   # flag flip on prior insights, not a domain mutation that needs them.
-  # rubocop:disable Rails/SkipsModelValidations
+  # rubocop:disable-next Rails/SkipsModelValidations
   def self.deactivate(tool, file_paths)
     SystemInsight.public_send(tool).where(file_path: file_paths).update_all(active: false)
   end
-  # rubocop:enable Rails/SkipsModelValidations
 
   def self.create_insight(**attrs)
     SystemInsight.create!(**attrs, active: true)

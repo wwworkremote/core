@@ -11,16 +11,15 @@ module ApplicationHelper
 
     # Safe: filter_html: true strips raw HTML from the source before
     # Redcarpet renders it, so the output here is sanitized markdown.
-    # rubocop:disable Rails/OutputSafety
+    # rubocop:disable-next Rails/OutputSafety
     markdown.render(text).html_safe
-    # rubocop:enable Rails/OutputSafety
   end
 
   private
 
   # One cohesive options hash -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def markdown_render_options
     {
       filter_html: true,
@@ -29,11 +28,10 @@ module ApplicationHelper
                          class: "text-violet-400 hover:text-violet-300 underline underline-offset-4" }
     }
   end
-  # rubocop:enable Metrics/MethodLength
 
   # One cohesive extensions hash -- splitting it further would obscure
   # it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def markdown_extensions
     {
       autolink: true,
@@ -44,5 +42,4 @@ module ApplicationHelper
       tables: true
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end

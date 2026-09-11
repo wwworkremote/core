@@ -7,7 +7,7 @@ class Api::V0::ApplicationContextsController < ApiController
     render json: context_payload
   end
 
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:disable-next Metrics/AbcSize, Metrics/MethodLength
   def update
     context = Resume::PersonaContext.call(params.expect(:persona_id))
     record = tracked_record
@@ -18,7 +18,6 @@ class Api::V0::ApplicationContextsController < ApiController
   rescue KeyError => e
     render json: { success: false, error: e.message }, status: :unprocessable_content
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   private
 

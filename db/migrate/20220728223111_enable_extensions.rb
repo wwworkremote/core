@@ -13,7 +13,7 @@ class EnableExtensions < ActiveRecord::Migration[7.0]
 
   # One cohesive list of extensions this app depends on -- splitting it
   # further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def enable_required_extensions
     enable_extension "citext"
     enable_extension "hstore"
@@ -25,5 +25,4 @@ class EnableExtensions < ActiveRecord::Migration[7.0]
     enable_extension "sslinfo"
     enable_extension "fuzzystrmatch"
   end
-  # rubocop:enable Metrics/MethodLength
 end

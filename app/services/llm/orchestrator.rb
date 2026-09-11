@@ -9,7 +9,7 @@ class LLM::Orchestrator
   # app/services, app/jobs, app/agents) -- wrapping them in a parameter
   # object would be the textbook Sandi Metz move, but that's an API change
   # rippling through every caller, out of scope for this internal cleanup.
-  # rubocop:disable Metrics/ParameterLists, Metrics/MethodLength
+  # rubocop:disable-next Metrics/ParameterLists, Metrics/MethodLength
   def initialize(untrusted_text:, chat: nil, agent: nil, system_rules: nil, task_instructions: nil, schema: nil,
                  model: nil, metadata: {})
     @untrusted_text = untrusted_text
@@ -21,7 +21,6 @@ class LLM::Orchestrator
     @model = resolve_model(model)
     @metadata = metadata || {}
   end
-  # rubocop:enable Metrics/ParameterLists, Metrics/MethodLength
 
   def call(&block)
     return format_failure("No model provided or found in registry") unless @model

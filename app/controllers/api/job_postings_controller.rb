@@ -37,7 +37,7 @@ class Api::JobPostingsController < ApplicationController
     )
   end
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def extracted
     return {} if params[:extracted].blank?
 
@@ -59,7 +59,6 @@ class Api::JobPostingsController < ApplicationController
       attrs["apply_url"] ||= attrs["canonical_url"].presence || params[:url].presence
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def apply_enrichment!
     attrs = JobPostingEnrichment::AttributeBuilder.new(job_posting, extracted, markdown_body).call

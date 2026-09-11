@@ -17,7 +17,7 @@ class LLM::Registry
 
   # One cohesive find_or_create_by! block -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def self.sync_model(model_id, attrs)
     m = Model.find_or_create_by!(provider: attrs["provider"], model_id: model_id) do |m|
       m.name = attrs["name"]
@@ -27,7 +27,6 @@ class LLM::Registry
     end
     Rails.logger.info "[Registry] Synced model: #{m.model_id}"
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   def self.default_model_id
     @default_model_id ||= YAML.load_file(CONFIG_PATH).dig("defaults", "primary")

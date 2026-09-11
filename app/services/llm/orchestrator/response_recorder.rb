@@ -27,7 +27,7 @@ class LLM::Orchestrator::ResponseRecorder
 
   # One cohesive create! call -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def persist_assistant_message(full_output)
     @chat.llm_messages.create!(
       role: "assistant",
@@ -38,7 +38,6 @@ class LLM::Orchestrator::ResponseRecorder
       cached_tokens: @message.cached_tokens
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   def record_usage_attributes
     set_attribute("app.llm.input_tokens", @message.input_tokens)

@@ -18,7 +18,7 @@ LLAMA_BASE = ENV.fetch("OLLAMA_API_BASE", "http://127.0.0.1:11500/v1").sub(%r{/v
 
 # Covers multiple classes against a live inference server, not one
 # class under test -- RSpec/DescribeClass doesn't apply.
-# rubocop:disable RSpec/DescribeClass
+# rubocop:disable-next RSpec/DescribeClass
 RSpec.describe "llama.cpp live integration", :live do
   # ── Server sanity ──────────────────────────────────────────────────────────
 
@@ -104,4 +104,3 @@ RSpec.describe "llama.cpp live integration", :live do
     end
   end
 end
-# rubocop:enable RSpec/DescribeClass

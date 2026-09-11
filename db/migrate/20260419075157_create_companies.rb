@@ -10,7 +10,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_companies_table
     create_table :companies do |t|
       t.string :name
@@ -20,5 +20,4 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

@@ -35,7 +35,7 @@ class AddDashboardTablesToCore < ActiveRecord::Migration[7.1]
     end
   end
 
-  # rubocop:disable Metrics/MethodLength -- one cohesive table definition
+  # rubocop:disable-next Metrics/MethodLength -- one cohesive table definition
   def create_sources_table
     create_table :sources do |t|
       t.string :signature, null: false
@@ -46,9 +46,8 @@ class AddDashboardTablesToCore < ActiveRecord::Migration[7.1]
     end
     add_index :sources, :signature, unique: true
   end
-  # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize -- one cohesive table definition
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize -- one cohesive table definition
   def create_job_postings_table
     create_table :job_postings do |t|
       t.string :signature, null: false
@@ -66,7 +65,6 @@ class AddDashboardTablesToCore < ActiveRecord::Migration[7.1]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   # rubocop:disable Metrics/MethodLength -- one cohesive table definition
   def create_domains_table

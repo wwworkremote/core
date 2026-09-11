@@ -52,7 +52,7 @@ RSpec.describe JobFetchers::PageFetch do
   # chain (playwright -> chromium -> browser -> context -> page ->
   # interceptor) is what's actually being driven; consolidating the
   # doubles would hide that shape, not simplify it.
-  # rubocop:disable RSpec/VerifiedDoubles, RSpec/MultipleMemoizedHelpers
+  # rubocop:disable-next RSpec/VerifiedDoubles, RSpec/MultipleMemoizedHelpers
   describe "#call falling through to Playwright" do
     let(:mock_playwright) { double("Playwright") }
     let(:mock_chromium) { double("Chromium") }
@@ -98,5 +98,4 @@ RSpec.describe JobFetchers::PageFetch do
       expect(fetcher.call).to be_nil
     end
   end
-  # rubocop:enable RSpec/VerifiedDoubles, RSpec/MultipleMemoizedHelpers
 end

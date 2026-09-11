@@ -3,7 +3,7 @@
 class CreateApplicationQuestions < ActiveRecord::Migration[8.1]
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def change
     create_table :application_questions do |t|
       t.references :job_posting, null: false, foreign_key: true
@@ -14,5 +14,4 @@ class CreateApplicationQuestions < ActiveRecord::Migration[8.1]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

@@ -29,7 +29,7 @@ class Guardrails::Pipeline
 
   # One cohesive value-object construction -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def build_result(sanitized_text, findings, classification)
     Guardrails::Result.new(
       allowed: classification[:disposition] != "block",
@@ -39,5 +39,4 @@ class Guardrails::Pipeline
       disposition: classification[:disposition]
     )
   end
-  # rubocop:enable Metrics/MethodLength
 end

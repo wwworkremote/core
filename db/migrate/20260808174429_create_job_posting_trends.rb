@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/MethodLength
+# rubocop:disable-next Metrics/MethodLength
 class CreateJobPostingTrends < ActiveRecord::Migration[8.1]
   def change
     create_table :job_posting_trends do |t|
@@ -14,4 +14,3 @@ class CreateJobPostingTrends < ActiveRecord::Migration[8.1]
                                                                name: "index_job_posting_trends_on_week_and_family"
   end
 end
-# rubocop:enable Metrics/MethodLength

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+# rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
 class CreateLeads < ActiveRecord::Migration[8.1]
   def change
     create_table :leads do |t|
@@ -25,4 +25,3 @@ class CreateLeads < ActiveRecord::Migration[8.1]
     add_index :leads, :discovery, using: :gin, opclass: :jsonb_path_ops
   end
 end
-# rubocop:enable Metrics/MethodLength, Metrics/AbcSize

@@ -18,7 +18,7 @@ class Admin::JobsController::Dashboard
 
   # 5 named steps + explicit self (needed since the last assign_* method's
   # own return value isn't this object) -- already the decomposed form;
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def call
     assign_queue_counts
     assign_scheduler_info
@@ -27,7 +27,6 @@ class Admin::JobsController::Dashboard
     assign_job_lists
     self
   end
-  # rubocop:enable Metrics/MethodLength
 
   private
 

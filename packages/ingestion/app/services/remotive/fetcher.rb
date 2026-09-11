@@ -30,7 +30,7 @@ class Remotive::Fetcher
 
   # One cohesive find_or_create_by! call -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def store_document(job, source, query)
     signature = Digest::SHA256.hexdigest("remotive-#{job['id']}")
 
@@ -40,5 +40,4 @@ class Remotive::Fetcher
       doc.document = job.to_json
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

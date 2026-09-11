@@ -4,7 +4,7 @@ require "rails_helper"
 
 # Cross-cutting integration audit spanning multiple providers/classes, not a
 # unit spec of one class -- a string description is the honest one here.
-# rubocop:disable RSpec/DescribeClass
+# rubocop:disable-next RSpec/DescribeClass
 RSpec.describe "External Ingestion Integrity" do
   let(:providers) { %w[indeed linkedin adzuna glassdoor dice remotive wwr arbeitnow] }
 
@@ -27,4 +27,3 @@ RSpec.describe "External Ingestion Integrity" do
     end
   end
 end
-# rubocop:enable RSpec/DescribeClass

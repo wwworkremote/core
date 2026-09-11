@@ -3,7 +3,7 @@
 class CreateModels < ActiveRecord::Migration[8.0]
   # Column and index list is one cohesive table definition -- splitting it
   # further would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def change
     create_table :models do |t|
       t.string :model_id, null: false
@@ -30,5 +30,4 @@ class CreateModels < ActiveRecord::Migration[8.0]
       t.index :modalities, using: :gin
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

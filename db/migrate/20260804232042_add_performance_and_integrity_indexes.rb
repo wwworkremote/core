@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+# rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
 class AddPerformanceAndIntegrityIndexes < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
@@ -48,4 +48,3 @@ class AddPerformanceAndIntegrityIndexes < ActiveRecord::Migration[8.1]
     remove_index :domains, :root_domain_id, algorithm: :concurrently, if_exists: true
   end
 end
-# rubocop:enable Metrics/MethodLength, Metrics/AbcSize

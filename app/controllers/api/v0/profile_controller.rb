@@ -9,7 +9,8 @@ class Api::V0::ProfileController < ApiController
     user = User.first
     profile = user.career_profile || user.create_career_profile!
     contact = (profile.contact_info || {}).deep_dup
-    permitted = params.expect(profile: %i[first_name middle_name last_name preferred_name email address_line1 postal_code phone_country_code phone_area_code phone_number])
+    permitted = params.expect(profile: %i[first_name middle_name last_name preferred_name email address_line1
+                                          postal_code phone_country_code phone_area_code phone_number])
     %i[email address_line1 postal_code phone_country_code phone_area_code phone_number].each do |key|
       contact[key.to_s] = permitted[key] if permitted.key?(key)
     end

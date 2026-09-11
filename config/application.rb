@@ -20,7 +20,7 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-# rubocop:disable Style/ClassAndModuleChildren
+# rubocop:disable-next Style/ClassAndModuleChildren
 module WwworkRemote
   class Application < Rails::Application # :nodoc:
     # Initialize configuration defaults for Rails 8.1.
@@ -86,4 +86,3 @@ module WwworkRemote
     end
   end
 end
-# rubocop:enable Style/ClassAndModuleChildren

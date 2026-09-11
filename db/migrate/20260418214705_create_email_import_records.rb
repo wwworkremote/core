@@ -11,7 +11,7 @@ class CreateEmailImportRecords < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_email_import_records_table
     create_table :email_import_records do |t|
       t.string :message_id
@@ -25,5 +25,4 @@ class CreateEmailImportRecords < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

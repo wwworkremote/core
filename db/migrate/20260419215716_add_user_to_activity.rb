@@ -25,7 +25,7 @@ class AddUserToActivity < ActiveRecord::Migration[8.0]
 
   # One cohesive backfill of the same id across 3 tables -- splitting it
   # further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def backfill_user_id_for_first_user
     first_user = User.first
     return unless first_user
@@ -36,5 +36,4 @@ class AddUserToActivity < ActiveRecord::Migration[8.0]
       execute "UPDATE company_pipeline_steps SET user_id = #{first_user.id}"
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

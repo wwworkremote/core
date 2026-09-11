@@ -9,7 +9,7 @@ class CreateCareerProfiles < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_career_profiles_table
     create_table :career_profiles do |t|
       t.references :user, null: false, foreign_key: true
@@ -21,5 +21,4 @@ class CreateCareerProfiles < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

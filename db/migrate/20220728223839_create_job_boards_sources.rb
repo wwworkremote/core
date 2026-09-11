@@ -10,7 +10,7 @@ class CreateJobBoardsSources < ActiveRecord::Migration[7.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_job_boards_sources_table
     create_table(:job_boards_sources) do |t|
       t.string :name, null: false
@@ -23,5 +23,4 @@ class CreateJobBoardsSources < ActiveRecord::Migration[7.0]
       t.datetime "updated_at", precision: 6, default: -> { "CURRENT_TIMESTAMP" }, null: false
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

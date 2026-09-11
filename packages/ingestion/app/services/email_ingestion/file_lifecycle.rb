@@ -18,7 +18,7 @@ class EmailIngestion::FileLifecycle
 
   private
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def move_to(subdir)
     return unless File.exist?(@file_path)
 
@@ -29,7 +29,6 @@ class EmailIngestion::FileLifecycle
     FileUtils.move(@file_path, target_path)
     target_path
   end
-  # rubocop:enable Metrics/MethodLength
 
   def target_directory(subdir)
     base_dir = File.dirname(@file_path, 2)

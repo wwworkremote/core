@@ -3,7 +3,7 @@
 class CreateJobRuns < ActiveRecord::Migration[8.1]
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def change
     create_table :job_runs do |t|
       t.string :job_class, null: false
@@ -21,5 +21,4 @@ class CreateJobRuns < ActiveRecord::Migration[8.1]
     add_index :job_runs, %i[status created_at]
     add_index :job_runs, %i[job_class created_at]
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

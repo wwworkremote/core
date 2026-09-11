@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateApplicationFieldObservations < ActiveRecord::Migration[7.1]
   def change
     create_table :application_field_observations do |t|
@@ -15,7 +17,7 @@ class CreateApplicationFieldObservations < ActiveRecord::Migration[7.1]
       t.timestamps
     end
     add_index :application_field_observations, %i[user_job_posting_id field_key], unique: true,
-              name: "idx_app_observations_on_app_and_key"
+                                                                                  name: "idx_app_observations_on_app_and_key"
     add_index :application_field_observations, %i[question_kind normalized_prompt],
               name: "idx_app_observations_on_kind_and_prompt"
   end

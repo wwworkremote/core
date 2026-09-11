@@ -15,7 +15,7 @@ class LLMChatResponseJob < ApplicationJob
 
   # Use Orchestrator for guardrails, safety, and streaming. Orchestrator
   # now handles placeholder creation and internal streaming broadcasts.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def request_response(llm_chat, content)
     LLM::Orchestrator.call(
       untrusted_text: content,
@@ -26,7 +26,6 @@ class LLMChatResponseJob < ApplicationJob
       metadata: { llm_chat_id: llm_chat.id }
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   def handle_result(llm_chat, result)
     return broadcast_final_message(llm_chat) if result[:success]

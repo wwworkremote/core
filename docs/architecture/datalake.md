@@ -135,7 +135,7 @@ data/datalake/                      # git-ignored, machine-local, never synced
 ```
 Datalake::Bundle          # manifest + asset bytes for one session_token, READ-ONLY
 Datalake::Extractor       # base: key / version / extract(bundle) / stale?(stamp)
-  Datalake::Extractors::…  # one subclass per consumer (none yet)
+Datalake::Extractors.… # one subclass per consumer (none yet)
 ```
 
 **Built (the contract surface):** `Datalake::Bundle` (`GuidedSession#datalake_bundle`,

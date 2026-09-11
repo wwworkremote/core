@@ -6,14 +6,16 @@ class Api::V0::ApplicationAnswerTemplatesController < ApiController
   end
 
   def create
-    attrs = params.expect(application_answer_template: %i[persona_id question_kind normalized_prompt prompt answer source enabled])
+    attrs = params.expect(application_answer_template: %i[persona_id question_kind normalized_prompt prompt answer
+                                                          source enabled])
     template = current_api_user.application_answer_templates.create(attrs)
     template.persisted? ? render(json: { success: true, template: template }) : render_errors(template)
   end
 
   def update
     template = current_api_user.application_answer_templates.find(params.expect(:id))
-    template.update(params.expect(application_answer_template: %i[persona_id question_kind normalized_prompt prompt answer source enabled]))
+    template.update(params.expect(application_answer_template: %i[persona_id question_kind normalized_prompt prompt
+                                                                  answer source enabled]))
     template.errors.empty? ? render(json: { success: true, template: template }) : render_errors(template)
   end
 

@@ -26,7 +26,7 @@ class Adzuna::Fetcher
 
   # One cohesive params hash -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def request_params
     {
       app_id: ENV.fetch("ADZUNA_APPLICATION_ID", nil),
@@ -35,9 +35,8 @@ class Adzuna::Fetcher
       "content-type": "application/json"
     }
   end
-  # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def fetch_and_store(source)
     query = JobBoards::Query.find_or_create_by!(source_id: source.id)
     response = JobBoards::Client.new("adzuna").get(BASE_URL, request_params)
@@ -48,7 +47,6 @@ class Adzuna::Fetcher
 
     store_documents(results, source, query)
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   def parse_results(body)
     results = JSON.parse(body)["results"]
@@ -64,7 +62,7 @@ class Adzuna::Fetcher
 
   # One cohesive find_or_create_by! call -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def store_document(job, source, query)
     signature = Digest::SHA256.hexdigest("adzuna-#{job['id']}")
 
@@ -74,5 +72,4 @@ class Adzuna::Fetcher
       doc.document = job.to_json
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

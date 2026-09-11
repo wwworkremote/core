@@ -60,7 +60,7 @@ class JobBoards::DetailFetcher
 
   # Smart content extraction: try common job description containers, or
   # fall back to the full page body text.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def extract_description(browser)
     browser.evaluate("() => {
           const selectors = [
@@ -77,7 +77,6 @@ class JobBoards::DetailFetcher
           return document.body.innerText;
         }")
   end
-  # rubocop:enable Metrics/MethodLength
 
   def apply_enrichment(job, description)
     job.update!(body: normalize_body(description))

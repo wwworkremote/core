@@ -12,7 +12,7 @@ class CleanupDatabaseSchema < ActiveRecord::Migration[8.0]
 
   # Previously added with validate: false -- one cohesive list, splitting
   # it further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def validate_solid_queue_foreign_keys
     validate_foreign_key :solid_queue_blocked_executions, :solid_queue_jobs
     validate_foreign_key :solid_queue_ready_executions, :solid_queue_jobs
@@ -21,7 +21,6 @@ class CleanupDatabaseSchema < ActiveRecord::Migration[8.0]
     validate_foreign_key :solid_queue_failed_executions, :solid_queue_jobs
     validate_foreign_key :solid_queue_claimed_executions, :solid_queue_jobs
   end
-  # rubocop:enable Metrics/MethodLength
 
   def remove_redundant_indexes
     # Covered by index_models_on_provider_and_model_id

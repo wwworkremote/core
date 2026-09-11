@@ -18,7 +18,7 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
   # browser session -- splitting into separate examples would mean
   # re-establishing browser/DB state for each phase, obscuring the flow
   # rather than simplifying it.
-  # rubocop:disable RSpec/ExampleLength
+  # rubocop:disable-next RSpec/ExampleLength
   scenario "User synchronizes identity and analyzes a match" do
     # 1. Identity Synchronization
     # Mock YamlImporter to avoid absolute path dependency and slow sync
@@ -66,5 +66,4 @@ RSpec.describe "The Career Orchestration Loop", type: :system do
     expect(page).to have_text(job_posting.title)
     expect(page).to have_text(/High Match/i)
   end
-  # rubocop:enable RSpec/ExampleLength
 end

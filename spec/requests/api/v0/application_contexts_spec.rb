@@ -54,7 +54,7 @@ RSpec.describe "Api::V0::ApplicationContext" do
     expect(response.parsed_body).to include(
       "selected_persona_id" => "staff_platform",
       "field_answers" => contain_exactly(include("field_key" => "workday:email:0",
-                                                  "answer" => "candidate@example.com"))
+                                                 "answer" => "candidate@example.com"))
     )
     expect(UserJobPosting.last.status).to eq("applied")
   end

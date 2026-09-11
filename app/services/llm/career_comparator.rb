@@ -13,7 +13,7 @@ class LLM::CareerComparator
 
   # One cohesive orchestrator call -- splitting it further would obscure
   # it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def call
     return { success: false, error: "Need at least 2 jobs to compare." } if @job_postings.count < 2
 
@@ -23,7 +23,6 @@ class LLM::CareerComparator
       task_instructions: "Return a sharp, comparative analysis in markdown."
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   private
 

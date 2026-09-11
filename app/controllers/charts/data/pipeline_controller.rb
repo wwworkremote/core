@@ -18,7 +18,7 @@ class Charts::Data::PipelineController < ApplicationController
 
   # Processing distribution -- one cohesive hash literal, splitting it
   # further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def processing_funnel_counts
     {
       "Raw Documents" => JobBoards::Document.count,
@@ -27,5 +27,4 @@ class Charts::Data::PipelineController < ApplicationController
       "Vector Indexed" => JobPosting.where.not(embedding: nil).count
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end

@@ -10,7 +10,7 @@ class JobBoards::StrategyAgent < RubyLLM::Agent
 
   # One cohesive orchestrator call -- splitting it further would obscure
   # it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def call(job_posting, user_job_posting)
     result = LLM::Orchestrator.call(
       agent: self,
@@ -21,7 +21,6 @@ class JobBoards::StrategyAgent < RubyLLM::Agent
     persist_result(user_job_posting, result)
     result
   end
-  # rubocop:enable Metrics/MethodLength
 
   # LLM::Orchestrator#default_task_instructions calls this when a caller
   # doesn't pass task_instructions: explicitly -- admin-editable via
@@ -59,7 +58,7 @@ class JobBoards::StrategyAgent < RubyLLM::Agent
     ERB.new(File.read(path)).result(binding)
   end
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def strategy_schema
     {
       "resume_track" => String,
@@ -68,7 +67,6 @@ class JobBoards::StrategyAgent < RubyLLM::Agent
       "key_risks" => Array
     }
   end
-  # rubocop:enable Metrics/MethodLength
 
   def persist_result(user_job_posting, result)
     return unless result[:success]

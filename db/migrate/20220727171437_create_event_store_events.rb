@@ -12,7 +12,7 @@ class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
     ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
   end
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_postgres_event_store_tables
     create_table(:event_store_events_in_streams, id: :bigserial, force: false) do |t|
       t.string      :stream,      null: false
@@ -33,9 +33,8 @@ class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
       t.datetime    :valid_at,    null: true
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_generic_event_store_tables
     create_table(:event_store_events_in_streams, force: false) do |t|
       t.string      :stream,      null: false
@@ -56,7 +55,6 @@ class CreateEventStoreEvents < ActiveRecord::Migration[4.2]
       t.datetime    :valid_at,    null: true,  precision: 6
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   def add_event_store_events_indexes
     add_index :event_store_events, :event_id, unique: true

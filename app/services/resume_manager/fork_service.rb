@@ -14,7 +14,7 @@ class ResumeManager::ForkService
 
   # One cohesive create! call -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_fork(name, version)
     @resume.user.resumes.create!(
       name: name,
@@ -25,7 +25,6 @@ class ResumeManager::ForkService
       skills: @resume.skills
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   def calculate_next_version(name)
     latest_version = @resume.user.resumes.where(name: name).maximum(:version) || 0

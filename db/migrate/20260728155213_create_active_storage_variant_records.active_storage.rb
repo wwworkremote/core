@@ -11,7 +11,7 @@ class CreateActiveStorageVariantRecords < ActiveRecord::Migration[6.0]
   private
 
   # Use Active Record's configured type for primary key
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_active_storage_variant_records_table
     create_table :active_storage_variant_records, id: primary_key_type, if_not_exists: true do |t|
       t.belongs_to :blob, null: false, index: false, type: blobs_primary_key_type
@@ -21,7 +21,6 @@ class CreateActiveStorageVariantRecords < ActiveRecord::Migration[6.0]
       t.foreign_key :active_storage_blobs, column: :blob_id
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def primary_key_type
     config = Rails.configuration.generators

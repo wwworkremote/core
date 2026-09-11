@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateExtensionErrorEvents < ActiveRecord::Migration[7.1]
   def change
     create_table :extension_error_events do |t|

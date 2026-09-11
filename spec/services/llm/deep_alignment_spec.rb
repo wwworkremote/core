@@ -4,7 +4,7 @@ require "rails_helper"
 
 # Integration coverage across the LLM alignment pipeline, not a single
 # class -- RSpec/DescribeClass's convention doesn't apply.
-# rubocop:disable RSpec/DescribeClass
+# rubocop:disable-next RSpec/DescribeClass
 RSpec.describe "Deep AI Career Alignment (V2)" do
   let(:user) { User.create!(email: "tester@example.com", name: "Tester", password: "password") }
   let(:ruby_job) {
@@ -64,4 +64,3 @@ RSpec.describe "Deep AI Career Alignment (V2)" do
     end
   end
 end
-# rubocop:enable RSpec/DescribeClass

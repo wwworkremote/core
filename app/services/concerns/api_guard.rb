@@ -30,12 +30,11 @@ module ApiGuard
 
   # Mutator, not a query -- returns true to match with_api_guard's documented
   # success value, not to signal a yes/no question.
-  # rubocop:disable Naming/PredicateMethod
+  # rubocop:disable-next Naming/PredicateMethod
   def record_fetch(source_slug)
     ApiGuard.store.write("api_guard:#{source_slug}:last_fetched_at", Time.zone.now)
     true
   end
-  # rubocop:enable Naming/PredicateMethod
 
   def lock_source!(source_slug, duration: 1.hour)
     Rails.logger.warn "[ApiGuard] ⚡ Circuit Breaker Tripped for #{source_slug}. Locking for #{duration.inspect}."

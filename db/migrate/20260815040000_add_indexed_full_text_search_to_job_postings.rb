@@ -11,7 +11,7 @@
 # isn't a good fit for full-body search anyway -- tsearch (stemmed) and the
 # vector half of hybrid_search already cover body content. Title is short
 # enough that even a sequential scan on it is cheap (~26ms measured).
-# rubocop:disable Metrics/MethodLength
+# rubocop:disable-next Metrics/MethodLength
 class AddIndexedFullTextSearchToJobPostings < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
@@ -39,4 +39,3 @@ class AddIndexedFullTextSearchToJobPostings < ActiveRecord::Migration[8.1]
     end
   end
 end
-# rubocop:enable Metrics/MethodLength

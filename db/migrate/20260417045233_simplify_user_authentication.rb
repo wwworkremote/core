@@ -10,7 +10,7 @@ class SimplifyUserAuthentication < ActiveRecord::Migration[8.0]
 
   # One cohesive list of Devise columns being removed -- splitting it
   # further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def remove_devise_columns
     safety_assured do
       remove_column :users, :encrypted_password, :string, default: "", null: false
@@ -31,5 +31,4 @@ class SimplifyUserAuthentication < ActiveRecord::Migration[8.0]
       remove_column :users, :locked_at, :datetime
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

@@ -10,7 +10,7 @@ class CreateLLMMessages < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_llm_messages_table
     create_table :llm_messages do |t|
       t.string :role, null: false
@@ -26,5 +26,4 @@ class CreateLLMMessages < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

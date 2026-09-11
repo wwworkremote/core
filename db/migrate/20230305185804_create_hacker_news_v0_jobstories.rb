@@ -10,7 +10,7 @@ class CreateHackerNewsV0Jobstories < ActiveRecord::Migration[7.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_hacker_news_v0_jobstories_table
     create_table(:hacker_news_v0_jobstories, id: false) do |t|
       t.integer :id, null: false
@@ -25,5 +25,4 @@ class CreateHackerNewsV0Jobstories < ActiveRecord::Migration[7.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

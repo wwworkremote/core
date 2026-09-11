@@ -30,9 +30,8 @@ module JobPostingTrendRollup
     rows = counts.map { |(week_start, family), count| trend_row(week_start, family, count, now) }
     # Bulk upsert of derived aggregate counts, not user data -- no model
     # validations apply here.
-    # rubocop:disable Rails/SkipsModelValidations
+    # rubocop:disable-next Rails/SkipsModelValidations
     JobPostingTrend.upsert_all(rows, unique_by: :index_job_posting_trends_on_week_and_family)
-    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def self.trend_row(week_start, family, count, timestamp)

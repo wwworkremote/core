@@ -26,7 +26,7 @@ class Resume::PersonaContext
   # The snapshot intentionally gathers every source-backed section in one
   # value so the application can be reproduced after the canonical source
   # changes.
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:disable-next Metrics/AbcSize, Metrics/MethodLength
   def call(persona_id)
     persona = archetypes.fetch(persona_id.to_s) { raise KeyError, "Unknown resume persona: #{persona_id}" }
 
@@ -42,7 +42,6 @@ class Resume::PersonaContext
       "selected_projects" => resolve_ids(persona["selected_projects"])
     }
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   private
 

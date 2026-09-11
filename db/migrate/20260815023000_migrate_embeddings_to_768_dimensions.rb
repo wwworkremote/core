@@ -5,7 +5,7 @@
 # the original 3584-dim vectors. Existing embeddings are incompatible with
 # the new model's output space, not just a different size -- they must be
 # cleared and regenerated (see bin/reembed), not migrated in place.
-# rubocop:disable Metrics/MethodLength
+# rubocop:disable-next Metrics/MethodLength
 class MigrateEmbeddingsTo768Dimensions < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
@@ -33,4 +33,3 @@ class MigrateEmbeddingsTo768Dimensions < ActiveRecord::Migration[8.1]
     end
   end
 end
-# rubocop:enable Metrics/MethodLength

@@ -25,12 +25,11 @@ class Guardrails::OutputValidator
   # tests `pattern === element`, but this needs `element === @output` for
   # each pattern against one fixed string -- grep can't express that
   # reversed direction, so `select` stays.
-  # rubocop:disable Style/SelectByRegexp
+  # rubocop:disable-next Style/SelectByRegexp
   def pattern_findings
     FORBIDDEN_PATTERNS.select { |pattern| pattern.match?(@output) }
                       .map { |pattern| "Forbidden pattern detected in output: #{pattern.source}" }
   end
-  # rubocop:enable Style/SelectByRegexp
 
   # JSON validation if schema provided
   def schema_findings

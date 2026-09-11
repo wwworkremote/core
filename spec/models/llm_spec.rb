@@ -4,7 +4,7 @@ require "rails_helper"
 
 # Checks multiple model classes load, not one class under test --
 # RSpec/DescribeClass doesn't apply.
-# rubocop:disable RSpec/DescribeClass
+# rubocop:disable-next RSpec/DescribeClass
 RSpec.describe "LLM Models loading" do
   it "can load LLMChat" do
     expect { LLMChat }.not_to raise_error
@@ -18,4 +18,3 @@ RSpec.describe "LLM Models loading" do
     expect { Model }.not_to raise_error
   end
 end
-# rubocop:enable RSpec/DescribeClass

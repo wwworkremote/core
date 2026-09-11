@@ -2,7 +2,7 @@
 
 class CreateApplicationFieldAnswers < ActiveRecord::Migration[8.1]
   # One cohesive table definition; splitting it would obscure the schema.
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:disable-next Metrics/AbcSize, Metrics/MethodLength
   def change
     create_table :application_field_answers do |t|
       t.references :user_job_posting, null: false, foreign_key: true
@@ -19,5 +19,4 @@ class CreateApplicationFieldAnswers < ActiveRecord::Migration[8.1]
     add_index :application_field_answers, %i[user_job_posting_id field_key], unique: true,
                                                                              name: "idx_app_fields_on_app_and_key"
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 end

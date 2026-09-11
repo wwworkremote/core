@@ -37,7 +37,7 @@ class LLM::ProfileMatcher::PromptBuilder
   # would fragment a single prompt into unreadable pieces for no real
   # simplification, so the AbcSize overage here is accepted rather than
   # mechanically chased.
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable-next Metrics/AbcSize
   def default_prompt
     <<~PROMPT
       [SYSTEM_OBJECTIVE]
@@ -78,7 +78,6 @@ class LLM::ProfileMatcher::PromptBuilder
       6. **INTERVIEW_PREP**: 3 custom technical questions they will likely ask, and the 'STAR' method responses the user should give based on their experience.
     PROMPT
   end
-  # rubocop:enable Metrics/AbcSize
 
   def experiences_context
     top_experiences.map { |exp| experience_block(exp) }.join("\n\n")

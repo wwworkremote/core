@@ -13,7 +13,7 @@ class Arbeitnow::Fetcher
 
   private
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def fetch_and_store(source)
     query = JobBoards::Query.find_or_create_by!(source_id: source.id)
     response = JobBoards::Client.new("arbeitnow").get(API_URL)
@@ -23,7 +23,6 @@ class Arbeitnow::Fetcher
     store_documents(jobs, source, query)
     Rails.logger.info "Arbeitnow: Fetched #{jobs.count} jobs."
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   def store_documents(jobs, source, query)
     jobs.each { |job_data| store_document(job_data, source, query) }
@@ -31,7 +30,7 @@ class Arbeitnow::Fetcher
 
   # One cohesive find_or_create_by! call -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def store_document(job_data, source, query)
     signature = "arbeitnow-#{job_data['slug']}"
 
@@ -41,5 +40,4 @@ class Arbeitnow::Fetcher
       doc.document = job_data.to_json
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

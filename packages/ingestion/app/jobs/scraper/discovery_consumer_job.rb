@@ -11,7 +11,7 @@ class Scraper::DiscoveryConsumerJob < ApplicationJob
 
   private
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def process_link(link)
     check_cancellation!
     link.update!(status: "processing")
@@ -23,7 +23,6 @@ class Scraper::DiscoveryConsumerJob < ApplicationJob
       link.update!(status: "error", error_message: e.message)
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   # Only Enricher's create_*_job_posting paths set status "processed" --
   # matches the last_ingested_at convention used by ServiceRunner/Syncer

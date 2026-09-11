@@ -13,7 +13,7 @@ class EmailIngestion::MessageParser
 
   private
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def mail_attributes(mail)
     {
       message_id: mail.message_id,
@@ -25,7 +25,6 @@ class EmailIngestion::MessageParser
       headers: mail.headers.to_h
     }
   end
-  # rubocop:enable Metrics/MethodLength
 
   def extract_text_body(mail)
     return mail.body.decoded if mail.mime_type == "text/plain"

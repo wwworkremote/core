@@ -9,7 +9,7 @@ class CreateWorkExperiences < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_work_experiences_table
     create_table :work_experiences do |t|
       t.references :career_profile, null: false, foreign_key: true
@@ -29,5 +29,4 @@ class CreateWorkExperiences < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

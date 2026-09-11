@@ -9,7 +9,7 @@ class CreateExtractionRuleObservations < ActiveRecord::Migration[8.1]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_extraction_rule_observations_table
     create_table :extraction_rule_observations do |t|
       t.string :provider, null: false
@@ -24,5 +24,4 @@ class CreateExtractionRuleObservations < ActiveRecord::Migration[8.1]
 
     add_index :extraction_rule_observations, %i[provider field_name]
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end

@@ -24,7 +24,7 @@ class LLM::CompanyAuditor
 
   # One cohesive orchestrator call -- splitting it further would obscure
   # it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def request_audit
     LLM::Orchestrator.call(
       untrusted_text: audit_prompt,
@@ -33,7 +33,6 @@ class LLM::CompanyAuditor
       task_instructions: "Return JSON only. Be clinical and accurate."
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   def handle_result(result)
     return { success: false, error: result[:error] } unless result[:success]
@@ -50,7 +49,7 @@ class LLM::CompanyAuditor
 
   # One cohesive update! call -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def apply_audit(parsed)
     return unless parsed
 
@@ -64,7 +63,6 @@ class LLM::CompanyAuditor
       )
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   # Admin-editable via PipelinePrompt (key: "company_auditor"); falls back
   # to #default_audit_prompt when no active override exists.

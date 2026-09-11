@@ -10,9 +10,8 @@ RSpec.describe Resume::SemanticMatchFinder do
     it "returns an empty array if career_profile has no embedding" do
       # update_column deliberately -- bypasses validation/callbacks to set
       # up the "no embedding" state directly, without re-triggering embedding generation.
-      # rubocop:disable Rails/SkipsModelValidations
+      # rubocop:disable-next Rails/SkipsModelValidations
       career_profile.update_column(:embedding, nil)
-      # rubocop:enable Rails/SkipsModelValidations
       expect(described_class.call(career_profile)).to eq([])
     end
 

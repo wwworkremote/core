@@ -9,7 +9,7 @@ class AddIntelligenceToCompanies < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive change_table block -- splitting it
   # further would obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def add_company_intelligence_columns
     change_table :companies, bulk: true do |t|
       t.jsonb :glassdoor_data
@@ -18,5 +18,4 @@ class AddIntelligenceToCompanies < ActiveRecord::Migration[8.0]
       t.boolean :toxic_culture_flag, default: false, null: false
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

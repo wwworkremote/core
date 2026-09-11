@@ -30,7 +30,7 @@ class HackerNews::Backfill
 
   # One cohesive find_or_create_by! call -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def store_hit(hit, source, query)
     signature = Digest::SHA256.hexdigest("hn-#{hit['objectID']}")
 
@@ -40,10 +40,9 @@ class HackerNews::Backfill
       doc.document = hit_attributes(hit).to_json
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   # Transform Algolia format to match Firebase format as much as possible for the Syncer
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def hit_attributes(hit)
     {
       id: hit["objectID"],
@@ -55,5 +54,4 @@ class HackerNews::Backfill
       type: "job"
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end

@@ -35,14 +35,13 @@ class JobBoards::Syncer::EditShield
   # increment!/touch deliberately skip validations here: this is a
   # lightweight counter/timestamp bump on an already-valid, already-saved
   # record, not a change worth re-validating.
-  # rubocop:disable Rails/SkipsModelValidations
+  # rubocop:disable-next Rails/SkipsModelValidations
   def apply_reseen!
     @job_posting.increment!(:seen_count)
     @job_posting.touch(:updated_at)
     mark_processed
     true
   end
-  # rubocop:enable Rails/SkipsModelValidations
 
   # A user-purged posting is never reactivated by a resync.
   def apply_purged!

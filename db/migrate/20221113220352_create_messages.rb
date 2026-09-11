@@ -10,7 +10,7 @@ class CreateMessages < ActiveRecord::Migration[7.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_messages_table
     create_table(:messages, id: :bigserial, force: false) do |t|
       t.string :subject, null: false
@@ -20,5 +20,4 @@ class CreateMessages < ActiveRecord::Migration[7.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

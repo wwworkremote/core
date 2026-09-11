@@ -3,10 +3,8 @@
 class Api::V0::ApplicationInsightsController < ApiController
   def index
     observations = current_api_user.user_job_postings.joins(:application_field_observations)
-                   .merge(ApplicationFieldObservation.order(:question_kind, :normalized_prompt))
-    if params[:job_posting_id].present?
-      observations = observations.where(job_posting_id: params[:job_posting_id])
-    end
+                                   .merge(ApplicationFieldObservation.order(:question_kind, :normalized_prompt))
+    observations = observations.where(job_posting_id: params[:job_posting_id]) if params[:job_posting_id].present?
 
     rows = observations.group(:question_kind, :normalized_prompt).count
     render json: { success: true, total_questions: observations.count,

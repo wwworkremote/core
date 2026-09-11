@@ -14,7 +14,7 @@ class Ingestion::AdapterRegistry
 
   # One cohesive hash literal -- splitting it further would obscure it,
   # not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def self.adapter_entry(slug, adapter_class, config)
     {
       class: adapter_class,
@@ -23,7 +23,6 @@ class Ingestion::AdapterRegistry
       type: config[:type] || "Standard"
     }
   end
-  # rubocop:enable Metrics/MethodLength
 
   def self.all
     @adapters

@@ -26,7 +26,7 @@ class Scraper::DocumentImporter
 
   # Mutator, not a predicate -- the boolean return (imported vs. skipped as a
   # duplicate) is incidental, used by #call to count actually-imported rows.
-  # rubocop:disable Naming/PredicateMethod
+  # rubocop:disable-next Naming/PredicateMethod
   def import!(job_data)
     doc = JobBoards::Document.find_or_initialize_by(signature: signature(job_data))
     return false unless doc.new_record?
@@ -34,7 +34,6 @@ class Scraper::DocumentImporter
     persist!(doc, job_data)
     true
   end
-  # rubocop:enable Naming/PredicateMethod
 
   def persist!(doc, job_data)
     doc.source_id = @source&.id

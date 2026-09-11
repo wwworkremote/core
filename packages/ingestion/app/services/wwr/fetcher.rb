@@ -30,7 +30,7 @@ class Wwr::Fetcher
 
   # One cohesive find_or_create_by! call -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def store_entry(entry, source, query)
     signature = Digest::SHA256.hexdigest("wwr-#{entry.entry_id}")
 
@@ -40,9 +40,8 @@ class Wwr::Fetcher
       doc.document = entry_attributes(entry).to_json
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def entry_attributes(entry)
     {
       title: entry.title,
@@ -53,5 +52,4 @@ class Wwr::Fetcher
       summary: entry.summary
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end

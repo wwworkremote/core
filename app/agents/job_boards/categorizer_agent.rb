@@ -5,7 +5,7 @@ class JobBoards::CategorizerAgent < RubyLLM::Agent
 
   # One cohesive orchestrator call -- splitting it further would obscure
   # it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def call(job_posting)
     # We delegate to the orchestrator to wrap this agent in guardrails
     LLM::Orchestrator.call(
@@ -15,7 +15,6 @@ class JobBoards::CategorizerAgent < RubyLLM::Agent
       metadata: { "job_posting_id" => job_posting.id }
     )
   end
-  # rubocop:enable Metrics/MethodLength
 
   # LLM::Orchestrator#default_task_instructions calls this when a caller
   # doesn't pass task_instructions: explicitly (see #call above) -- this
@@ -36,7 +35,7 @@ class JobBoards::CategorizerAgent < RubyLLM::Agent
 
   # One cohesive schema definition -- splitting it further would
   # obscure it, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def categorization_schema
     {
       "category" => String,
@@ -48,5 +47,4 @@ class JobBoards::CategorizerAgent < RubyLLM::Agent
       "currency" => String
     }
   end
-  # rubocop:enable Metrics/MethodLength
 end

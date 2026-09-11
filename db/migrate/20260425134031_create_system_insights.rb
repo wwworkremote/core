@@ -13,7 +13,7 @@ class CreateSystemInsights < ActiveRecord::Migration[8.0]
   # migration's history. A real fix would be a new migration.
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Rails/ThreeStateBooleanColumn, Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Rails/ThreeStateBooleanColumn, Metrics/MethodLength, Metrics/AbcSize
   def create_system_insights_table
     create_table :system_insights do |t|
       t.integer :tool
@@ -28,7 +28,6 @@ class CreateSystemInsights < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Rails/ThreeStateBooleanColumn, Metrics/MethodLength, Metrics/AbcSize
 
   def add_system_insights_indexes
     add_index :system_insights, :file_path

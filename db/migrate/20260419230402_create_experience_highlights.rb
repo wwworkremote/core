@@ -9,7 +9,7 @@ class CreateExperienceHighlights < ActiveRecord::Migration[8.0]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_experience_highlights_table
     create_table :experience_highlights do |t|
       t.references :work_experience, null: false, foreign_key: true
@@ -19,5 +19,4 @@ class CreateExperienceHighlights < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

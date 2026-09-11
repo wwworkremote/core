@@ -11,7 +11,7 @@ RSpec.describe Scraper::ApplicationAgent do
   # 5 doubles model a genuine 5-level Playwright API chain (playwright ->
   # chromium -> browser -> page -> element) -- consolidating them would
   # hide that chain's real shape, not simplify it.
-  # rubocop:disable RSpec/MultipleMemoizedHelpers
+  # rubocop:disable-next RSpec/MultipleMemoizedHelpers
   describe ".call" do
     # Playwright's real API is generated per-session over an RPC channel
     # (define_channel_owner), not discoverable via reflection ahead of a
@@ -48,5 +48,4 @@ RSpec.describe Scraper::ApplicationAgent do
     end
     # rubocop:enable RSpec/VerifiedDoubles
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers
 end

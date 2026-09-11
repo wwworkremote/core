@@ -8,7 +8,7 @@ class AddDeviseToUsers < ActiveRecord::Migration[7.0]
 
   # Column list is one cohesive table alteration -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def self.add_devise_columns
     change_table :users, bulk: true do |t|
       ## Database authenticatable
@@ -44,7 +44,6 @@ class AddDeviseToUsers < ActiveRecord::Migration[7.0]
       # t.timestamps null: false
     end
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   def self.add_devise_indexes
     # add_index :users, :email,                unique: true

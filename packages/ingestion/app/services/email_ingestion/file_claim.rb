@@ -7,7 +7,7 @@ class EmailIngestion::FileClaim
     @checksum = checksum
   end
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def call
     EmailImportRecord.transaction do
       existing = EmailImportRecord.find_by(file_checksum: @checksum)
@@ -16,7 +16,6 @@ class EmailIngestion::FileClaim
       nil
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   private
 
@@ -28,7 +27,7 @@ class EmailIngestion::FileClaim
     record
   end
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_record
     EmailImportRecord.create!(
       file_path: @file_path,
@@ -37,5 +36,4 @@ class EmailIngestion::FileClaim
       status: "pending"
     )
   end
-  # rubocop:enable Metrics/MethodLength
 end

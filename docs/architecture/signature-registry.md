@@ -129,10 +129,10 @@ Declarative, not a database table — a plain Ruby constant living on
 
 ```ruby
 SIGNATURE_EXPECTATIONS = {
-  "linkedin"   => { "job_id" => :required },
+  "linkedin" => { "job_id" => :required },
   "greenhouse" => { "job_post_id" => :required, "ats_application_id" => :required_after_submit },
-  "indeed"     => { "job_key" => :required },
-  "workday"    => { "tenant_id" => :required, "candidate_id" => :optional }
+  "indeed" => { "job_key" => :required },
+  "workday" => { "tenant_id" => :required, "candidate_id" => :optional }
 }.freeze
 ```
 

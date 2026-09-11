@@ -81,7 +81,7 @@ RSpec.describe "Ingestion Pipeline Hardening" do
   # phase's assertions gating the next -- splitting into separate examples
   # would either re-run the full expensive setup per phase or hide the
   # temporal ordering that's the entire point of this system spec.
-  # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
+  # rubocop:disable-next RSpec/ExampleLength, RSpec/MultipleExpectations
   it "executes the full ingestion sequence from UI trigger to Enriched JobPosting" do
     # Phase A: Trigger Ingestion via UI
     visit data_fetchers_path
@@ -127,5 +127,4 @@ RSpec.describe "Ingestion Pipeline Hardening" do
     expect(page).to have_text(/Senior Ruby Engineer/i)
     expect(page).to have_text(/Test Corp/i)
   end
-  # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
 end

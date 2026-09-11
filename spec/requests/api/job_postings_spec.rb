@@ -82,30 +82,30 @@ RSpec.describe "Api::JobPostings" do
         expect(job_posting.target_url).to eq("https://acme.example/apply")
       end
 
-    it "maps derived fields" do
-      expect(job_posting.published_at.to_date).to eq(Date.new(2026, 1, 2))
-      expect(job_posting.tags).to eq(%w[ruby rails postgres])
-    end
+      it "maps derived fields" do
+        expect(job_posting.published_at.to_date).to eq(Date.new(2026, 1, 2))
+        expect(job_posting.tags).to eq(%w[ruby rails postgres])
+      end
 
-    it "uses the current canonical posting URL when Apply URL is blank" do
-      canonical_url = "https://cengage.wd5.myworkdayjobs.com/CengageNorthAmericaCareers/job/United-States/Principal-Software-Engineer_R2026-711"
+      it "uses the current canonical posting URL when Apply URL is blank" do
+        canonical_url = "https://cengage.wd5.myworkdayjobs.com/CengageNorthAmericaCareers/job/United-States/Principal-Software-Engineer_R2026-711"
 
-      post enrich_api_job_posting_path(job_posting), params: {
-        provider: "workday",
-        url: "#{canonical_url}?wwwr_id=#{job_posting.id}",
-        extracted: {
-          title: "Principal Software Engineer",
-          company: "Cengage",
-          location: "United States",
-          description_text: "Principal posting body",
-          canonical_url: canonical_url
+        post enrich_api_job_posting_path(job_posting), params: {
+          provider: "workday",
+          url: "#{canonical_url}?wwwr_id=#{job_posting.id}",
+          extracted: {
+            title: "Principal Software Engineer",
+            company: "Cengage",
+            location: "United States",
+            description_text: "Principal posting body",
+            canonical_url: canonical_url
+          }
         }
-      }
 
-      expect(response).to be_successful
-      expect(job_posting.reload.target_url).to eq(canonical_url)
+        expect(response).to be_successful
+        expect(job_posting.reload.target_url).to eq(canonical_url)
+      end
     end
-  end
 
     it "merges known jsonb fields into the existing data column without clobbering it" do
       job_posting.update!(data: { "existing_key" => "kept" })

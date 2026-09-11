@@ -12,7 +12,7 @@ require "reverse_markdown"
 # and it's a flat table of 14 near-identical provider mappers -- scattering
 # those across 14 files would make "what does every provider map?" strictly
 # harder to answer for zero real decoupling benefit.
-# rubocop:disable Metrics/ClassLength
+# rubocop:disable-next Metrics/ClassLength
 class JobBoards::Syncer::AttributeMapper
   PROVIDER_MAPPERS = {
     "hackernews" => :map_hackernews,
@@ -271,4 +271,3 @@ class JobBoards::Syncer::AttributeMapper
     title.split(/\s+at\s+/).last&.strip
   end
 end
-# rubocop:enable Metrics/ClassLength

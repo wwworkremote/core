@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AddResumePersonaToUserJobPostings < ActiveRecord::Migration[8.1]
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def change
     safety_assured do
       change_table :user_job_postings, bulk: true do |t|
@@ -11,5 +11,4 @@ class AddResumePersonaToUserJobPostings < ActiveRecord::Migration[8.1]
       end
     end
   end
-  # rubocop:enable Metrics/MethodLength
 end

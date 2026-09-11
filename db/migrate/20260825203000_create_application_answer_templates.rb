@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateApplicationAnswerTemplates < ActiveRecord::Migration[7.1]
   def change
     create_table :application_answer_templates do |t|

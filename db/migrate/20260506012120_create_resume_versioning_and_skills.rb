@@ -12,7 +12,7 @@ class CreateResumeVersioningAndSkills < ActiveRecord::Migration[7.2]
 
   # Column list is one cohesive table definition -- splitting it further
   # would obscure the schema, not simplify it.
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def create_skills_table
     create_table :skills do |t|
       t.string :name, null: false
@@ -23,9 +23,8 @@ class CreateResumeVersioningAndSkills < ActiveRecord::Migration[7.2]
     end
     add_index :skills, :name, unique: true
   end
-  # rubocop:enable Metrics/MethodLength
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable-next Metrics/MethodLength, Metrics/AbcSize
   def create_resumes_table
     create_table :resumes do |t|
       t.references :user, null: false, foreign_key: true
@@ -41,7 +40,6 @@ class CreateResumeVersioningAndSkills < ActiveRecord::Migration[7.2]
     add_index :resumes, :parent_id
     add_index :resumes, %i[user_id name version], unique: true
   end
-  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   # rubocop:disable Metrics/MethodLength
   def create_resume_skills_table

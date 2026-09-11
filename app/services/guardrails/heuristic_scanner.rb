@@ -31,7 +31,7 @@ class Guardrails::HeuristicScanner
 
   private
 
-  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable-next Metrics/MethodLength
   def scan_patterns
     findings = []
     score = 0
@@ -45,7 +45,6 @@ class Guardrails::HeuristicScanner
 
     [findings, score]
   end
-  # rubocop:enable Metrics/MethodLength
 
   # Allow for up to 3 optional words between the keywords in the pattern
   def pattern_regex(pattern)

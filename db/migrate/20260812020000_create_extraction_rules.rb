@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/MethodLength
+# rubocop:disable-next Metrics/MethodLength
 class CreateExtractionRules < ActiveRecord::Migration[8.1]
   def change
     create_table :extraction_rules do |t|
@@ -16,4 +16,3 @@ class CreateExtractionRules < ActiveRecord::Migration[8.1]
     add_index :extraction_rules, %i[provider field_name], unique: true
   end
 end
-# rubocop:enable Metrics/MethodLength
