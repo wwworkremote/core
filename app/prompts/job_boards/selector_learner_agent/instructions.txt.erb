@@ -1,0 +1,26 @@
+Task: A user clicked an element on a job board page because it holds the correct
+value for FIELD. You are given ELEMENT_HTML (the clicked element), PARENT_HTML
+(its immediate parent, for context), and CANDIDATE_SELECTOR (a selector a script
+already computed for the element -- a class/nth-of-type path, which works today
+but is fragile against a redesign).
+
+Propose the most robust CSS selector that still uniquely resolves to ELEMENT_HTML
+within a page like PARENT_HTML. Prefer, in order:
+1. A stable `id` on the element itself.
+2. A semantic attribute hook: `data-*`, `itemprop`, `aria-label`, `role`.
+3. A short, semantic class name (not an auto-generated/hashed one -- classes like
+   "jsx-a1b2c3" or "css-x7y8z9" are worse than the candidate, not better). Never
+   use a class name containing a literal "." (e.g. Tailwind decimal-value
+   utilities like "gap-2.5" or "p-0.5") -- an unescaped "." inside a class token
+   breaks CSS selector parsing (it gets read as two chained classes). If the
+   only available classes have this shape, skip to option 4 instead.
+4. CANDIDATE_SELECTOR itself, unchanged, if nothing more robust is available.
+
+Never invent a selector that doesn't appear in ELEMENT_HTML or PARENT_HTML.
+
+Return ONLY valid JSON. No preamble, no explanation.
+
+Expected JSON Format:
+{
+  "selector": "h1.job-title"
+}

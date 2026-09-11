@@ -1,0 +1,12 @@
+<%
+  badge = {
+    "captured"  => %w[bg-blue-500/10 text-blue-400 border-blue-500/20],
+    "matched"   => %w[bg-yellow-500/10 text-yellow-400 border-yellow-500/20],
+    "promoted"  => %w[bg-emerald-500/10 text-emerald-400 border-emerald-500/20],
+    "discarded" => %w[bg-slate-500/10 text-slate-400 border-slate-500/20],
+    "duplicate" => %w[bg-orange-500/10 text-orange-400 border-orange-500/20],
+  }.fetch(lead.status, %w[bg-slate-500/10 text-slate-400 border-slate-500/20])
+%>
+<span class="inline-flex items-center px-2 py-0.5 rounded <%= badge.join(' ') %> border text-xs font-bold">
+  <%= lead.status&.humanize %>
+</span>

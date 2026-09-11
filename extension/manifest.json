@@ -1,0 +1,93 @@
+{
+  "manifest_version": 3,
+  "name": "WWWorkRemote Ingestion Assistant",
+  "version": "1.36.1",
+  "description": "Bridge for capturing high-fidelity job data from third-party boards back into your local synthesis engine.",
+  "permissions": ["activeTab", "scripting", "storage", "sidePanel", "debugger"],
+  "host_permissions": [
+    "http://localhost:31000/*",
+    "http://localhost:*/*",
+    "http://wwworkremote.localhost/*",
+    "https://wwworkremote.localhost/*",
+    "https://www.linkedin.com/*",
+    "https://www.indeed.com/*",
+    "https://myjobs.indeed.com/*",
+    "https://*.adzuna.com/*",
+    "https://weworkremotely.com/*",
+    "https://remoteok.com/*",
+    "https://boards.greenhouse.io/*",
+    "https://*.greenhouse.io/*",
+    "https://jobs.lever.co/*",
+    "https://*.workday.com/*",
+    "https://*.myworkdayjobs.com/*",
+    "https://jobs.ashby.com/*",
+    "https://*.ashbyhq.com/*",
+    "https://jobs.smartrecruiters.com/*",
+    "https://wellfound.com/*",
+    "https://www.dice.com/*",
+    "https://jobs.rubyonrails.org/*",
+    "https://apply.workable.com/*",
+    "https://himalayas.app/*",
+    "https://*.icims.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "devtools_page": "devtools.html",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "open-wwworkremote-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open the WWWorkRemote application panel"
+    },
+    "open-wwworkremote-panel-alt": {
+      "suggested_key": {
+        "default": "Alt+Shift+Y",
+        "mac": "Alt+Shift+Y"
+      },
+      "description": "Open the WWWorkRemote application panel (alternate)"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://myjobs.indeed.com/*", "https://my.greenhouse.io/*"],
+      "js": ["outcome_capture.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.linkedin.com/*",
+        "http://wwworkremote.localhost/*",
+        "https://wwworkremote.localhost/*",
+        "https://www.indeed.com/*",
+        "https://*.adzuna.com/*",
+        "https://weworkremotely.com/*",
+        "https://remoteok.com/*",
+        "https://boards.greenhouse.io/*",
+        "https://*.greenhouse.io/*",
+        "https://jobs.lever.co/*",
+        "https://*.workday.com/*",
+        "https://*.myworkdayjobs.com/*",
+        "https://jobs.ashby.com/*",
+        "https://*.ashbyhq.com/*",
+        "https://jobs.smartrecruiters.com/*",
+        "https://wellfound.com/*",
+        "https://www.dice.com/*",
+        "https://jobs.rubyonrails.org/*",
+        "https://apply.workable.com/*",
+        "https://himalayas.app/*",
+        "https://*.icims.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}

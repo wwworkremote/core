@@ -1,0 +1,106 @@
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <div class="mb-10 text-xs font-bold opacity-60">
+    <div class="flex items-center gap-3">
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <%= link_to t('.breadcrumb_resumes'), resumes_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <span class="text-white"><%= t('.breadcrumb_current') %></span>
+    </div>
+  </div>
+
+  <div class="mb-12">
+    <h1 class="text-4xl font-black text-white tracking-tight leading-none mb-3"><%= t('.title') %></h1>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-500">A:</span>
+        <span class="text-xs font-bold text-white"><%= @resume_a.name %> (v<%= @resume_a.version %>)</span>
+      </div>
+      <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4 text-primary opacity-60" } %>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-500">B:</span>
+        <span class="text-xs font-bold text-white"><%= @resume_b.name %> (v<%= @resume_b.version %>)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <div class="card-neural p-8 border-l-4 border-slate-700 bg-slate-900/20">
+      <h3 class="text-xs font-bold text-white/60 mb-6"><%= t('.changes_heading') %></h3>
+      <div class="space-y-4">
+        <% if @diff[:name_changed] %>
+          <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-warning/20">
+            <span class="text-xs font-bold text-warning"><%= t('.name_change') %></span>
+            <span class="text-xs text-slate-400 font-mono"><%= @resume_a.name %> → <%= @resume_b.name %></span>
+          </div>
+        <% end %>
+
+        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-primary/20">
+          <span class="text-xs font-bold text-primary"><%= t('.version_advance') %></span>
+          <span class="text-xs text-white font-mono">+<%= @diff[:version_diff] %> <%= t('.versions_suffix') %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-neural p-8 border-l-4 border-accent bg-accent/5">
+      <h3 class="text-xs font-bold text-white/60 mb-6"><%= t('.skills_heading') %></h3>
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <div class="text-xs font-bold text-success mb-3"><%= t('.added') %></div>
+          <div class="flex flex-wrap gap-2">
+            <% if @diff[:skills_added].any? %>
+              <% @diff[:skills_added].each do |skill| %>
+                <span class="px-2 py-1 rounded bg-success/10 border border-success/20 text-xs font-bold text-success"><%= skill %></span>
+              <% end %>
+            <% else %>
+              <span class="text-xs text-slate-500 italic"><%= t('.none') %></span>
+            <% end %>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-error mb-3"><%= t('.removed') %></div>
+          <div class="flex flex-wrap gap-2">
+            <% if @diff[:skills_removed].any? %>
+              <% @diff[:skills_removed].each do |skill| %>
+                <span class="px-2 py-1 rounded bg-error/10 border border-error/20 text-xs font-bold text-error"><%= skill %></span>
+              <% end %>
+            <% else %>
+              <span class="text-xs text-slate-500 italic"><%= t('.none') %></span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-neural p-8">
+    <h3 class="text-xs font-bold text-white/60 mb-6"><%= t('.content_heading') %></h3>
+    <div class="space-y-8">
+      <% if @diff[:content_diff].any? %>
+        <% @diff[:content_diff].each do |key, values| %>
+          <div class="border-b border-white/5 pb-8 last:border-0">
+            <div class="text-xs font-bold text-primary mb-4"><%= key.humanize %></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <div class="text-xs font-bold text-slate-500"><%= t('.from') %></div>
+                <div class="p-4 bg-error/5 border border-error/10 rounded-xl text-xs text-error/80 line-through leading-relaxed">
+                  <%= values[:from].is_a?(Array) ? t('.modified_list', count: values[:from].count) : values[:from] %>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="text-xs font-bold text-slate-500"><%= t('.to') %></div>
+                <div class="p-4 bg-success/5 border border-success/10 rounded-xl text-xs text-success/80 leading-relaxed">
+                  <%= values[:to].is_a?(Array) ? t('.modified_list', count: values[:to].count) : values[:to] %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-20 text-slate-500 italic text-sm">
+          <%= t('.no_changes') %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

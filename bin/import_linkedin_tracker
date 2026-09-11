@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Backfill application history from a saved LinkedIn job-tracker page.
+#
+# LinkedIn has no export and no API for the tracker, so the input is a
+# "Save Page As -> Complete" of https://www.linkedin.com/jobs-tracker/?stage=<stage>.
+# The list is client-rendered, so the saved DOM is the only place the data
+# exists -- there is no embedded JSON payload to read instead.
+#
+# Usage:
+#   bin/import_linkedin_tracker applied "~/ai/inbox/Job tracker _ LinkedIn - stage=applied.html"
+#   bin/import_linkedin_tracker saved   <file>   # also: clicked_apply
+#   bin/import_linkedin_tracker applied <file> --dry-run
+#
+# ponytail: one page per invocation, no pagination. LinkedIn renders 10 rows
+# per stage before "show more", so a heavy month needs scrolling before the
+# save. If that becomes the norm, drive it with the Chrome extension instead
+# of hand-saving.
+#
+# Row upsert/advance logic lives in Applications::LinkedinRowImporter
+# (TASK-83 AC #9's shared adapter shape) -- this script only parses the
+# saved DOM into rows.
+require_relative "../config/environment"
+require "nokogiri"
+
+STAGES = Applications::LinkedinRowImporter::STAGES.keys
+
+def usage
+  warn "Usage: bin/import_linkedin_tracker <#{STAGES.join('|')}> <saved-html> [--dry-run]"
+  exit 1
+end
+
+stage, path, *flags = ARGV
+usage unless STAGES.include?(stage) && path
+dry_run = flags.include?("--dry-run")
+path = File.expand_path(path)
+abort "No such file: #{path}" unless File.exist?(path)
+abort "Empty file (the save produced 0 bytes): #{path}" if File.size(path).zero?
+
+def rows_from(doc)
+  doc.css('a[href*="/jobs/view/"]').filter_map do |a|
+    id = a["href"][%r{/jobs/view/(\d{8,12})}, 1]
+    next unless id
+
+    # Each field is its own <p> inside the anchor. a.text runs them together
+    # ("Software Engineer | RemoteCrossing Hurdles"), so read the elements.
+    lines = a.css("p").map { |p| p.text.strip }.reject(&:empty?)
+    next if lines.empty?
+
+    company, location = (lines[1..].find { |l| l.include?("·") } || "").split("·", 2).map(&:strip)
+    { id: id, title: lines.first, company: company, location: location,
+      note: lines[1..].find { |l| l.match?(/\b(Applied|Saved|Viewed)\b.*ago/) },
+      # LinkedIn's own outcome signal: this line is already inside the anchor's
+      # <p> children (every row has it, or doesn't) -- previously parsed and
+      # discarded. It's the same fact Greenhouse expresses as `inactive` and
+      # Indeed as employerJobStatus CLOSED: the listing closed, not a
+      # rejection, but real signal that beats silence.
+      closed: lines.any? { |l| l.include?("No longer accepting applications") } }
+  end.uniq { |r| r[:id] }
+end
+
+def dry_run_line(row)
+  posting = Applications::PostingMatcher.call(
+    signature: Digest::SHA256.hexdigest("linkedin-tracker-#{row[:id]}"), native_id_fragment: "/jobs/view/#{row[:id]}",
+    target_url: "https://www.linkedin.com/jobs/view/#{row[:id]}/", company: row[:company], title: row[:title]
+  )
+  posting ? "exists" : "create"
+end
+
+user = User.sole
+rows = rows_from(Nokogiri::HTML(File.read(path)))
+abort "Parsed 0 rows -- was the page fully loaded before saving?" if rows.empty?
+
+puts "#{rows.size} rows in #{File.basename(path)} (stage=#{stage})#{' [DRY RUN]' if dry_run}"
+
+rows.each do |row|
+  if dry_run
+    action = dry_run_line(row)
+    puts format("  %-8s %-44s %-24s %s", action, row[:title].to_s[0, 42], row[:company].to_s[0, 22],
+                row[:closed] ? "[closed]" : "")
+  else
+    result = Applications::LinkedinRowImporter.call(row, user: user, stage: stage)
+    puts format("  %-8s %-44s %-24s %-12s %s", "ok", row[:title].to_s[0, 42], row[:company].to_s[0, 22],
+                result[:applied_at]&.to_date || "", row[:closed] ? "[closed]" : "")
+  end
+end

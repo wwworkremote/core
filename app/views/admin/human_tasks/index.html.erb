@@ -1,0 +1,51 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Task Inbox</h1>
+    <p class="text-slate-500 font-bold text-sm">Everything an automated step has proposed and is waiting on you to approve, edit, or reject.</p>
+  </div>
+</div>
+
+<% if @human_tasks.empty? %>
+  <div class="card-neural p-8 text-center text-slate-500 font-bold text-sm">Nothing pending.</div>
+<% end %>
+
+<div class="space-y-4">
+  <% @human_tasks.each do |task| %>
+    <div class="card-neural p-6 <%= "border border-amber-500/40" if task.stale? %>">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <span class="inline-block px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-bold mb-2">
+            <%= task.kind.humanize %>
+          </span>
+          <% if task.stale? %>
+            <span class="inline-block px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-bold mb-2">
+              ⚠ Pending <%= distance_of_time_in_words(task.created_at, Time.current) %>
+            </span>
+          <% end %>
+          <h3 class="text-lg font-bold text-white">
+            <%= link_to task.job_posting.title, job_posting_path(task.job_posting), class: "hover:text-primary" %>
+          </h3>
+          <% company = task.job_posting.company %>
+          <p class="text-slate-500 text-xs font-mono"><%= company.is_a?(Company) ? company.name : company %> · proposed by <%= task.proposed_by %></p>
+        </div>
+      </div>
+
+      <% if task.kind == "persona_review" %>
+        <div class="bg-black/20 p-4 rounded border border-white/5 mb-4 font-mono text-xs text-slate-300 space-y-1">
+          <div><span class="text-slate-500">persona_id:</span> <%= task.payload["persona_id"] %></div>
+          <div><span class="text-slate-500">confidence:</span> <%= task.payload["confidence"] %>%</div>
+          <div><span class="text-slate-500">rationale:</span> <%= task.payload["rationale"] %></div>
+        </div>
+      <% else %>
+        <pre class="bg-black/20 p-4 rounded border border-white/5 mb-4 font-mono text-xs text-slate-300 whitespace-pre-wrap"><%= JSON.pretty_generate(task.payload) %></pre>
+      <% end %>
+
+      <div class="flex gap-3">
+        <%= button_to "Approve", approve_admin_human_task_path(task), method: :post, class: "btn-neural bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-sm" %>
+        <%= button_to "Reject", reject_admin_human_task_path(task), method: :post, class: "btn-neural bg-rose-500/10 text-rose-400 border-rose-500/20 text-sm" %>
+      </div>
+    </div>
+  <% end %>
+</div>

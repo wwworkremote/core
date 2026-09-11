@@ -1,0 +1,41 @@
+# Not used by bin/dev -- the actual dev loop (Procfile.dev) runs Puma/
+# SolidQueue/Tailwind directly against host Postgres with zero Colima/Docker
+# involvement. This file exists for optional containerized builds only.
+services:
+  web:
+    build:
+      context: .
+    command: ./bin/rails server -b 0.0.0.0
+    volumes:
+      - .:/rails
+    ports:
+      - "31000:31000"
+    environment:
+      # Point to host machine PostgreSQL
+      DATABASE_URL: postgres://${DB_USERNAME:-postgres}:${DB_PASSWORD:-password}@host.docker.internal:5432/wwworkremote_development
+      ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
+      ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
+      # Point to host machine OTel Collector (otelcol-contrib + OpenObserve)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+      OTEL_SERVICE_NAME: wwworkremote-web
+      OLLAMA_API_BASE: http://host.docker.internal:11500/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  worker:
+    build:
+      context: .
+    command: ./bin/jobs
+    volumes:
+      - .:/rails
+    environment:
+      # Point to host machine PostgreSQL
+      DATABASE_URL: postgres://${DB_USERNAME:-postgres}:${DB_PASSWORD:-password}@host.docker.internal:5432/wwworkremote_development
+      ADZUNA_APPLICATION_ID: ${ADZUNA_APPLICATION_ID}
+      ADZUNA_APPLICATION_KEY: ${ADZUNA_APPLICATION_KEY}
+      # Point to host machine OTel Collector (otelcol-contrib + OpenObserve)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+      OTEL_SERVICE_NAME: wwworkremote-worker
+      OLLAMA_API_BASE: http://host.docker.internal:11500/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,49 @@
+---
+id: TASK-37.5
+title: Implement and live-verify extraction for approved new providers
+status: In Progress
+assignee: []
+created_date: '2026-08-13 17:41'
+updated_date: '2026-08-20 12:19'
+labels: []
+milestone: m-1
+dependencies:
+  - TASK-37.4
+parent_task_id: TASK-37
+priority: medium
+type: feature
+ordinal: 3000
+---
+
+## Description
+
+<!-- SECTION:DESCRIPTION:BEGIN -->
+Depends on TASK-37.4's recommendation -- read it before starting; it will name which providers to add and in what order.
+
+Follow this session's established pattern exactly (see the parent task TASK-37 and `docs/extension-workflow.md` for the full rationale): for each approved provider, live-inspect the real DOM before writing any selector, prefer schema.org JobPosting JSON-LD when present (and verify it actually matches the page being viewed -- don't assume, RemoteOK's JSON-LD turned out to be an unrelated feed dump), prefer stable/semantic hooks (data-* attributes, hostname or URL conventions, plainly-named classes) over hashed CSS-Modules classes when writing CSS-tier fallbacks, and verify against at least 2 real postings/tenants where the platform is multi-tenant.
+<!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 Each provider approved by TASK-37.4's research is added to extension/content.js's PROVIDERS object and to manifest.json's host_permissions and content_scripts.matches
+- [ ] #2 Each new provider extracts title/company/location/description reliably, plus salary/employment_type/remote where the source discloses them
+- [x] #3 Each new extractor is verified against at least one real live posting (title/company/location/description confirmed correct) before being considered done
+- [ ] #4 manifest.json version is bumped following the project's semver rule (new provider = new capability = minor bump)
+- [ ] #5 docs/extension-workflow.md's provider list/components section is updated to include the new providers
+- [ ] #6 docs/architecture/openapi.yaml is updated if the new providers require any request/response shape not already covered
+- [ ] #7 node --check and npm run lint:extension pass on all modified extension files
+<!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+1/5 done: jobs.rubyonrails.org implemented, live-verified (JobPosting 6166), committed 13dcb413, pushed. manifest.json 1.11.0. Next: Workable.
+
+2/5 done: Workable implemented, verified against 2 tenants (Rokt/GOVX, JobPosting 6168/6169). Committed 9727b309, pushed. manifest.json 1.12.0. Note: Workable is client-side-rendered SPA, verify_promote.rb's plain fetch can't see its JSON-LD -- used field-override fallback instead. Next: Himalayas.
+
+3/5 done: Himalayas implemented, verified against 2 tenants (Linxon/lemon.io, JobPosting 6170/6171). Committed e3a3dde4, pushed. manifest.json 1.13.0. Added bin/verify_promote.rb --html-file flag (reusable fix for Cloudflare-gated boards). Next: iCIMS (iframe-based, real design decision -- see TASK-37.4's research note).
+
+4/5 providers done and live-verified: jobs.rubyonrails.org (13dcb413), Workable (9727b309), Himalayas (e3a3dde4, verified against 2 tenants), iCIMS (4cd6d2a6, verified live against a real Cotiviti tenant, iframe-based extraction -- real design decision). All committed and pushed to origin/main. manifest.json now 1.14.0.
+
+Work at a Startup (last one, lowest priority) deferred: its job listing page is a JS-only SPA (Algolia-driven client search, no server-rendered links or JSON-LD), so a real posting URL can't be found without a working browser -- tried the sanctioned direct-fetch fallback (curl with browser headers, attempted the exposed Algolia search API directly) and it's a dead end without JS execution. TASK-37.4's docs/extension-workflow.md section 9 already has the real structural pattern from an earlier live-verified session (`<h1>Title at <a href="/companies/{slug}">Company</a></h1>`, prose-parsed salary/location) -- user chose to wait for Chrome reconnection rather than implement blind or use a stale/unverified URL. Resume this once claude-in-chrome is connected again.
+<!-- SECTION:NOTES:END -->

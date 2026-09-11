@@ -1,0 +1,28 @@
+<% content_for :title, "Docs | WWWorkRemote" %>
+
+<div class="mb-10 text-xs font-bold opacity-60">
+  <div class="flex items-center gap-3">
+    <%= link_to "Home", root_path, class: "hover:text-primary transition-all" %>
+    <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+    <span class="text-white">Docs</span>
+  </div>
+</div>
+
+<div class="mb-12">
+  <h1 class="text-4xl font-black text-white mb-2 tracking-tight">Docs</h1>
+  <p class="text-slate-500 font-bold text-sm">How the system works, and how the job application pipeline works.</p>
+</div>
+
+<% @entries.group_by { |entry| File.dirname(entry) }.sort.each do |dir, entries| %>
+  <div class="mb-10">
+    <h2 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3"><%= dir == "." ? "docs/" : "docs/#{dir}/" %></h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <% entries.sort.each do |entry| %>
+        <%= link_to doc_path(path: entry),
+            class: "bg-base-200 border border-white/5 rounded-xl px-5 py-4 font-bold text-sm hover:border-primary/50 hover:text-primary transition-all" do %>
+          <%= File.basename(entry, ".md") %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,36 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "Bleeding-edge data acquisition engine and dashboard for remote job listings, powered by the \"Ultimate Rails Platform Stack.\"",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.20",
+    "daisyui": "^5.5.19",
+    "yarn": "^1.22.19"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:extension": "eslint extension"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wwworkremote/core.git"
+  },
+  "keywords": [],
+  "author": "Mike Hall",
+  "license": "Proprietary",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wwworkremote/core/issues"
+  },
+  "homepage": "https://github.com/wwworkremote/core#readme",
+  "devDependencies": {
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
+    "playwright": "^1.59.1"
+  }
+}

@@ -1,0 +1,246 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 rounded-2xl border border-white/5 px-8 py-10 md:px-10 bg-cover bg-[right_-2rem_top_-1rem]"
+     style="background-image: linear-gradient(to right, rgba(26,27,47,0.94) 30%, rgba(26,27,47,0.55)), url('<%= asset_path("kanagawa-wave.jpg") %>');">
+  <div>
+    <h1 class="text-4xl font-black tracking-tight text-white mb-2"><%= t('.title') %></h1>
+    <p class="text-base-content/70 font-bold text-sm"><%= t('.subtitle') %></p>
+  </div>
+  <div class="flex gap-4">
+    <%= link_to career_profile_path, class: "btn btn-outline btn-sm rounded-lg font-bold text-sm" do %>
+      <%= heroicon "user-circle", options: { class: "w-4 h-4" } %> <%= t('.edit_profile') %>
+    <% end %>
+    <%= link_to data_fetchers_path, class: "btn btn-primary btn-sm rounded-lg font-bold text-sm" do %>
+      <%= heroicon "cpu-chip", options: { class: "w-4 h-4" } %> <%= t('.data_sources_cta') %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Funnel Health (TASK-81): the narrowest point in the funnel, not the
+     healthiest -- deliberately 3 numbers, no chart. -->
+<div class="flex flex-wrap items-center gap-x-10 gap-y-3 mb-12 px-2">
+  <div>
+    <div class="text-2xl font-black text-warning tabular-nums">
+      <%= @last_application_at ? distance_of_time_in_words(@last_application_at, Time.current) : t('.funnel_health.never') %>
+    </div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider"><%= t('.funnel_health.since_last_application') %></div>
+  </div>
+  <div>
+    <div class="text-2xl font-black text-warning tabular-nums"><%= @untriaged_count %></div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider"><%= t('.funnel_health.untriaged') %></div>
+  </div>
+  <% if @oldest_untriaged_at %>
+    <div>
+      <div class="text-2xl font-black text-warning tabular-nums"><%= distance_of_time_in_words(@oldest_untriaged_at, Time.current) %></div>
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider"><%= t('.funnel_health.oldest_untriaged') %></div>
+    </div>
+  <% end %>
+</div>
+
+<!-- What this app does -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
+    <div class="card-body p-8 relative z-10">
+      <div class="text-xs font-bold text-primary mb-4"><%= t('.capabilities.job_postings_eyebrow') %></div>
+      <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.job_aggregation_title') %></h2>
+      <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.job_aggregation_body') %></p>
+      <%= link_to job_postings_path, class: "btn btn-ghost btn-xs p-0 text-primary hover:bg-transparent font-bold" do %>
+        <%= t('.capabilities.browse_jobs') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
+      <% end %>
+    </div>
+    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <%= heroicon "globe-alt", options: { class: "w-24 h-24" } %>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group border-primary/20">
+    <div class="card-body p-8 relative z-10">
+      <div class="text-xs font-bold text-secondary mb-4"><%= t('.capabilities.saved_jobs_eyebrow') %></div>
+      <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.match_scoring_title') %></h2>
+      <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.match_scoring_body') %></p>
+      <%= link_to user_job_postings_path, class: "btn btn-ghost btn-xs p-0 text-secondary hover:bg-transparent font-bold" do %>
+        <%= t('.capabilities.view_saved_jobs') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
+      <% end %>
+    </div>
+    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <%= heroicon "sparkles", options: { class: "w-24 h-24" } %>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 border border-white/5 shadow-2xl relative overflow-hidden group">
+    <div class="card-body p-8 relative z-10">
+      <div class="text-xs font-bold text-accent mb-4"><%= t('.capabilities.admin_eyebrow') %></div>
+      <h2 class="text-xl font-black text-white mb-4"><%= t('.capabilities.pipeline_status_title') %></h2>
+      <p class="text-sm text-slate-400 leading-relaxed mb-6"><%= t('.capabilities.pipeline_status_body') %></p>
+      <%= link_to admin_root_path, class: "btn btn-ghost btn-xs p-0 text-accent hover:bg-transparent font-bold" do %>
+        <%= t('.capabilities.open_admin') %> <%= heroicon "arrow-right", variant: :outline, options: { class: "w-4 h-4" } %>
+      <% end %>
+    </div>
+    <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+      <%= heroicon "adjustments-horizontal", options: { class: "w-24 h-24" } %>
+    </div>
+  </div>
+</section>
+
+<%= turbo_stream_from "system_telemetry" %>
+
+<div class="grid grid-cols-1 gap-12">
+  <!-- Priority In-Box Block -->
+  <% if @priority_inbox.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-accent"><%= t('.priority_inbox.heading') %></h2>
+        <div class="h-px flex-1 bg-accent/20"></div>
+        <span class="badge badge-accent badge-xs font-black"><%= @priority_inbox.count %> <%= t('.priority_inbox.pending') %></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @priority_inbox.each do |user_job| %>
+          <% job = user_job.job_posting %>
+          <div class="card bg-base-200 border border-accent/10 hover:border-accent/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
+                <div class="badge badge-accent text-xs font-bold"><%= t('.priority_inbox.high_match') %></div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-accent transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-xs font-bold text-slate-500"><%= job.location.presence || t('job_postings.show.remote_fallback') %></div>
+                <div class="flex gap-2">
+                  <%= button_to t('.priority_inbox.favorite'), user_job_postings_path(job_posting_id: job.id, status: 'favorited'), class: "text-xs font-bold text-primary hover:underline" %>
+                  <%= link_to t('.priority_inbox.review'), job_posting_path(job), class: "text-xs font-bold text-slate-400 hover:text-white" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Idle Follow-ups Block -->
+  <% if @idle_followups.any? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-warning"><%= t('.idle_followups.heading') %></h2>
+        <div class="h-px flex-1 bg-warning/20"></div>
+        <span class="badge badge-warning badge-xs font-black"><%= @idle_followups.count %> <%= t('.idle_followups.pending') %></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @idle_followups.each do |user_job| %>
+          <% job = user_job.job_posting %>
+          <div class="card bg-base-200 border border-warning/10 hover:border-warning/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
+                <div class="badge badge-warning badge-outline text-xs font-bold">
+                  <%= t('.idle_followups.idle_badge', duration: distance_of_time_in_words(user_job.last_pipeline_activity_at, Time.current)) %>
+                </div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-warning transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-xs font-bold text-slate-500"><%= user_job.status.humanize %></div>
+                <%= link_to t('.idle_followups.follow_up'), job_posting_path(job), class: "text-xs font-bold text-warning hover:underline" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Personal Alignment Block -->
+  <% if @top_matches.present? %>
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-sm font-black uppercase tracking-widest text-primary"><%= t('.matches.heading') %></h2>
+        <div class="h-px flex-1 bg-primary/20"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @top_matches.each do |job| %>
+          <div class="card bg-base-200 border border-primary/10 hover:border-primary/50 transition-all shadow-xl group">
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="text-xs font-bold text-slate-400"><%= job.company_name %></div>
+                <div class="badge badge-primary badge-outline text-xs font-bold"><%= t('.matches.ai_match') %></div>
+              </div>
+              <h3 class="text-md font-black text-white group-hover:text-primary transition-colors leading-tight mb-4">
+                <%= link_to job.title, job_posting_path(job) %>
+              </h3>
+              <div class="mt-auto flex items-center justify-between">
+                <div class="text-xs font-bold text-slate-500"><%= job.location.presence || t('job_postings.show.remote_fallback') %></div>
+                <%= link_to t('.matches.view'), job_posting_path(job), class: "text-xs font-bold text-primary hover:underline" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Data sources -->
+  <section>
+    <div class="flex items-center gap-4 mb-6">
+      <h2 class="text-sm font-black uppercase tracking-widest text-base-content/60"><%= t('.data_sources_heading') %></h2>
+      <div class="h-px flex-1 bg-white/20"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
+        <%= render "home/telemetry_ingestion" %>
+      </div>
+
+      <div class="card bg-base-200 border border-white/5 shadow-xl">
+        <div class="card-body p-6">
+          <h3 class="card-title text-xs font-bold text-base-content/60 mb-4"><%= t('.jobs_fetched_chart_title') %></h3>
+          <%= line_chart(charts_data_sources_path(days: 21),
+              discrete: true,
+              height: "140px",
+              colors: ["#7E9CD8"],
+              library: {
+                scales: {
+                  y: { display: false },
+                  x: { display: false }
+                },
+                plugins: { legend: { display: false } }
+              }) %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recently published -->
+  <section>
+    <div class="flex items-center gap-4 mb-6">
+      <h2 class="text-sm font-black uppercase tracking-widest text-base-content/60"><%= t('.recently_published_heading') %></h2>
+      <div class="h-px flex-1 bg-white/20"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
+        <%= render "home/telemetry_synthesis" %>
+      </div>
+
+      <div class="card bg-base-200 border border-white/5 shadow-xl">
+        <div class="card-body p-6">
+          <h3 class="card-title text-xs font-bold text-base-content/60 mb-4"><%= t('.new_postings_chart_title') %></h3>
+          <%= line_chart(charts_data_job_postings_path(days: 21),
+              discrete: true,
+              height: "140px",
+              colors: ["#98BB6C"],
+              library: {
+                scales: {
+                  y: { display: false },
+                  x: { display: false }
+                },
+                plugins: { legend: { display: false } }
+              }) %>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

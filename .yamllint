@@ -1,0 +1,49 @@
+---
+# Without this file yamllint runs its stock `default` profile, which fails
+# on config files that were already in the repo (.overcommit.yml,
+# .annotaterb.yml, packwerk.yml). The YamlLint pre-commit hook shells out to
+# `yamllint .` -- a whole-tree run -- so touching ANY unexcluded .yml made
+# the hook fail on unrelated pre-existing files. It only ever passed because
+# the excluded paths happened to be the yaml people edited.
+extends: default
+
+rules:
+  # Disabled rather than widened: every offender is a single unsplittable
+  # value -- a DATABASE_URL, a docker command, an OpenAPI description. YAML
+  # gains nothing from wrapping those, and any cap just relocates the same
+  # failure to a different file.
+  line-length: disable
+
+  # `---` is used inconsistently across these config files and carries no
+  # meaning in single-document YAML.
+  document-start: disable
+
+  # Several config files indent list items under their key rather than at
+  # the key's own column. Both are valid YAML; this only enforces a style.
+  indentation:
+    indent-sequences: consistent
+
+  # Generated/vendored config (.annotaterb.yml) uses long inline comments.
+  comments:
+    require-starting-space: true
+    min-spaces-from-content: 1
+
+  # docs/architecture/openapi.yaml writes flow mappings as `{ a: b }`, which
+  # is the readable form and consistent throughout that file.
+  braces:
+    max-spaces-inside: 1
+
+  brackets:
+    max-spaces-inside: 1
+
+  # GitHub Actions requires a literal `on:` key, which YAML 1.1 reads as the
+  # boolean true. Checking values still catches real typos.
+  truthy:
+    check-keys: false
+
+ignore: |
+  node_modules/
+  vendor/
+  spec/cassettes/
+  tmp/
+  coverage/

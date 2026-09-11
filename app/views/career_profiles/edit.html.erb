@@ -1,0 +1,58 @@
+<div class="max-w-4xl mx-auto py-10 px-6">
+  <div class="mb-10 text-xs font-bold opacity-60">
+    <div class="flex items-center gap-3">
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <span class="text-white"><%= t('.breadcrumb_current') %></span>
+    </div>
+  </div>
+
+  <header class="mb-12">
+    <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= t('.title') %></h1>
+    <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
+  </header>
+
+  <%= form_with model: @career_profile, url: career_profile_path, method: :patch, class: "space-y-8" do |f| %>
+    <div class="card-neural p-8 space-y-6">
+      <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5"><%= t('.basics_heading') %></h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <%= f.label :experience_level, t('.experience_level_label'), class: "label text-xs font-bold text-slate-500" %>
+          <%= f.select :experience_level, ["Junior", "Mid", "Senior", "Staff", "Principal", "Lead"], {}, class: "select select-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
+        </div>
+        <div>
+          <%= f.label :skills, t('.skills_label'), class: "label text-xs font-bold text-slate-500" %>
+          <%= f.text_field :skills, placeholder: "Ruby, Rails, Postgres, AWS...", class: "input input-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :github_url, t('.github_url_label'), class: "label text-xs font-bold text-slate-500" %>
+        <%= f.text_field :github_url, placeholder: "https://github.com/your-username", class: "input input-bordered bg-base-300 w-full rounded-xl font-mono text-sm" %>
+        <p class="text-xs text-slate-500 pl-2"><%= t('.github_url_helper') %></p>
+      </div>
+    </div>
+
+    <div class="card-neural p-8 space-y-6">
+      <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5"><%= t('.resume_heading') %></h3>
+      <div>
+        <%= f.label :resume_text, t('.resume_text_label'), class: "label text-xs font-bold text-slate-500" %>
+        <%= f.text_area :resume_text, rows: 15, placeholder: "Paste your resume or list your work history here...", class: "textarea textarea-bordered bg-base-300 w-full rounded-xl font-mono text-sm leading-relaxed" %>
+      </div>
+    </div>
+
+    <div class="card-neural p-8 space-y-6">
+      <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5"><%= t('.goals_heading') %></h3>
+      <div>
+        <%= f.label :goals, t('.goals_label'), class: "label text-xs font-bold text-slate-500" %>
+        <%= f.text_area :goals, rows: 5, placeholder: "What are you looking for in your next role? (e.g. Remote Ruby role at a high-growth startup)", class: "textarea textarea-bordered bg-base-300 w-full rounded-xl font-mono text-sm leading-relaxed" %>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-4">
+      <%= link_to t('.cancel'), career_profile_path, class: "btn btn-ghost rounded-xl font-bold" %>
+      <%= f.submit t('.save'), class: "btn btn-primary rounded-xl px-10 font-bold" %>
+    </div>
+  <% end %>
+</div>

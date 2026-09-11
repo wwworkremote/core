@@ -1,0 +1,95 @@
+<%= render "admin/shared/nav" %>
+
+<div class="max-w-4xl mx-auto py-10 px-6">
+  <div class="mb-10 text-xs font-bold opacity-60">
+    <div class="flex items-center gap-3">
+      <%= link_to "Prompts", admin_pipeline_prompts_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <span class="text-white"><%= pipeline_prompt.new_record? ? "New Prompt" : "Edit Prompt" %></span>
+    </div>
+  </div>
+
+  <div class="mb-12">
+    <h1 class="text-4xl font-black text-white tracking-tight leading-none mb-3">
+      <%= pipeline_prompt.new_record? ? "New Prompt" : "Edit Prompt" %>
+    </h1>
+    <p class="text-slate-500 font-bold text-sm">Define an AI prompt used at a point in the pipeline.</p>
+  </div>
+
+  <% if PipelinePrompt::KNOWN_KEYS.any? %>
+    <div class="card-neural p-6 mb-8 border-l-4 border-l-accent">
+      <h3 class="text-xs font-bold text-accent mb-4">Known Pipeline Keys</h3>
+      <p class="text-xs text-slate-400 mb-4">Use one of these keys to override a real prompt already running in the pipeline. Any other key is saved but won't be used until code references it.</p>
+      <dl class="space-y-3 font-mono text-xs">
+        <% PipelinePrompt::KNOWN_KEYS.each do |key, locals_hint| %>
+          <div>
+            <dt class="text-white font-bold"><%= key %></dt>
+            <dd class="text-slate-500">Locals: <%= locals_hint %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  <% end %>
+
+  <div class="card-neural p-8">
+    <%= form_with(model: [:admin, pipeline_prompt], class: "space-y-8") do |f| %>
+      <% if pipeline_prompt.errors.any? %>
+        <div class="alert alert-error rounded-2xl text-xs font-bold p-4">
+          <ul>
+            <% pipeline_prompt.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="form-control">
+          <%= f.label :key, "Key", class: "label text-xs font-bold text-slate-500" %>
+          <%= f.text_field :key, placeholder: "e.g., job_boards_categorizer", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white font-mono" %>
+          <label class="label">
+            <span class="label-text-alt text-xs text-slate-500">Stable identifier the pipeline looks this prompt up by. Cannot be changed casually once code depends on it.</span>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :name, "Name", class: "label text-xs font-bold text-slate-500" %>
+          <%= f.text_field :name, placeholder: "e.g., Job Categorization", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="form-control">
+          <%= f.label :stage, "Stage", class: "label text-xs font-bold text-slate-500" %>
+          <%= f.text_field :stage, placeholder: "e.g., Categorization", class: "input input-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :active, "Status", class: "label text-xs font-bold text-slate-500" %>
+          <label class="label cursor-pointer justify-start gap-3 bg-white/5 border border-white/10 rounded-xl px-4 h-14">
+            <%= f.check_box :active, class: "checkbox checkbox-primary" %>
+            <span class="text-sm text-white">Active (used by the pipeline)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-control">
+        <%= f.label :description, "Description", class: "label text-xs font-bold text-slate-500" %>
+        <%= f.text_area :description, rows: 2, class: "textarea textarea-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white text-sm leading-relaxed", placeholder: "What this prompt is for…" %>
+      </div>
+
+      <div class="form-control">
+        <%= f.label :body, "Prompt Body", class: "label text-xs font-bold text-slate-500" %>
+        <%= f.text_area :body, rows: 20, class: "textarea textarea-bordered bg-white/5 border-white/10 rounded-xl focus:border-primary text-white font-mono text-xs leading-relaxed", placeholder: "ERB template -- reference a local by wrapping it in ERB output tags" %>
+        <label class="label">
+          <span class="label-text-alt text-xs text-slate-500">Rendered as ERB (output tags wrap a local's name, e.g. the profile local from the table above). If rendering fails (bad syntax, unknown local), the pipeline falls back to its built-in default rather than breaking.</span>
+        </label>
+      </div>
+
+      <div class="pt-6 border-t border-white/5 flex justify-end gap-4">
+        <%= link_to "Cancel", admin_pipeline_prompts_path, class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold" %>
+        <%= f.submit (pipeline_prompt.new_record? ? "Create Prompt" : "Update Prompt"), class: "btn btn-primary rounded-xl px-10 font-bold" %>
+      </div>
+    <% end %>
+  </div>
+</div>

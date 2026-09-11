@@ -1,0 +1,169 @@
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <div class="mb-10 text-xs font-bold opacity-60">
+    <div class="flex items-center gap-3">
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <%= link_to t('.breadcrumb_resumes'), resumes_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <span class="text-white"><%= @resume.name %> v<%= @resume.version %></span>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <h1 class="text-4xl font-black text-white tracking-tight leading-none"><%= @resume.name %></h1>
+        <span class="text-xl font-black text-primary opacity-60 tracking-tighter mt-1">V<%= @resume.version %></span>
+      </div>
+      <div class="flex items-center gap-4">
+        <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
+        <span class="badge badge-neutral bg-white/5 border-none text-xs font-bold"><%= @resume.status %></span>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-4">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost border-white/10 rounded-xl px-6 font-bold">
+          <%= heroicon "arrow-down-tray", variant: :outline, options: { class: "w-4 h-4 mr-2" } %> <%= t('.export') %>
+        </div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-52 mt-4 border border-white/5">
+          <li><%= link_to "Markdown (.md)", export_resume_path(@resume, format: :markdown) %></li>
+          <li><%= link_to "Plain Text (.txt)", export_resume_path(@resume, format: :text) %></li>
+          <li><%= link_to "JSON (.json)", export_resume_path(@resume, format: :json) %></li>
+          <li><%= link_to "MCP Object", export_resume_path(@resume, format: :mcp) %></li>
+          <li><%= link_to "PDF (HTML)", export_resume_path(@resume, format: :pdf) %></li>
+        </ul>
+      </div>
+
+      <% if @parent %>
+        <%= link_to diff_resume_path(@resume, other_id: @parent.id), class: "btn btn-ghost border-white/10 rounded-xl px-6 font-bold hover:text-blue-400" do %>
+          <%= heroicon "arrows-right-left", variant: :outline, options: { class: "w-4 h-4 mr-2" } %> <%= t('.compare_with_parent', version: @parent.version) %>
+        <% end %>
+      <% end %>
+
+      <%= button_to fork_resume_path(@resume), method: :post, class: "btn btn-ghost border-white/10 rounded-xl px-6 font-bold hover:text-accent" do %>
+        <%= heroicon "document-duplicate", variant: :outline, options: { class: "w-4 h-4 mr-2" } %> <%= t('.fork') %>
+      <% end %>
+
+      <%= link_to edit_resume_path(@resume), class: "btn btn-primary rounded-xl px-10 font-bold" do %>
+        <%= t('.edit') %>
+      <% end %>
+    </div>
+  </div>
+
+  <% other_versions = current_user.resumes.where(name: @resume.name).where.not(id: @resume.id).order(version: :desc) %>
+  <% if other_versions.any? %>
+    <div class="mb-12 p-6 bg-white/5 rounded-2xl border border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="text-xs font-bold text-slate-500 mb-1"><%= t('.compare_heading') %></div>
+        <p class="text-sm text-slate-500"><%= t('.compare_helper') %></p>
+      </div>
+      <div class="flex items-center gap-4">
+        <%= form_with url: diff_resume_path(@resume), method: :get, class: "flex gap-2" do |f| %>
+          <%= f.select :other_id, other_versions.map { |r| ["v#{r.version} (#{r.created_at.strftime('%Y-%m-%d')})", r.id] }, {}, class: "select select-sm bg-base-300 rounded-lg text-sm font-mono border-white/10" %>
+          <%= f.submit t('.compare_submit'), class: "btn btn-ghost btn-sm border-white/10 rounded-lg font-bold hover:text-primary" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="md:col-span-2 space-y-8">
+      <div class="card-neural p-8">
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6"><%= t('.content_heading') %></h3>
+
+        <div class="prose prose-invert max-w-none prose-sm leading-relaxed">
+          <% if @resume.content.present? %>
+            <% if @resume.content["summary"] %>
+              <div class="mb-10">
+                <div class="text-xs font-bold text-slate-500 mb-3"><%= t('.summary_label') %></div>
+                <p class="text-base text-white/80"><%= @resume.content["summary"] %></p>
+              </div>
+            <% end %>
+
+            <% if @resume.content["experience"].present? %>
+              <div class="space-y-8">
+                <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.experience_label') %></div>
+                <% Array(@resume.content["experience"]).each do |exp| %>
+                  <div class="border-l-2 border-white/5 pl-6 py-1">
+                    <div class="flex justify-between items-start mb-1">
+                      <h4 class="text-lg font-black text-white"><%= exp["role"] %></h4>
+                      <span class="text-xs font-bold text-slate-500"><%= exp["start_date"] %> &mdash; <%= exp["end_date"] %></span>
+                    </div>
+                    <div class="text-xs font-bold text-primary mb-4"><%= exp["company"] %></div>
+                    <div class="text-xs text-white/60"><%= markdown(exp["description"]) %></div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-20 opacity-50 italic">
+              <%= t('.no_content') %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-8">
+      <div class="card-neural p-8">
+        <h3 class="text-xs font-bold text-base-content/50 pb-4 border-b border-white/5 mb-6"><%= t('.details_heading') %></h3>
+        <div class="space-y-6">
+          <div>
+            <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.lineage_label') %></div>
+            <div class="flex flex-col gap-2">
+              <% if @parent %>
+                <div class="text-xs font-bold text-slate-400"><%= t('.parent_label') %> <%= link_to "#{@parent.name} v#{@parent.version}", resume_path(@parent), class: "text-primary hover:underline" %></div>
+              <% else %>
+                <div class="text-xs font-bold text-slate-500 italic"><%= t('.original_version') %></div>
+              <% end %>
+
+              <% if @children.any? %>
+                <div class="text-xs font-bold text-slate-500 mt-2 mb-1"><%= t('.forks_label') %></div>
+                <div class="flex flex-col gap-1">
+                  <% @children.each do |child| %>
+                    <%= link_to "#{child.name} v#{child.version}", resume_path(child), class: "text-xs font-bold text-slate-400 hover:text-accent" %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.matching_label') %></div>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full <%= @resume.embedding.present? ? 'bg-success' : 'bg-warning' %> animate-pulse"></div>
+              <span class="text-xs font-bold text-white"><%= @resume.embedding.present? ? t('.matching_indexed') : t('.matching_not_indexed') %></span>
+            </div>
+          </div>
+
+          <% if @resume.imported_from_url.present? %>
+            <div>
+              <div class="text-xs font-bold text-slate-500 mb-2"><%= t('.imported_from_label') %></div>
+              <div class="text-xs font-mono text-slate-500 break-all"><%= @resume.imported_from_url %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card-neural p-8 border-l-4 border-primary bg-primary/5">
+        <h3 class="text-xs font-bold text-white/60 mb-6 flex justify-between items-center">
+          <span><%= t('.active_searches_heading') %></span>
+          <%= heroicon "signal", variant: :outline, options: { class: "w-4 h-4 text-primary" } %>
+        </h3>
+        <div class="space-y-4">
+          <% if @resume.job_searches.active.any? %>
+            <% @resume.job_searches.active.each do |campaign| %>
+              <%= link_to job_search_path(campaign), class: "block p-4 bg-white/5 rounded-xl border border-white/5 hover:border-primary transition-all" do %>
+                <div class="text-xs font-bold text-white"><%= campaign.name %></div>
+                <div class="text-xs font-bold text-slate-500 mt-1"><%= t('.jobs_linked', count: campaign.user_job_postings.count) %></div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div class="text-xs text-slate-500 italic py-4"><%= t('.no_active_searches') %></div>
+            <%= link_to t('.start_search'), new_job_search_path(resume_id: @resume.id), class: "btn btn-ghost border-white/10 btn-block btn-xs font-bold" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,208 @@
+<div class="max-w-5xl mx-auto py-16 px-6" data-controller="guided-session-playback"
+     data-guided-session-playback-playback-url-value="<%= playback_guided_session_path(@guided_session) %>"
+     data-guided-session-playback-position-value="<%= @guided_session.playback_position %>">
+  <div class="flex items-start justify-between gap-6 mb-10">
+    <div>
+      <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-4">Guided application session</div>
+      <h1 class="text-4xl font-black text-white mb-3">Your lap is at Intake</h1>
+      <p class="text-slate-400 font-medium"><%= @guided_session.purpose == "application_research" ? "Research mode: inspect and record the application flow without committing or submitting." : "Application mode: work toward applying under supervision; submission remains separately approval-gated." %></p>
+    </div>
+    <span class="badge badge-primary badge-outline font-bold"><%= @guided_session.status.humanize %></span>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3 mb-6" aria-label="Playback controls">
+    <button type="button" class="btn btn-primary rounded-xl font-bold" data-guided-session-playback-target="play" data-action="guided-session-playback#play">Play lap</button>
+    <button type="button" class="btn btn-ghost border-white/10 rounded-xl font-bold" data-guided-session-playback-target="pause" data-action="guided-session-playback#pause">Pause</button>
+    <button type="button" class="btn btn-ghost border-white/10 rounded-xl font-bold" data-action="guided-session-playback#previous">Previous</button>
+    <button type="button" class="btn btn-ghost border-white/10 rounded-xl font-bold" data-action="guided-session-playback#next">Next</button>
+    <span class="text-xs font-bold text-slate-400" data-guided-session-playback-target="position" aria-live="polite">Playback position: <%= @guided_session.playback_position %></span>
+  </div>
+
+  <div class="rounded-xl border border-primary/20 bg-primary/5 p-4 mb-10" aria-live="polite">
+    <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Now playing</div>
+    <div class="text-lg font-black text-white" data-guided-session-playback-target="current">Ready to begin the lap</div>
+  </div>
+
+  <div class="grid md:grid-cols-4 gap-3 mb-10">
+    <% %w[Intake Resolution Response\ Construction Reorientation].each_with_index do |phase, index| %>
+      <div class="rounded-xl border <%= index.zero? ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5' %> p-4" data-guided-session-playback-target="phase" data-phase="<%= phase.parameterize(separator: '_') %>">
+        <div class="text-xs font-black text-slate-500 mb-2">0<%= index + 1 %></div>
+        <div class="text-sm font-bold text-white"><%= phase %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card-neural p-8 space-y-5">
+    <div>
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Session purpose</div>
+      <div class="text-white font-black"><%= @guided_session.purpose.humanize %></div>
+    </div>
+    <div>
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Source posting</div>
+      <%= link_to @guided_session.source_url, @guided_session.source_url, target: "_blank", rel: "noreferrer", class: "text-primary break-all" %>
+    </div>
+    <% if (tracked = @guided_session.user_job_posting) %>
+      <div>
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tracked in WWWorkRemote</div>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 text-sm font-bold">
+          <%= link_to tracked.job_posting.title, job_posting_path(tracked.job_posting), class: "text-primary hover:underline" %>
+          <% posting_company = tracked.job_posting.company_record %>
+          <% if posting_company %>
+            <span class="text-slate-600">·</span>
+            <%= link_to posting_company.name, company_path(posting_company), class: "text-primary hover:underline" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <div>
+      <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Next move</div>
+      <div class="text-xl font-black text-white">Review the posting</div>
+      <p class="text-sm text-slate-400 mt-2">Confirm the opportunity and tell the system what matters before it proposes the next step.</p>
+      <%= link_to(@guided_session.purpose == "application_research" ? "Open research flow" : "Open supervised application",
+                  @guided_session.tracked_source_url,
+                  target: "_blank", rel: "noreferrer",
+                  class: "btn btn-primary rounded-xl font-bold mt-4") %>
+    </div>
+    <div class="border-t border-white/10 pt-5 text-sm text-slate-500">
+      Session <code class="text-slate-300"><%= @guided_session.session_token %></code> · Provider <span class="text-slate-300"><%= @guided_session.provider %></span>
+    </div>
+  </div>
+
+  <% if @field_answers.any? || @field_mappings.positive? %>
+    <div class="card-neural p-6 mt-6">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">
+        Field activity this session &mdash; <%= pluralize(@field_answers.size, "field filled") %>,
+        <%= pluralize(@field_mappings, "mapping") %>
+      </div>
+      <% if @field_answers.any? %>
+        <div class="grid md:grid-cols-2 gap-2">
+          <% @field_answers.each do |answer| %>
+            <div class="rounded border border-white/10 px-3 py-2 text-xs flex justify-between gap-2">
+              <span class="font-bold text-white"><%= answer.field_label.presence || answer.field_key %></span>
+              <span class="text-slate-500 shrink-0"><%= answer.answer_source %> · <%= answer.provided_at&.strftime("%H:%M") %></span>
+            </div>
+          <% end %>
+        </div>
+        <p class="text-[10px] text-slate-600 mt-2">Values are not shown here &mdash; the timeline records that a field was filled and from which source, never what was typed.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="mt-10">
+    <div class="text-xs font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Recorded timeline</div>
+    <% if @events.any? %>
+      <div class="space-y-4">
+        <% @events.each_with_index do |event, index| %>
+          <article id="event-<%= event.id %>" class="card-neural p-6 border-l-2 <%= event.approval_state == 'pending' ? 'border-warning' : 'border-primary/40' %>" data-guided-session-playback-target="event" data-index="<%= index %>" data-phase="<%= event.phase %>">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="text-xs font-black uppercase tracking-widest text-primary"><%= event.kind.humanize %></span>
+              <span class="badge badge-ghost text-xs"><%= event.requirement.humanize %></span>
+              <span class="badge badge-ghost text-xs"><%= event.reversibility.humanize %></span>
+              <span class="badge badge-ghost text-xs"><%= event.approval_state.humanize %></span>
+            </div>
+            <div class="text-white font-bold"><%= event.action %></div>
+            <p class="text-sm text-slate-400 mt-2"><%= event.intent %></p>
+
+            <% sig = event.evidence.slice("job_post_id", "ats_application_id", "provider").compact_blank %>
+            <% if sig.any? %>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <% sig.each do |key, value| %>
+                  <span class="badge badge-outline border-accent/30 text-accent text-[10px] font-mono"><%= key %>: <%= value %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%# AC#3: the actor re-classifies what this move required and how
+                reversible it was. Evidence and the extension's own reading stay
+                on the record; this adds Mike's. %>
+            <details class="mt-4">
+              <summary class="text-[10px] font-bold uppercase tracking-widest text-slate-500 cursor-pointer hover:text-white">Reclassify</summary>
+              <%= form_with url: event_guided_session_path(@guided_session, event_id: event.id), method: :patch,
+                            class: "mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" do |f| %>
+                <%= f.fields_for :guided_session_event, event do |ef| %>
+                  <%= ef.text_field :intent, autocomplete: "off", class: "input input-sm input-bordered bg-black/20 sm:col-span-2" %>
+                  <%= ef.select :requirement, GuidedSessionEvent::REQUIREMENTS.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= ef.select :reversibility, GuidedSessionEvent::REVERSIBILITIES.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= ef.select :approval_state, GuidedSessionEvent::APPROVAL_STATES.map { |v| [v.humanize, v] }, {}, class: "select select-sm select-bordered bg-black/20" %>
+                  <%= f.submit "Save classification", class: "btn btn-sm btn-ghost border-white/10 rounded-lg font-bold" %>
+                <% end %>
+              <% end %>
+            </details>
+            <% fields = event.evidence["fields"] %>
+            <% if fields.is_a?(Array) && fields.any? %>
+              <div class="mt-5 rounded-lg border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Observed form structure · <%= fields.length %> fields</div>
+                <div class="grid md:grid-cols-2 gap-2">
+                  <% fields.each do |field| %>
+                    <div class="rounded border border-white/10 px-3 py-2 text-xs">
+                      <span class="font-bold text-white"><%= field["label"] %></span>
+                      <span class="text-slate-500"> · <%= field["type"] %> · <%= field["classification"].to_s.humanize %> · <%= field["required"] ? "required" : "optional" %></span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            <% if event.approval_state == 'pending' %>
+              <div class="mt-5 rounded-lg border border-warning/30 bg-warning/10 p-4">
+                <div class="text-sm font-black text-warning">Approval required</div>
+                <p class="text-xs text-slate-400 mt-1">This transition is paused. Decide here before any irreversible provider action is considered.</p>
+                <div class="flex gap-3 mt-4">
+                  <%= button_to "Approve", approval_guided_session_path(@guided_session, event_id: event.id), method: :patch, params: { approval_state: "approved" }, class: "btn btn-sm btn-success rounded-lg font-bold" %>
+                  <%= button_to "Deny", approval_guided_session_path(@guided_session, event_id: event.id), method: :patch, params: { approval_state: "denied" }, class: "btn btn-sm btn-error btn-outline rounded-lg font-bold" %>
+                </div>
+              </div>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="rounded-xl border border-dashed border-white/10 p-6 text-sm text-slate-500">No meaningful transitions recorded yet.</div>
+    <% end %>
+  </div>
+
+  <% if @replay_plan[:steps].any? %>
+    <div class="card-neural p-6 mt-10">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Replay plan &mdash; what a later run would do</div>
+      <p class="text-sm text-slate-400 mb-4">
+        A replay would <span class="text-success font-bold">pre-fill <%= pluralize(@replay_plan[:replayable], "step") %></span>
+        from the recorded answers and <span class="text-warning font-bold">pause for you at <%= pluralize(@replay_plan[:gates], "gate") %></span>.
+        Replay only ever fills fields &mdash; it never clicks Next, Continue, or Submit, and every gate hands control back to you.
+      </p>
+
+      <% if @guided_session.status == "completed" %>
+        <% if @replay %>
+          <div class="rounded-lg border border-primary/30 bg-primary/5 p-4 mb-4">
+            <div class="text-sm font-black text-white">Replay <%= @replay.status.humanize %> &mdash; step <%= @replay.current_step + 1 %> of <%= @replay_plan[:steps].size %></div>
+            <p class="text-xs text-slate-400 mt-1">Open the application to continue &mdash; the extension walks you through each fill.</p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <%= link_to "Open the application", @guided_session.tracked_source_url, target: "_blank", rel: "noreferrer", class: "btn btn-xs btn-primary rounded-lg font-bold" %>
+              <%= button_to "Stop replay", guided_session_replay_path(@guided_session, @replay), method: :patch, params: { command: "stop" }, class: "btn btn-xs btn-ghost border-error/30 text-error rounded-lg font-bold" %>
+            </div>
+          </div>
+        <% else %>
+          <%= form_with url: guided_session_replays_path(@guided_session), method: :post, class: "flex flex-wrap items-center gap-3 mb-2" do %>
+            <label class="flex items-center gap-2 text-xs text-slate-400">
+              <%= check_box_tag :allow_real_site, "1", false, class: "checkbox checkbox-xs" %>
+              Let this replay drive a real employer site
+            </label>
+            <%= submit_tag "Start replay", class: "btn btn-xs btn-primary rounded-lg font-bold" %>
+          <% end %>
+          <p class="text-[10px] text-slate-600">Sandbox always allowed. A real site needs the box above.</p>
+        <% end %>
+      <% end %>
+      <ol class="space-y-1 text-xs">
+        <% @replay_plan[:steps].each do |step| %>
+          <li class="flex items-center gap-2">
+            <span class="badge badge-outline text-[10px] <%= step.disposition == :replay ? 'border-success/40 text-success' : 'border-warning/40 text-warning' %>">
+              <%= step.disposition == :replay ? "auto" : "pause" %>
+            </span>
+            <span class="text-slate-300"><%= step.event.kind.humanize %></span>
+            <span class="text-slate-600">&mdash; <%= step.reason %></span>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% end %>
+
+  <%= render "reference_comparison", guided_session: @guided_session %>
+</div>

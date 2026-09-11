@@ -1,0 +1,8 @@
+# Standing job-search criteria fed verbatim into LLM prompts (interview prep,
+# matching). Copy to config/job_search_criteria.yml (gitignored) and set real
+# values. If that file is absent, prompts get a neutral placeholder instead.
+criteria:
+  - "Compensation floor: <base-salary floor>; below it, culture/belonging has to carry real weight."
+  - "Weight team culture and being genuinely wanted above marginal comp — a first-class factor, not a tiebreaker."
+  - "<Location / work-authorization constraint, e.g. US-only>."
+  - "Target level is sized to company stage (Staff/Principal through CTO), not a fixed title."

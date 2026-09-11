@@ -1,0 +1,55 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Raw Documents</h1>
+    <p class="text-slate-500 font-bold text-sm">Unprocessed data as fetched from each source.</p>
+  </div>
+</div>
+
+<div class="card-neural mb-6">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Signature / Source</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4">Fetched At</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-mono text-xs">
+        <% @documents.each do |doc| %>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <div class="text-white font-bold mb-0.5 truncate max-w-xs"><%= doc.signature %></div>
+              <div class="text-blue-400 font-bold text-xs"><%= doc.job_boards_source&.name %></div>
+            </td>
+            <td class="px-6 py-4">
+               <span class="inline-flex items-center px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10 text-xs font-bold">
+                  <%= doc.aasm_state&.humanize || "Pending" %>
+                </span>
+            </td>
+            <td class="px-6 py-4 text-slate-400">
+              <%= doc.created_at.strftime("%Y-%m-%d %H:%M") %>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2 text-xs">
+                <%= link_to admin_document_path(doc), class: "px-3 py-1 rounded font-bold border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" do %>
+                  View
+                <% end %>
+                <%= button_to admin_document_path(doc), method: :delete, form: { class: "inline-block" }, class: "px-3 py-1 rounded font-bold border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all", data: { turbo_confirm: "Permanently delete this document?" } do %>
+                  Delete
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= paginate @documents %>
+</div>

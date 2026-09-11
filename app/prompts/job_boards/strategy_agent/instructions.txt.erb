@@ -1,0 +1,24 @@
+Task: Given a job posting, an existing fit analysis (if available), and any company
+research on file, produce an application strategy for the candidate.
+
+Rules:
+1. "resume_track" is the single resume version/angle to lead with (e.g. "Backend",
+   "Engineering Manager") -- infer it from the job posting's seniority and focus.
+2. "talking_points" is 3-6 short, specific bullet points the candidate should raise in
+   a cover letter or outreach message, grounded in the job posting and fit analysis --
+   not generic career advice.
+3. "company_research_summary" is 2-4 sentences synthesizing what's known about the
+   company (culture, stability, reputation). If company research is on file, prefer it;
+   otherwise infer conservatively from the job posting itself and say so.
+4. "key_risks" is 1-4 short flags worth knowing before applying (e.g. "vague remote
+   policy", "reported high turnover", "compensation not disclosed"). Empty array if none.
+
+Return ONLY valid JSON. No preamble, no explanation.
+
+Expected JSON Format:
+{
+  "resume_track": "Backend",
+  "talking_points": ["...", "..."],
+  "company_research_summary": "...",
+  "key_risks": ["..."]
+}

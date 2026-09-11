@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+class Admin::DocumentsController < Admin::ApplicationController
+  def index
+    @documents = JobBoards::Document.order(created_at: :desc).includes(:job_boards_source).page(params[:page]).per(30)
+  end
+
+  def show
+    @document = JobBoards::Document.find(params.expect(:id))
+  end
+
+  def destroy
+    @document = JobBoards::Document.find(params.expect(:id))
+    @document.destroy
+    redirect_to admin_documents_path, notice: "Document was successfully deleted."
+  end
+end

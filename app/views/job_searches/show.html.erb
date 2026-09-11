@@ -1,0 +1,123 @@
+<div class="max-w-7xl mx-auto py-10 px-6">
+  <div class="mb-10 text-xs font-bold opacity-60">
+    <div class="flex items-center gap-3">
+      <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <%= link_to t('.breadcrumb_searches'), job_searches_path, class: "hover:text-primary transition-all" %>
+      <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+      <span class="text-white"><%= @job_search.name %></span>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div>
+      <h1 class="text-4xl font-black text-white tracking-tight leading-none mb-3"><%= @job_search.name %></h1>
+      <div class="flex items-center gap-4">
+        <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
+        <span class="badge badge-primary badge-outline text-xs font-bold"><%= @job_search.status %></span>
+      </div>
+    </div>
+    <div class="flex gap-4">
+      <%= link_to t('.edit'), edit_job_search_path(@job_search), class: "btn btn-ghost border-white/10 rounded-xl px-10 font-bold" %>
+      <%= button_to t('.close_search'), job_search_path(@job_search), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline btn-error rounded-xl px-10 font-bold" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+    <div class="lg:col-span-1 space-y-8">
+      <div class="card-neural p-8 border-l-4 border-primary">
+        <h3 class="text-xs font-bold text-white/60 mb-6"><%= t('.resume_heading') %></h3>
+        <% if @job_search.resume %>
+          <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+            <%= link_to resume_path(@job_search.resume), class: "group" do %>
+              <div class="text-lg font-black text-white group-hover:text-primary transition-colors"><%= @job_search.resume.name %></div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-xs font-bold text-primary/60">v<%= @job_search.resume.version %></span>
+                <span class="badge badge-success badge-xs text-xs font-bold"><%= t('.indexed') %></span>
+              </div>
+            <% end %>
+          </div>
+          <div class="mt-6 space-y-4">
+            <div class="text-xs font-bold text-slate-500"><%= t('.targeting_heading') %></div>
+            <p class="text-xs text-slate-500 leading-relaxed font-medium"><%= t('.targeting_body') %></p>
+          </div>
+        <% else %>
+          <div class="alert alert-warning text-xs font-bold"><%= t('.no_resume') %></div>
+        <% end %>
+      </div>
+
+      <div class="card-neural p-8">
+        <h3 class="text-xs font-bold text-white/60 mb-6 flex justify-between items-center">
+          <span><%= t('.skill_matches_heading') %></span>
+          <%= heroicon "cpu-chip", variant: :outline, options: { class: "w-4 h-4 text-primary/60" } %>
+        </h3>
+        <div class="space-y-3">
+          <% if @skill_matches.any? %>
+            <% @skill_matches.each do |skill| %>
+              <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+                <span class="text-xs font-bold text-white"><%= skill.name %></span>
+                <span class="text-xs font-bold text-primary/70"><%= (100 - (skill.neighbor_distance * 100)).round(1) %>%</span>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-xs text-slate-500 italic"><%= t('.calculating') %></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-3 space-y-8">
+      <div class="flex items-center justify-between px-2">
+        <h3 class="text-xs font-bold text-white/60"><%= t('.matches_heading') %></h3>
+        <span class="text-xs font-bold text-slate-500"><%= t('.matches_count', count: @matches.count) %></span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6">
+        <% if @matches.any? %>
+          <% @matches.each do |job| %>
+            <div class="card-neural p-8 border border-white/5 hover:border-primary/20 transition-all group">
+              <div class="flex flex-col md:flex-row justify-between gap-6">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-2">
+                    <h4 class="text-xl font-black text-white"><%= job.title %></h4>
+                    <span class="badge badge-neutral bg-white/5 border-none text-xs font-bold"><%= job.freshness.to_s.humanize %></span>
+                  </div>
+                  <div class="flex items-center gap-4 mb-6">
+                    <span class="text-sm font-bold text-primary"><%= job.company_name %></span>
+                    <span class="text-slate-500 text-xs font-bold">&mdash;</span>
+                    <span class="text-slate-500 text-xs font-bold"><%= job.location %></span>
+                  </div>
+                  <div class="prose prose-invert prose-sm line-clamp-3 text-white/50 text-xs">
+                    <%= markdown(job.body&.truncate(300)) %>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end justify-between text-right min-w-[150px]">
+                  <div class="flex flex-col items-end gap-1">
+                    <div class="text-xs font-bold text-slate-500"><%= t('.match_score') %></div>
+                    <div class="text-3xl font-black text-white tracking-tighter">
+                      <%= (100 - (job.neighbor_distance * 100)).round(1) %><span class="text-primary/60 text-xl">%</span>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <%= link_to t('.view_job'), job_posting_path(job), class: "btn btn-ghost border-white/10 btn-sm font-bold hover:text-primary" %>
+                    <% if job.user_job_postings.where(user: current_user).any? %>
+                      <div class="badge badge-success badge-outline rounded text-xs font-bold px-4 h-8"><%= t('.tracked') %></div>
+                    <% else %>
+                      <%= button_to t('.track'), user_job_postings_path(job_posting_id: job.id, job_search_id: @job_search.id), method: :post, class: "btn btn-primary btn-sm font-bold px-6" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="card-neural p-20 text-center border-dashed border-white/10">
+            <%= heroicon "magnifying-glass", variant: :outline, options: { class: "w-9 h-9 text-slate-700 mb-6 block" } %>
+            <div class="text-sm font-bold text-slate-500"><%= t('.no_matches_title') %></div>
+            <p class="text-xs text-slate-500 mt-4 max-w-sm mx-auto leading-relaxed"><%= t('.no_matches_body') %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

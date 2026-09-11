@@ -1,0 +1,18 @@
+<% system ||= local_assigns[:llm_message] || local_assigns[:message] %>
+<div id="llm_message_<%= system.id %>" class="flex flex-col items-center justify-center my-8 group">
+  <div class="flex items-center gap-3 mb-2">
+    <div class="h-[1px] w-8 bg-white/5"></div>
+    <div class="badge badge-outline badge-xs opacity-50 font-bold text-xs py-2 px-3 border-white/10">
+      System Instruction
+    </div>
+    <div class="h-[1px] w-8 bg-white/5"></div>
+  </div>
+
+  <div class="text-xs font-medium text-center text-base-content/60 max-w-lg leading-relaxed italic px-6">
+    <%= system.content %>
+  </div>
+
+  <div class="chat-footer opacity-40 text-xs font-bold mt-2">
+    <%= system.created_at&.strftime("%I:%M %p") %>
+  </div>
+</div>

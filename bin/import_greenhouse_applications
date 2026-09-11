@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Backfill application history from my.greenhouse.io.
+#
+# Unlike LinkedIn, Greenhouse has a real aggregating endpoint --
+# GET my.greenhouse.io/applications.json?page=N&active_only=true -- that spans
+# every Greenhouse-powered company he applied to, not one tenant at a time.
+# That answers TASK-83 AC #10: my.greenhouse.io is Tier 1, not Tier 3.
+#
+# It is behind a login, so the input is a HAR capture of the page rather than
+# a fetch we can make ourselves. Save the network log while paging through
+# my.greenhouse.io, and every page's response is in it.
+#
+# Usage:
+#   bin/import_greenhouse_applications ~/ai/inbox/my.greenhouse.io.har --dry-run
+#   bin/import_greenhouse_applications ~/ai/inbox/my.greenhouse.io.har
+#
+# Why this beats the saved DOM: applied_at is a real ISO timestamp. LinkedIn
+# only exposes relative ages ("Applied 3mo ago"), so its dates are approximate
+# by construction; these are exact and go straight into applied_at.
+require_relative "../config/environment"
+require "json"
+require "base64"
+
+def usage
+  warn "Usage: bin/import_greenhouse_applications <har-file> [--dry-run]"
+  exit 1
+end
+
+path, *flags = ARGV
+usage unless path
+dry_run = flags.include?("--dry-run")
+path = File.expand_path(path)
+abort "No such file: #{path}" unless File.exist?(path)
+
+# HAR bodies arrive either as plain text or base64, and Chrome mixes both
+# within a single capture -- pages 3 and 4 of this file were base64 while the
+# rest were not. Reading only .text silently drops them.
+def body_of(entry)
+  content = entry.dig("response", "content") || {}
+  text = content["text"].to_s
+  return nil if text.empty?
+
+  content["encoding"] == "base64" ? Base64.decode64(text) : text
+end
+
+def applications_from(har)
+  har.fetch("log", {}).fetch("entries", []).filter_map do |entry|
+    next unless entry.dig("request", "url").to_s.include?("applications.json")
+
+    body = body_of(entry) or next
+    JSON.parse(body).dig("active", "applications")
+  rescue JSON::ParserError
+    nil
+  end.flatten.uniq { |a| a["id"] }
+end
+
+# Upsert + outcome logic lives in Applications::GreenhouseRowImporter,
+# shared with Api::V0::OutcomesController so the extension's live capture and
+# this HAR-replay backfill write through one code path.
+def dry_run_line(app)
+  posting = Applications::PostingMatcher.call(
+    signature: Digest::SHA256.hexdigest("greenhouse-app-#{app['id']}"),
+    native_id_fragment: "/jobs/#{app['job_post_id']}", target_url: app["job_post_url"],
+    company: app["company_name"], title: app["job_title"]
+  )
+  posting ? "exists" : "create"
+end
+
+user = User.sole
+har = JSON.parse(File.read(path))
+apps = applications_from(har)
+abort "Parsed 0 applications -- does the HAR contain my.greenhouse.io/applications.json?" if apps.empty?
+
+puts "#{apps.size} applications in #{File.basename(path)}#{' [DRY RUN]' if dry_run}"
+
+apps.sort_by { |a| a["applied_at"].to_s }.each do |app|
+  if dry_run
+    action = dry_run_line(app)
+    applied_at = Time.zone.parse(app["applied_at"].to_s)
+    puts format("  %-8s %-10s %-26s %s", action, applied_at&.to_date, app["company_name"].to_s[0, 24],
+                app["job_title"].to_s[0, 44])
+  else
+    result = Applications::GreenhouseRowImporter.call(app, user: user)
+    puts format("  %-8s %-10s %-26s %-44s %s", "ok", result[:applied_at]&.to_date,
+                app["company_name"].to_s[0, 24], app["job_title"].to_s[0, 44],
+                result[:outcome] ? "[#{result[:outcome]}]" : "")
+  end
+end

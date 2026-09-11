@@ -1,0 +1,106 @@
+<div data-controller="triage" data-action="keydown@window->triage#keydown">
+  <div class="max-w-2xl mx-auto <%= 'pb-36' if @job_posting %>">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-4xl font-black tracking-tight text-white mb-2"><%= t('.title') %></h1>
+        <p class="text-base-content/60 font-bold text-sm"><%= t('.subtitle') %></p>
+      </div>
+      <div class="flex items-center gap-3">
+        <% if @last_triaged %>
+          <%= link_to job_posting_path(@last_triaged), data: { triage_target: "back" },
+              title: t('.back_to_last', title: @last_triaged.title),
+              class: "btn btn-outline btn-sm rounded-lg font-bold" do %>
+            <%= t('.back') %> <span class="opacity-50 text-xs">B</span>
+          <% end %>
+        <% end %>
+        <%= link_to t('.back_to_list'), job_postings_path, class: "btn btn-ghost btn-sm rounded-lg font-bold" %>
+      </div>
+    </div>
+
+    <% if @job_posting.nil? %>
+      <div class="py-20 text-center bg-base-200 rounded-2xl border border-dashed border-white/10">
+        <h2 class="text-xl font-black text-white mb-2" data-triage-target="heading" tabindex="-1"><%= t('.empty.title') %></h2>
+        <p class="text-base-content/50 font-bold text-sm mb-8"><%= t('.empty.body') %></p>
+        <%= link_to t('.empty.reset_skips'), job_posting_triage_path(reset_skips: true), class: "btn btn-outline btn-sm rounded-lg font-bold" %>
+      </div>
+    <% else %>
+      <div class="card bg-base-200 border border-white/5 p-8">
+        <h2 class="text-2xl font-black text-white mb-1" data-triage-target="heading" tabindex="-1">
+          <%= link_to @job_posting.title, job_posting_path(@job_posting), class: "hover:text-primary" %>
+        </h2>
+        <p class="text-secondary font-bold text-sm mb-3">
+          <% if (company_name = @job_posting.company.presence&.to_s) %>
+            <%= company_name %>
+          <% else %>
+            <span class="text-base-content/40 italic"><%= t('.unknown_company') %></span>
+          <% end %>
+        </p>
+        <% if @job_posting.location.present? %>
+          <div class="flex items-center text-base-content/60 text-xs font-bold gap-2 mb-2">
+            <%= heroicon "map-pin", variant: :solid, options: { class: "w-3 h-3 text-primary" } %>
+            <%= @job_posting.location %>
+          </div>
+        <% end %>
+        <div class="text-base-content/50 text-xs font-bold mb-6">
+          <% published_time = @job_posting.published_at || @job_posting.created_at %>
+          <%= t('.posted_ago', time: time_ago_in_words(published_time)) %>
+        </div>
+
+        <%= form_with url: admin_job_posting_pipeline_steps_path(@job_posting), method: :post, id: "triage-form", class: "space-y-4" do %>
+          <%= hidden_field_tag :from_triage, "true" %>
+
+          <div class="grid grid-cols-2 gap-y-3 gap-x-6">
+            <% [%w[industry reason_industry], %w[skills_seniority reason_skills_seniority],
+                %w[compensation reason_compensation], %w[location_remote reason_location_remote]].each do |key, label_key| %>
+              <div class="flex items-center justify-between text-xs font-bold text-base-content/70">
+                <span class="text-base-content/50"><%= t(".#{label_key}") %></span>
+                <div class="flex gap-3">
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <%= radio_button_tag "reason_tags[#{key}]", "good", false, class: "radio radio-xs radio-success" %> <%= t('.good') %>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <%= radio_button_tag "reason_tags[#{key}]", "bad", false, class: "radio radio-xs radio-error" %> <%= t('.bad') %>
+                  </label>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div>
+            <label for="triage_note" class="sr-only"><%= t('.note_placeholder') %></label>
+            <%= text_area_tag :note, nil, id: "triage_note", placeholder: t('.note_placeholder'),
+                class: "textarea textarea-bordered w-full text-sm bg-base-300", rows: 2 %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @job_posting %>
+    <div class="fixed inset-x-0 bottom-0 z-10 bg-base-200 border-t border-white/10 px-4 py-3"
+        style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
+      <div class="max-w-2xl mx-auto flex flex-col gap-3">
+        <%= button_to job_posting_triage_path, method: :get,
+            params: { skip: @job_posting.id },
+            data: { triage_target: "skip" },
+            class: "btn btn-neutral min-h-11 rounded-lg font-bold w-full" do %>
+          <%= t('.skip') %> <span class="opacity-50 text-xs">S</span>
+        <% end %>
+        <div class="flex gap-3 pt-2 border-t border-white/10">
+          <button type="submit" form="triage-form" name="status" value="favorite" data-triage-target="favorite"
+              class="btn btn-primary min-h-11 rounded-lg font-bold flex-1">
+            <%= t('.favorite') %> <span class="opacity-50 text-xs">F</span>
+          </button>
+          <button type="submit" form="triage-form" name="status" value="ignore" data-triage-target="ignore"
+              class="btn btn-outline btn-error min-h-11 rounded-lg font-bold flex-1">
+            <%= t('.not_interested') %> <span class="opacity-50 text-xs">N</span>
+          </button>
+          <button type="submit" form="triage-form" name="status" value="expire" data-triage-target="expire"
+              class="btn btn-outline min-h-11 rounded-lg font-bold flex-1">
+            <%= t('.expired') %> <span class="opacity-50 text-xs">E</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

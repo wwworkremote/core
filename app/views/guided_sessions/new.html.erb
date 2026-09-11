@@ -1,0 +1,39 @@
+<div class="max-w-3xl mx-auto py-16 px-6">
+  <div class="mb-10">
+    <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-4">Pump track · Intake</div>
+    <h1 class="text-4xl font-black text-white mb-4">Start a guided application session</h1>
+    <p class="text-slate-400 font-medium">Paste a job posting link to begin a supervised lap. The system will record what happens and why; you approve ambiguous or irreversible moves.</p>
+  </div>
+
+  <%= form_with model: @guided_session, class: "card-neural p-8 space-y-6" do |form| %>
+    <% if @guided_session.errors.any? %>
+      <div class="alert alert-error text-sm"><%= @guided_session.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <div>
+      <%= form.label :source_url, "Job posting URL", class: "label text-xs font-bold text-slate-400" %>
+      <%= form.url_field :source_url, autofocus: true, required: true, placeholder: "https://jobs.example.com/roles/42", class: "input input-bordered w-full bg-white/5 border-white/10 text-white" %>
+      <p class="text-xs text-slate-500 mt-2">Copy the link from the posting, then return here. Nothing is submitted to the employer from this step.</p>
+    </div>
+
+    <fieldset class="space-y-3">
+      <legend class="label text-xs font-bold text-slate-400">Session purpose</legend>
+      <label class="flex gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 cursor-pointer">
+        <%= form.radio_button :purpose, "application_research", class: "radio radio-primary mt-1" %>
+        <span>
+          <span class="block font-black text-white">Research the application</span>
+          <span class="block text-sm text-slate-400 mt-1">Open the employer flow, inspect its steps and questions, and record what it asks. Stop before any commitment or sensitive-data transmission.</span>
+        </span>
+      </label>
+      <label class="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4 cursor-pointer">
+        <%= form.radio_button :purpose, "application_execution", class: "radio radio-primary mt-1" %>
+        <span>
+          <span class="block font-black text-white">Work toward applying</span>
+          <span class="block text-sm text-slate-400 mt-1">Prepare and fill the application under supervision. Final submission still requires explicit approval.</span>
+        </span>
+      </label>
+    </fieldset>
+
+    <%= form.submit "Start intake", class: "btn btn-primary rounded-xl font-bold" %>
+  <% end %>
+</div>

@@ -1,0 +1,14 @@
+<div id="llm_message_<%= tool_calls.id %>" class="chat chat-start group">
+  <div class="chat-header opacity-60 text-xs font-bold mb-1">
+    Tool Call
+  </div>
+  <div class="chat-bubble bg-base-300/50 text-base-content border border-dashed border-white/10 shadow-lg text-sm leading-relaxed p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="font-bold text-accent"><%= tool_call.name %></span>
+    </div>
+    <pre class="bg-black/20 p-3 rounded-lg text-xs font-mono opacity-80 overflow-x-auto"><%= tool_call.arguments.map { |k, v| "#{k}: #{v.inspect}" }.join("\n") %></pre>
+  </div>
+  <div class="chat-footer opacity-40 text-xs font-bold mt-1">
+    <%= tool_calls.created_at&.strftime("%I:%M %p") %>
+  </div>
+</div>

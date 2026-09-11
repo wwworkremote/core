@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# bin/verify_email_ingestion -- Operational check for the email-drop
+# ingestion path (~/.wwworkremote/{source}/*.eml). Confirms
+# EmailIngestion::Scanner can run cleanly against whatever's actually on
+# disk right now, real files and all -- claiming/enqueuing genuinely
+# present .eml files is the intended real behavior, not a side effect to
+# avoid. Zero files found is a healthy PASS (mail is intermittent, not
+# guaranteed present), not a failure.
+
+require_relative "../config/environment"
+
+if Rails.env.test?
+  puts "\e[31m✗ Refusing to run under RAILS_ENV=test\e[0m"
+  puts "  This script writes real, persistent EmailImportRecord rows -- see docs/agents/bin-script-conventions.md."
+  puts "  Run it against development instead: unset RAILS_ENV or RAILS_ENV=development bin/verify_email_ingestion"
+  exit 1
+end
+
+puts "--- Running Email Ingestion Verification ---"
+
+begin
+  EmailIngestion::Scanner::SOURCES.each do |source|
+    dir = File.join(EmailIngestion::Scanner::BASE_DIR, source)
+    if Dir.exist?(dir)
+      puts "  #{source}: #{Dir.glob(File.join(dir, '*.eml')).count} file(s) found"
+    else
+      puts "  #{source}: no drop directory"
+    end
+  end
+
+  EmailIngestion::Scanner.new.call
+
+  puts "\e[32m✓ Email ingestion scan completed without error\e[0m"
+  exit 0
+rescue StandardError => e
+  puts "\e[31m✗ Email ingestion scan failed: #{e.message}\e[0m"
+  exit 1
+end

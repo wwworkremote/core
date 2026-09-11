@@ -1,0 +1,142 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+  <div>
+    <h1 class="text-4xl font-black text-white mb-2 tracking-tight">System Health</h1>
+    <p class="text-slate-400 font-bold text-sm">Pipeline performance and user activity.</p>
+  </div>
+</div>
+
+<!-- System Health -->
+<section class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <h2 class="text-xs font-bold text-slate-400">Pipeline Performance</h2>
+    <div class="h-px flex-1 bg-white/20"></div>
+  </div>
+
+  <div class="stats stats-vertical lg:stats-horizontal w-full bg-base-200 shadow-2xl border border-white/10 mb-10">
+    <div class="stat p-8">
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Avg Latency</div>
+      <div class="stat-value text-primary text-4xl font-black tracking-tighter"><%= @latency_avg %>s</div>
+      <div class="stat-desc font-bold text-xs text-slate-400 mt-2">Fetch to enrich</div>
+    </div>
+
+    <div class="stat p-8">
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Daily Traffic</div>
+      <div class="stat-value text-kanagawa-yellow text-4xl font-black tracking-tighter"><%= @traffic_daily %></div>
+      <div class="stat-desc font-bold text-xs text-slate-400 mt-2">Postings ingested</div>
+    </div>
+
+    <div class="stat p-8">
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Error Rate</div>
+      <div class="stat-value text-kanagawa-red-text text-4xl font-black tracking-tighter"><%= @error_rate %>%</div>
+      <div class="stat-desc font-bold text-xs text-kanagawa-red-text mt-2">Failed executions</div>
+    </div>
+
+    <div class="stat p-8 border-none!">
+      <div class="stat-title text-xs font-bold text-slate-500 mb-2">Saturation</div>
+      <div class="stat-value text-kanagawa-accent text-4xl font-black tracking-tighter"><%= @saturation %>%</div>
+      <div class="stat-desc font-bold text-xs text-slate-400 mt-2">Worker utilization</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div class="card bg-base-200 border border-white/10 shadow-xl">
+      <div class="card-body p-10">
+        <h3 class="card-title text-xs font-bold text-slate-400 mb-8 flex justify-between items-center">
+          <span>Signal Flow</span>
+          <span class="text-xs badge badge-outline border-white/20 text-slate-500">7 days</span>
+        </h3>
+        <%= line_chart charts_data_pipeline_health_path,
+            height: "250px",
+            colors: ["#7E9CD8"],
+            library: {
+              scales: {
+                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#C8C093", font: { size: 10, weight: 'bold' } } },
+                x: { grid: { display: false }, ticks: { color: "#C8C093", font: { size: 10, weight: 'bold' } } }
+              },
+              plugins: { legend: { display: false } }
+            } %>
+      </div>
+    </div>
+
+    <div class="card bg-base-200 border border-white/10 shadow-xl">
+      <div class="card-body p-10">
+        <h3 class="card-title text-xs font-bold text-slate-400 mb-8">Pipeline Funnel</h3>
+        <%= bar_chart charts_data_pipeline_funnel_path,
+            height: "250px",
+            colors: ["#98BB6C"],
+            library: {
+              scales: {
+                x: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#C8C093", font: { size: 10, weight: 'bold' } } },
+                y: { grid: { display: false }, ticks: { color: "#C8C093", font: { size: 10, weight: 'bold' } } }
+              },
+              plugins: { legend: { display: false } }
+            } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Behavioral Analytics -->
+<section>
+  <div class="flex items-center gap-4 mb-8">
+    <h2 class="text-xs font-bold text-slate-400">User Activity</h2>
+    <div class="h-px flex-1 bg-white/20"></div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <div class="card bg-base-200 border border-white/10 shadow-xl lg:col-span-2">
+      <div class="card-body p-10">
+        <h3 class="card-title text-xs font-bold text-slate-400 mb-8 flex justify-between items-center">
+          <span>Visits</span>
+          <span class="text-xs badge badge-primary font-bold px-3 py-2">Live</span>
+        </h3>
+        <%= area_chart charts_data_behavior_visits_path,
+            height: "280px",
+            colors: ["#98BB6C"],
+            library: {
+              scales: {
+                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#C8C093", font: { size: 10, weight: 'bold' } } },
+                x: { grid: { display: false }, ticks: { color: "#C8C093", font: { size: 10, weight: 'bold' } } }
+              },
+              plugins: { legend: { display: false } }
+            } %>
+      </div>
+    </div>
+
+    <div class="space-y-10">
+      <div class="card bg-base-200 border border-white/10 shadow-xl">
+        <div class="card-body p-8">
+          <h3 class="text-xs font-bold text-slate-500 mb-6 pb-3 border-b border-white/5 flex items-center gap-2">
+            <%= heroicon "globe-alt", options: { class: "w-4 h-4" } %> Top Referrers
+          </h3>
+          <ul class="space-y-5">
+            <% @top_referrers.each do |ref, count| %>
+              <li class="flex items-center justify-between group">
+                <span class="text-sm font-bold text-slate-300 group-hover:text-primary transition-colors truncate max-w-[150px]">
+                  <%= ref.present? ? ref.gsub(%r{https?://}, '') : 'Direct' %>
+                </span>
+                <span class="text-xs font-bold text-slate-500 font-mono"><%= count %></span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card bg-base-200 border border-white/10 shadow-xl">
+        <div class="card-body p-8">
+          <h3 class="text-xs font-bold text-slate-500 mb-6 pb-3 border-b border-white/5 flex items-center gap-2">
+            <%= heroicon "magnifying-glass", options: { class: "w-4 h-4" } %> Top Searches
+          </h3>
+          <ul class="space-y-5">
+            <% @top_job_searches.each do |query, count| %>
+              <li class="flex items-center justify-between group">
+                <span class="text-sm font-bold text-slate-300 group-hover:text-secondary transition-colors italic">"<%= query %>"</span>
+                <span class="text-xs font-bold text-slate-500 font-mono"><%= count %></span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

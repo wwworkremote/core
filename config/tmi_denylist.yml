@@ -1,0 +1,10 @@
+# Local TMI Denylist (gitignored)
+denylist:
+  - "Aneta"
+  - "Beep"
+  - "Basis"
+  - "UGtastic"
+  - "Speedfunds"
+  - "\\$200[kK]"
+  - "140[–-]175[kK]"
+  - "bb213682-6e49-48d4-bdfe-3b17aba79366"

@@ -1,0 +1,92 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TASK-85: derive country_code for JobPosting rows that predate it.
+#
+# Runs the existing JobBoards::GeocodingJob's logic (packages/ingestion)
+# synchronously, one row per second, for postings with a location string
+# but no country_code -- same Nominatim lookup the live pipeline already
+# uses per-posting, aimed at the backlog. Deliberately NOT perform_later:
+# an earlier run enqueued through SolidQueue's 5-thread "light" queue and
+# most requests landed close enough together to get silently rate-limited
+# by Nominatim (country_code stayed nil, no error surfaced -- the job's
+# own 429 handling only matches when "429" is literally in the message).
+# One req/sec sequential respects Nominatim's usage policy and is fast
+# enough for a backlog this size (order-of-100 rows, not order-of-1000s).
+#
+# Scoped to the same statuses JobPostingFiltering already shows (excludes
+# ignored/purged/expired) -- GeocodingJob's own geocodable? guard silently
+# no-ops on expired postings (by design, to not burn API calls on dead
+# listings), so processing those wastes calls for rows that can never
+# surface anyway. Learned the hard way: an earlier undifferentiated run
+# targeted 3,418 rows, 90% of them expired and silently skipped.
+#
+# Postings with no location text at all (732 as of 2026-08-24) have no
+# signal to geocode from and are left nil -- see JobPosting::GeoFiltering
+# for why nil stays visible rather than guessed at.
+#
+# Usage:
+#   bin/backfill_country_codes --status     # just print current counts
+#   bin/backfill_country_codes --dry-run    # preview what would be processed
+#   bin/backfill_country_codes              # geocode the backlog, 1 row/sec
+require_relative "../config/environment"
+
+def usage
+  warn "Usage: bin/backfill_country_codes [--dry-run|--status]"
+  exit 1
+end
+
+flags = ARGV
+usage unless (flags - %w[--dry-run --status]).empty?
+
+EXCLUDED_STATUSES = %w[ignored purged expired].freeze
+
+def print_counts
+  total = JobPosting.count
+  nil_country = JobPosting.where(country_code: nil).count
+  no_location = JobPosting.where(country_code: nil, location: [nil, ""]).count
+  backfillable = JobPosting.where(country_code: nil).where.not(location: [nil, ""])
+                           .where.not(status: EXCLUDED_STATUSES).count
+  puts "total postings: #{total}"
+  puts "country_code nil: #{nil_country} (#{no_location} have no location text to geocode from)"
+  puts "  of those, #{backfillable} are visible-status (not ignored/purged/expired) and backfillable"
+  puts "geo_allowed (US or unknown): #{JobPosting.geo_allowed.count}"
+end
+
+if flags.include?("--status")
+  print_counts
+  exit
+end
+
+target = JobPosting.where(country_code: nil).where.not(location: [nil, ""]).where.not(status: EXCLUDED_STATUSES)
+puts "before:"
+print_counts
+ids = target.pluck(:id)
+puts "\n#{ids.size} postings to geocode#{' [DRY RUN]' if flags.include?('--dry-run')}"
+exit if flags.include?("--dry-run")
+
+# Backfill writes are meant to persist for real; a stray run under
+# RAILS_ENV=test would otherwise leave rows behind in the shared test DB.
+abort "Refusing to run under RAILS_ENV=test" if Rails.env.test?
+
+# Calls Geocoder directly rather than through JobBoards::GeocodingJob#perform
+# so an OverQueryLimitError is visible here -- the job's own circuit breaker
+# (ApiGuard#lock_source!) writes to Rails.cache, which is a NullStore in
+# this environment, so it silently never engages. Stopping the whole run on
+# the first rate-limit hit instead of continuing to hammer a service that's
+# already throttling us; re-run later once it clears.
+ids.each_with_index do |id, i|
+  posting = JobPosting.find(id)
+  result = Geocoder.search(posting.location).first
+  if result
+    posting.update!(latitude: result.latitude, longitude: result.longitude,
+                    country_code: result.country_code&.upcase)
+  end
+  sleep 1
+  print "\r#{i + 1}/#{ids.size}"
+rescue Geocoder::OverQueryLimitError, Geocoder::RequestDenied
+  puts "\nRate-limited by Nominatim after #{i} rows -- stopping here. Re-run bin/backfill_country_codes later."
+  exit 1
+end
+puts "\ndone."
+print_counts

@@ -1,0 +1,63 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Prompts</h1>
+    <p class="text-slate-500 font-bold text-sm">AI prompts used at each point in the pipeline. Edit or add new ones without touching code.</p>
+  </div>
+  <div>
+    <%= link_to "New Prompt", new_admin_pipeline_prompt_path, class: "btn btn-primary rounded-xl px-10 font-bold" %>
+  </div>
+</div>
+
+<div class="card-neural mb-6">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
+        <tr>
+          <th class="px-6 py-4">Name / Key</th>
+          <th class="px-6 py-4">Stage</th>
+          <th class="px-6 py-4 text-center">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-mono text-xs">
+        <% @pipeline_prompts.each do |prompt| %>
+          <tr class="group hover:bg-white/[0.03] transition-colors">
+            <td class="px-6 py-4">
+              <div class="text-white font-bold mb-0.5"><%= link_to prompt.name, admin_pipeline_prompt_path(prompt), class: "hover:text-primary" %></div>
+              <div class="text-slate-500 text-xs"><%= prompt.key %></div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="badge badge-neutral bg-white/5 border-none text-xs font-bold text-slate-400"><%= prompt.stage %></span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <% if prompt.active? %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">Active</span>
+              <% else %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-white/5 text-slate-500 border border-white/10 text-xs font-bold">Inactive</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2 text-xs">
+                <%= link_to "Edit", edit_admin_pipeline_prompt_path(prompt), class: "px-3 py-1 rounded font-bold border border-white/10 hover:bg-white/10 hover:text-white transition-all text-slate-400" %>
+                <%= button_to "Delete", admin_pipeline_prompt_path(prompt), method: :delete, form: { class: "inline-block" }, class: "px-3 py-1 rounded font-bold border border-rose-900/50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all", data: { turbo_confirm: "Delete this prompt? The pipeline will fall back to its original built-in prompt." } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @pipeline_prompts.empty? %>
+      <div class="text-center py-16">
+        <div class="text-sm font-bold text-slate-500">No prompt overrides yet</div>
+        <p class="text-xs text-slate-500 mt-2 max-w-md mx-auto">The pipeline is running on its built-in default prompts. Create one here to customize how the AI evaluates job postings, matches, or company audits.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="mt-8">
+  <%= paginate @pipeline_prompts %>
+</div>

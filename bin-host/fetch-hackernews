@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+# Ensure we are in the project root (where docker-compose.yml is)
+cd "$(dirname "$0")/.." || exit
+
+echo "--- Starting Hacker News Job Fetch ---"
+
+bin/rails runner - <<'EOF'
+  puts "Phase 1: Fetching raw data from Hacker News API..."
+  source = JobBoards::Source.find_or_create_by!(slug: "hackernews", name: "Hacker News")
+  JobBoards::Query.find_or_create_by!(source_id: source.id)
+  load "exe/hackernews"
+
+  puts "Phase 2: Syncing raw data to Dashboard models..."
+  JobBoards::Syncer.new.call
+  puts "Done! Total JobPostings: #{JobPosting.count}"
+EOF
+
+echo "--- Fetch and Sync Complete ---"

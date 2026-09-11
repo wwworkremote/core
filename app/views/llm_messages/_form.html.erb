@@ -1,0 +1,19 @@
+<%= form_with(model: [llm_chat, llm_message], id: "new_llm_message", class: "flex gap-2 items-end") do |form| %>
+  <% if llm_message.errors.any? %>
+    <div id="error_explanation" class="alert alert-error mb-4">
+      <ul class="text-xs">
+        <% llm_message.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="flex-1">
+    <%= form.text_area :content, rows: 1, placeholder: "Type a message…", autofocus: true,
+        class: "textarea textarea-bordered bg-base-300 border-white/10 w-full focus:outline-primary font-medium text-sm rounded-xl py-4",
+        onkeydown: "if (event.keyCode == 13 && !event.shiftKey) { event.preventDefault(); this.form.requestSubmit(); }" %>
+  </div>
+
+  <%= form.submit "Send", class: "btn btn-primary rounded-xl px-8 font-bold" %>
+<% end %>

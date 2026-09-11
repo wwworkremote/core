@@ -1,0 +1,176 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "cc8547226a03534ce23c2c55445404fc180e90b09a818dacfbc3e5fc78a55306",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/outbound_links_controller.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(JobPosting.find_by(:id => params[:job_posting_id]).target_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OutboundLinksController",
+        "method": "show"
+      },
+      "user_input": "JobPosting.find_by(:id => params[:job_posting_id]).target_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "1c74bad7ceb4025aa815859f6ca5c7bea73cb5df407a4841c601bb2867964aaa",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/outbound_links_controller.rb",
+      "line": 17,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(JobPosting.where(:target_url => params[:url]).limit(1).pick(:target_url), :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OutboundLinksController",
+        "method": "show"
+      },
+      "user_input": "JobPosting.where(:target_url => params[:url]).limit(1).pick(:target_url)",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "Secondary verification against database records makes this safe."
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "8eb7fb2e8aa0ebe6fd2200ca3f6b81b958a7eb0e383dd7cf455c312be8cfb80f",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `constantize` called on parameter value",
+      "file": "app/controllers/admin/jobs_controller.rb",
+      "line": 64,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "(YAML.load_file(Rails.root.join(\"config/recurring.yml\"))[Rails.env] or YAML.load_file(Rails.root.join(\"config/recurring.yml\"))[\"development\"])[params[:task_id]][\"class\"].constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::JobsController",
+        "method": "trigger"
+      },
+      "user_input": "params[:task_id]",
+      "confidence": "Medium",
+      "cwe_id": [
+        470
+      ],
+      "note": "Task ID is whitelisted against recurring.yml keys before constantize is called."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "c765ac8f4578e2aa732286bf987c4478c724a6498a4297cdb34174a7c2f72a03",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/guided_sessions/show.html.erb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "link_to(GuidedSession.find(params.expect(:id)).source_url, GuidedSession.find(params.expect(:id)).source_url, :target => \"_blank\", :rel => \"noreferrer\", :class => \"text-primary break-all\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "GuidedSessionsController",
+          "method": "show",
+          "line": 13,
+          "file": "app/controllers/guided_sessions_controller.rb",
+          "rendered": {
+            "name": "guided_sessions/show",
+            "file": "app/views/guided_sessions/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "guided_sessions/show"
+      },
+      "user_input": "GuidedSession.find(params.expect(:id)).source_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "GuidedSession#source_url_is_http rejects any non-http(s) scheme at write time, so a persisted source_url can never carry a javascript: payload."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "5030733e73ab4cad55438e447966c24725146b37d1584eadf167ddb1acabd3ee",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/guided_sessions/show.html.erb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "link_to((if (GuidedSession.find(params.expect(:id)).purpose == \"application_research\") then\n  \"Open research flow\"\nelse\n  \"Open supervised application\"\nend), GuidedSession.find(params.expect(:id)).tracked_source_url, :target => \"_blank\", :rel => \"noreferrer\", :class => \"btn btn-primary rounded-xl font-bold mt-4\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "GuidedSessionsController",
+          "method": "show",
+          "line": 13,
+          "file": "app/controllers/guided_sessions_controller.rb",
+          "rendered": {
+            "name": "guided_sessions/show",
+            "file": "app/views/guided_sessions/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "guided_sessions/show"
+      },
+      "user_input": "GuidedSession.find(params.expect(:id)).tracked_source_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "tracked_source_url is derived from source_url, which GuidedSession#source_url_is_http constrains to http(s) at write time."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "1fcacec87b50b699e92038bf4dd386156544786e9225195c6ff69d1746dde71b",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/guided_sessions/show.html.erb",
+      "line": 178,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(\"Open the application\", GuidedSession.find(params.expect(:id)).tracked_source_url, :target => \"_blank\", :rel => \"noreferrer\", :class => \"btn btn-xs btn-primary rounded-lg font-bold\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "GuidedSessionsController",
+          "method": "show",
+          "line": 22,
+          "file": "app/controllers/guided_sessions_controller.rb",
+          "rendered": {
+            "name": "guided_sessions/show",
+            "file": "app/views/guided_sessions/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "guided_sessions/show"
+      },
+      "user_input": "GuidedSession.find(params.expect(:id)).tracked_source_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "tracked_source_url is derived from source_url, which GuidedSession#source_url_is_http constrains to http(s) at write time (same as the other two entries on this template)."
+    }
+  ],
+  "brakeman_version": "8.0.6"
+}

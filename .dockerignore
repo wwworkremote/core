@@ -1,0 +1,10 @@
+.git
+.gitignore
+node_modules
+tmp
+log
+storage
+public/assets
+.env
+Dockerfile
+docker-compose.yml

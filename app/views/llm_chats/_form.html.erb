@@ -1,0 +1,27 @@
+<%= form_with(model: llm_chat, class: "space-y-8 relative") do |form| %>
+  <% if llm_chat.errors.any? %>
+    <div id="error_explanation" class="alert alert-error rounded-2xl text-xs font-bold p-4">
+      <ul>
+        <% llm_chat.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-2">
+    <%= form.label :model_id, t('.model_label'), class: "text-xs font-bold opacity-60 ml-4" %>
+    <%= form.collection_select :model_id, @chat_models, :id, :name, { selected: @selected_model },
+        class: "select select-bordered bg-base-300 border-white/10 w-full focus:outline-primary font-bold text-sm rounded-2xl h-14" %>
+  </div>
+
+  <div class="space-y-2">
+    <%= form.label :prompt, t('.prompt_label'), class: "text-xs font-bold opacity-60 ml-4" %>
+    <%= form.text_area :prompt, rows: 4, placeholder: t('.prompt_placeholder'),
+        class: "textarea textarea-bordered bg-base-300 border-white/10 w-full focus:outline-primary font-medium text-sm rounded-[2rem] p-6 leading-relaxed" %>
+  </div>
+
+  <div class="pt-4">
+    <%= form.submit t('.submit'), class: "btn btn-primary btn-block rounded-2xl font-bold h-14 shadow-2xl shadow-primary/20" %>
+  </div>
+<% end %>

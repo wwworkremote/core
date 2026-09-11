@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  title: WWWorkRemote Extension API
+  description: >
+    API consumed by the WWWorkRemote Chrome extension (`extension/`). This is
+    the unversioned `namespace :api` block in config/routes.rb -- distinct
+    from the separate, versioned `/api/v0/*` API, which this file does not
+    cover. See docs/extension-workflow.md for the full sequence diagrams
+    these calls fit into.
+  version: 0.2.0
+servers:
+  - url: http://localhost:31000/api
+    description: Local development server (matches config/puma.rb's default port)
+
+paths:
+  /leads:
+    post:
+      summary: Capture a Lead
+      description: >
+        Fired automatically by content.js the instant a job-detail page is
+        confirmed, before the user opens the review panel. Idempotent on a
+        signature derived from `url` -- revisiting the same page refreshes
+        `found_at` on the existing Lead instead of duplicating it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, provider]
+              properties:
+                url: { type: string, format: uri }
+                provider: { type: string, example: dice, description: "Provider key from content.js's PROVIDERS map, or \"generic\" via Scan This Page" }
+                title: { type: string, nullable: true }
+                company_name: { type: string, nullable: true }
+                location: { type: string, nullable: true }
+                raw_html: { type: string, nullable: true, description: "Capped at 512KB client-side" }
+                discovery:
+                  type: object
+                  description: Free-form provenance metadata
+                  properties:
+                    referrer: { type: string }
+                    search_context: { type: string }
+                    extraction_confidence: { type: string, enum: [high, medium, low] }
+                    extraction_method: { type: string, enum: [json_ld, css, meta, generic] }
+                    field_count: { type: integer, description: "Non-null fields extraction found, before promote-mode edits" }
+                    html_truncated: { type: boolean }
+      responses:
+        '201':
+          description: Lead created or refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, enum: [true] }
+                  id: { type: integer }
+                  status: { type: string, enum: [captured, matched, promoted, discarded, duplicate] }
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, enum: [false] }
+                  errors: { type: array, items: { type: string } }
+
+  /leads/{id}/promote:
+    post:
+      summary: Promote a Lead into a JobPosting
+      description: >
+        Fired when the user submits the review panel. Delegates to
+        Leads::CaptureService, which resolves/creates the Company and Source
+        the same way the scraper pipeline does, then enqueues the same
+        downstream AI analysis a scraped posting gets.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, target_url]
+              properties:
+                title: { type: string }
+                location: { type: string, nullable: true }
+                target_url: { type: string, format: uri }
+                body: { type: string, description: Plain-text description }
+                company_id: { type: integer, description: "Set when the user picked an existing company from the fuzzy-match list" }
+                company:
+                  type: object
+                  description: "Set instead of company_id when creating a new company"
+                  properties:
+                    name: { type: string }
+                data:
+                  type: object
+                  description: "Mirrors JobPostingEnrichment::AttributeBuilder::JSONB_KEYS -- salary_min/max, employment_type, remote, skills, etc."
+      responses:
+        '200':
+          description: Promoted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, enum: [true] }
+                  lead_id: { type: integer }
+                  job_posting_id: { type: integer }
+        '422':
+          description: CaptureService failure (e.g. invalid record)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, enum: [false] }
+                  error: { type: string }
+
+  /job_postings/{id}/enrich:
+    post:
+      summary: Enrich an existing JobPosting (enrich mode)
+      description: >
+        The "SOURCE_ORIGIN_VERIFY & ENRICH" flow -- the Rails app links out
+        to the posting's original URL with `?wwwr_id=NNN` appended; the
+        extension detects that param and, instead of capturing a Lead,
+        submits straight back to this JobPosting.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                html: { type: string, description: "Full page body.innerHTML, capped at 512KB" }
+                html_truncated: { type: boolean }
+                url: { type: string, format: uri }
+                title: { type: string, description: document.title, not the job title }
+                provider: { type: string }
+                extracted:
+                  type: object
+                  description: Same field set as the panel form -- see ExtractionRule field names in docs/extension-workflow.md
+      responses:
+        '200':
+          description: Enriched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, enum: [true] }
+                  message: { type: string }
+        '404':
+          description: JobPosting not found
+        '422':
+          description: No description found in captured content
+
+  /extraction_rules:
+    get:
+      summary: List learned selectors for a provider
+      description: >
+        Fetched by content.js once per extraction run; each rule's selector
+        is applied as a field-level override on top of the normal
+        JSON-LD/CSS/meta/generic result.
+      parameters:
+        - name: provider
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Learned rules for this provider
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field_name: { type: string }
+                    selector: { type: string }
+    post:
+      summary: Teach a selector for one field
+      description: >
+        Fired when the user clicks an element via the panel's element
+        picker. JobBoards::SelectorLearnerAgent refines the raw candidate
+        into a more stable selector; the result upserts ExtractionRule
+        (current value, one row per provider+field) and appends an
+        ExtractionRuleObservation (immutable history of every teach event).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider, field_name, candidate_selector, element_html, parent_html]
+              properties:
+                provider: { type: string }
+                field_name: { type: string, example: description_text }
+                candidate_selector: { type: string, description: "Raw DOM-path computed client-side by computeSelector(), CSS.escape'd" }
+                element_html: { type: string, description: "Capped at 4000 chars client-side" }
+                parent_html: { type: string, description: "Capped at 6000 chars client-side" }
+                source_url: { type: string, format: uri }
+      responses:
+        '200':
+          description: Selector learned and saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, enum: [true] }
+                  selector: { type: string, description: "The refined selector actually saved -- may differ from candidate_selector" }
+
+  /companies/search:
+    get:
+      summary: Fuzzy-search existing companies
+      description: >
+        Powers the panel's company picker (debounced 400ms on the company
+        field). Backed by Companies::FuzzyMatcher (pg_trgm).
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Matching companies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: integer }
+                    name: { type: string }
+                    slug: { type: string }
+                    status: { type: string }

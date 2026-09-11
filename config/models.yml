@@ -1,0 +1,56 @@
+defaults:
+  primary: "local"
+  fallback: "claude-3-5-sonnet-20241022"
+
+  # Per-purpose overrides. Any key here is readable as
+  # LLM::Registry.model_for(:key); unset means "use primary".
+  #
+  # answer_generation: screening answers written for an employer. Unlike
+  # ingestion there's no untrusted third-party text and no PHI, and the
+  # output is read by a human deciding whether to interview -- so this is
+  # the one path where quality outranks keeping the call on-box. The
+  # primary is a 7B *code* model, which is a tool mismatch for first-person
+  # career prose regardless of its size: it invented a Go migration, a
+  # "Principal Engineer" title Mike never held, and described Solid Queue
+  # and OpenTelemetry as "AI tools" in a screening answer.
+  #
+  # Now on Gemini (GEMINI_API_KEY, 2026-08-24). Anthropic stays unconfigured
+  # -- the key in the environment is rejected.
+  answer_generation: "gemini-3.7-flash"
+  #
+  # Caveat worth keeping: nothing reads defaults.fallback below, so if this
+  # model ever fails to authenticate, answer generation goes down rather
+  # than degrading to local. Comment this line out to fall back by hand.
+  #
+  # interview_prep: the interview prep pack (LLM::InterviewPrepGenerator).
+  # Same profile as answer_generation -- prose Mike reads, no PHI, the only
+  # untrusted text is the posting body which the orchestrator already
+  # screens -- so quality outranks on-box. Left unset (uses primary) until
+  # the local prose quality proves insufficient; then point it at the same
+  # model answer_generation uses.
+  # interview_prep: "gemini-3.7-flash"
+
+models:
+  local:
+    name: "Qwen 2.5 Coder 7B (Local)"
+    provider: "ollama"
+    family: "qwen"
+    context_window: 32768
+    max_output_tokens: 2048
+
+  claude-3-5-sonnet-20241022:
+    name: "Claude 3.5 Sonnet"
+    provider: "anthropic"
+    family: "claude"
+    context_window: 200000
+    max_output_tokens: 8192
+
+  # Verified against the live /v1beta/models listing on 2026-08-24 rather than
+  # assumed -- the id has to match exactly or the call 404s at request time,
+  # which would look like a generation bug rather than a config typo.
+  gemini-3.7-flash:
+    name: "Gemini 3.7 Flash"
+    provider: "gemini"
+    family: "gemini"
+    context_window: 1048576
+    max_output_tokens: 8192

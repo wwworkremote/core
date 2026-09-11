@@ -1,0 +1,77 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Extension Workflow</h1>
+    <p class="text-slate-500 font-bold text-sm">
+      Browser extension &rarr; wwworkremote.localhost, end to end. Source: <code class="text-xs">docs/extension-workflow.md</code>.
+    </p>
+  </div>
+</div>
+
+<div class="card-neural mb-12">
+  <div class="p-6 border-b border-white/10">
+    <h3 class="text-xs font-bold text-slate-500 mb-1">Capture Health &mdash; last 7 days</h3>
+    <p class="text-slate-600 text-xs">
+      Per-provider extraction quality from every "Captured Lead" event (<%= link_to "Api::LeadsController#track_capture", "https://github.com/wwworkremote/core/blob/main/app/controllers/api/leads_controller.rb", class: "text-blue-400 hover:text-blue-300" %>).
+      A falling avg fields or rising low-confidence share means that board's markup is drifting -- even before any single field gets re-taught.
+    </p>
+  </div>
+  <% if @capture_health.any? %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-white/5 border-b border-white/10 text-xs font-bold text-slate-500">
+          <tr>
+            <th class="px-6 py-4">Provider</th>
+            <th class="px-6 py-4">Captures</th>
+            <th class="px-6 py-4">Avg Fields</th>
+            <th class="px-6 py-4">JSON-LD</th>
+            <th class="px-6 py-4">Low Confidence</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5 font-mono text-xs">
+          <% @capture_health.each do |row| %>
+            <% low_conf_pct = (row.low_confidence_count.to_f / row.captures * 100).round %>
+            <tr class="hover:bg-white/[0.03] transition-colors">
+              <td class="px-6 py-4 text-white font-bold"><%= row.provider %></td>
+              <td class="px-6 py-4 text-slate-400"><%= row.captures %></td>
+              <td class="px-6 py-4 text-slate-400"><%= row.avg_fields %></td>
+              <td class="px-6 py-4 text-slate-400"><%= row.json_ld_count %> / <%= row.captures %></td>
+              <td class="px-6 py-4 <%= low_conf_pct.positive? ? "text-rose-400" : "text-emerald-500" %>">
+                <%= low_conf_pct %>%
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="p-6 text-slate-600 text-xs">No captures in the last 7 days.</div>
+  <% end %>
+</div>
+
+<div class="card-neural p-8 mb-12">
+  <div id="extension-workflow-doc" class="prose prose-invert prose-violet max-w-none prose-headings:font-black prose-pre:bg-black/30 prose-code:text-emerald-400 prose-table:text-sm">
+    <%= markdown(@doc) %>
+  </div>
+</div>
+
+<script>
+  (async () => {
+    const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs");
+
+    // Redcarpet renders ```mermaid fences as <pre><code class="mermaid">raw text</code></pre>.
+    // Mermaid's own startOnLoad scan expects <div class="mermaid">, so re-home the text
+    // (not innerHTML -- avoids re-parsing Redcarpet's HTML-escaped entities) before running it.
+    const blocks = document.querySelectorAll('#extension-workflow-doc pre > code.mermaid');
+    blocks.forEach((code) => {
+      const div = document.createElement('div');
+      div.className = 'mermaid';
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    });
+
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    mermaid.run({ querySelector: '#extension-workflow-doc .mermaid' });
+  })();
+</script>

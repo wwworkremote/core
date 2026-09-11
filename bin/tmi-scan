@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# bin/tmi-scan: Scan tracked files for sensitive strings, live interview mentions,
+# and PII matching config/tmi_denylist.yml.
+#
+# Usage: bin/tmi-scan [--git-log]
+
+require "yaml"
+require "open3"
+
+root = File.expand_path("..", __dir__)
+config_path = File.join(root, "config/tmi_denylist.yml")
+config_path = File.join(root, "config/tmi_denylist.yml.example") unless File.exist?(config_path)
+
+unless File.exist?(config_path)
+  warn "No tmi_denylist.yml found in config/. Skipping scan."
+  exit 0
+end
+
+config = YAML.safe_load_file(config_path)
+patterns = Array(config["denylist"]).map(&:to_s).reject(&:empty?)
+
+if patterns.empty?
+  puts "TMI denylist is empty."
+  exit 0
+end
+
+hits = []
+# Exclude the denylist files themselves, bin/tmi-scan, LICENSE, and VCR cassettes (third-party scraped data)
+exclude_args = [":!config/tmi_denylist.yml*", ":!bin/tmi-scan", ":!LICENSE*", ":!spec/cassettes/*"]
+
+
+patterns.each do |pattern|
+  cmd = ["git", "-C", root, "grep", "-iEn", pattern, "--", "."] + exclude_args
+  stdout, _stderr, status = Open3.capture3(*cmd)
+  if status.success? && !stdout.strip.empty?
+    stdout.each_line do |line|
+      hits << "[#{pattern}] #{line.strip}"
+    end
+  end
+end
+
+if ARGV.include?("--git-log")
+  patterns.each do |pattern|
+    cmd = ["git", "-C", root, "log", "-n", "1", "-p", "-S", pattern]
+    stdout, _stderr, status = Open3.capture3(*cmd)
+    if status.success? && !stdout.strip.empty?
+      hits << "[git log hit: #{pattern}] Found in recent commits"
+    end
+  end
+end
+
+if hits.empty?
+  puts "OK: TMI scan clean (0 hits against #{patterns.size} patterns)."
+  exit 0
+else
+  warn "FAILED: TMI scan found #{hits.size} hit(s):"
+  hits.each { |h| warn "  #{h}" }
+  exit 1
+end
