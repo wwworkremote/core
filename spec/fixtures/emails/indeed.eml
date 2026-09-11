@@ -1,0 +1,18 @@
+From: indeed@indeed.com
+To: user@example.com
+Subject: New jobs at Indeed
+Date: Mon, 21 Apr 2026 10:00:00 +0000
+Message-ID: <1234567890@indeed.com>
+Content-Type: text/html; charset=UTF-8
+
+<html>
+<body>
+  <h1>New jobs at Indeed</h1>
+  <p>Here are some new jobs for you:</p>
+  <ul>
+    <li><a href="https://www.indeed.com/rc/clk?jk=1234567890abcdef&from=email">Software Engineer at TechCorp</a></li>
+    <li><a href="https://www.indeed.com/rc/clk?jk=abcdef1234567890&from=email">Product Manager at StartupCo</a></li>
+  </ul>
+  <p><a href="https://www.indeed.com/preferences">Unsubscribe</a></p>
+</body>
+</html>

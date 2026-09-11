@@ -1,0 +1,8 @@
+<div id="<%= dom_id(job_run) %>" data-controller="toast" data-toast-ms-value="6000"
+    class="alert <%= job_run.status == "failed" ? "alert-error" : (job_run.status == "finished" ? "alert-success" : "alert-info") %> shadow-lg rounded-xl text-xs font-bold">
+  <span class="uppercase tracking-widest opacity-70"><%= job_run.status %></span>
+  <span><%= job_run.job_class %></span>
+  <% if job_run.error_message.present? %>
+    <span class="opacity-80 truncate max-w-xs"><%= job_run.error_message %></span>
+  <% end %>
+</div>

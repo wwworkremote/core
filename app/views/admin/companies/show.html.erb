@@ -1,0 +1,84 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1"><%= @company.name %></h1>
+    <p class="text-slate-500 font-bold text-sm">Postings and activity for this company.</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2 space-y-6">
+    <div class="card-neural p-8 border-t-4 border-t-primary">
+      <h2 class="text-xs font-bold text-slate-500 mb-6">Postings</h2>
+      <div class="overflow-x-auto">
+        <table class="table-admin">
+          <thead>
+            <tr class="text-slate-500 text-xs font-bold border-b border-white/5">
+              <th class="py-3">Title</th>
+              <th class="py-3">Published</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @company.job_postings.each do |posting| %>
+              <tr class="border-b border-white/5">
+                <td class="py-4 font-bold text-white"><%= link_to posting.title, job_posting_path(posting), class: "hover:text-primary" %></td>
+                <td class="py-4 text-slate-400"><%= posting.published_at&.to_date %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card-neural p-6 <%= "border-l-4 border-l-warning" if @company.in_cooldown? %>">
+      <h3 class="text-xs font-bold text-slate-500 mb-4 border-b border-white/5 pb-4">Decline Cooldown</h3>
+      <% if @company.last_declined_at %>
+        <p class="text-xs font-bold <%= @company.in_cooldown? ? 'text-warning' : 'text-slate-500' %> mb-4">
+          <% if @company.in_cooldown? %>
+            In cooldown until <%= @company.cooldown_ends_at.to_date %>
+          <% else %>
+            Last declined <%= @company.last_declined_at.to_date %> (cooldown ended <%= @company.cooldown_ends_at.to_date %>)
+          <% end %>
+        </p>
+      <% else %>
+        <p class="text-xs font-bold text-slate-500 mb-4">No decline recorded.</p>
+      <% end %>
+      <%# TASK-91.2 AC #3: backfill independent of any specific posting's outcome %>
+      <%= form_with url: set_decline_date_admin_company_path(@company), class: "flex gap-2" do %>
+        <%= date_field_tag :last_declined_at, @company.last_declined_at&.to_date,
+                            class: "input input-bordered input-xs bg-base-300 flex-1", autocomplete: "off" %>
+        <%= submit_tag "Set", class: "btn-admin btn-xs bg-white/5" %>
+      <% end %>
+    </div>
+
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-6 border-b border-white/5 pb-4">Activity</h3>
+
+      <div class="flex gap-2 mb-6">
+        <% ['favorite', 'archive'].each do |event| %>
+          <% if @company.send("may_#{event}?") %>
+            <%= button_to event.humanize, admin_company_company_pipeline_steps_path(@company), params: { status: event }, class: "btn-admin bg-primary/20 text-primary border-primary/20 hover:bg-primary/40" %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <%= form_with url: admin_company_company_pipeline_steps_path(@company), class: "mb-8 space-y-2" do |f| %>
+        <%= f.text_area :note, placeholder: "Add a note…", class: "textarea textarea-bordered bg-base-300 w-full rounded-lg text-xs" %>
+        <%= f.submit "Log Activity", class: "btn-admin bg-white/5 w-full" %>
+      <% end %>
+
+      <div class="space-y-4">
+        <% @company.company_pipeline_steps.order(created_at: :desc).each do |step| %>
+          <div class="border-l-2 border-white/10 pl-4 py-2">
+            <div class="text-xs font-bold text-slate-500"><%= step.created_at.strftime("%b %d, %H:%M") %></div>
+            <div class="text-xs font-bold text-white"><%= step.status.humanize %></div>
+            <% if step.note.present? %><p class="text-xs text-slate-400 mt-1"><%= step.note %></p><% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

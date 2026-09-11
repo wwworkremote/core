@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'fileutils'
+require 'net/http'
+
+# path to your application root.
+APP_ROOT = File.expand_path('..', __dir__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+def check_service(name, url)
+  puts "== Checking #{name} connection (#{url}) =="
+  uri = URI.parse(url)
+  Net::HTTP.get(uri)
+  puts "✅ #{name} is UP"
+rescue StandardError
+  puts "❌ #{name} is DOWN or unreachable at #{url}"
+  puts "   This is required for ingestion and AI features."
+end
+
+FileUtils.chdir APP_ROOT do
+  puts '== 🚀 Starting WWWorkRemote Setup =='
+
+  puts "\n== Installing Ruby Dependencies =="
+  system! 'gem install bundler --conservative'
+  system('bundle check') || system!('bundle install')
+
+  puts "\n== Installing Node Dependencies =="
+  if system('which npm > /dev/null')
+    system! 'npm install'
+  else
+    puts "⚠️ npm not found. Skipping Node dependencies."
+  end
+
+  puts "\n== Installing Playwright Browsers =="
+  if system("npm bin > /dev/null 2>&1") || File.exist?('node_modules/.bin/playwright')
+    system! 'npx playwright install chromium'
+  else
+    puts "⚠️ Playwright not found. Ingestion may fail."
+  end
+
+  puts "\n== Preparing Database =="
+  system! 'bin/rails db:prepare'
+  system! 'bin/rails db:test:prepare'
+
+  puts "\n== Syncing AI Registry =="
+  system! 'bin/rails runner "LLM::Registry.sync"'
+
+  puts "\n== Verifying Infrastructure =="
+  # Use a slight delay for LLM check or handle it as non-fatal warning
+  check_service('Local LLM (llama.cpp)', 'http://localhost:8080/v1/models')
+
+  puts "\n== Cleaning Environment =="
+  system! 'bin/rails log:clear tmp:clear'
+
+  puts "\n== ✨ Setup Complete! =="
+  puts "Run 'bin/dev' to start the application."
+end

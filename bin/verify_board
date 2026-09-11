@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# bin/verify_board <provider> <board-args...>
+#
+# Live end-to-end check for ONE company on any of the board-based direct/
+# scraper ingestion adapters (adp, workday, greenhouse, lever) -- calls the
+# adapter's real fetch_granular directly, bypassing SolidQueue and the
+# adapter's cooldown, so you get an immediate yes/no on whether a new
+# tenant/site slug is right before adding it to db/seeds.rb or a Query's
+# boards list. Writes real JobBoards::Document rows in whatever environment
+# you run it against -- that's the point (same as running the real adapter).
+#
+# Usage:
+#   bin/verify_board adp corpfollettexternal
+#   bin/verify_board greenhouse doximity
+#   bin/verify_board lever ro
+#   bin/verify_board workday myhrhome wd1 OneMainCareers   # tenant wd site
+#
+# See config/initializers/ingestion_adapters.rb for the full provider list;
+# only "Direct" and "Scraper"-type adapters implement fetch_granular.
+
+require_relative "../config/environment"
+
+if Rails.env.test?
+  puts "\e[31m✗ Refusing to run under RAILS_ENV=test\e[0m"
+  puts "  This script writes real, persistent Document rows -- see docs/agents/bin-script-conventions.md."
+  puts "  Run it against development instead: unset RAILS_ENV or RAILS_ENV=development bin/verify_board ..."
+  exit 1
+end
+
+provider = ARGV[0]
+board = provider == "workday" ? { "tenant" => ARGV[1], "wd" => ARGV[2], "site" => ARGV[3] } : ARGV[1]
+
+if provider.nil? || board.nil? || (board.is_a?(Hash) && board.values.any?(&:nil?))
+  warn "Usage: bin/verify_board <adp|greenhouse|lever> <board-slug>"
+  warn "       bin/verify_board workday <tenant> <wd> <site>"
+  exit 1
+end
+
+fetcher_class = "#{provider.camelize}::Fetcher".safe_constantize
+unless fetcher_class&.method_defined?(:fetch_granular, false)
+  puts "\e[31m✗ #{provider.inspect} has no board-based fetch_granular adapter\e[0m"
+  puts "  Check config/initializers/ingestion_adapters.rb for the registered provider list."
+  exit 1
+end
+
+source = JobBoards::Source.find_or_create_by!(slug: provider) { |s| s.name = provider.titleize }
+query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+label = board.is_a?(Hash) ? "#{board['tenant']}/#{board['site']}" : board
+
+before = JobBoards::Document.where(source_id: source.id).count
+puts "--- Verifying #{provider} / #{label} ---"
+
+begin
+  fetcher_class.new.fetch_granular(board, "", source.id, query.id)
+rescue StandardError => e
+  puts "\e[31m✗ fetch_granular raised: #{e.class}: #{e.message}\e[0m"
+  puts e.backtrace.first(5)
+  exit 1
+end
+
+after = JobBoards::Document.where(source_id: source.id).count
+delta = after - before
+
+if delta.positive?
+  puts "\e[32m✓ #{delta} new Document row(s) for #{label}\e[0m"
+  JobBoards::Document.where(source_id: source.id).order(created_at: :desc).limit(3).each do |doc|
+    payload = JSON.parse(doc.document)
+    puts "  - #{payload['title'] || payload['jobTitle'] || payload['publishedJobTitle']}"
+  end
+else
+  puts "\e[33m! No new Document rows -- 0 postings returned or every posting already existed\e[0m"
+  puts "  If this is a brand-new board, check the tenant/site slug against the company's own career-site URL."
+end

@@ -1,0 +1,122 @@
+# Unified Data Acquisition (API, Scrapers, ATS)
+development:
+  # TASK-141: recover the launchd web service when it silently wedges (puma
+  # holds the socket but stops answering; launchd KeepAlive can't see it).
+  # Runs in the jobs process; no-ops unless the com.wwworkremote.web agent is
+  # loaded, so it's dev-machine only and never touches CI.
+  web_health_watchdog:
+    class: WebHealthWatchdogJob
+    schedule: every minute
+
+  fetch_all_jobs:
+    class: DataAcquisition::RunAllJob
+    schedule: every 6 hours
+  sync_to_dashboard:
+    class: SyncDashboardJob
+    schedule: every hour at minute 45
+  # sync_emails_indeed/adzuna/linkedin: disabled, see TASK-19 -- EmailIngestion::ImportJob
+  # doesn't exist (Zeitwerk expects it from packages/ingestion/app/jobs/email_ingestion/import_job.rb,
+  # which actually defines a broken top-level EmailImportJob calling a nonexistent EmailImporter
+  # constant). The live EmailImportJob (app/jobs/email_import_job.rb) takes a record_id, not a
+  # source name, so it isn't a drop-in fix. Solid Queue treats any unresolvable recurring class as
+  # fatal at boot, so these were disabled rather than pointed at the wrong signature.
+
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+  prune_stale_solid_queue_jobs:
+    command: "SolidQueueMaintenance::StaleJobPruner.call"
+    schedule: every day at 4am
+
+  batch_ai_matching:
+    class: LLM::BatchMatchJob
+    schedule: every hour at minute 30
+
+  active_link_monitoring:
+    class: JobBoards::LinkMonitorJob
+    schedule: every hour at minute 45
+
+  content_enrichment:
+    class: JobBoards::ContentEnrichmentJob
+    schedule: every 30 minutes
+
+  # Drains DiscoveryLink rows (status: pending) created by CrawlDiscoveryJob
+  # into JobPostings via Scraper::Enricher. Was defined but never scheduled
+  # (TASK-74) -- the crawl-based sources (cord, builtin, remoteok, etc) kept
+  # discovering links that just piled up unprocessed, so last_ingested_at
+  # froze even though last_synced_at kept refreshing.
+  discovery_link_consumption:
+    class: Scraper::DiscoveryConsumerJob
+    schedule: every 30 minutes
+
+  nightly_database_backup:
+    class: DatabaseBackupJob
+    schedule: every day at 3am
+
+  expire_stale_postings:
+    class: JobLifecycle::ExpirySweepJob
+    schedule: every day at 4:30am
+
+  job_posting_trend_rollup:
+    class: JobPostingTrendRollupJob
+    schedule: every day at 5am
+
+  job_boards_audit:
+    class: JobBoards::AuditJob
+    schedule: every day at 5:30am
+
+
+production:
+  fetch_all_jobs:
+    class: DataAcquisition::RunAllJob
+    schedule: every 6 hours
+  sync_to_dashboard:
+    class: SyncDashboardJob
+    schedule: every hour at minute 45
+  # sync_emails_indeed/adzuna/linkedin: disabled, see TASK-19 -- EmailIngestion::ImportJob
+  # doesn't exist (Zeitwerk expects it from packages/ingestion/app/jobs/email_ingestion/import_job.rb,
+  # which actually defines a broken top-level EmailImportJob calling a nonexistent EmailImporter
+  # constant). The live EmailImportJob (app/jobs/email_import_job.rb) takes a record_id, not a
+  # source name, so it isn't a drop-in fix. Solid Queue treats any unresolvable recurring class as
+  # fatal at boot, so these were disabled rather than pointed at the wrong signature.
+
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+  prune_stale_solid_queue_jobs:
+    command: "SolidQueueMaintenance::StaleJobPruner.call"
+    schedule: every day at 4am
+
+  batch_ai_matching:
+    class: LLM::BatchMatchJob
+    schedule: every hour at minute 30
+
+  active_link_monitoring:
+    class: JobBoards::LinkMonitorJob
+    schedule: every hour at minute 45
+
+  content_enrichment:
+    class: JobBoards::ContentEnrichmentJob
+    schedule: every 30 minutes
+
+  discovery_link_consumption:
+    class: Scraper::DiscoveryConsumerJob
+    schedule: every 30 minutes
+
+  nightly_database_backup:
+    class: DatabaseBackupJob
+    schedule: every day at 3am
+
+  expire_stale_postings:
+    class: JobLifecycle::ExpirySweepJob
+    schedule: every day at 4:30am
+
+  job_posting_trend_rollup:
+    class: JobPostingTrendRollupJob
+    schedule: every day at 5am
+
+  job_boards_audit:
+    class: JobBoards::AuditJob
+    schedule: every day at 5:30am

@@ -1,0 +1,120 @@
+<% comparison = guided_session.latest_comparison %>
+<section class="mt-10" aria-labelledby="reference-comparison-heading">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div class="text-xs font-black uppercase tracking-[0.25em] text-slate-500" id="reference-comparison-heading">Reference comparison</div>
+    <div class="flex gap-2">
+      <% unless guided_session.status == "completed" %>
+        <%= button_to "Complete session", complete_guided_session_path(guided_session), method: :post, class: "btn btn-sm btn-ghost border-white/10 rounded-lg font-bold" %>
+      <% end %>
+      <%= button_to "Compare to reference", compare_guided_session_path(guided_session), method: :post, class: "btn btn-sm btn-primary rounded-lg font-bold" %>
+    </div>
+  </div>
+
+  <% if comparison.nil? %>
+    <div class="rounded-xl border border-dashed border-white/10 p-6 text-sm text-slate-500">
+      No comparison has run yet. It runs automatically when the session is completed, or on demand above. Advisory only &mdash; it never submits or advances an application.
+    </div>
+  <% elsif comparison.outcome == "no_reference" %>
+    <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-sm text-slate-400">
+      No reference scenario exists for <span class="text-slate-200 font-bold"><%= comparison.provider %></span> yet, so there is nothing to compare against. The recorded session above is still the durable record.
+    </div>
+  <% elsif comparison.outcome == "failed" %>
+    <div class="rounded-xl border border-error/30 bg-error/10 p-6 text-sm text-slate-300">
+      The comparison could not run: <code class="text-error"><%= comparison.error %></code>
+    </div>
+  <% else %>
+    <% coverage = comparison.coverage.with_indifferent_access %>
+    <div class="card-neural p-6 mb-4">
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">
+        Coverage &mdash; how far this lap reached
+        <% if coverage[:status] == "unavailable" %>
+          <span class="text-slate-400">· unavailable (no applicable checkpoints)</span>
+        <% elsif coverage[:ratio] %>
+          <span class="text-slate-400">· <%= "#{coverage[:reached]}/#{coverage[:applicable]}" %> applicable checkpoints</span>
+        <% end %>
+      </div>
+      <% checkpoints = Array(coverage[:checkpoints]) %>
+      <% if checkpoints.any? %>
+        <div class="grid md:grid-cols-2 gap-2">
+          <% checkpoints.each do |checkpoint| %>
+            <% status = checkpoint[:status] %>
+            <div class="rounded border border-white/10 px-3 py-2 text-xs flex items-center justify-between gap-2">
+              <span class="text-slate-300"><%= checkpoint[:step] || checkpoint[:kind] %></span>
+              <span class="badge badge-ghost text-[10px] <%= { "reached" => "text-success", "not_reached" => "text-warning", "not_applicable" => "text-slate-500" }[status] %>"><%= status.to_s.humanize %></span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-slate-500">The reference has no step checkpoints to measure against.</p>
+      <% end %>
+    </div>
+
+    <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Drift findings</div>
+    <% findings = comparison.comparison_findings.includes(:suggested_disposition, :finding_dispositions).order(:category, :dimension, :locator) %>
+    <% if findings.any? %>
+      <div class="space-y-3">
+        <% findings.each do |finding| %>
+          <article class="card-neural p-5">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="text-xs font-black uppercase tracking-widest text-primary"><%= finding.category.humanize %></span>
+              <span class="badge badge-ghost text-[10px]"><%= finding.dimension.humanize %></span>
+              <code class="text-xs text-slate-300"><%= finding.locator %></code>
+              <% if finding.detail.present? %><span class="text-[10px] text-slate-500"><%= finding.detail.map { |k, v| "#{k}: #{v}" }.join(" · ") %></span><% end %>
+            </div>
+            <% current = finding.current_disposition %>
+            <% if current %>
+              <div class="text-xs text-slate-400 mb-3">Current disposition: <span class="text-slate-200 font-bold"><%= current.value.humanize %></span><% if current.rationale.present? %> &mdash; <%= current.rationale %><% end %></div>
+            <% elsif finding.suggested_disposition %>
+              <div class="text-xs text-warning/90 mb-3">Suggested from an earlier run: <span class="font-bold"><%= finding.suggested_disposition.value.humanize %></span> &mdash; not applied; confirm below.</div>
+            <% end %>
+            <%= form_with url: finding_dispositions_guided_session_path(guided_session, finding_id: finding.id), method: :post, class: "flex flex-wrap items-end gap-2" do %>
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex flex-col gap-1">
+                Disposition
+                <%= select_tag :value, options_for_select(FindingDisposition::VALUES.map { |v| [v.humanize, v] }, finding.suggested_disposition&.value), class: "select select-sm select-bordered bg-black/20 text-xs" %>
+              </label>
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex flex-col gap-1 flex-1 min-w-[12rem]">
+                Rationale
+                <%= text_field_tag :rationale, nil, autocomplete: "off", class: "input input-sm input-bordered bg-black/20 text-xs w-full", placeholder: "why this disposition" %>
+              </label>
+              <%= submit_tag "Record", class: "btn btn-sm btn-primary rounded-lg font-bold" %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="rounded-xl border border-dashed border-white/10 p-5 text-sm text-slate-500">No drift or coverage-gap findings in this run.</div>
+    <% end %>
+  <% end %>
+
+  <% if guided_session.scenario %>
+    <% opportunities = Scenarios::ContextOpportunities.call(guided_session.scenario, purpose: guided_session.purpose,
+                                                           user_job_posting: guided_session.user_job_posting) %>
+    <% if opportunities.any? %>
+      <div class="text-xs font-black uppercase tracking-widest text-slate-500 mt-8 mb-3">Opportunities to gather more context</div>
+      <div class="space-y-2">
+        <% opportunities.each do |opportunity| %>
+          <div class="card-neural p-4 flex items-start gap-3">
+            <span class="badge badge-ghost text-[10px] mt-0.5">#<%= opportunity.rank %></span>
+            <div>
+              <code class="text-xs text-slate-300"><%= opportunity.kind %></code>
+              <p class="text-xs text-slate-500 mt-1"><%= opportunity.reason %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <p class="text-[10px] text-slate-600 mt-2">Advisory &mdash; a checklist of what one more selector or recorded step could add. Nothing here is acted on automatically.</p>
+    <% end %>
+  <% end %>
+
+  <% history = guided_session.reference_comparisons.includes(:comparison_findings).order(ran_at: :desc, id: :desc) %>
+  <% if history.size > 1 %>
+    <details class="mt-5 text-xs text-slate-500">
+      <summary class="cursor-pointer font-bold uppercase tracking-widest">Prior comparison runs (<%= history.size %>)</summary>
+      <ul class="mt-3 space-y-1">
+        <% history.each do |run| %>
+          <li>· <%= run.ran_at.strftime("%Y-%m-%d %H:%M") %> · <%= run.trigger %> · <%= run.outcome %> · <%= run.comparison_findings.size %> findings</li>
+        <% end %>
+      </ul>
+    </details>
+  <% end %>
+</section>

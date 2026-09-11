@@ -1,0 +1,56 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk grep *)",
+      "mcp__backlog__task_view",
+      "Bash(ruby -c *)",
+      "Bash(rtk cat *)",
+      "Bash(rtk find *)",
+      "Bash(rtk ls *)",
+      "Bash(rtk tail *)",
+      "Bash(xcrun simctl list *)",
+      "Bash(curl -s -o /dev/null -w *)",
+      "Bash(bundle exec rspec *)",
+      "Bash(command grep *)",
+      "Bash(node --check *)",
+      "Bash(npm run lint:extension)",
+      "mcp__claude-in-chrome__read_console_messages",
+      "mcp__backlog__task_list",
+      "mcp__backlog__get_backlog_instructions",
+      "mcp__o2__o2_service",
+      "mcp__o2__o2_slow",
+      "mcp__claude-in-chrome__get_page_text",
+      "mcp__backlog__task_search",
+      "Bash(rtk git status *)",
+      "Bash(rtk git diff *)",
+      "Bash(rtk git log *)",
+      "Bash(zdots-ctx bus-read *)",
+      "Bash(zdots-ctx query *)",
+      "Bash(bin/wwworkremote-ctl status)",
+      "Bash(bin/rails routes)",
+      "Bash(bin/rails routes *)",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "mcp__claude-in-chrome__find",
+      "mcp__claude-in-chrome__read_network_requests",
+      "mcp__claude-in-chrome__read_page",
+      "mcp__backlog__milestone_list",
+      "mcp__backlog__document_view",
+      "mcp__ctx__ctx_semantic_search",
+      "mcp__ctx__ctx_query",
+      "mcp__o2__o2_logs"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/format-on-change.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# bin/apply <job_id> — Instant Application Package Generator & Clipboard Copier
+
+require_relative "../config/environment"
+
+job_id = ARGV[0]
+if job_id.blank?
+  puts "⚠️ Usage: bin/apply <job_id>"
+  puts "Example: bin/apply 3025"
+  exit 1
+end
+
+job = JobPosting.find_by(id: job_id)
+unless job
+  puts "❌ Job posting ##{job_id} not found in database."
+  exit 1
+end
+
+u = User.first || User.create!(email: "mike@just3ws.com", name: "mike")
+u.career_profile
+
+puts "✨ Generating Application Package for: #{job.title} @ #{job.company&.name || job.company_name}"
+puts "Target URL: #{job.target_url}"
+puts "-" * 65
+
+# Generate tailored cover letter text
+cover_letter = <<~TEXT
+  Dear #{job.company&.name || job.company_name || 'Engineering'} Team,
+
+  I am writing to express my strong interest in the #{job.title} role. With a deep engineering background in Ruby 3/4, Rails 8, PostgreSQL optimization, monolith architecture refactoring, and platform reliability, I thrive on building zero-downtime, production-grade applications.
+
+  Recently, I architected a vector-native synthesis engine on Rails 8.1, implementing high-dimension PostgreSQL pgvector HNSW indexing, distributed rate limiting, and resilient LLM orchestration with OpenTelemetry observability. My focus is always on simplifying complex domain boundaries, eliminating tech debt, and maintaining razor-thin latency budgets.
+
+  I would welcome the opportunity to discuss how my technical experience in Ruby modernization and platform engineering can support your team.
+
+  Best regards,
+  Mike
+  mike@just3ws.com
+TEXT
+
+# Copy cover letter to macOS clipboard via pbcopy if available
+if RUBY_PLATFORM.include?("darwin")
+  IO.popen("pbcopy", "w") { |io| io.write(cover_letter) }
+  puts "📋 COPIED TO CLIPBOARD! You can now press Cmd+V in your browser to paste your cover letter!"
+end
+
+# Save full package to file
+app_dir = Rails.root.join("data/applications")
+FileUtils.mkdir_p(app_dir)
+filename = "app_#{job.id}_#{job.company_name.to_s.parameterize}.md"
+file_path = app_dir.join(filename)
+
+package_content = <<~MD
+  # Application Package: #{job.title} @ #{job.company_name}
+
+  - **Job ID**: ##{job.id}
+  - **Company**: #{job.company_name}
+  - **Apply Link**: #{job.target_url}
+  - **Generated At**: #{Time.current.strftime('%Y-%m-%d %H:%M:%S')}
+
+  ---
+
+  ## ✉️ Tailored Cover Letter (Copied to Clipboard)
+
+  #{cover_letter}
+
+  ---
+
+  ## 📄 ATS Resume Bullet Points
+
+  - **Monolith Modernization**: Refactored complex Ruby & Rails domain logic into bounded-context Service objects using standard Command patterns.
+  - **High-Dimension Vector Indexing**: Configured native PostgreSQL `pgvector` HNSW expression indexes for 3584-dimension embeddings, enabling sub-10ms semantic search.
+  - **System Safety & Rate Limiting**: Built non-blocking `ApiGuard` circuit breakers and `Rack::Attack` rate limiters to protect critical endpoints under high concurrency.
+  - **Test Suite Rigor**: Maintained strict RSpec suites with automated database safety guards preventing state pollution.
+
+  ---
+
+  ## 🧪 Quick Interview Talking Points
+
+  1. **Architecture**: Focus on Strangler Fig pattern for monolith refactoring and explicit packwerk bounded contexts.
+  2. **Performance**: Emphasize `halfvec` vector casting and pgvector indexing for high-dimensional embeddings.
+  3. **Reliability**: Discuss zero-downtime database migrations with `strong_migrations` compliance.
+MD
+
+File.write(file_path, package_content)
+
+puts "💾 Saved full package to: #{file_path}"
+puts "\n🎉 SURPRISE! Ready to submit!"

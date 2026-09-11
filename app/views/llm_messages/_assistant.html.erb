@@ -1,0 +1,12 @@
+<% assistant ||= local_assigns[:llm_message] || local_assigns[:message] %>
+<div id="llm_message_<%= assistant.id %>" class="chat chat-start group">
+  <div class="chat-header opacity-60 text-xs font-bold mb-1">
+    Assistant
+  </div>
+  <div id="llm_message_<%= assistant.id %>_content" class="chat-bubble bg-base-300 text-base-content border border-white/5 shadow-lg text-sm leading-relaxed prose prose-sm max-w-none prose-invert prose-violet">
+    <%= markdown(assistant.content) %>
+  </div>
+  <div class="chat-footer opacity-40 text-xs font-bold mt-1">
+    <%= assistant.created_at&.strftime("%I:%M %p") %>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+cd "$(dirname "$0")/.." || exit
+echo "--- Starting Arbeitnow Job Fetch ---"
+bin/rails runner - <<'EOF'
+  Arbeitnow::Fetcher.new.call
+  JobBoards::Syncer.new.call
+EOF
+echo "--- Done ---"

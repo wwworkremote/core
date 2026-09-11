@@ -1,0 +1,130 @@
+---
+id: TASK-82
+title: >-
+  Two competing status state machines — JobPosting.status vs
+  UserJobPosting.status have drifted on 25 rows
+status: Done
+assignee:
+  - claude
+created_date: '2026-08-22 15:39'
+updated_date: '2026-08-27 01:16'
+labels: []
+dependencies: []
+modified_files:
+  - app/models/user_job_posting.rb
+  - app/controllers/admin/pipeline_steps_controller.rb
+priority: high
+type: bug
+ordinal: 95000
+---
+
+## Description
+
+<!-- SECTION:DESCRIPTION:BEGIN -->
+`JobPosting` and `UserJobPosting` both have a `status` column, both have an AASM machine, and the state names overlap. Different writers target different models:
+
+- **`bin/wwwr transition <id> <event>`** → writes `JobPosting.status` (states: none, favorited, applied, interview, offered, archived, **ignored, purged, expired**).
+- **Web UI, Chrome extension, `UserJobPosting#record_status_event!`** → write `UserJobPosting.status` (states: none, favorited, applied, interview, offered, archived).
+
+They are never reconciled, and **25 rows currently disagree**. Examples:
+
+| Posting | JobPosting.status | UserJobPosting.status |
+|---|---|---|
+| #2125 Lead SWE, Front Office AI | ignored | **applied** |
+| #1821 Rails / React Lead Engineer | purged | favorited |
+| #5033 Principal Engineer | none | favorited |
+| #2117 Remote Sr/Staff Engineer | archived | favorited |
+
+#2125 is the worst shape: applied to, and simultaneously marked ignored.
+
+## Why it matters beyond tidiness
+`bin/wwwr transition` **also creates a `PipelineStep`** recording the event, so the audit trail says the user pipeline advanced while `UserJobPosting.status` never moved. Any funnel metric is therefore unreliable depending on which model it reads:
+
+- by `UserJobPosting`: 2 applied, 144 untriaged
+- by `JobPosting`: 4 applied, 452 ignored, 407 none
+
+This is foundational for the strategic-decision system Mike wants built over the posting corpus. "Have I applied to this?" currently has two answers.
+
+## Shape
+Pick one owner. `UserJobPosting` is the semantically correct home for *the user's relationship to a posting*; `JobPosting.status` conflates that with posting lifecycle (expired/purged are properties of the posting, not of Mike's pipeline). Likely: split lifecycle (expired/purged) onto JobPosting, move all pipeline states to UserJobPosting, and make `bin/wwwr transition` write through `record_status_event!` like every other caller.
+
+Reconcile the existing 25 before or during.
+<!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [x] #1 One model owns the user's pipeline state; the other owns posting lifecycle only
+- [x] #2 bin/wwwr transition writes through the same path as the UI and extension
+- [x] #3 The 25 drifted rows are reconciled, #2125 (applied+ignored) explicitly resolved
+- [x] #4 A PipelineStep is never created for a transition that did not actually change pipeline state
+- [x] #5 Funnel counts return the same answer regardless of which model is queried
+<!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+## Research findings (2026-08-26)
+
+Full writer inventory across the codebase:
+
+**Already dual-writing (a prior session's stopgap, same comment repeated verbatim at each site: "Same two-machine write as every importer/every session — JobPosting and UserJobPosting drift when only one is moved (TASK-82)"):**
+- `lib/wwwr/cli.rb#perform_transition` (bin/wwwr transition)
+- `app/services/applications/indeed_row_importer.rb#advance`
+- `app/services/applications/greenhouse_row_importer.rb#advance`
+- `app/controllers/job_postings_controller.rb#favorite_for_current_user`
+
+All four call `posting.<event>!` (JobPosting AASM) *and* `record_status_event!` (UserJobPosting AASM) together. This keeps the two in sync going forward for these four call sites only — it is not AC #1's "one model owns pipeline state," it's a stopgap that stops new drift at these specific sites.
+
+**JobPosting-only, and correctly so (posting-lifecycle, not user-pipeline — no change needed here):**
+- `app/jobs/job_lifecycle/expiry_sweep_job.rb` — `expire!`
+- `app/models/concerns/job_posting/geocoding.rb#enforce_commute_zone` — `ignore!`
+- `app/controllers/admin/job_postings_controller.rb#purge` / `#restore` — `purge!` / `restore!`
+
+**UserJobPosting-only, correctly so (already routes through record_status_event!):**
+- `app/controllers/user_job_postings_controller.rb` ("Your Activity" section on job_postings/show)
+- `app/controllers/api/v0/application_statuses_controller.rb` (Chrome extension)
+
+**The one remaining, actively-drifting writer — the real gap:**
+- `app/controllers/admin/pipeline_steps_controller.rb#apply_status_event` — writes `@job_posting.public_send(bang)` (favorite!/apply!/interview!/offer!/archive!/ignore!/expire! on JobPosting) with **no dual-write at all**. This backs BOTH the triage queue (job_posting_triage/show.html.erb — this session's Skip Tax work) and the "Application Status" sidebar card on job_postings/show.html.erb (TASK-64) — the two highest-traffic interaction points in the app. Every triage decision and every Application Status pill click today still causes new drift, on the busiest surfaces, right now.
+
+## Proposed phasing
+
+Given the size (schema change + data backfill + every JobPosting.status-reading call site), this needs to be staged rather than done as one change. Presenting for approval before writing code, per the material-decision review rule.
+
+**Phase 1 — stop the active bleeding (small, low-risk, consistent with the existing stopgap pattern):**
+Add the same dual-write to `Admin::PipelineStepsController#apply_status_event` that the four other call sites already use, for the pipeline-state events only (favorite/apply/interview/offer/archive — not ignore/expire, which stay JobPosting-only like every other site). One or two lines, following an established pattern, not a new one.
+
+**Phase 2 — reconcile the 25 existing drifted rows (AC #3):**
+Needs the actual 25 rows pulled and a reconciliation rule decided (naive "most recent wins" is wrong here since JobPosting alone holds ignored/purged/expired, which aren't blind overwrites) — will present the data and a proposed rule before writing any reconciliation script, since this mutates real records including #2125 (applied+ignored).
+
+**Phase 3 — the actual architectural fix (AC #1, #5):**
+Remove favorited/applied/interview/offered/archived from JobPosting's AASM entirely (keep only none/ignored/purged/expired), migrate every remaining JobPosting.status-reading call site (dashboards, funnel counts, bin/wwwr filters/print_postings, admin views) to read UserJobPosting instead, then delete the now-redundant dual-write plumbing from all 5 sites. Highest risk/effort of the three phases — likely warrants its own dedicated pass rather than folding into this one.
+
+Recommending: do Phase 1 now (bounded, safe, immediately stops the worst ongoing damage), surface Phase 2's actual data before touching it, and treat Phase 3 as a separate follow-up once 1+2 are settled — rather than attempting the full schema migration in this pass.
+<!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Phase 1 done and committed (74acba4b): Admin::PipelineStepsController now syncs UserJobPosting.status via a new UserJobPosting#advance_pipeline_state! (state-only, no duplicate PipelineStep -- see plan for why record_status_event! wasn't reused directly here). Verified live: favorited a real posting through the UI, confirmed JobPosting.status and UserJobPosting.status both read 'favorited' and exactly one PipelineStep exists, then reverted the test posting. 46 specs green, rubocop clean. Active drift on the two busiest surfaces (triage, Application Status pills) is stopped as of this commit. Phase 2 (reconcile the 25 already-drifted rows) and phase 3 (remove pipeline states from JobPosting's AASM, migrate remaining readers) still open -- task stays In Progress.
+
+Phase 2 done. Pulled the real drifted set: 31 rows (not 25 -- count had moved since the task was filed), of which only 3 were real problems once actually read:
+
+- 21 rows are NOT conflicts at all: JobPosting holds a lifecycle fact (LinkMonitorJob dead-link auto-archive, geo-ignore, admin purge) that's independently true alongside whatever UserJobPosting shows -- e.g. #764/#6691/#6697/#6663/#2117 all show Mike applied or favorited, then the listing died weeks later per a `[SYSTEM_MONITOR]` PipelineStep. That's the target model already working correctly. No action; they stop even looking like drift once phase 3 removes pipeline states from JobPosting.
+- #5810 and #5817 were real fossils of the exact bug phase 1 fixed -- literal PipelineStep note text "Status changed to favorite" (Admin::PipelineStepsController's pre-fix, JobPosting-only write) with UserJobPosting never touched. Reconciled: advanced both to UserJobPosting.status=favorited via advance_pipeline_state! (not record_status_event!, to avoid a second PipelineStep for a click already logged in 2026-08). Verified no duplicate PipelineStep created.
+- #2125, the case AC #3 names explicitly: not a data conflict to patch at all. Mike genuinely favorited and applied (real PipelineSteps, 2026-04-22). JobPosting.status separately read 'ignored' with *no* PipelineStep -- that's JobPosting::Geocoding#enforce_commute_zone (the geo auto-classifier) silently overriding a posting he'd already acted on, since it only checked JobPosting's own AASM guard, not whether the user had any real activity on it. Real fix: added a guard so enforce_commute_zone skips any posting with a non-none UserJobPosting -- geo-blocking should only ever apply before Mike's touched a posting, never override that he did. Covered by a new spec case (spec/models/job_posting_spec.rb) reproducing #2125's exact shape: JobPosting.status still 'none' while a UserJobPosting shows real activity.
+
+AC #4 (PipelineStep never created for a no-op transition) was already satisfied by the existing guard-before-create pattern in both apply_status_event and record_status_event!/advance_pipeline_state! -- verified, not newly built.
+
+AC #1, #2, #5 remain open -- that's phase 3 (removing pipeline states from JobPosting's AASM entirely), not done here.
+<!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Three phases: (1) stopped the actively-drifting writer (Admin::PipelineStepsController) with the same dual-write stopgap every other caller already had, (2) reconciled the real drifted rows (2 fossils of the same bug, plus a missing guard in the geo auto-classifier -- most of the "31 drifted rows" turned out not to be drift at all under the target model), (3) the actual architectural fix -- JobPosting's AASM now only has none/ignored/purged/expired/archived; UserJobPosting owns favorited/applied/interview/archived entirely; offered moved to outcome alongside rejected (TASK-94's finding). All five dual-writing callers simplified to write UserJobPosting only. 89 existing rows backfilled.
+
+Found and fixed 4 real regressions along the way that only surfaced from actually using the UI and running the full suite: the status badge/pill UI was entirely JobPosting-driven (would have silently stopped showing pipeline state forever), the triage queue and Source/Company#mark_not_interested! filtered on JobPosting.status=="none" to mean "untouched" (would have shown the same triage card forever / re-ignored already-favorited postings), a "these disagree" warning banner existed specifically to flag what's now the *correct* state, and JobBoards::Syncer's non-bang `ignore` call on an unsaved record would have raised on every low-quality ingestion once lifecycle transitions started logging PipelineSteps.
+
+Verified live in a real browser end-to-end and via the full spec suite (isolated-file re-runs used to separate real signal from TASK-56's pre-existing test-order pollution). Commits: 74acba4b (phase 1), 3534da2b (phase 2), f48d774a (phase 3).
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -1,0 +1,101 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Neutral graphite palette -- replaces the prior Dracula Pro theme.
+     Every color below is verified >=4.5:1 (WCAG AA, normal text) against
+     ALL THREE base surfaces, including base-300 (the lightest -- used for
+     form inputs, dropdown menus, and nested cards app-wide), not just
+     base-100. The Dracula palette this replaced was only ever checked
+     against base-100; five of its "tuned" colors (primary, secondary, the
+     muted comment color, and both relightened slates) failed as low as
+     2.86:1 against base-300. See app CHANGELOG/commit history for the
+     computed ratios. */
+  --color-graphite-bg: #1a1c1f;
+  --color-graphite-bg-dark: #131416;
+  --color-graphite-bg-light: #2a2d31;
+  --color-graphite-fg: #e8e9ea;
+
+  --color-graphite-blue: #6292f0;       /* primary */
+  --color-graphite-slate-blue: #8a94a5; /* secondary */
+  --color-graphite-sky: #6fa8f0;        /* accent / info */
+  --color-graphite-green: #4caf6e;      /* success */
+  --color-graphite-amber: #d9a441;      /* warning */
+  --color-graphite-coral: #e5715d;      /* error */
+
+  /* Structural components (bg-slate-800/900/950) grounded to the same
+     darkness family as base-100/200, one step darker for slate-950. */
+  --color-slate-950: #0e0f11;
+  --color-slate-900: #131416;
+  --color-slate-800: #1a1c1f;
+
+  /* Tailwind's default slate-500/600 fail WCAG AA against every one of
+     this theme's dark backgrounds. Lightened to clear 4.5:1 against
+     base-300 (the lightest, worst-case background) with a small margin,
+     which guarantees base-100/base-200 pass too since they're darker
+     still. Same relative ordering preserved (600 reads more muted). */
+  --color-slate-600: #8895a4; /* 4.53:1 vs base-300 (was failing at 2.86:1) */
+  --color-slate-500: #9aa8b8; /* 5.71:1 vs base-300 */
+
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  :root {
+    --color-base-100: var(--color-graphite-bg);
+    --color-base-200: var(--color-graphite-bg-dark);
+    --color-base-300: var(--color-graphite-bg-light);
+    --color-base-content: var(--color-graphite-fg);
+
+    --color-primary: var(--color-graphite-blue);
+    --color-primary-content: #000000; /* Max contrast for buttons */
+
+    --color-secondary: var(--color-graphite-slate-blue);
+    --color-secondary-content: #000000;
+
+    --color-accent: var(--color-graphite-sky);
+    --color-accent-content: #000000;
+
+    --color-info: var(--color-graphite-sky);
+    --color-success: var(--color-graphite-green);
+    --color-warning: var(--color-graphite-amber);
+    --color-error: var(--color-graphite-coral);
+  }
+
+  body {
+    /* Increase base weight from 400 to 500 for better stroke visibility on dark backgrounds */
+    @apply font-inter bg-base-100 text-base-content antialiased min-h-screen text-[15px] font-medium;
+    -webkit-font-smoothing: subpixel-antialiased;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-extrabold tracking-tight text-white;
+  }
+}
+
+@layer components {
+  .card-admin {
+    @apply bg-base-200 border border-white/10 rounded-xl shadow-2xl overflow-hidden;
+  }
+
+  .table-admin {
+    @apply w-full text-left border-collapse text-sm;
+  }
+
+  .btn-admin {
+    @apply btn btn-sm rounded-lg font-extrabold uppercase tracking-wider text-[11px];
+  }
+
+  /* Force minimum contrast for opacity-based muted text */
+  .text-base-content\/40, .opacity-40 { opacity: 0.75 !important; }
+  .text-base-content\/30, .opacity-30 { opacity: 0.65 !important; }
+  .text-base-content\/20, .opacity-20 { opacity: 0.55 !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin, .animate-pulse, .animate-bounce, .animate-ping {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,49 @@
+<% model_id = model.respond_to?(:model_id) ? model.model_id : model.id %>
+<% row_id = [model.provider, model_id].join("_").parameterize(separator: "_") %>
+
+<tr id="model_<%= row_id %>" class="hover:bg-primary/5 transition-colors group">
+  <td class="px-6 py-4">
+    <div class="flex items-center gap-3">
+      <div class="badge badge-outline badge-xs opacity-60 font-bold text-xs py-2 px-2 border-white/10 group-hover:border-primary/30">
+        <%= model.provider_class&.name || model.provider %>
+      </div>
+    </div>
+  </td>
+
+  <td class="px-6 py-4">
+    <div class="flex flex-col">
+      <span class="text-sm font-bold text-white group-hover:text-primary transition-colors">
+        <%= model.respond_to?(:display_name) ? model.display_name : model.name %>
+      </span>
+      <span class="text-xs font-bold opacity-50 mt-0.5"><%= model_id %></span>
+    </div>
+  </td>
+
+  <td class="px-6 py-4">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-mono opacity-70"><%= number_with_delimiter(model.context_window) if model.context_window %></span>
+      <span class="text-xs font-bold opacity-40">ctx</span>
+    </div>
+  </td>
+
+  <td class="px-6 py-4">
+    <div class="flex items-center gap-2">
+      <% input = model.input_price_per_million %>
+      <% output = model.output_price_per_million %>
+      <% if input && output %>
+        <span class="text-xs font-mono text-success opacity-80">$<%= "%.2f" % input %></span>
+        <span class="opacity-40">/</span>
+        <span class="text-xs font-mono text-secondary opacity-80">$<%= "%.2f" % output %></span>
+      <% else %>
+        <span class="text-xs font-bold opacity-40">Local</span>
+      <% end %>
+    </div>
+  </td>
+
+  <td class="px-6 py-4 text-right">
+    <%= link_to new_llm_chat_path(model: model_id), class: "btn btn-ghost btn-xs rounded-lg group-hover:bg-primary group-hover:text-primary-content transition-all font-bold gap-2 px-4" do %>
+      Chat
+      <%= heroicon "bolt", variant: :solid, options: { class: "w-2 h-2" } %>
+    <% end %>
+  </td>
+</tr>

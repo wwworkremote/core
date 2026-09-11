@@ -1,0 +1,222 @@
+---
+# Overcommit configuration
+# See: https://github.com/sds/overcommit
+
+# Verify that overcommit is installed
+verify_signatures: false
+
+PreCommit:
+  ALL:
+    on_warn: fail  # Failure is required
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'spec/**/*'
+
+  # Basic Info
+  AuthorName:
+    enabled: true
+
+  AuthorEmail:
+    enabled: true
+
+  # Git stuff
+  MergeConflicts:
+    enabled: true
+
+  BrokenSymlinks:
+    enabled: true
+
+  # Linting/Formatting
+  HardTabs:
+    enabled: true
+    exclude:
+      - '**/Makefile'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  TrailingWhitespace:
+    enabled: true
+    exclude:
+      - '**/db/schema.rb'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'spec/**/*'
+
+  EndOfLine:
+    enabled: true
+
+  FixMe:
+    enabled: true
+    keywords: ['FIXME', 'TODO', 'HACK']
+    exclude:
+      - '.overcommit.yml'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  YamlLint:
+    enabled: true
+    command: ['yamllint', '.']
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+      - 'spec/cassettes/**/*'
+      - 'config/locales/**/*'
+      - '.rubocop_todo.yml'
+
+  JsonSyntax:
+    enabled: true
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  # Ruby specific
+  RuboCop:
+    enabled: true
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  Brakeman:
+    enabled: true
+    # Only when Ruby that could actually introduce a vulnerability changed.
+    # A full-app scan on an extension-JS or docs-only commit is pure latency,
+    # and PrePush re-runs Brakeman unscoped as the real gate.
+    include:
+      - 'app/**/*.rb'
+      - 'lib/**/*.rb'
+      - 'config/**/*.rb'
+      - 'packages/**/*.rb'
+
+  BundleAudit:
+    # Advisories can only change when the lockfile does; scanning on every
+    # commit re-checks an unchanged dependency set.
+    enabled: true
+    include:
+      - 'Gemfile'
+      - 'Gemfile.lock'
+
+  RailsBestPractices:
+    enabled: false
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  Reek:
+    enabled: false
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  Fasterer:
+    enabled: false
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  ClaudeAssets:
+    enabled: true
+    description: 'Validate .claude/skills and .claude/agents are self-describing'
+    include:
+      - '.claude/skills/**/*'
+      - '.claude/agents/**/*'
+
+  EslintExtension:
+    enabled: true
+    description: 'Lint extension/ JS with ESLint'
+    include:
+      - 'extension/**/*.js'
+
+  RSpec:
+    enabled: true
+    # bin/rspec-precommit, not `bundle exec rspec ...` directly: setting
+    # `include` below makes Overcommit append the matched staged files to
+    # this command as rspec arguments, which makes rspec try to load Gemfile
+    # and app/*.rb as spec files. The wrapper ignores those arguments and
+    # runs the full fixed suite (with --fail-fast). See the script's header.
+    command: ['bin/rspec-precommit']
+    # Only run when something Ruby-side could have changed behavior. An
+    # extension-JS, docs, or locale-only commit can't break a Ruby spec, and
+    # paying the full suite for those is what makes committing feel too
+    # expensive to do incrementally. `exclude: []` is required to undo
+    # PreCommit::ALL's blanket `spec/**/*` exclusion -- without it, editing
+    # only specs would skip the very suite that runs them.
+    exclude: []
+    include:
+      - 'app/**/*'
+      - 'lib/**/*'
+      - 'config/**/*'
+      - 'db/**/*'
+      - 'packages/**/*'
+      - 'spec/**/*'
+      - 'Gemfile'
+      - 'Gemfile.lock'
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:password@localhost:5432/wwworkremote_test
+
+  # Shell scripts
+  ShellCheck:
+    enabled: true
+    include:
+      - 'bin-host/**/*'
+      - '**/*.sh'
+    exclude:
+      - 'bin/**/*'
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+  # Docker
+  Hadolint:
+    enabled: true
+    include:
+      - 'Dockerfile*'
+    exclude:
+      - 'node_modules/**/*'
+      - 'vendor/**/*'
+
+CommitMsg:
+  ALL:
+    on_warn: fail
+
+  CapitalizedSubject:
+    enabled: true
+    # This repo's entire history uses lowercase Conventional Commits prefixes
+    # (fix:/chore:/feat:), which this hook otherwise rejects -- don't let
+    # ALL's on_warn: fail escalate that mismatch into a hard failure.
+    on_warn: warn
+
+  SingleLineSubject:
+    enabled: true
+
+  TextWidth:
+    enabled: true
+    # Subject width stays a hard failure -- it's what keeps `git log
+    # --oneline` readable. Body width is pure cosmetics, so it warns rather
+    # than throwing away an otherwise-passing commit (including the full
+    # test suite that just ran) over where a line happened to wrap.
+    on_warn: warn
+    max_subject_width: 72
+    max_body_width: 72
+
+  TrailingPeriod:
+    enabled: true
+
+PostCheckout:
+  BundleInstall:
+    enabled: true
+
+PostMerge:
+  BundleInstall:
+    enabled: true
+
+PrePush:
+  ForbiddenBranches:
+    enabled: true
+    branch_patterns: ['main', 'master', 'develop']
+
+  Brakeman:
+    enabled: true
+
+  RuboCop:
+    enabled: true

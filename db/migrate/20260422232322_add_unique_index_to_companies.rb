@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+class AddUniqueIndexToCompanies < ActiveRecord::Migration[8.0]
+  disable_ddl_transaction!
+
+  def up
+    safety_assured { execute "SET lock_timeout = '30s'" }
+    add_index :companies, :name, unique: true, algorithm: :concurrently, if_not_exists: true
+  end
+
+  def down
+    remove_index :companies, :name, algorithm: :concurrently, if_exists: true
+  end
+end

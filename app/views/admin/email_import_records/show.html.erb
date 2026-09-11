@@ -1,0 +1,54 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1">Email Import</h1>
+    <p class="text-slate-500 font-bold text-sm">Message ID: <%= @record.message_id %></p>
+  </div>
+  <div>
+    <%= link_to admin_email_import_records_path, class: "btn-neural text-sm" do %>
+      Back
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="lg:col-span-1 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-4">Details</h3>
+      <dl class="space-y-4 font-mono text-xs">
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Status</dt>
+          <dd class="font-bold <%= @record.status == 'processed' ? 'text-emerald-400' : 'text-rose-400' %>">
+            <%= @record.status&.humanize %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Source</dt>
+          <dd class="text-white font-bold"><%= @record.source %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Processed At</dt>
+          <dd class="text-slate-400"><%= @record.processed_at&.strftime("%Y-%m-%d %H:%M:%S") || "Not yet" %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-6">Log</h3>
+      <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400 whitespace-pre-wrap overflow-x-auto leading-relaxed">
+        <div class="text-slate-500 mb-4 border-b border-white/5 pb-2 text-xs font-bold">Metadata</div>
+        File: <%= @record.file_path %>
+        Checksum: <%= @record.file_checksum %>
+        Message-ID: <%= @record.message_id %>
+
+        <% if @record.error_message.present? %>
+          <div class="text-rose-400 mt-6 border-b border-rose-900/20 pb-2 text-xs font-bold">Error</div>
+          <%= @record.error_message %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Public-release audit: bounded, read-only checks for a clean public snapshot.
+# Usage: bin/audit_public_release [--json]
+
+require "json"
+require "open3"
+
+ROOT = File.expand_path("..", __dir__)
+JSON_OUTPUT = ARGV.delete("--json")
+
+def run(*command, env: {})
+  stdout, stderr, status = Open3.capture3(env, *command, chdir: ROOT)
+  [status.success?, stdout, stderr]
+end
+
+checks = []
+add = lambda do |name, passed, detail|
+  checks << { name: name, passed: passed, detail: detail }
+end
+
+required = %w[README.md LICENSE CONTRIBUTING.md DISCLAIMER.md bin/tmi-scan config/tmi_denylist.yml.example]
+missing = required.reject { |path| File.file?(File.join(ROOT, path)) }
+add.call("required_files", missing.empty?, missing.empty? ? "all present" : missing.join(", "))
+
+success, stdout, = run("git", "status", "--porcelain")
+add.call("working_tree", success && stdout.empty?, if success
+                                                     stdout.empty? ? "clean" : "uncommitted changes"
+                                                   else
+                                                     "git status failed"
+                                                   end)
+
+success, stdout, = run("git", "rev-list", "--count", "HEAD")
+add.call("history_depth", success && stdout.to_i == 1, success ? stdout.strip : "git history check failed")
+
+success, stdout, = run("git", "for-each-ref", "refs/heads", "--format=%(refname:short)")
+branches = stdout.lines.map(&:chomp).reject { |branch| branch == "main" }
+unmerged = branches.reject do |branch|
+  system("git", "-C", ROOT, "merge-base", "--is-ancestor", branch, "main", out: File::NULL, err: File::NULL)
+end
+add.call("branch_disposition", success && unmerged.empty?,
+         unmerged.empty? ? "all non-main branches merged" : unmerged.join(", "))
+
+success, stdout, = run("git", "ls-files")
+forbidden = stdout.lines.map(&:chomp).grep(%r{(^|/)(\.env($|\.)|\.zdots\.secrets|data/backfills/|config/master\.key$)})
+add.call("forbidden_paths", success && forbidden.empty?, forbidden.empty? ? "none" : forbidden.join(", "))
+
+success, = run("git", "show", "--check", "--oneline", "HEAD")
+add.call("whitespace", success, success ? "clean" : "whitespace errors")
+
+scanner = File.join(ROOT, "bin/tmi-scan")
+success, stdout, stderr = run("ruby", scanner,
+                              env: { "TMI_DENYLIST" => File.join(ROOT, "config/tmi_denylist.yml.example") })
+add.call("tmi_scan", success, (stdout + stderr).lines.first.to_s.strip)
+
+passed = checks.all? { |check| check[:passed] }
+if JSON_OUTPUT
+  puts JSON.generate(ok: passed, checks: checks)
+else
+  checks.each { |check| puts "#{check[:passed] ? 'PASS' : 'FAIL'} #{check[:name]}: #{check[:detail]}" }
+  puts(passed ? "PUBLIC RELEASE AUDIT: PASS" : "PUBLIC RELEASE AUDIT: FAIL")
+end
+
+exit(passed ? 0 : 1)

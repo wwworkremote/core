@@ -1,0 +1,68 @@
+<% content_for :title, "Guided sessions | WWWorkRemote" %>
+
+<div class="mb-10">
+  <div class="text-xs font-black uppercase tracking-[0.25em] text-primary mb-3">Harness</div>
+  <h1 class="text-3xl font-black text-white tracking-tight">Guided sessions</h1>
+  <p class="text-slate-400 font-medium mt-2 text-sm">
+    Supervised laps through employer application flows. Read-only &mdash; starting or completing
+    a session never advances a posting's pipeline state on its own.
+  </p>
+
+  <%= form_with model: GuidedSession.new(purpose: "application_research"),
+                class: "mt-6 flex flex-col sm:flex-row gap-3 sm:items-center" do |form| %>
+    <%= form.url_field :source_url, required: true, autofocus: true,
+          placeholder: "Paste a job posting URL to start a lap…",
+          class: "input input-bordered flex-1 bg-white/5 border-white/10 text-white" %>
+    <%= form.select :purpose,
+          [["Research the flow", "application_research"], ["Work toward applying", "application_execution"]],
+          {}, class: "select select-bordered bg-white/5 border-white/10 text-white" %>
+    <%= form.submit "Start", class: "btn btn-primary rounded-xl font-bold shrink-0" %>
+  <% end %>
+</div>
+
+<div class="bg-base-200 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+  <table class="w-full text-sm">
+    <thead class="bg-white/5 text-xs font-bold text-base-content/50 uppercase tracking-wider">
+      <tr>
+        <th class="text-left px-6 py-4">Posting</th>
+        <th class="text-left px-6 py-4">Company</th>
+        <th class="text-left px-6 py-4">Purpose</th>
+        <th class="text-left px-6 py-4">State</th>
+        <th class="text-left px-6 py-4">Last activity</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-white/5">
+      <% @guided_sessions.each do |session| %>
+        <% posting = session.user_job_posting&.job_posting %>
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="px-6 py-4 font-bold text-white">
+            <%= link_to session.purpose.humanize, guided_session_path(session), class: "hover:text-primary" %>
+            <% if posting %>
+              <div class="text-xs font-medium text-slate-500 mt-1">
+                <%= link_to truncate(posting.title, length: 60), job_posting_path(posting), class: "hover:text-primary" %>
+              </div>
+            <% else %>
+              <div class="text-xs font-medium text-slate-600 mt-1 break-all"><%= truncate(session.source_url, length: 60) %></div>
+            <% end %>
+          </td>
+          <td class="px-6 py-4 text-slate-400">
+            <% company = posting&.company_record %>
+            <% if company %>
+              <%= link_to company.name, company_path(company), class: "hover:text-primary" %>
+            <% else %>
+              <%= posting&.company_name.presence || "&mdash;".html_safe %>
+            <% end %>
+          </td>
+          <td class="px-6 py-4 text-slate-400"><%= session.purpose.humanize %></td>
+          <td class="px-6 py-4">
+            <span class="badge badge-outline text-xs font-bold border-white/20 text-slate-300"><%= session.status.humanize %></span>
+          </td>
+          <td class="px-6 py-4 text-xs font-bold text-slate-500"><%= session.updated_at.strftime("%b %-d, %Y · %H:%M") %></td>
+        </tr>
+      <% end %>
+      <% if @guided_sessions.empty? %>
+        <tr><td colspan="5" class="px-6 py-16 text-center text-sm font-bold italic text-slate-500">No guided sessions yet.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+# bin/wwwr-ctl — launchd-backed service control for local dev.
+#
+# Mirrors the zdots platform's own service pattern (see zsvc / docs at
+# ~/.config/zsh/docs/platform-service-plane.md) instead of foreman: each
+# process is a real LaunchAgent with KeepAlive + a 30s ThrottleInterval, so a
+# crash gets throttled and retried instead of foreman's group-kill-on-any-exit
+# behavior turning one bad process into a full outage (see TASK-22 for the bug
+# that motivated this).
+#
+# Services:  web (Puma)  jobs (Solid Queue)
+# Commands:  start  stop  restart  status  logs
+
+set -euo pipefail
+
+ZDOTS_LIB="$HOME/.config/zsh/lib/svc-launchd.bash"
+if [[ ! -f "$ZDOTS_LIB" ]]; then
+  echo "wwwr-ctl: missing $ZDOTS_LIB (zdots platform not present on this machine)" >&2
+  exit 1
+fi
+# shellcheck source=/dev/null
+source "$ZDOTS_LIB"
+
+APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STATE_DIR="$HOME/.local/state/wwworkremote"
+PLIST_DIR="$HOME/Library/LaunchAgents"
+
+_meta() {
+  case "$1" in
+    web)
+      SVC_LABEL="com.wwworkremote.web"
+      SVC_BIN="$APP_ROOT/bin/wwwr-web"
+      ;;
+    jobs)
+      SVC_LABEL="com.wwworkremote.jobs"
+      SVC_BIN="$APP_ROOT/bin/wwwr-jobs"
+      ;;
+    *)
+      echo "wwwr-ctl: unknown service: $1 (expected: web, jobs, all)" >&2
+      exit 1
+      ;;
+  esac
+  SVC_NAME="$1"
+  SVC_PLIST="$PLIST_DIR/${SVC_LABEL}.plist"
+  SVC_LOG="$STATE_DIR/${1}.log"
+}
+
+ALL_SVCS=(web jobs)
+WEB_READY_TIMEOUT=30
+
+# Solid Queue's ForkSupervisor uses fork(), not exec() -- if a prior
+# non-launchd-managed run's supervisor dies (crash, nohup/foreman restart
+# chaos) before its forked worker/dispatcher/scheduler children exit,
+# launchd has no idea those children exist: it only ever tracked the PID it
+# itself started. The orphans keep running the in-memory Ruby loaded at
+# fork time indefinitely, invisible to every later `restart jobs` (TASK-31 --
+# happened twice, ~11h and unknown duration, produced fake JobPosting rows
+# each time before being found by hand).
+_sq_all_pids() {
+  ps -eo pid=,command= | grep -E 'solid-queue-(worker|dispatcher|scheduler|fork-supervisor)\(' | awk '{print $1}'
+}
+
+_sq_supervised_pids() {
+  local supervisor_pid="$1"
+  [[ -n "$supervisor_pid" ]] || return 0
+  ps -o command= -p "$supervisor_pid" 2>/dev/null | sed -n 's/.*supervising //p' | tr ',' '\n' | grep -oE '[0-9]+'
+}
+
+# PIDs of running Solid Queue processes that aren't the given supervisor
+# itself or one of the children it reports supervising.
+_sq_orphan_pids() {
+  local supervisor_pid="$1" known pid
+  known=" $supervisor_pid $(_sq_supervised_pids "$supervisor_pid" | tr '\n' ' ') "
+  while read -r pid; do
+    [[ -z "$pid" ]] && continue
+    [[ "$known" == *" $pid "* ]] || echo "$pid"
+  done < <(_sq_all_pids)
+}
+
+_sq_warn_orphans() {
+  local supervisor_pid="$1" pid cmd orphans
+  orphans=$(_sq_orphan_pids "$supervisor_pid")
+  [[ -n "$orphans" ]] || return 0
+  echo "jobs: WARNING - orphaned Solid Queue process(es) outside the current supervisor's tree:" >&2
+  while read -r pid; do
+    cmd=$(ps -o command= -p "$pid" 2>/dev/null || echo "(already gone)")
+    echo "  pid $pid: $cmd" >&2
+  done <<<"$orphans"
+  echo "  run 'bin/wwwr-ctl restart jobs' to reap them" >&2
+}
+
+_sq_reap_orphans() {
+  local supervisor_pid="$1" pid orphans
+  orphans=$(_sq_orphan_pids "$supervisor_pid")
+  [[ -n "$orphans" ]] || return 0
+  while read -r pid; do
+    echo "jobs: reaping orphaned Solid Queue process pid $pid" >&2
+    kill -TERM "$pid" 2>/dev/null || true
+  done <<<"$orphans"
+  sleep 2
+  while read -r pid; do
+    if kill -0 "$pid" 2>/dev/null; then
+      echo "jobs: pid $pid still alive after SIGTERM, sending SIGKILL" >&2
+      kill -KILL "$pid" 2>/dev/null || true
+    fi
+  done <<<"$orphans"
+}
+
+_sq_current_pid() {
+  local sp
+  sp=$(zdots_svc_launchd_status "com.wwworkremote.jobs")
+  echo "${sp#* }"
+}
+
+_web_ready() {
+  local port="${PORT:-31000}" deadline=$((SECONDS + WEB_READY_TIMEOUT)) status
+  while (( SECONDS < deadline )); do
+    status=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+      --connect-timeout 1 --max-time 2 "http://127.0.0.1:${port}/" 2>/dev/null || true)
+    case "$status" in
+      2??|3??) return 0 ;;
+    esac
+    sleep 1
+  done
+  echo "web: Puma did not become HTTP-ready within ${WEB_READY_TIMEOUT}s" >&2
+  return 1
+}
+
+cmd_start() {
+  _meta "$1"
+  zdots_svc_launchd_register "$SVC_LABEL" "$SVC_PLIST" "$SVC_BIN" "$SVC_LOG"
+  zdots_svc_launchd_start "$SVC_LABEL" "$SVC_PLIST"
+  [[ "$SVC_NAME" != "web" ]] || _web_ready
+}
+
+cmd_stop() {
+  _meta "$1"
+  zdots_svc_launchd_stop "$SVC_LABEL"
+}
+
+cmd_restart() {
+  _meta "$1"
+  zdots_svc_launchd_stop "$SVC_LABEL"
+  zdots_svc_launchd_register "$SVC_LABEL" "$SVC_PLIST" "$SVC_BIN" "$SVC_LOG"
+  zdots_svc_launchd_start "$SVC_LABEL" "$SVC_PLIST"
+  [[ "$SVC_NAME" != "web" ]] || _web_ready
+  if [[ "$SVC_NAME" == "jobs" ]]; then
+    sleep 2 # let the new supervisor fork its worker/dispatcher/scheduler tree
+    _sq_reap_orphans "$(_sq_current_pid)"
+  fi
+}
+
+cmd_status() {
+  _meta "$1"
+  local sp running pid
+  sp=$(zdots_svc_launchd_status "$SVC_LABEL")
+  running="${sp%% *}"
+  pid="${sp#* }"
+  if [[ "$running" == "true" ]]; then
+    echo "$SVC_NAME: running (pid ${pid:-?})"
+  else
+    echo "$SVC_NAME: stopped"
+  fi
+  if [[ "$SVC_NAME" == "jobs" ]]; then
+    _sq_warn_orphans "${pid:-}"
+  fi
+}
+
+cmd_logs() {
+  _meta "$1"
+  mkdir -p "$STATE_DIR"
+  echo "wwwr-ctl: tailing $SVC_LOG — Ctrl+C to stop" >&2
+  tail -f "$SVC_LOG"
+}
+
+_for_each() {
+  local fn="$1" svc
+  for svc in "${ALL_SVCS[@]}"; do "$fn" "$svc"; done
+}
+
+usage() {
+  cat <<'EOF'
+Usage: bin/wwwr-ctl <command> [web|jobs|all]
+
+COMMANDS
+  start   <svc|all>   Register + start (RunAtLoad, KeepAlive, 30s throttle)
+  stop    <svc|all>   Stop and unregister
+  restart <svc|all>   Stop, re-register, start; web waits for HTTP readiness
+  status  <svc|all>   running/stopped + pid
+  logs    <svc>       Tail the service log (Ctrl+C to stop)
+
+SERVICES
+  web    Puma            (config/puma.rb, port 31000)
+  jobs   Solid Queue      (bin/jobs) -- status warns on orphaned
+         worker/dispatcher/scheduler processes left behind by a prior
+         supervisor's death; restart reaps them (TASK-31)
+
+Logs:  ~/.local/state/wwworkremote/{web,jobs}.log
+Plists: ~/Library/LaunchAgents/com.wwworkremote.{web,jobs}.plist
+EOF
+}
+
+[[ $# -ge 1 ]] || { usage >&2; exit 1; }
+cmd="$1"; shift || true
+target="${1:-all}"
+
+case "$cmd" in
+  start|stop|restart|status)
+    if [[ "$target" == "all" ]]; then
+      _for_each "cmd_${cmd}"
+    else
+      "cmd_${cmd}" "$target"
+    fi
+    ;;
+  logs)
+    [[ "$target" != "all" ]] || { echo "wwwr-ctl: logs needs a single service (web or jobs)" >&2; exit 1; }
+    cmd_logs "$target"
+    ;;
+  -h|--help) usage ;;
+  *) echo "wwwr-ctl: unknown command: $cmd" >&2; usage >&2; exit 1 ;;
+esac

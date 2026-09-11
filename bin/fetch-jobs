@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# bin/fetch-jobs — One-command job fetcher, embedder & ranker
+
+require_relative "../config/environment"
+
+puts "🚀 WWWorkRemote — Fetching fresh jobs..."
+puts "-" * 60
+
+sources = %w[wwr remotive yc]
+sources.each do |slug|
+  print "Fetching #{slug.upcase}... "
+  res = DataAcquisitionManager.run(slug, force: true) rescue nil
+  puts res&.[](:error) ? "⚠️ #{res[:error]}" : "✅ Done"
+end
+
+puts "\n🧠 Auto-ranking matches against your CareerProfile..."
+u = User.first
+if u&.career_profile
+  Resume::ProfileEmbedder.call(u.career_profile) rescue nil
+  matches = Resume::SemanticMatchFinder.call(u.career_profile, limit: 10) rescue []
+
+  if matches.any?
+    puts "\n🎯 TOP SEMANTIC MATCHES FOR YOU:"
+    puts "=" * 60
+    matches.each_with_index do |j, idx|
+      puts "#{idx + 1}. [##{j.id}] #{j.title} @ #{j.company&.name || j.company_name}"
+      puts "   Location: #{j.location}"
+      puts "   Apply: #{j.target_url}\n\n"
+    end
+  end
+end
+
+puts "✨ Complete! Check your app dashboard or DB for full details."

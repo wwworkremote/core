@@ -1,0 +1,163 @@
+# frozen_string_literal: true
+
+class UserJobPostingsController < ApplicationController
+  before_action :set_job_posting, only: %i[create analyze_match generate_artifacts generate_interview_prep]
+
+  # COALESCE rather than plain applied_at: rows tracked before that column
+  # existed have no date, and ordering on a bare NULL drops them all to one end
+  # regardless of direction. Falling back to created_at sorts them by when we
+  # learned of them, which is the honest approximation.
+  SORTS = {
+    "newest" => Arel.sql("COALESCE(applied_at, created_at) DESC"),
+    "oldest" => Arel.sql("COALESCE(applied_at, created_at) ASC")
+  }.freeze
+
+  # The overview intentionally materializes one ordered collection so its
+  # columns and summary cards agree on the same funnel snapshot.
+  # rubocop:disable-next Metrics/AbcSize
+  def index
+    scoped = sorted_tracked_postings
+    @tracked = scoped.to_a
+    @funnel_stats = funnel_stats(@tracked)
+    @favorites = @tracked.select { |record| record.status == "favorited" }
+    @applied = @tracked.select { |record| record.status == "applied" }
+  end
+
+  def create
+    build_user_job_posting
+    apply_status_event
+    apply_manual_outcome
+    redirect_back_or_to(job_posting_path(@job_posting), notice: "Job status updated.")
+  end
+
+  def update
+    @user_job_posting = current_user.user_job_postings.find(params.expect(:id))
+    return unless @user_job_posting.update(user_job_posting_params)
+
+    redirect_back_or_to(user_job_postings_path, notice: "Job record updated.")
+  end
+
+  def destroy
+    @user_job_posting = current_user.user_job_postings.find(params.expect(:id))
+    @user_job_posting.destroy
+    redirect_back_or_to(user_job_postings_path, notice: "Job removed from your list.")
+  end
+
+  # Thin POST-and-redirect wrappers over an LLM service -- see #run_llm.
+  def analyze_match = run_llm(LLM::ProfileMatcher, success: "AI alignment scan complete.", failure: "Scan failed")
+
+  def generate_artifacts = run_llm(LLM::ArtifactGenerator, success: "Bespoke application artifacts generated.")
+
+  def generate_interview_prep = run_llm(LLM::InterviewPrepGenerator, success: "Interview prep pack generated.")
+
+  # Fixed vocabulary, not free text -- the same values the backfill importers
+  # write (see bin/import_indeed_applications, bin/import_linkedin_tracker),
+  # so a manually-logged rejection and an imported one render identically.
+  # "manual" as outcome_source still lets a later import overwrite this if a
+  # stronger automated signal shows up. "offered" lives here, not on status
+  # -- see the comment on UserJobPosting's aasm block (TASK-82/TASK-94).
+  MANUAL_OUTCOMES = %w[rejected reviewed closed offered].freeze
+  CLEARABLE_OUTCOME_ATTRS = %i[outcome outcome_at outcome_source outcome_reason outcome_evidence].freeze
+
+  private
+
+  def apply_status_event
+    @user_job_posting.record_status_event!(params[:status]) if params[:status].present?
+  end
+
+  # outcome_reason/outcome_evidence are optional and only ever meaningful
+  # for a rejected outcome in the UI (see the Reject form in
+  # job_postings/show.html.erb), but the model doesn't enforce that -- no
+  # value is provided for the other MANUAL_OUTCOMES buttons, which just
+  # POST outcome alone.
+  def apply_manual_outcome
+    return unless MANUAL_OUTCOMES.include?(params[:outcome])
+
+    @user_job_posting.update!(manual_outcome_attrs)
+    attach_outcome_evidence
+    record_company_decline
+  end
+
+  # TASK-91.2: starts the company's cooldown the moment Mike marks a
+  # rejection here. Scoped to this manual flow only -- the import scripts
+  # (bin/import_indeed_applications etc.) write outcome directly and don't
+  # go through this action, so an imported rejection doesn't yet start a
+  # cooldown.
+  def record_company_decline
+    return unless params[:outcome] == "rejected"
+
+    @user_job_posting.job_posting.company_record&.record_decline!
+  end
+
+  def manual_outcome_attrs
+    { outcome: params[:outcome], outcome_at: Time.current, outcome_source: "manual",
+      outcome_reason: params[:outcome_reason].presence }
+  end
+
+  def attach_outcome_evidence
+    return if params[:outcome_evidence].blank?
+
+    @user_job_posting.outcome_evidence.attach(params[:outcome_evidence])
+  end
+
+  def sorted_tracked_postings
+    current_user.user_job_postings.includes(:job_posting, :application_field_answers).order(SORTS.fetch(sort_key))
+  end
+
+  # rubocop:disable-next Metrics/AbcSize
+  def funnel_stats(records)
+    { tracked: records.length, applied: records.count { |record| record.status == "applied" },
+      personas: records.count { |record| record.resume_persona_id.present? },
+      answers: records.sum { |record| record.application_field_answers.length },
+      outcomes: records.count { |record| record.outcome.present? } }
+  end
+
+  def sort_key
+    @sort = SORTS.key?(params[:sort]) ? params[:sort] : "newest"
+  end
+
+  def set_job_posting
+    @job_posting = JobPosting.find(params.expect(:job_posting_id))
+  end
+
+  def build_user_job_posting
+    @user_job_posting = current_user.user_job_postings.find_or_initialize_by(job_posting: @job_posting)
+    assign_job_search_id
+    @user_job_posting.save!
+  end
+
+  def assign_job_search_id
+    @user_job_posting.job_search_id = params[:job_search_id] if params[:job_search_id].present?
+  end
+
+  def forced?
+    params[:force] == "true"
+  end
+
+  def flash_llm_result(result, success:, failure:)
+    if result[:success]
+      flash[:notice] = success
+    else
+      flash[:alert] = "#{failure}: #{result[:error]}"
+    end
+  end
+
+  # The three POST-and-redirect LLM actions differ only in service + notice.
+  def run_llm(service, success:, failure: "Generation failed")
+    flash_llm_result(service.call(current_user, @job_posting, force: forced?), success: success, failure: failure)
+    redirect_back_or_to(job_posting_path(@job_posting))
+  end
+
+  # Deliberately excludes :status -- writing that column directly would skip
+  # the AASM guards entirely. Status changes go through record_status_event!.
+  # outcome and friends (including outcome_reason/outcome_evidence, TASK-91.1)
+  # ARE permitted here, but only to support clearing a mistaken mark (the
+  # Clear form posts all of CLEARABLE_OUTCOME_ATTRS as nil together, and
+  # assigning nil to outcome_evidence purges the attachment) -- setting a
+  # real outcome goes through apply_manual_outcome's fixed vocabulary in
+  # #create, not through arbitrary values on this action.
+  def user_job_posting_params
+    permitted = params.expect(user_job_posting: [:notes, :interview_prep_pack, *CLEARABLE_OUTCOME_ATTRS])
+    permitted[:outcome].present? ? permitted.except(*CLEARABLE_OUTCOME_ATTRS) : permitted
+  end
+end

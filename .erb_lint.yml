@@ -1,0 +1,16 @@
+---
+# Rubocop linter deliberately left off: it lints each embedded-Ruby
+# fragment as if it were a standalone file against the full
+# .rubocop.yml (frozen_string_literal, final newline, etc.), which is
+# noise on 2-3 line tag bodies rather than signal. The layout linters
+# below are what actually reduce back-and-forth on ERB templates.
+EnableDefaultLinters: true
+linters:
+  ErbSafety:
+    enabled: false # needs a separate better_html config; not set up yet
+  Rubocop:
+    enabled: false
+  FinalNewline:
+    enabled: true
+  TrailingWhitespace:
+    enabled: true

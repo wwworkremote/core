@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# bin/wwwr-jobs — launchd entry point for the Solid Queue supervisor.
+#
+# Not meant to be run by hand; registered as a LaunchAgent by bin/wwwr-ctl.
+# See bin/wwwr-web for why this execs directly instead of going through
+# foreman.
+
+set -euo pipefail
+
+APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$APP_ROOT"
+
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+exec bin/jobs

@@ -1,0 +1,65 @@
+<% content_for :title, "Companies | WWWorkRemote" %>
+
+<div class="mb-10 text-xs font-bold opacity-60">
+  <div class="flex items-center gap-3">
+    <%= link_to t('.breadcrumb_home'), root_path, class: "hover:text-primary transition-all" %>
+    <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+    <span class="text-white"><%= t('.breadcrumb_current') %></span>
+  </div>
+</div>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+  <div>
+    <h1 class="text-4xl font-black text-white mb-2 tracking-tight"><%= t('.title') %></h1>
+    <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
+  <% @companies.each do |company| %>
+    <div class="group bg-base-200 border border-white/5 rounded-2xl p-8 h-full shadow-2xl transition-all hover:border-primary/50 hover:translate-y-[-4px] relative overflow-hidden">
+      <% if company.ingestion_enabled? %>
+        <%= button_to mark_not_interested_admin_company_path(company),
+            form: { class: "absolute top-3 right-3 z-20" },
+            title: t('.not_interested'),
+            class: "btn btn-ghost btn-xs btn-circle text-base-content/40 hover:text-error hover:bg-error/10",
+            data: { turbo_confirm: "Mark #{company.name} not interested? Open postings will be ignored and future postings will be skipped automatically." } do %>
+          <%= heroicon "x-mark", options: { class: "w-4 h-4" } %>
+        <% end %>
+      <% end %>
+
+      <div class="relative z-10">
+        <h3 class="text-xl font-black text-white group-hover:text-primary transition-colors truncate mb-6">
+          <%= link_to company.name, company_path(company), class: "before:absolute before:inset-0" %>
+        </h3>
+
+        <div class="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-slate-500"><%= t('.open_postings') %></span>
+            <span class="text-lg font-black text-white"><%= company.job_postings_count %></span>
+          </div>
+
+          <% if company.toxic_culture_flag %>
+            <div class="badge badge-error gap-1 text-xs font-bold">
+              <%= heroicon "exclamation-triangle", variant: :outline, options: { class: "w-4 h-4" } %> <%= t('.toxicity_alert') %>
+            </div>
+          <% end %>
+
+          <% if company.in_cooldown? %>
+            <div class="badge badge-outline border-warning/40 text-warning gap-1 text-xs font-bold">
+              <%= heroicon "clock", variant: :outline, options: { class: "w-4 h-4" } %> <%= t('.cooldown_alert') %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+        <%= heroicon "building-office", options: { class: "w-16 h-16" } %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="flex justify-center mt-12 pb-20">
+  <%= paginate @companies %>
+</div>

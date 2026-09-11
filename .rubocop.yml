@@ -1,0 +1,168 @@
+---
+inherit_from: .rubocop_todo.yml
+
+plugins:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-rubycw
+  - rubocop-thread_safety
+  - rubocop-md
+  - rubocop-capybara
+  - rubocop-factory_bot
+
+AllCops:
+  TargetRubyVersion: 4.0
+  DefaultFormatter: fuubar
+  NewCops: enable
+  SuggestExtensions: false
+  CacheRootDirectory: 'tmp/'
+  MaxFilesInCache: 65536
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+  Include:
+    - '**/*.rb'
+    - '**/*.gemspec'
+    - '**/*.rake'
+    - '**/*.md'
+    - '**/Gemfile'
+    - '**/Rakefile'
+    - '**/config.ru'
+    - 'Capfile'
+  Exclude:
+    - 'db/schema.rb'
+    # Archived planning docs -- code fences are illustrative snippets from
+    # a point in time, not live code; Sandi-Metz extraction on prose
+    # examples would relocate lines to satisfy the linter, not clean code.
+    - 'docs/history/**/*'
+    - 'db/cache_schema.rb'
+    - 'node_modules/**/*'
+    - 'bin/**/*'
+    - 'sbin/**/*'
+    - 'vendor/**/*'
+    - '.git/**/*'
+
+# --- Rails 8 Specifics ---
+Rails/ActiveRecordCallbacksOrder:
+  Enabled: true
+
+Rails/UniqueValidationWithoutIndex:
+  Enabled: true
+
+# --- Metrics (Sandi Metz rules: 5-line methods, 4 params, 100-line classes) ---
+Metrics/AbcSize:
+  Max: 10
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Gemfile'
+    - 'config/routes.rb'
+    - 'config/environments/*.rb'
+    - 'config/initializers/ingestion_adapters.rb'
+    - 'spec/**/*'
+    - 'lib/tasks/*.rake'
+
+Metrics/ClassLength:
+  Max: 100
+
+Metrics/MethodLength:
+  Max: 5
+
+Metrics/ModuleLength:
+  Max: 100
+
+Metrics/ParameterLists:
+  Max: 4
+
+# --- RSpec Standards ---
+# Use Rails' own inflector so acronyms declared in
+# config/initializers/inflections.rb (e.g. LLM) are respected when
+# deriving expected spec paths, instead of the cop's naive default
+# lowercasing everything.
+RSpec/SpecFilePathFormat:
+  EnforcedInflector: active_support
+  # app/{services,jobs}/LLM and spec/{services,jobs}/LLM are tracked in
+  # git as lowercase llm/ (confirmed via `git ls-files`); the uppercase
+  # LLM some tool invocations report is a case-preserving-but-insensitive
+  # filesystem directory-entry artifact, not a real path mismatch.
+  Exclude:
+    - 'spec/services/LLM/**/*'
+    - 'spec/jobs/LLM/**/*'
+    - 'spec/services/llm/**/*'
+    - 'spec/jobs/llm/**/*'
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 10 # Allow more flexibility in complex integration specs
+
+RSpec/ExampleLength:
+  Max: 15
+
+RSpec/NestedGroups:
+  Max: 5
+
+# --- Style and Layout ---
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'config/initializers/*'
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  SafeAutoCorrect: true
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# --- Overrides from existing config ---
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/EmptyLines:
+  Enabled: false
+
+Lint/Debugger:
+  Enabled: false
+
+Naming/InclusiveLanguage:
+  Enabled: false
+
+Rubycw/Rubycw:
+  Exclude:
+    - '**/*.md'
+
+Naming/FileName:
+  Exclude:
+    - '**/CHANGELOG.md'
+    - '**/README.md'
+    - '**/*.md'
+    - 'node_modules/**/*'
+
+Rails/Output:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+Rails/DangerousColumnNames:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/RescueModifier:
+  Enabled: false
+
+Style/Semicolon:
+  Enabled: false

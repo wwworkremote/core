@@ -1,0 +1,19 @@
+<% error_message = tool.tool_error_message %>
+<% if error_message.present? %>
+  <%= render "llm_messages/error",
+    llm_message: tool,
+    title: "Tool Error",
+    error_message: error_message %>
+<% else %>
+  <div id="llm_message_<%= tool.id %>" class="chat chat-start group">
+    <div class="chat-header opacity-60 text-xs font-bold mb-1">
+      Tool Result
+    </div>
+    <div class="chat-bubble bg-base-300/30 text-base-content border border-white/5 shadow-lg text-sm leading-relaxed p-4">
+      <pre class="bg-black/20 p-3 rounded-lg text-xs font-mono opacity-80 overflow-x-auto"><%= tool.content.presence || "(no output)" %></pre>
+    </div>
+    <div class="chat-footer opacity-40 text-xs font-bold mt-1">
+      <%= tool.created_at&.strftime("%I:%M %p") %>
+    </div>
+  </div>
+<% end %>

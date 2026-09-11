@@ -1,0 +1,8 @@
+#!/usr/bin/env sh -x
+
+cat /home/deploy/projects/wwworkremote/core/current/config/deploy/production/nginx.conf > /etc/nginx/sites-available/default
+
+sudo systemctl stop nginx 2> /dev/null
+sudo systemctl stop puma 2> /dev/null
+sudo systemctl start nginx 2> /dev/null
+sudo systemctl start puma 2> /dev/null

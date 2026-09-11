@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WWWorkRemote</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      width: 270px;
+      margin: 0;
+      padding: 14px;
+      background: #22212c;
+      color: #f8f8f2;
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .title {
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ff80bf;
+      margin-bottom: 10px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .label { color: #9590c5; }
+    .value { color: #8aff80; }
+    .divider {
+      border: none;
+      border-top: 1px solid #454158;
+      margin: 10px 0;
+    }
+    .note {
+      font-size: 12px;
+      color: #9590c5;
+      line-height: 1.5;
+    }
+    .board-list { margin: 6px 0 0 0; padding: 0; list-style: none; }
+    .board-list li { color: #f8f8f2; }
+    .board-list li::before { content: "› "; color: #9580ff; }
+    .board-list li.dim { color: #9590c5; }
+    .board-list li.dim::before { color: #454158; }
+
+    .section-label {
+      font-size: 12px;
+      color: #9590c5;
+      margin-bottom: 4px;
+    }
+    .input-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .cfg-input {
+      flex: 1;
+      background: #17161d;
+      border: 1px solid #454158;
+      border-radius: 3px;
+      color: #f8f8f2;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 4px 6px;
+      outline: none;
+      min-width: 0;
+    }
+    .cfg-input:focus { border-color: #9580ff; }
+    .save-btn {
+      background: #454158;
+      border: none;
+      border-radius: 3px;
+      color: #f8f8f2;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .save-btn:hover { background: #9590c5; }
+    .save-status {
+      font-size: 12px;
+      min-height: 14px;
+      margin-top: 2px;
+      text-align: right;
+    }
+    .auth-note {
+      font-size: 11px;
+      color: #454158;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">WWWorkRemote_Ingestion</div>
+
+  <div class="row">
+    <span class="label">Status:</span>
+    <span class="value">Active</span>
+  </div>
+
+  <hr class="divider">
+
+  <div class="note">
+    Shows a capture button on any supported board's job-detail page — click it
+    to ingest. Also opens on a URL containing
+    <span style="color:#ffff80;">?wwwr_id=NNN</span> to enrich an existing posting.
+  </div>
+
+  <hr class="divider">
+
+  <button class="save-btn" id="scan-page-btn" style="width:100%;padding:7px;">🔍 SCAN THIS PAGE</button>
+  <div class="note" style="margin-top:4px;">
+    For sites not in the supported list below. Scans <strong>only</strong> the
+    current tab, <strong>only</strong> when you click this — nothing runs
+    automatically on unsupported sites.
+  </div>
+  <div class="save-status" id="scan-status"></div>
+
+  <hr class="divider">
+
+  <!-- API URL -->
+  <div class="section-label">API endpoint:</div>
+  <div class="input-row">
+    <input type="text" id="api-url" class="cfg-input"
+           placeholder="http://localhost:31000" spellcheck="false">
+    <button class="save-btn" id="save-btn">SAVE</button>
+  </div>
+
+  <!-- Credentials -->
+  <div class="section-label">Admin credentials (HTTP Basic Auth):</div>
+  <div class="input-row">
+    <input type="email" id="api-email" class="cfg-input"
+           placeholder="email" autocomplete="off">
+  </div>
+  <div class="input-row">
+    <input type="password" id="api-password" class="cfg-input"
+           placeholder="password" autocomplete="off">
+  </div>
+  <div class="auth-note">
+    Stored locally in this browser profile. Match ADMIN_EMAIL / ADMIN_PASSWORD in Rails .env.
+  </div>
+
+  <div class="save-status" id="save-status"></div>
+
+  <hr class="divider">
+
+  <div class="label" style="margin-bottom:4px;">Supported boards:</div>
+  <ul class="board-list">
+    <li>LinkedIn</li>
+    <li>Indeed</li>
+    <li>Adzuna</li>
+    <li>WeWorkRemotely</li>
+    <li>RemoteOK</li>
+    <li>Greenhouse</li>
+    <li>Lever</li>
+    <li>Workday</li>
+    <li>Ashby</li>
+    <li>SmartRecruiters</li>
+    <li>Wellfound</li>
+    <li class="dim">+ any site, via Scan This Page</li>
+  </ul>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+#!/usr/bin/env sh -x
+
+sudo systemctl stop puma.service 2> /dev/null
+sudo systemctl disable puma.service 2> /dev/null
+
+sudo cp -f /home/deploy/projects/wwworkremote/core/current/config/deploy/production/puma.service /etc/systemd/system/puma.service
+
+cd /etc/systemd/system || exit
+sudo systemctl enable puma.service
+sudo systemctl daemon-reload
+sudo systemctl start puma.service
+sudo systemctl status puma.service

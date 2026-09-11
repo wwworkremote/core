@@ -1,0 +1,95 @@
+<%= render "admin/shared/nav" %>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div>
+    <h1 class="text-3xl font-black tracking-tight text-white mb-1"><%= @extraction_rule.provider %> / <%= @extraction_rule.field_name %></h1>
+    <p class="text-slate-500 font-bold text-sm font-mono"><%= @extraction_rule.selector %></p>
+  </div>
+  <div>
+    <%= link_to admin_extraction_rules_path, class: "btn-neural text-sm" do %>
+      Back
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+  <div class="lg:col-span-1 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-4">Details</h3>
+      <dl class="space-y-4 font-mono text-xs">
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Provider</dt>
+          <dd class="text-white font-bold"><%= @extraction_rule.provider %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Field</dt>
+          <dd class="text-white font-bold"><%= @extraction_rule.field_name %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Selector</dt>
+          <dd class="text-slate-400 break-all"><%= @extraction_rule.selector %></dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Taught On</dt>
+          <dd>
+            <% if @extraction_rule.source_url.present? %>
+              <%= link_to @extraction_rule.source_url, safe_job_url(@extraction_rule.source_url), target: "_blank", rel: "noopener",
+                          class: "text-blue-400 hover:text-blue-300 break-all" %>
+            <% else %>
+              <span class="text-slate-600">Unknown</span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-slate-500 font-bold mb-1">Updated At</dt>
+          <dd class="text-slate-400"><%= @extraction_rule.updated_at&.strftime("%Y-%m-%d %H:%M:%S") %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2 space-y-6">
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-2">Taught Element Snapshot</h3>
+      <p class="text-slate-600 text-xs mb-4">
+        The DOM element clicked when this rule was taught -- for reviewing why the selector
+        was chosen and diagnosing drift if the board's markup changes.
+      </p>
+      <% if @extraction_rule.sample_html.present? %>
+        <div class="bg-black/20 p-6 rounded border border-white/5 font-mono text-xs text-slate-400 whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-[32rem] overflow-y-auto">
+<%= @extraction_rule.sample_html %>
+        </div>
+      <% else %>
+        <span class="text-slate-600 text-xs">No snapshot on file.</span>
+      <% end %>
+    </div>
+
+    <div class="card-neural p-6">
+      <h3 class="text-xs font-bold text-slate-500 mb-2">Teach History (<%= @observations.size %>)</h3>
+      <p class="text-slate-600 text-xs mb-4">
+        Every time this field was taught, most recent first -- the raw DOM-path candidate
+        the picker computed vs. the selector the AI actually learned from it. Repeated drift
+        here is the signal that the board's markup is unstable for this field.
+      </p>
+      <% if @observations.any? %>
+        <div class="space-y-3 font-mono text-xs">
+          <% @observations.each do |obs| %>
+            <div class="bg-black/20 p-4 rounded border border-white/5">
+              <div class="flex justify-between text-slate-600 mb-2">
+                <span><%= obs.created_at.strftime("%Y-%m-%d %H:%M:%S") %></span>
+                <% if obs.source_url.present? %>
+                  <%= link_to "source", safe_job_url(obs.source_url), target: "_blank", rel: "noopener",
+                              class: "text-blue-400 hover:text-blue-300" %>
+                <% end %>
+              </div>
+              <div class="text-slate-500">candidate: <span class="text-slate-400 break-all"><%= obs.candidate_selector.presence || "(none)" %></span></div>
+              <div class="text-slate-500">learned:   <span class="text-white break-all"><%= obs.learned_selector %></span></div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <span class="text-slate-600 text-xs">No history yet -- this rule predates observation logging.</span>
+      <% end %>
+    </div>
+  </div>
+</div>

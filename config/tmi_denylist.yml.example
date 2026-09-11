@@ -1,0 +1,6 @@
+# Public-safe starter rules. Keep personal names, locations, compensation, and
+# other identifying values in the ignored config/tmi_denylist.yml instead.
+denylist:
+  - "sk-[A-Za-z0-9]{20,}"
+  - "AIza[0-9A-Za-z_-]{20,}"
+  - "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----"

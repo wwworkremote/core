@@ -1,0 +1,75 @@
+<div class="max-w-6xl mx-auto py-10 px-6">
+  <header class="mb-12 flex justify-between items-end">
+    <div>
+      <div class="text-xs font-bold opacity-60 mb-3 flex items-center gap-3">
+        <span class="text-white">Tasks</span>
+      </div>
+      <h1 class="text-4xl font-black text-white tracking-tight leading-none">Tasks</h1>
+      <p class="text-slate-500 font-bold text-sm mt-2">Follow-ups across all job postings.</p>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <!-- Pending -->
+    <div class="space-y-6">
+      <h3 class="text-xs font-bold text-primary pb-4 border-b border-primary/20 flex justify-between items-center">
+        <span>Pending</span>
+        <span class="badge badge-primary badge-sm font-bold"><%= @pending_tasks.count %></span>
+      </h3>
+
+      <div class="space-y-4">
+        <% @pending_tasks.each do |task| %>
+          <div class="card-neural p-6 border-l-2 border-l-primary/30">
+            <div class="text-xs font-bold text-slate-500 mb-1">
+              Due: <%= task.due_at&.strftime("%Y-%m-%d") || "No date" %>
+            </div>
+            <h4 class="text-sm font-bold text-white leading-tight mb-2"><%= task.title %></h4>
+            <p class="text-xs text-slate-400 font-medium mb-4">
+              <%= link_to task.job_posting.company_name, task.job_posting, class: "text-primary hover:underline" %>
+            </p>
+            <%= button_to "Start", admin_task_path(task, status: 'in_progress'), method: :patch, class: "w-full py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary hover:text-white transition-all" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- In Progress -->
+    <div class="space-y-6">
+      <h3 class="text-xs font-bold text-accent pb-4 border-b border-accent/20 flex justify-between items-center">
+        <span>In Progress</span>
+        <span class="badge badge-accent badge-sm font-bold"><%= @in_progress_tasks.count %></span>
+      </h3>
+
+      <div class="space-y-4">
+        <% @in_progress_tasks.each do |task| %>
+          <div class="card-neural p-6 border-l-2 border-l-accent">
+            <h4 class="text-sm font-bold text-white leading-tight mb-2"><%= task.title %></h4>
+            <p class="text-xs text-slate-400 font-medium mb-4">
+              <%= link_to task.job_posting.company_name, task.job_posting, class: "text-accent hover:underline" %>
+            </p>
+            <div class="flex gap-2">
+              <%= button_to "Complete", admin_task_path(task, status: 'completed'), method: :patch, class: "flex-1 py-1.5 rounded-lg bg-accent/20 text-accent text-xs font-bold hover:bg-accent hover:text-base-100 transition-all" %>
+              <%= button_to "Block", admin_task_path(task, status: 'blocked'), method: :patch, class: "py-1.5 px-3 rounded-lg bg-white/5 text-slate-400 text-xs font-bold" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Completed -->
+    <div class="space-y-6 opacity-70">
+      <h3 class="text-xs font-bold text-slate-500 pb-4 border-b border-white/5 flex justify-between items-center">
+        <span>Completed</span>
+      </h3>
+
+      <div class="space-y-4">
+        <% @completed_tasks.each do |task| %>
+          <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+            <h4 class="text-xs font-bold text-slate-400 line-through"><%= task.title %></h4>
+            <div class="text-xs text-slate-500 mt-1"><%= task.job_posting.company_name %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

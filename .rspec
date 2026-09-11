@@ -1,0 +1,4 @@
+--format Fuubar
+--color
+--order random
+--require rails_helper

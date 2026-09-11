@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../config/environment'
+
+puts "--- Running Operational Ingestion Verification ---"
+
+# Wrapped in a transaction that's always rolled back so this verification
+# script never leaves persistent Source/Document rows behind -- in any
+# environment, including the shared test DB bin/smoke runs it against
+# (TASK-35: those leftover rows broke unrelated specs asserting exact counts).
+error = nil
+ActiveRecord::Base.transaction do
+  source = Source.find_or_create_by!(signature: 'smoke_test_source') do |s|
+    s.event = { 'name' => 'Smoke Test Source' }
+    s.payload = { 'url' => 'https://example.com' }
+  end
+  # Query might be associated via a different model, but let's fix Source first
+  # query = JobBoards::Query.find_or_create_by!(source_id: source.id)
+
+  # Mock ingestion: Just ensure a single worker can process a test Jobstory
+  # We use HN as the reference implementation
+  hn_source = Source.find_or_create_by!(signature: 'hackernews') do |s|
+    s.event = { 'name' => 'HackerNews' }
+    s.payload = { 'url' => 'https://hacker-news.firebaseio.com' }
+  end
+  # Query might be associated via a different model, but let's fix Source first
+  # query = BoardQuery.find_or_create_by!(source_id: hn_source.id)
+  test_jobstory_id = 41300000 # Use a dummy valid-looking ID
+
+  puts "Running ingestion sync test..."
+  # Use nil for query_id or a generic one if possible
+  HackerNews::FetchJobstoryJob.new.perform(test_jobstory_id, hn_source.id, nil)
+  JobBoards::Syncer.new.call
+rescue => e
+  error = e
+ensure
+  raise ActiveRecord::Rollback
+end
+
+if error
+  puts "\e[31m✗ Ingestion failure: #{error.message}\e[0m"
+  exit 1
+else
+  puts "\e[32m✓ Ingestion operational\e[0m"
+  exit 0
+end

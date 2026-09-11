@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Senior Backend Engineer - Acme Sandbox Co</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <style>
+      body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+      .field { margin-bottom: 1rem; }
+      label { display: block; font-weight: bold; margin-bottom: 0.25rem; }
+    </style>
+  </head>
+  <body>
+    <!-- Fake ATS fixture -- placeholder content only, never a real employer's
+         real posting. Mirrors the real Greenhouse DOM shape TASK-78's
+         extension listener already targets. See
+         docs/architecture/sandbox-provider.md. -->
+    <div class="job__header">
+      <img alt="Acme Sandbox Co Logo" src="" width="1" height="1">
+    </div>
+
+    <h1 class="app-title">Senior Backend Engineer</h1>
+    <div class="job__location">Remote - US</div>
+    <div class="employment-type">Full-time</div>
+    <div class="job__pay-ranges">Annual Salary: $120,000 - $160,000 USD</div>
+
+    <div class="job__description">
+      <p>Acme Sandbox Co is a fictional company used only to exercise the WWWorkRemote
+      extension and its application harness. This posting is a fixture, not a real job.</p>
+      <p>Responsibilities include maintaining fake widgets, mocking fake services, and
+      shipping fake pull requests to nowhere in particular.</p>
+    </div>
+
+    <%= form_with url: sandbox_applications_path, method: :post, html: { id: "application-form", data: { "job-post-id": @job_post_id } } do |f| %>
+      <%= f.hidden_field :job_post_id, id: "job_post_id", value: @job_post_id %>
+
+      <div class="field">
+        <%= f.label :first_name, "First Name" %>
+        <%= f.text_field :first_name, id: "first_name", autocomplete: "given-name" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :last_name, "Last Name" %>
+        <%= f.text_field :last_name, id: "last_name", autocomplete: "family-name" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :email, "Email" %>
+        <%= f.email_field :email, id: "email", autocomplete: "email" %>
+      </div>
+
+      <div class="field">
+        <label id="question_1-label" for="question_1">Why do you want to work here?</label>
+        <textarea id="question_1" name="question_1"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="question_2">What is your notice period?</label>
+        <input type="text" id="question_2" name="question_2" autocomplete="off">
+      </div>
+
+      <div id="demographic-section">
+        <h3>Voluntary Self-Identification</h3>
+        <div class="field">
+          <label for="8">Gender</label>
+          <select id="8" name="8">
+            <option>Decline to self-identify</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+      </div>
+
+      <%= f.submit "Submit Application" %>
+    <% end %>
+  </body>
+</html>

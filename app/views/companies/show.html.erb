@@ -1,0 +1,99 @@
+<% content_for :title, "#{@company.name} | WWWorkRemote" %>
+
+<div class="mb-10 text-xs font-bold opacity-60">
+  <div class="flex items-center gap-3">
+    <%= link_to t('.breadcrumb_root'), job_postings_path, class: "hover:text-primary transition-all" %>
+    <%= heroicon "chevron-right", variant: :outline, options: { class: "w-3 h-3" } %>
+    <span class="text-white"><%= @company.name %></span>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+  <article class="lg:col-span-2 space-y-8">
+    <header class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-8 opacity-5">
+        <%= heroicon "building-office", options: { class: "w-32 h-32" } %>
+      </div>
+
+      <div class="relative z-10">
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <h1 class="text-4xl font-black text-white mb-3 tracking-tight leading-none"><%= @company.name %></h1>
+            <p class="text-slate-500 font-bold text-sm"><%= t('.subtitle') %></p>
+            <% if @company.in_cooldown? %>
+              <span class="badge badge-outline border-warning/40 text-warning text-xs font-bold mt-3">
+                <%= t('.cooldown_until', date: @company.cooldown_ends_at.to_date) %>
+              </span>
+            <% end %>
+          </div>
+          <% if @company.ingestion_enabled? %>
+            <%= button_to t('.not_interested'), mark_not_interested_admin_company_path(@company),
+                class: "btn btn-outline btn-sm rounded-lg font-bold border-error/30 text-error hover:bg-error hover:text-white shrink-0",
+                data: { turbo_confirm: "Mark #{@company.name} not interested? Open postings will be ignored and future postings from them will be skipped automatically." } %>
+          <% else %>
+            <span class="badge badge-outline border-error/30 text-error text-xs font-bold py-3 px-4 shrink-0"><%= t('.marked_not_interested') %></span>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-10 shadow-2xl">
+      <h2 class="text-xs font-bold text-base-content/50 mb-10 pb-4 border-b border-white/5"><%= t('.postings_heading') %></h2>
+
+      <% if @harness_processed_count.positive? %>
+        <p class="text-xs font-bold text-base-content/50 mb-6 -mt-6">
+          Harness activity:
+          <span class="text-white"><%= pluralize(@harness_processed_count, "supervised application") %></span> ·
+          <span class="text-white"><%= pluralize(@harness_recorded_sessions, "recorded session") %></span>
+        </p>
+      <% end %>
+
+      <div class="grid grid-cols-1 gap-4">
+        <% @company.job_postings.order(published_at: :desc).each do |job| %>
+          <div class="card-neural p-6 hover:border-primary/50 transition-all group flex items-center justify-between">
+            <div>
+              <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors">
+                <%= link_to job.title, job_posting_path(job) %>
+                <% _, harness_label = harness_badge(@harness_by_posting[job.id]) %>
+                <% if harness_label %>
+                  <span class="badge badge-outline border-accent/40 text-accent text-xs font-bold align-middle ml-1"><%= harness_label %></span>
+                <% end %>
+              </h4>
+              <div class="text-xs font-bold text-slate-500 mt-1">
+                <%= job.location.presence || t('job_postings.show.remote_fallback') %> · <%= job.published_at&.to_date || job.created_at.to_date %>
+              </div>
+            </div>
+            <%= link_to t('.view_posting'), job_posting_path(job), class: "btn btn-xs rounded-lg bg-white/5 text-xs font-bold border-none hover:bg-white/10" %>
+          </div>
+        <% end %>
+        <% if @company.job_postings.empty? %>
+          <div class="text-center py-10 opacity-50 text-sm font-bold italic"><%= t('.no_postings') %></div>
+        <% end %>
+      </div>
+    </div>
+  </article>
+
+  <aside class="space-y-8">
+    <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <h3 class="text-xs font-bold text-base-content/50 mb-8 pb-4 border-b border-white/5"><%= t('.timeline_heading') %></h3>
+
+      <!-- Activity Logger -->
+      <%= form_with url: admin_company_company_pipeline_steps_path(@company), class: "space-y-3 mb-10" do |f| %>
+        <%= f.text_area :note, placeholder: t('.note_placeholder'), class: "textarea textarea-bordered bg-base-300 w-full rounded-xl text-sm font-mono", rows: 2 %>
+        <%= f.submit t('.add_update'), class: "w-full py-2 rounded-xl bg-white/5 text-xs font-bold hover:bg-white/10 transition-all" %>
+      <% end %>
+
+      <!-- Timeline -->
+      <div class="space-y-6">
+        <% @company.company_pipeline_steps.order(created_at: :desc).each do |step| %>
+          <div class="relative pl-6 border-l border-white/5">
+            <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-primary/30"></div>
+            <div class="text-xs font-bold text-base-content/40 mb-1"><%= step.created_at.strftime("%b %-d, %Y · %H:%M") %></div>
+            <div class="text-sm font-bold text-white"><%= step.status.humanize %></div>
+            <% if step.note.present? %><p class="text-xs text-base-content/60 mt-1 leading-tight"><%= step.note %></p><% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </aside>
+</div>

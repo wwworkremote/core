@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/environment"
+require "solid_queue/cli"
+
+# Solid Queue CLI entry point
+# On macOS Tahoe + Ruby 4.0.2, ensure we use the threaded supervisor if available
+# or manage forks via gssencmode=disable
+puts "🚀 Starting Solid Queue Supervisor..."
+SolidQueue::Cli.start(ARGV)
