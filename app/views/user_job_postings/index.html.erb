@@ -41,33 +41,28 @@
         <div class="space-y-4">
           <% @favorites.each do |user_job| %>
             <% job = user_job.job_posting %>
-            <div class="card-neural p-6 hover:border-primary/50 transition-all group">
-              <div class="flex justify-between items-start">
-                <div>
+            <div class="card-neural p-6 hover:border-primary/50 transition-all group border border-white/5">
+              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] gap-6 items-center">
+                <div class="min-w-0">
                   <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
-                  <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors"><%= link_to job.title, job_posting_path(job) %></h4>
-
-                  <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                    <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
-                      <%= heroicon "bookmark", variant: :outline, options: { class: "w-4 h-4" } %> saved <%= user_job.created_at.strftime("%b %-d, %Y") %>
-                    </span>
-                    <% if job.data['is_remote'] %>
-                      <span class="text-xs font-bold text-emerald-500 flex items-center gap-1">
-                        <%= heroicon "signal", variant: :outline, options: { class: "w-4 h-4" } %> Remote
-                      </span>
-                    <% end %>
-
+                  <h4 class="text-lg font-black text-white group-hover:text-primary transition-colors truncate"><%= link_to job.title, job_posting_path(job) %></h4>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs font-bold">
+                    <span class="text-slate-500"><%= job.location.presence || "Location unknown" %></span>
+                    <% if job.data['is_remote'] %><span class="text-emerald-500">Remote eligible</span><% end %>
                     <% if job.data['salary_min'] || job.data['salary_max'] %>
-                      <span class="text-xs font-bold text-amber-500 flex items-center gap-1">
-                        <%= heroicon "banknotes", variant: :outline, options: { class: "w-4 h-4" } %> <%= number_to_currency(job.data['salary_min'], precision: 0) %> - <%= number_to_currency(job.data['salary_max'], precision: 0) %>
-                      </span>
+                      <span class="text-amber-500"><%= number_to_currency(job.data['salary_min'], precision: 0) %>–<%= number_to_currency(job.data['salary_max'], precision: 0) %></span>
                     <% end %>
                   </div>
                 </div>
-                <%= button_to "×", user_job_posting_path(user_job), method: :delete, class: "text-rose-500 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity", title: "Remove" %>
-              </div>
-              <div class="mt-4 flex gap-2">
-                <%= button_to "Mark Applied", user_job_postings_path(job_posting_id: job.id, status: 'applied'), class: "btn btn-xs rounded-lg bg-emerald-900/20 text-emerald-500 border-none font-bold" %>
+                <div class="flex flex-wrap lg:flex-col gap-2 text-xs font-bold">
+                  <span class="text-slate-500">Saved <%= user_job.created_at.strftime("%b %-d, %Y") %></span>
+                  <% if user_job.match_score.present? %><span class="text-primary"><%= user_job.match_score %>% match</span><% end %>
+                  <span class="text-slate-600"><%= time_ago_in_words(user_job.created_at) %> ago</span>
+                </div>
+                <div class="flex lg:flex-col items-start lg:items-end gap-2">
+                  <%= button_to "Mark Applied", user_job_postings_path(job_posting_id: job.id, status: 'applied'), class: "btn btn-xs rounded-lg bg-emerald-900/20 text-emerald-500 border-none font-bold" %>
+                  <%= button_to "Remove", user_job_posting_path(user_job), method: :delete, class: "text-rose-500 text-xs font-bold opacity-70 hover:opacity-100", title: "Remove" %>
+                </div>
               </div>
             </div>
           <% end %>
@@ -85,10 +80,12 @@
         <div class="space-y-4">
           <% @applied.each do |user_job| %>
             <% job = user_job.job_posting %>
-            <div class="card-neural p-6 border-accent/20">
-              <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
-              <h4 class="text-lg font-black text-white"><%= link_to job.title, job_posting_path(job) %></h4>
-              <div class="mt-4 flex flex-wrap items-center gap-2">
+            <div class="card-neural p-6 border border-accent/20">
+              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] gap-6 items-center">
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-slate-500 mb-1"><%= job.company_name %></div>
+                  <h4 class="text-lg font-black text-white truncate"><%= link_to job.title, job_posting_path(job) %></h4>
+                  <div class="mt-3 flex flex-wrap items-center gap-2">
                 <span class="px-2 py-1 rounded bg-accent/20 text-accent text-xs font-bold border border-accent/10">Applied</span>
                 <%# Employer response, kept visually distinct from the "Applied" badge above --
                     they're different facts (what he did vs. what the employer did) and
@@ -120,6 +117,17 @@
                     tracked <%= user_job.created_at.strftime("%b %-d, %Y") %>
                   </span>
                 <% end %>
+                  </div>
+                </div>
+                <div class="flex flex-wrap lg:flex-col gap-2 text-xs font-bold">
+                  <span class="text-slate-500"><%= job.location.presence || "Location unknown" %></span>
+                  <% if job.data['is_remote'] %><span class="text-emerald-500">Remote eligible</span><% end %>
+                  <% if user_job.match_score.present? %><span class="text-primary"><%= user_job.match_score %>% match</span><% end %>
+                </div>
+                <div class="flex lg:flex-col items-start lg:items-end gap-2">
+                  <%= link_to "Open posting", job_posting_path(job), class: "text-xs font-bold text-primary hover:underline" %>
+                  <%= link_to "View timeline", job_posting_path(job, anchor: "pipeline"), class: "text-xs font-bold text-slate-400 hover:text-white" %>
+                </div>
               </div>
             </div>
           <% end %>

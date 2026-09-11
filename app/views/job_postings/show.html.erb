@@ -251,7 +251,7 @@
 
     <!-- Supervised application (harness) -->
     <% harness_sessions = user_job ? user_job.guided_sessions.order(started_at: :desc) : [] %>
-    <div class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl">
+    <div id="pipeline" class="bg-base-200 border border-white/5 rounded-2xl p-8 shadow-2xl scroll-mt-24">
       <h3 class="text-xs font-bold text-base-content/50 mb-6 pb-4 border-b border-white/5">Supervised application</h3>
 
       <% if harness_sessions.any? %>
