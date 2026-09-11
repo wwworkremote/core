@@ -66,6 +66,11 @@ credentials, or private local integrations to a public checkout.
 
 ## Contact
 
-WWWorkRemote is maintained by Mike Hall. For project questions, privacy
-requests, or security reports, contact [mike@just3ws.com](mailto:mike@just3ws.com)
-or visit [just3ws.com](https://www.just3ws.com).
+WWWorkRemote is maintained by Mike Hall. Explore the [public profile](https://www.just3ws.com/),
+[canonical résumé](https://www.just3ws.com/resume/), [GitHub profile](https://github.com/just3ws),
+or [LinkedIn profile](https://www.linkedin.com/in/just3ws/). For project questions,
+privacy requests, or security reports, contact
+[mike@just3ws.com](mailto:mike@just3ws.com).
+
+If WWWorkRemote is useful to you, you can support its continued development
+through [GitHub Sponsors](https://github.com/sponsors/just3ws).
