@@ -24,7 +24,7 @@
     <path d="M31 50 51 134h18l23-56 23 56h18l20-84h-21l-10 49-21-49H84L63 99 53 50z" fill="url(#accent)"/>
     <circle cx="148" cy="32" r="7" fill="#ff2b9a"/>
   </g>
-  <text x="330" y="235" fill="#ffffff" font-family="system-ui, sans-serif" font-size="72" font-weight="800" letter-spacing="-3">WWWork<tspan fill="#8b7cff">Remote</tspan></text>
+  <text x="330" y="235" fill="#ffffff" font-family="system-ui, sans-serif" font-size="72" font-weight="800" letter-spacing="-3">WWWork<tspan fill="#6657ff">Remote</tspan></text>
   <text x="336" y="304" fill="#b4bdcc" font-family="system-ui, sans-serif" font-size="28" font-weight="600">Find the work. Build the pipeline. Make the next move.</text>
   <rect x="336" y="358" width="420" height="8" rx="4" fill="url(#accent)"/>
   <text x="336" y="420" fill="#7f8ba0" font-family="ui-monospace, monospace" font-size="19" letter-spacing="2">LOCAL-FIRST · HUMAN-SUPERVISED · AGPLV3</text>
