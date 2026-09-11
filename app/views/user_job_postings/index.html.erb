@@ -38,7 +38,7 @@
     <div class="space-y-6">
       <h3 class="text-xs font-bold text-primary border-b border-primary/10 pb-4">Favorites</h3>
       <% if @favorites.any? %>
-        <div class="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <% @favorites.each do |user_job| %>
             <% job = user_job.job_posting %>
             <div class="card-neural p-6 hover:border-primary/50 transition-all group border border-white/5 h-full">
@@ -82,7 +82,7 @@
     <div class="space-y-6">
       <h3 class="text-xs font-bold text-accent border-b border-accent/10 pb-4">Applications</h3>
       <% if @applied.any? %>
-        <div class="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <% @applied.each do |user_job| %>
             <% job = user_job.job_posting %>
             <div class="card-neural p-6 border border-accent/20 h-full">
