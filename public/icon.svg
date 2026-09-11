@@ -1,14 +1,6 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">WWWorkRemote</title>
-  <desc id="desc">Three WWWorkRemote W marks representing just3ws and wwwr.</desc>
+  <title id="title">WWWR</title>
+  <desc id="desc">WWWR, the compact WWWorkRemote mark.</desc>
   <rect width="512" height="512" rx="112" fill="#171b22"/>
-  <g transform="translate(20 150) scale(.55)">
-    <path d="M0 0 25 196h29l31-106 31 106h29L170 0h-32l-16 115-29-115H70L40 115 24 0z" fill="#8b7cff"/>
-  </g>
-  <g transform="translate(176 150) scale(.55)">
-    <path d="M0 0 25 196h29l31-106 31 106h29L170 0h-32l-16 115-29-115H70L40 115 24 0z" fill="#8b7cff"/>
-  </g>
-  <g transform="translate(332 150) scale(.55)">
-    <path d="M0 0 25 196h29l31-106 31 106h29L170 0h-32l-16 115-29-115H70L40 115 24 0z" fill="#00d4c7"/>
-  </g>
+  <text x="256" y="300" text-anchor="middle" fill="#f1f5f9" font-family="Arial, Helvetica, sans-serif" font-size="142" font-weight="900" letter-spacing="-12">WWW<tspan fill="#6657ff">R</tspan></text>
 </svg>
